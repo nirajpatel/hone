@@ -2501,7 +2501,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                       <div className={`flex items-center gap-2 px-3 py-2.5 ${canExpand ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`} style={{ backgroundColor: '#FFF2CC' }}>
                         <span className="flex-shrink-0 leading-none" style={{ transform: 'translateY(-2px)' }}>🎯</span>
                         <p className="text-sm text-gray-900 font-medium flex-1 text-left">
-                          Dial-In Notes
+                          Dial-In Guidance
                         </p>
                         <ChevronDown 
                           className={`w-4 h-4 text-gray-900 transition-transform ${canExpand && isSuggestionsOpen ? 'transform rotate-180' : ''}`}
@@ -2601,6 +2601,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     step="0.1"
                     value={brewTime}
                     onChange={(e) => setExtractionTime(validateNumericInput(e.target.value))}
+                    placeholder="30"
                     className="mt-2"
                   />
                 </div>
@@ -2614,6 +2615,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     step="0.1"
                     value={finalWeight}
                     onChange={(e) => setFinalWeight(validateNumericInput(e.target.value))}
+                    placeholder="36"
                     className="mt-2"
                   />
                 </div>
@@ -2745,7 +2747,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
             <div>
               <Label>
-                Quality Rating <span className="text-muted-foreground">(optional)</span>
+                Extraction Quality <span className="text-muted-foreground">(optional)</span>
               </Label>
               <div className="mt-3 flex items-center gap-3">
                 <div className="flex items-center gap-2">

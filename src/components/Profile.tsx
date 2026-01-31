@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Coffee, Extraction, BrewMethod } from '../types';
+import { User, Coffee, Brew, BrewMethod } from '../types';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { UserCircle2, MapPin, Calendar, Flame, Edit2 } from 'lucide-react';
@@ -19,39 +19,39 @@ interface ProfileProps {
   currentUser: User;
   users: User[];
   coffees: Coffee[];
-  extractions: Extraction[];
+  brews: Brew[];
   accessToken: string;
-  onNewExtraction: () => void;
+  onNewBrew: () => void;
   onNewCoffee: () => void;
-  onEditExtraction: (extraction: Extraction) => void;
-  onDeleteExtraction: (id: string) => void;
+  onEditBrew: (brew: Brew) => void;
+  onDeleteBrew: (id: string) => void;
   onEditCoffee: (coffee: Coffee) => void;
   onDeleteCoffee: (id: string) => void;
-  onDuplicateExtraction: (extraction: Extraction) => void;
+  onDuplicateBrew: (brew: Brew) => void;
 }
 
 export function Profile({
   currentUser,
   users,
   coffees,
-  extractions,
+  brews,
   accessToken,
-  onNewExtraction,
+  onNewBrew,
   onNewCoffee,
-  onEditExtraction,
-  onDeleteExtraction,
+  onEditBrew,
+  onDeleteBrew,
   onEditCoffee,
   onDeleteCoffee,
-  onDuplicateExtraction,
+  onDuplicateBrew,
 }: ProfileProps) {
   const [profileData, setProfileData] = useState<ProfileData>({});
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'extractions' | 'coffees'>('extractions');
+  const [activeTab, setActiveTab] = useState<'brews' | 'coffees'>('brews');
   const [filterMethod, setFilterMethod] = useState<BrewMethod | 'all'>('all');
   const [groupBy, setGroupBy] = useState<'month' | 'coffee'>('month');
-  const [hoveredExtractionRating, setHoveredExtractionRating] = useState<{ id: string; rating: number } | null>(null);
-  const [selectedExtraction, setSelectedExtraction] = useState<Extraction | null>(null);
+  const [hoveredBrewRating, setHoveredBrewRating] = useState<{ id: string; rating: number } | null>(null);
+  const [selectedBrew, setSelectedBrew] = useState<Brew | null>(null);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
 
   // Fetch profile data
@@ -116,14 +116,14 @@ export function Profile({
     year: 'numeric' 
   });
 
-  // Get user's extractions sorted by date
-  const userExtractions = extractions
+  // Get user's brews sorted by date
+  const userBrews = brews
     .filter(e => e.userId === currentUser.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // Calculate streak
   const calculateStreak = () => {
-    if (userExtractions.length === 0) return 0;
+    if (userBrews.length === 0) return 0;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -137,18 +137,18 @@ export function Profile({
       const dayEnd = new Date(currentDate);
       dayEnd.setHours(23, 59, 59, 999);
 
-      const hasExtraction = userExtractions.some(e => {
-        const extractionDate = new Date(e.createdAt);
-        return extractionDate >= dayStart && extractionDate <= dayEnd;
+      const hasBrew = userBrews.some(e => {
+        const brewDate = new Date(e.createdAt);
+        return brewDate >= dayStart && brewDate <= dayEnd;
       });
 
-      if (hasExtraction) {
+      if (hasBrew) {
         streak++;
         currentDate.setDate(currentDate.getDate() - 1);
       } else {
         // Allow one day gap if we're not on the first day
         if (streak === 0 && i === 0) {
-          // Today has no extraction, check yesterday
+          // Today has no brew, check yesterday
           currentDate.setDate(currentDate.getDate() - 1);
           continue;
         }
@@ -160,8 +160,8 @@ export function Profile({
   };
 
   const streak = calculateStreak();
-  const lastExtractionDate = userExtractions.length > 0 
-    ? new Date(userExtractions[0].createdAt).toLocaleDateString('en-US', {
+  const lastBrewDate = userBrews.length > 0 
+    ? new Date(userBrews[0].createdAt).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
@@ -263,12 +263,12 @@ export function Profile({
                     </div>
                   </div>
 
-                  {/* Last Extraction */}
+                  {/* Last Brew */}
                   <div className="flex items-start gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div className="text-left flex-1">
-                      <div className="text-gray-500">Last extraction</div>
-                      <div className="font-medium text-gray-900">{lastExtractionDate}</div>
+                      <div className="text-gray-500">Last brew</div>
+                      <div className="font-medium text-gray-900">{lastBrewDate}</div>
                     </div>
                   </div>
                 </div>
@@ -277,9 +277,9 @@ export function Profile({
                 <div className="w-full pt-4 border-t border-gray-200 grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">
-                      {userExtractions.length}
+                      {userBrews.length}
                     </div>
-                    <div className="text-xs text-gray-500">Extractions</div>
+                    <div className="text-xs text-gray-500">Brews</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">
@@ -298,14 +298,14 @@ export function Profile({
             <div className="border-b border-gray-200 mb-6">
               <div className="flex gap-6">
                 <button
-                  onClick={() => setActiveTab('extractions')}
+                  onClick={() => setActiveTab('brews')}
                   className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'extractions'
+                    activeTab === 'brews'
                       ? 'border-gray-900 text-gray-900'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  Extractions
+                  Brews
                 </button>
                 <button
                   onClick={() => setActiveTab('coffees')}
@@ -321,27 +321,27 @@ export function Profile({
             </div>
 
             {/* Tab Content */}
-            {activeTab === 'extractions' ? (
+            {activeTab === 'brews' ? (
               <BrewsTableView
-                extractions={userExtractions}
+                brews={userBrews}
                 coffees={coffees}
                 users={users}
                 filterMethod={filterMethod}
                 groupBy={groupBy}
                 onFilterMethodChange={setFilterMethod}
                 onGroupByChange={setGroupBy}
-                onNewExtraction={onNewExtraction}
-                onSelectExtraction={setSelectedExtraction}
-                onEditExtraction={onEditExtraction}
-                onDeleteExtraction={onDeleteExtraction}
-                onDuplicateExtraction={onDuplicateExtraction}
-                hoveredExtractionRating={hoveredExtractionRating}
-                onHoverExtractionRating={setHoveredExtractionRating}
+                onNewBrew={onNewBrew}
+                onSelectBrew={setSelectedBrew}
+                onEditBrew={onEditBrew}
+                onDeleteBrew={onDeleteBrew}
+                onDuplicateBrew={onDuplicateBrew}
+                hoveredBrewRating={hoveredBrewRating}
+                onHoverBrewRating={setHoveredBrewRating}
               />
             ) : (
               <CoffeesTableView
                 coffees={userCoffees}
-                extractions={userExtractions}
+                brews={userBrews}
                 filterMethod={filterMethod}
                 groupBy={groupBy}
                 onFilterMethodChange={setFilterMethod}

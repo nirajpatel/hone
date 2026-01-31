@@ -67,19 +67,19 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [selectedBrew, setSelectedBrew] = useState<Extraction | null>(null);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
-  const [showNewExtraction, setShowNewExtraction] = useState(false);
+  const [showNewBrew, setShowNewBrew] = useState(false);
   const [showAddCoffee, setShowAddCoffee] = useState(false);
   const [activeView, setActiveView] = useState<'brews' | 'coffees' | 'profile'>('brews');
   const [filterMethod, setFilterMethod] = useState<BrewMethod | 'all'>('all');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [duplicateExtractionData, setDuplicateExtractionData] = useState<Extraction | null>(null);
+  const [duplicateBrewData, setDuplicateBrewData] = useState<Brew | null>(null);
   const [prefilledCoffeeId, setPrefilledCoffeeId] = useState<string | null>(null);
   const [prefilledBrewMethod, setPrefilledBrewMethod] = useState<BrewMethod | null>(null);
   const [editingCoffee, setEditingCoffee] = useState<Coffee | null>(null);
-  const [editingExtraction, setEditingExtraction] = useState<Extraction | null>(null);
+  const [editingBrew, setEditingBrew] = useState<Brew | null>(null);
   const [qrCodeCoffee, setQrCodeCoffee] = useState<Coffee | null>(null);
-  const [deletingExtractionId, setDeletingExtractionId] = useState<string | null>(null);
+  const [deletingBrewId, setDeletingBrewId] = useState<string | null>(null);
   const [deletingCoffeeId, setDeletingCoffeeId] = useState<string | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [groupBy, setGroupBy] = useState<'month' | 'coffee'>('month');
@@ -394,10 +394,10 @@ export default function App() {
       });
 
       if (res.ok) {
-        const newExtraction = await res.json();
-        setBrews([...brews, newExtraction]);
-        setShowNewExtraction(false);
-        toast.success('Extraction logged');
+        const newBrew = await res.json();
+        setBrews([...brews, newBrew]);
+        setShowNewBrew(false);
+        toast.success('Brew logged');
       } else {
         const error = await res.json();
         console.error('Failed to create brew:', error);
@@ -494,11 +494,11 @@ export default function App() {
   };
 
   const handleDuplicateExtraction = (brew: Extraction) => {
-    setDuplicateExtractionData(brew);
-    setShowNewExtraction(true);
+    setDuplicateBrewData(brew);
+    setShowNewBrew(true);
   };
 
-  const handleDeleteExtraction = async (id: string) => {
+  const handleDeleteBrew = async (id: string) => {
     if (!accessToken) {
       toast.error('Please sign in to delete brews');
       return;
@@ -517,8 +517,8 @@ export default function App() {
 
       if (res.ok) {
         setBrews(brews.filter((e) => e.id !== id));
-        toast.success('Extraction deleted');
-        setDeletingExtractionId(null);
+        toast.success('Brew deleted');
+        setDeletingBrewId(null);
       } else {
         const error = await res.json();
         console.error('Failed to delete brew:', error);
@@ -609,9 +609,9 @@ export default function App() {
   };
 
   const handleEditExtraction = (brew: Extraction) => {
-    setShowNewExtraction(false); // Close new brew form if open
-    setDuplicateExtractionData(null); // Clear any duplicate data
-    setEditingExtraction(brew);
+    setShowNewBrew(false); // Close new brew form if open
+    setDuplicateBrewData(null); // Clear any duplicate data
+    setEditingBrew(brew);
   };
 
   const handleUpdateExtraction = async (
@@ -672,8 +672,8 @@ export default function App() {
       if (res.ok) {
         const updated = await res.json();
         setBrews(brews.map((e) => (e.id === id ? updated : e)));
-        setEditingExtraction(null);
-        toast.success('Extraction updated successfully');
+        setEditingBrew(null);
+        toast.success('Brew updated successfully');
       } else {
         const error = await res.json();
         console.error('Failed to update brew:', error);
@@ -791,7 +791,7 @@ export default function App() {
   };
 
   // Filter data
-  const filteredExtractions = brews.filter(
+  const filteredBrews = brews.filter(
     (e) => filterMethod === 'all' || e.brewMethod === filterMethod
   );
 
@@ -800,9 +800,9 @@ export default function App() {
   );
 
   // Group data
-  const groupExtractionsByMonth = (brews: Extraction[]) => {
+  const groupExtractionsByMonth = (brews: Brew[]) => {
     const sorted = [...brews].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    const grouped: { [key: string]: Extraction[] } = {};
+    const grouped: { [key: string]: Brew[] } = {};
     
     sorted.forEach(brew => {
       const date = new Date(brew.createdAt);
@@ -816,8 +816,8 @@ export default function App() {
     return grouped;
   };
 
-  const groupExtractionsByRoaster = (brews: Extraction[]) => {
-    const grouped: { [key: string]: Extraction[] } = {};
+  const groupExtractionsByRoaster = (brews: Brew[]) => {
+    const grouped: { [key: string]: Brew[] } = {};
     
     brews.forEach(brew => {
       const key = `${brew.roaster} – ${brew.coffeeName}`;
@@ -833,7 +833,7 @@ export default function App() {
     });
     
     // Sort groups by the most recent brew date in each group (newest first)
-    const sortedGrouped: { [key: string]: Extraction[] } = {};
+    const sortedGrouped: { [key: string]: Brew[] } = {};
     Object.keys(grouped)
       .sort((a, b) => {
         const aLatest = new Date(grouped[a][0].createdAt).getTime();
@@ -894,9 +894,9 @@ export default function App() {
     return sortedGrouped;
   };
 
-  const groupedExtractions = groupBy === 'month' 
-    ? groupExtractionsByMonth(filteredExtractions) 
-    : groupExtractionsByRoaster(filteredExtractions);
+  const groupedBrews = groupBy === 'month' 
+    ? groupExtractionsByMonth(filteredBrews) 
+    : groupExtractionsByRoaster(filteredBrews);
   
   const groupedCoffees = groupBy === 'month' 
     ? groupCoffeesByMonth(filteredCoffees) 
@@ -977,8 +977,8 @@ export default function App() {
         coffees={coffees}
         brews={brews}
         accessToken={accessToken!}
-        onNewExtraction={() => {
-          setShowNewExtraction(true);
+        onNewBrew={() => {
+          setShowNewBrew(true);
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
@@ -987,21 +987,21 @@ export default function App() {
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
-        onEditExtraction={(brew) => {
-          setEditingExtraction(brew);
+        onEditBrew={(brew) => {
+          setEditingBrew(brew);
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
-        onDeleteExtraction={handleDeleteExtraction}
+        onDeleteBrew={handleDeleteBrew}
         onEditCoffee={(coffee) => {
           setEditingCoffee(coffee);
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
         onDeleteCoffee={handleDeleteCoffee}
-        onDuplicateExtraction={(brew) => {
-          setDuplicateExtractionData(brew);
-          setShowNewExtraction(true);
+        onDuplicateBrew={(brew) => {
+          setDuplicateBrewData(brew);
+          setShowNewBrew(true);
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
@@ -1148,14 +1148,14 @@ export default function App() {
               groupBy={groupBy}
               onFilterMethodChange={setFilterMethod}
               onGroupByChange={setGroupBy}
-              onNewBrew={() => setShowNewExtraction(true)}
+              onNewBrew={() => setShowNewBrew(true)}
               onSelectBrew={setSelectedBrew}
               onEditBrew={(brew) => {
-                setEditingExtraction(brew);
+                setEditingBrew(brew);
               }}
-              onDeleteBrew={(id) => setDeletingExtractionId(id)}
+              onDeleteBrew={(id) => setDeletingBrewId(id)}
               onDuplicateBrew={(brew) => {
-                setDuplicateExtractionData(brew);
+                setDuplicateBrewData(brew);
               }}
               hoveredBrewRating={hoveredBrewRating}
               onHoverBrewRating={setHoveredBrewRating}
@@ -1165,7 +1165,7 @@ export default function App() {
               onAddBrewForCoffee={(coffeeId, brewMethod) => {
                 setPrefilledCoffeeId(coffeeId);
                 setPrefilledBrewMethod(brewMethod);
-                setShowNewExtraction(true);
+                setShowNewBrew(true);
               }}
               onOpenEquipment={() => setShowEquipment(true)}
               onOpenAddCoffee={() => setShowAddCoffee(true)}
@@ -1177,7 +1177,7 @@ export default function App() {
               users={users}
               filterMethod={filterMethod}
               onFilterMethodChange={setFilterMethod}
-              onNewBrew={() => setShowNewExtraction(true)}
+              onNewBrew={() => setShowNewBrew(true)}
               onSelectBrew={setSelectedBrew}
               view={brewsView}
               onViewChange={setBrewsView}
@@ -1185,7 +1185,7 @@ export default function App() {
               onAddBrewForCoffee={(coffeeId, brewMethod) => {
                 setPrefilledCoffeeId(coffeeId);
                 setPrefilledBrewMethod(brewMethod);
-                setShowNewExtraction(true);
+                setShowNewBrew(true);
               }}
               onOpenEquipment={() => setShowEquipment(true)}
               onOpenAddCoffee={() => setShowAddCoffee(true)}
@@ -1220,14 +1220,14 @@ export default function App() {
 
       {selectedBrew && (() => {
         // Get flat list of filtered brews in table order
-        const flatExtractions: Extraction[] = [];
-        Object.entries(groupedExtractions).forEach(([_, groupExtractions]) => {
-          flatExtractions.push(...groupExtractions);
+        const flatBrews: Brew[] = [];
+        Object.entries(groupedBrews).forEach(([_, groupBrews]) => {
+          flatBrews.push(...groupBrews);
         });
         
-        const currentIndex = flatExtractions.findIndex(e => e.id === selectedBrew.id);
+        const currentIndex = flatBrews.findIndex(e => e.id === selectedBrew.id);
         const hasPrev = currentIndex > 0;
-        const hasNext = currentIndex < flatExtractions.length - 1;
+        const hasNext = currentIndex < flatBrews.length - 1;
         
         return (
           <BrewDetail
@@ -1236,10 +1236,10 @@ export default function App() {
             onClose={() => setSelectedBrew(null)}
             onEdit={(brew) => {
               setSelectedBrew(null);
-              setEditingExtraction(brew);
+              setEditingBrew(brew);
             }}
-            onNavigatePrev={hasPrev ? () => setSelectedBrew(flatExtractions[currentIndex - 1]) : undefined}
-            onNavigateNext={hasNext ? () => setSelectedBrew(flatExtractions[currentIndex + 1]) : undefined}
+            onNavigatePrev={hasPrev ? () => setSelectedBrew(flatBrews[currentIndex - 1]) : undefined}
+            onNavigateNext={hasNext ? () => setSelectedBrew(flatBrews[currentIndex + 1]) : undefined}
             hasPrev={hasPrev}
             hasNext={hasNext}
           />
@@ -1274,7 +1274,7 @@ export default function App() {
         );
       })()}
 
-      {showNewExtraction && (
+      {showNewBrew && (
         currentUser ? (
           <NewBrewFlow
             coffees={coffees}
@@ -1283,13 +1283,13 @@ export default function App() {
             brews={brews}
             accessToken={accessToken!}
             onClose={() => {
-              setShowNewExtraction(false);
-              setDuplicateExtractionData(null);
+              setShowNewBrew(false);
+              setDuplicateBrewData(null);
               setPrefilledCoffeeId(null);
               setPrefilledBrewMethod(null);
             }}
             onSave={handleAddExtraction}
-            duplicateData={duplicateExtractionData}
+            duplicateData={duplicateBrewData}
             equipmentChangeCounter={equipmentChangeCounter}
             prefilledCoffeeId={prefilledCoffeeId}
             prefilledBrewMethod={prefilledBrewMethod}
@@ -1299,7 +1299,7 @@ export default function App() {
             <div className="bg-white rounded-lg p-6 max-w-md">
               <h2 className="text-gray-900 mb-4">Sign In Required</h2>
               <p className="text-gray-600 mb-6">Please sign in to create brews.</p>
-              <Button onClick={() => setShowNewExtraction(false)}>Close</Button>
+              <Button onClick={() => setShowNewBrew(false)}>Close</Button>
             </div>
           </div>
         )
@@ -1318,16 +1318,16 @@ export default function App() {
         />
       )}
 
-      {editingExtraction && (
+      {editingBrew && (
         <NewBrewFlow
           coffees={coffees}
           users={users}
           currentUser={currentUser!}
           brews={brews}
           accessToken={accessToken!}
-          onClose={() => setEditingExtraction(null)}
+          onClose={() => setEditingBrew(null)}
           onSave={handleAddExtraction}
-          editingExtraction={editingExtraction}
+          editingBrew={editingBrew}
           onUpdate={handleUpdateExtraction}
           equipmentChangeCounter={equipmentChangeCounter}
         />
@@ -1340,8 +1340,8 @@ export default function App() {
         />
       )}
 
-      {deletingExtractionId && (
-        <AlertDialog open={!!deletingExtractionId} onOpenChange={(open) => !open && setDeletingExtractionId(null)}>
+      {deletingBrewId && (
+        <AlertDialog open={!!deletingBrewId} onOpenChange={(open) => !open && setDeletingBrewId(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <div className="flex items-start justify-between">
@@ -1349,7 +1349,7 @@ export default function App() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setDeletingExtractionId(null)}
+                  onClick={() => setDeletingBrewId(null)}
                   className="cursor-pointer flex-shrink-0 -mt-1"
                 >
                   <X className="w-5 h-5" />
@@ -1360,8 +1360,8 @@ export default function App() {
               This action cannot be undone. This will permanently delete the brew.
             </AlertDialogDescription>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setDeletingExtractionId(null)} className="cursor-pointer">Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => handleDeleteExtraction(deletingExtractionId)} className="cursor-pointer">Delete</AlertDialogAction>
+              <AlertDialogCancel onClick={() => setDeletingBrewId(null)} className="cursor-pointer">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => handleDeleteBrew(deletingBrewId)} className="cursor-pointer">Delete</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

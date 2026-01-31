@@ -70,7 +70,7 @@ export function BrewsTimelineView({
     lastExtractionDate: Date;
   }> = {};
 
-  filteredExtractions.forEach(brew => {
+  filteredBrews.forEach(brew => {
     const coffee = coffees.find(c => c.id === brew.coffeeId);
     if (!coffee) return;
 
@@ -167,7 +167,7 @@ export function BrewsTimelineView({
           <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
             <div className="max-w-md mx-auto">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {filterMethod !== 'all' ? 'No Extractions Found' : 'No Extractions Yet'}
+                {filterMethod !== 'all' ? 'No Brews Found' : 'No Brews Yet'}
               </h3>
               <p className="text-sm text-gray-600 mb-6">
                 {filterMethod !== 'all' ? (
