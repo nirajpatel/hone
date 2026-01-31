@@ -121,7 +121,7 @@ export function BrewsMobileListView({
               <div key={brew.id}>
                 <button
                   onClick={() => onSelectBrew(brew)}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
+                  className="w-full text-left px-3 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                 >
                   {groupBy === 'coffee' ? (
                     // When grouped by coffee: Show date on line 1, brew method on line 2, time on line 3

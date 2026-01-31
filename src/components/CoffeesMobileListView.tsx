@@ -165,7 +165,7 @@ export function CoffeesMobileListView({
                 <div key={coffee.id}>
                   <button
                     onClick={() => onSelectCoffee(coffee)}
-                    className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-full text-left px-3 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                   >
                     {/* Three-line layout with emoji vertically centered on the right */}
                     <div className="flex items-center gap-3">
