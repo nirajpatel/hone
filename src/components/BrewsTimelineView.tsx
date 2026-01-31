@@ -104,20 +104,41 @@ export function BrewsTimelineView({
   );
 
   // Format date/time for node
-  const formatNodeDateTime = (dateString: string) => {
+  const formatNodeDateTime = (dateString: string, nextDateString: string | null = null) => {
     const date = new Date(dateString);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
-    const currentYear = new Date().getFullYear();
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
     
-    const dateStr = year !== currentYear 
+    // Check if this is the oldest node in a year (timeline goes newest to oldest)
+    // Show year on the oldest node of a year if the next node (older) is in a different year
+    let shouldShowYear = false;
+    const currentYear = new Date().getFullYear();
+    
+    if (nextDateString) {
+      const nextDate = new Date(nextDateString);
+      const nextYear = nextDate.getFullYear();
+      // Show year if next node (older) is in a different year
+      if (year !== nextYear) {
+        // Only show year if it's not the current year
+        if (year !== currentYear) {
+          shouldShowYear = true;
+        }
+      }
+    } else {
+      // Last node (oldest) - show year if not current year
+      if (year !== currentYear) {
+        shouldShowYear = true;
+      }
+    }
+    
+    const dateStr = shouldShowYear 
       ? `${month} ${day} '${year.toString().slice(-2)}`
       : `${month} ${day}`;
     
@@ -349,7 +370,7 @@ let timelineIdCounter = 0;
 interface TimelineRowProps {
   brews: Brew[];
   onSelectBrew: (brew: Brew) => void;
-  formatNodeDateTime: (dateString: string) => { date: string; time: string };
+  formatNodeDateTime: (dateString: string, nextDateString?: string | null) => { date: string; time: string };
   coffeeId?: string;
   brewMethod?: BrewMethod;
   onAddExtraction?: (coffeeId: string, brewMethod: BrewMethod) => void;
@@ -779,8 +800,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
 
             {/* Date/Time labels below graph */}
             <div className="flex items-start gap-3 md:gap-8 relative mt-3"> {/* Match node spacing gap-3 */}
-              {brews.map((brew) => {
-                const { date, time } = formatNodeDateTime(brew.createdAt);
+              {brews.map((brew, index) => {
+                const { date, time } = formatNodeDateTime(brew.createdAt, index < brews.length - 1 ? brews[index + 1].createdAt : null);
 
                 return (
                   <div key={brew.id} className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
