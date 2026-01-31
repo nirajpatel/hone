@@ -224,6 +224,7 @@ export function ExtractionsTableView({
               extractions={filteredExtractions}
               onSelectExtraction={onSelectExtraction}
               groupBy={groupBy}
+              users={users}
             />
           </div>
           

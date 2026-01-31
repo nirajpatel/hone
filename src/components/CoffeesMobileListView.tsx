@@ -178,7 +178,7 @@ export function CoffeesMobileListView({
                       <div className="flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                         {avgRating > 0 ? (
                           <>
-                            <span className="text-lg leading-none">
+                            <span className="text-xl leading-none">
                               {getRatingEmoji(avgRating)}
                             </span>
                             {extractionCount > 0 && (
