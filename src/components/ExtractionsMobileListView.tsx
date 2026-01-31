@@ -129,11 +129,13 @@ export function ExtractionsMobileListView({
                         >
                           {formatDate(extraction.createdAt)}
                         </div>
-                        {extraction.quality && (
-                          <div className="text-lg leading-none flex-shrink-0 whitespace-nowrap">
-                            {getRatingEmoji(extraction.quality)}
-                          </div>
-                        )}
+                        <div className="flex-shrink-0 whitespace-nowrap">
+                          {extraction.quality ? (
+                            <span className="text-lg leading-none">{getRatingEmoji(extraction.quality)}</span>
+                          ) : (
+                            <span className="text-sm text-gray-500">Unrated</span>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Line 2: Brew Method, Recipe, and Time */}
@@ -157,11 +159,13 @@ export function ExtractionsMobileListView({
                         >
                           {extraction.roaster} – {extraction.coffeeName}
                         </div>
-                        {extraction.quality && (
-                          <div className="text-lg leading-none flex-shrink-0 whitespace-nowrap">
-                            {getRatingEmoji(extraction.quality)}
-                          </div>
-                        )}
+                        <div className="flex-shrink-0 whitespace-nowrap">
+                          {extraction.quality ? (
+                            <span className="text-lg leading-none">{getRatingEmoji(extraction.quality)}</span>
+                          ) : (
+                            <span className="text-sm text-gray-500">Unrated</span>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Line 2: Brew Method, Recipe, and Time */}

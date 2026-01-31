@@ -649,12 +649,12 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
                       {/* Node Circle - centered on the curve */}
                       <button
                         onClick={() => onSelectExtraction(extraction)}
-                        className={`w-3 h-3 rounded-full transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
+                        className={`w-2.5 h-2.5 rounded-full transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
                           isUnrated 
                             ? 'border-dashed border-gray-400 bg-transparent hover:border-gray-600' 
                             : `${dotColor} ${dotBorderColor} hover:opacity-80 ${isNewest ? 'animate-radiate' : ''}`
                         }`}
-                        style={{ marginTop: `${yPos - 6}px` }}
+                        style={{ marginTop: `${yPos - 5}px` }}
                         title={isUnrated ? 'Click to rate this extraction' : ''}
                       >
                       </button>

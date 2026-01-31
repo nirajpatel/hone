@@ -485,10 +485,10 @@ export function CoffeesShelvesView({
           
           <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
             <SelectTrigger className="w-[180px] cursor-default text-sm">
-              <SelectValue placeholder="By Month" />
+              <SelectValue placeholder="By Roast Month" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="month">By Month</SelectItem>
+              <SelectItem value="month">By Roast Month</SelectItem>
               <SelectItem value="coffee">By Roaster</SelectItem>
             </SelectContent>
           </Select>

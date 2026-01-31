@@ -176,15 +176,19 @@ export function CoffeesMobileListView({
                         {coffee.name}
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
-                        {avgRating > 0 && (
-                          <span className="text-lg leading-none">
-                            {getRatingEmoji(avgRating)}
-                          </span>
-                        )}
-                        {extractionCount > 0 && (
-                          <span className="text-sm text-gray-500">
-                            ({extractionCount})
-                          </span>
+                        {avgRating > 0 ? (
+                          <>
+                            <span className="text-lg leading-none">
+                              {getRatingEmoji(avgRating)}
+                            </span>
+                            {extractionCount > 0 && (
+                              <span className="text-sm text-gray-500">
+                                ({extractionCount})
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-sm text-gray-500">Unrated</span>
                         )}
                       </div>
                     </div>
@@ -198,17 +202,14 @@ export function CoffeesMobileListView({
                             {coffee.roaster}
                           </div>
                           <div className="text-gray-500 whitespace-nowrap text-right" style={{ flex: '0 0 auto' }}>
-                            {getDaysOld(coffee.roastDate)}
+                            {getDaysOld(coffee.roastDate)} 
                           </div>
                         </>
                       ) : (
                         // When grouped by roaster, show roast date (left) and age (right)
                         <>
                           <div className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ flex: '1 1 auto', minWidth: 0 }}>
-                            {formatRoastDate(coffee.roastDate)}
-                          </div>
-                          <div className="text-gray-500 whitespace-nowrap text-right" style={{ flex: '0 0 auto' }}>
-                            {getDaysOld(coffee.roastDate)}
+                            Roasted {formatRoastDate(coffee.roastDate)} • {getDaysOld(coffee.roastDate)}
                           </div>
                         </>
                       )}

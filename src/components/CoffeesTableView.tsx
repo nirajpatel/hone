@@ -179,8 +179,8 @@ export function CoffeesTableView({
               <span>
                 {groupBy === 'month' && (
                   <>
-                    <span className="hidden md:inline">By Month</span>
-                    <span className="md:hidden">By Date</span>
+                    <span className="hidden md:inline">By Roast Month</span>
+                    <span className="md:hidden">By Roast Date</span>
                   </>
                 )}
                 {groupBy === 'coffee' && 'By Roaster'}
@@ -188,8 +188,8 @@ export function CoffeesTableView({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="month">
-                <span className="hidden md:inline">By Month</span>
-                <span className="md:hidden">By Date</span>
+                <span className="hidden md:inline">By Roast Month</span>
+                <span className="md:hidden">By Roast Date</span>
               </SelectItem>
               <SelectItem value="coffee">By Roaster</SelectItem>
             </SelectContent>

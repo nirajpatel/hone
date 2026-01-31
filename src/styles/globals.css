@@ -737,3 +737,12 @@ html {
     flex: 0 !important;
   }
 }
+
+/* Custom width and height classes */
+.w-2\.5 {
+  width: calc(var(--spacing) * 2.5);
+}
+
+.h-2\.5 {
+  height: calc(var(--spacing) * 2.5);
+}
