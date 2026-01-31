@@ -695,8 +695,8 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
 
                 return (
                   <div key={extraction.id} className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
-                    <div className="text-sm font-normal text-gray-900 whitespace-nowrap">{date}</div>
-                    <div className="text-sm text-gray-500 whitespace-nowrap">{time}</div>
+                    <div className="text-xs font-normal text-gray-900 whitespace-nowrap">{date}</div>
+                    <div className="text-xs text-gray-500 whitespace-nowrap">{time}</div>
                   </div>
                 );
               })}
