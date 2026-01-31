@@ -10,11 +10,11 @@ export function EspressoLoading() {
         </defs>
 
         {/* Portafilter shape - vertical lines with horizontal bar */}
-        <path d="M 25 15 L 25 20 L 50 20 L 50 15"
+        <path d="M 25 16 L 25 20 L 50 20 L 50 16"
               stroke="black" 
-              strokeWidth="3" 
-              strokeLinejoin="round"
-              strokeLinecap="butt"
+              strokeWidth="3.25" 
+              strokeLinejoin="miter"
+              strokeLinecap="square"
               fill="none" />
 
         {/* Drip */}
@@ -26,8 +26,7 @@ export function EspressoLoading() {
             repeatCount="indefinite"
             values="15;23;40;40"
             keyTimes="0;0.6;0.95;1"
-            calcMode="spline"
-            keySplines="0.2 0 0.8 1; 0.4 0 0.6 1; 0 0 1 0.4"
+            calcMode="linear"
           />
 
           {/* Fade at end */}

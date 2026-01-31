@@ -64,22 +64,26 @@ export function ExtractionsToolbar({
       <div className="flex items-center gap-2 desktop-filters">
         {/* View Toggle Buttons */}
         <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
-          <Button
-            variant={view === 'table' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => onViewChange('table')}
-            className="cursor-pointer h-8 px-2"
-          >
-            <TableIcon className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={view === 'timeline' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => onViewChange('timeline')}
-            className="cursor-pointer h-8 px-2"
-          >
-            <Activity className="w-4 h-4" />
-          </Button>
+          <SimpleTooltip content="Table">
+            <Button
+              variant={view === 'table' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => onViewChange('table')}
+              className="cursor-pointer h-8 px-2"
+            >
+              <TableIcon className="w-4 h-4" />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content="Timeline">
+            <Button
+              variant={view === 'timeline' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => onViewChange('timeline')}
+              className="cursor-pointer h-8 px-2"
+            >
+              <Activity className="w-4 h-4" />
+            </Button>
+          </SimpleTooltip>
         </div>
         
         <Select value={filterMethod} onValueChange={(v) => onFilterMethodChange(v as BrewMethod | 'all')}>

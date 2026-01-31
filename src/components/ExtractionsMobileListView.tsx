@@ -71,23 +71,13 @@ export function ExtractionsMobileListView({
     return `${displayHours}:${displayMinutes}${ampm}`;
   };
 
-  // Format date for display when grouped by coffee (e.g., "Jan 30" or "9:07am" for today)
+  // Format date for display when grouped by coffee (e.g., "Jan 30, 2026")
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-    
-    // If today, just show time
-    if (checkDate.getTime() === today.getTime()) {
-      return formatTime(dateString);
-    }
-    
-    // Otherwise show abbreviated date
     return date.toLocaleDateString('en-US', { 
       month: 'short', 
-      day: 'numeric' 
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -116,7 +106,7 @@ export function ExtractionsMobileListView({
       {Object.entries(grouped).map(([groupLabel, groupExtractions]) => (
         <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
           {/* Group Header */}
-          <div className="px-3 pt-2 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)' }}>
+          <div className="px-3 pt-2 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
             {groupLabel}
           </div>
           
@@ -129,15 +119,15 @@ export function ExtractionsMobileListView({
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                 >
                   {groupBy === 'coffee' ? (
-                    // When grouped by coffee: Show brew method on line 1, date/time and quality on line 2
+                    // When grouped by coffee: Show date on line 1, brew method/recipe and time on line 2
                     <>
-                      {/* Line 1: Brew Method and Recipe */}
+                      {/* Line 1: Date and Quality */}
                       <div className="flex items-start gap-2 mb-1">
                         <div 
                           className="text-gray-900 truncate flex-1 min-w-0"
                           style={{ fontWeight: 'var(--font-weight-medium)' }}
                         >
-                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
+                          {formatDate(extraction.createdAt)}
                         </div>
                         {extraction.quality && (
                           <div className="text-lg leading-none flex-shrink-0 whitespace-nowrap">
@@ -146,9 +136,14 @@ export function ExtractionsMobileListView({
                         )}
                       </div>
                       
-                      {/* Line 2: Date */}
-                      <div className="text-sm text-gray-500 truncate">
-                        {formatDate(extraction.createdAt)}
+                      {/* Line 2: Brew Method, Recipe, and Time */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ flex: '1 1 auto', minWidth: 0 }}>
+                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
+                        </div>
+                        <div className="text-gray-500 whitespace-nowrap text-right" style={{ flex: '0 0 auto' }}>
+                          {formatTime(extraction.createdAt)}
+                        </div>
                       </div>
                     </>
                   ) : (

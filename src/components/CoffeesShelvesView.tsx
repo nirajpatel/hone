@@ -7,6 +7,7 @@ import { getRatingEmoji, getRatingText } from '../utils/formatters';
 import { useState, useEffect, useRef } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import VanillaTilt from 'vanilla-tilt';
+import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface CoffeesShelvesViewProps {
   coffees: Coffee[];
@@ -459,22 +460,26 @@ export function CoffeesShelvesView({
           {/* View Toggle Buttons */}
           {onViewChange && (
             <div className="flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
-              <Button
-                variant={view === 'table' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewChange('table')}
-                className="cursor-pointer h-8 px-2"
-              >
-                <TableIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={view === 'shelf' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewChange('shelf')}
-                className="cursor-pointer h-8 px-2"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </Button>
+              <SimpleTooltip content="Table">
+                <Button
+                  variant={view === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewChange('table')}
+                  className="cursor-pointer h-8 px-2"
+                >
+                  <TableIcon className="w-4 h-4" />
+                </Button>
+              </SimpleTooltip>
+              <SimpleTooltip content="Shelf">
+                <Button
+                  variant={view === 'shelf' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewChange('shelf')}
+                  className="cursor-pointer h-8 px-2"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </Button>
+              </SimpleTooltip>
             </div>
           )}
           
