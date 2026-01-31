@@ -8,7 +8,7 @@ import { getRatingEmoji, getRatingText } from '../utils/formatters';
 
 interface CoffeeDetailProps {
   coffee: Coffee;
-  extractions: Extraction[];
+  brews: Brew[];
   onClose: () => void;
   onEdit: (coffee: Coffee) => void;
   onNavigatePrev?: () => void;
@@ -17,7 +17,7 @@ interface CoffeeDetailProps {
   hasNext?: boolean;
 }
 
-export function CoffeeDetail({ coffee, extractions, onClose, onEdit, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: CoffeeDetailProps) {
+export function CoffeeDetail({ coffee, brews, onClose, onEdit, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: CoffeeDetailProps) {
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
@@ -54,19 +54,19 @@ export function CoffeeDetail({ coffee, extractions, onClose, onEdit, onNavigateP
   };
 
   const getCoffeeAverageRating = (coffeeId: string): { rating: number; count: number } => {
-    const coffeeExtractions = extractions.filter(
-      (extraction) => extraction.coffeeId === coffeeId && extraction.quality && extraction.quality > 0
+    const coffeeBrews = brews.filter(
+      (brew) => brew.coffeeId === coffeeId && brew.quality && brew.quality > 0
     );
     
-    if (coffeeExtractions.length === 0) {
+    if (coffeeBrews.length === 0) {
       return { rating: 0, count: 0 };
     }
 
-    const sum = coffeeExtractions.reduce((acc, extraction) => acc + (extraction.quality || 0), 0);
-    const average = sum / coffeeExtractions.length;
+    const sum = coffeeBrews.reduce((acc, brew) => acc + (brew.quality || 0), 0);
+    const average = sum / coffeeBrews.length;
     const rounded = Math.round(average);
     
-    return { rating: rounded, count: coffeeExtractions.length };
+    return { rating: rounded, count: coffeeBrews.length };
   };
 
   const { rating, count } = getCoffeeAverageRating(coffee.id);
@@ -152,10 +152,10 @@ export function CoffeeDetail({ coffee, extractions, onClose, onEdit, onNavigateP
                     <span className="text-3xl">{getRatingEmoji(rating)}</span>
                     <span className="text-base text-gray-900">{getRatingText(rating)}</span>
                   </div>
-                  <p className="text-sm text-gray-500">Average of {count} extraction{count !== 1 ? 's' : ''}</p>
+                  <p className="text-sm text-gray-500">Average of {count} brew{count !== 1 ? 's' : ''}</p>
                 </>
               ) : (
-                <p className="text-sm text-gray-500">No extractions logged yet</p>
+                <p className="text-sm text-gray-500">No brews logged yet</p>
               )}
             </div>
 

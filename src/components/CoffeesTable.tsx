@@ -17,19 +17,19 @@ import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 interface CoffeesTableProps {
   coffees: Coffee[];
-  extractions: Extraction[];
+  brews: Brew[];
   onEdit?: (coffee: Coffee) => void;
   onDelete?: (id: string) => void;
 }
 
 export function CoffeesTable({
   coffees,
-  extractions,
+  brews,
   onEdit,
   onDelete,
 }: CoffeesTableProps) {
   const getExtractionCount = (coffeeId: string) => {
-    return extractions.filter(e => e.coffeeId === coffeeId).length;
+    return brews.filter(e => e.coffeeId === coffeeId).length;
   };
 
   const formatDate = (dateStr: string | undefined) => {

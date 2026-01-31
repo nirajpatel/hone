@@ -2,11 +2,11 @@ import { Hono } from 'npm:hono';
 import { cors } from 'npm:hono/cors';
 import { logger } from 'npm:hono/logger';
 import { createClient } from 'jsr:@supabase/supabase-js@2.49.8';
-import * as kv from './kv_store.tsx';
-import * as notifications from './notifications.tsx';
-import * as lamarzocco from './lamarzocco.tsx';
-import { formatBrewForPrompt, supportsStages } from './brewMethods.tsx';
-import { migrateExtractionToBrew, cleanupOldExtractions } from './migrate-extraction-to-brew.tsx';
+import * as kv from './kv_store.ts';
+import * as notifications from './notifications.ts';
+import * as lamarzocco from './lamarzocco.ts';
+import { formatBrewForPrompt, supportsStages } from './brewMethods.ts';
+import { migrateExtractionToBrew, cleanupOldExtractions } from './migrate-extraction-to-brew.ts';
 
 // Coffee brew tracking server
 const app = new Hono();

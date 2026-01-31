@@ -1,7 +1,7 @@
 import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User } from 'lucide-react';
 import { useEffect } from 'react';
 import { formatTime, formatExtractionTime } from './TimeInput';
-import { Extraction, BrewMethod } from '../types';
+import { Brew, BrewMethod, User as UserType } from '../types';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
 import { BrewEquipmentIcon } from './icons/BrewEquipmentIcon';
@@ -9,17 +9,18 @@ import { GrinderIcon } from './icons/GrinderIcon';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
 import { supportsStages } from '../utils/brewMethods';
 
-interface ExtractionDetailProps {
-  extraction: Extraction;
+interface BrewDetailProps {
+  brew: Brew;
+  users: UserType[];
   onClose: () => void;
-  onEdit: (extraction: Extraction) => void;
+  onEdit: (brew: Brew) => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
   hasPrev?: boolean;
   hasNext?: boolean;
 }
 
-export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: ExtractionDetailProps) {
+export function BrewDetail({ brew, users, onClose, onEdit, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: BrewDetailProps) {
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
@@ -62,7 +63,7 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
 
   // Calculate brew ratio
   const calculateBrewRatio = () => {
-    const ratio = extraction.finalWeight / extraction.dosage;
+    const ratio = brew.finalWeight / brew.dosage;
     const rounded = Math.round(ratio * 10) / 10;
     // If it's a whole number, don't show decimal
     return `1:${rounded % 1 === 0 ? Math.round(rounded) : rounded.toFixed(1)}`;
@@ -72,15 +73,15 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
     <StandardDialog
       open={true}
       onOpenChange={(open) => !open && onClose()}
-      title={`Extraction on ${formatHeaderDate(extraction.createdAt)}`}
-      subtitle={`${extraction.roaster} – ${extraction.coffeeName} • ${capitalizeBrewMethod(extraction.brewMethod)}`}
+      title={`Brew on ${formatHeaderDate(brew.createdAt)}`}
+      subtitle={`${brew.roaster} – ${brew.coffeeName} • ${capitalizeBrewMethod(brew.brewMethod)}`}
       footerContent={
         <div className="flex gap-3">
           <Button variant="outline" onClick={onClose} className="cursor-pointer">
             Close
           </Button>
-          <Button onClick={() => onEdit(extraction)} className="flex-1 cursor-pointer">
-            Edit Extraction
+          <Button onClick={() => onEdit(brew)} className="flex-1 cursor-pointer">
+            Edit Brew
           </Button>
         </div>
       }
@@ -92,15 +93,15 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
                 <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Date & Time</p>
-                  <p className="text-sm text-gray-900">{formatHeaderDate(extraction.createdAt)}</p>
+                  <p className="text-sm text-gray-900">{formatHeaderDate(brew.createdAt)}</p>
                 </div>
               </div>
-              {extraction.userName && (
+              {brew.userName && users.length > 1 && (
                 <div className="flex items-start gap-3">
                   <User className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Made By</p>
-                    <p className="text-sm text-gray-900">{extraction.userName}</p>
+                    <p className="text-sm text-gray-900">{brew.userName}</p>
                   </div>
                 </div>
               )}
@@ -108,81 +109,81 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
                 <Coffee className="w-5 h-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Brew Method</p>
-                  <p className="text-sm text-gray-900 capitalize">{capitalizeBrewMethod(extraction.brewMethod)}</p>
+                  <p className="text-sm text-gray-900 capitalize">{capitalizeBrewMethod(brew.brewMethod)}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Thermometer className="w-5 h-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Temperature</p>
-                  <p className="text-sm text-gray-900">{getTemperatureLabel(extraction.coffeeTemperature)}</p>
+                  <p className="text-sm text-gray-900">{getTemperatureLabel(brew.coffeeTemperature)}</p>
                 </div>
               </div>
-              {extraction.brewerName && (
+              {brew.brewerName && (
                 <div className="flex items-start gap-3">
                   <BrewEquipmentIcon className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Brewer</p>
-                    <p className="text-sm text-gray-900">{extraction.brewerName}</p>
+                    <p className="text-sm text-gray-900">{brew.brewerName}</p>
                   </div>
                 </div>
               )}
-              {extraction.grinderName && (
+              {brew.grinderName && (
                 <div className="flex items-start gap-3">
                   <GrinderIcon className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Grinder</p>
-                    <p className="text-sm text-gray-900">{extraction.grinderName}</p>
+                    <p className="text-sm text-gray-900">{brew.grinderName}</p>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Extraction Parameters */}
+            {/* Brew Parameters */}
             <div className="border-t border-gray-200 pt-6 mb-6">
-              <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Extraction Parameters</h3>
+              <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Brew Parameters</h3>
               <div className="grid grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
                   <Gauge className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Grind Setting</p>
-                    <p className="text-sm text-gray-900">{extraction.grindSetting}</p>
+                    <p className="text-sm text-gray-900">{brew.grindSetting}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Weight className="w-5 h-5 text-gray-500 mt-0.5" />
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Dosage</p>
-                    <p className="text-sm text-gray-900">{extraction.dosage} grams</p>
+                    <p className="text-sm text-gray-900">{brew.dosage} grams</p>
                   </div>
                 </div>
                 
-                {extraction.waterTemp && (
+                {brew.waterTemp && (
                   <div className="flex items-start gap-3">
                     <Thermometer className="w-5 h-5 text-gray-500 mt-0.5" />
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Water Temperature</p>
-                      <p className="text-sm text-gray-900">{extraction.waterTemp}°F</p>
+                      <p className="text-sm text-gray-900">{brew.waterTemp}°F</p>
                     </div>
                   </div>
                 )}
                 
                 {/* Pour Over with Stages */}
-                {supportsStages(extraction.brewMethod) && extraction.stages && extraction.stages.length > 0 ? (
+                {supportsStages(brew.brewMethod) && brew.stages && brew.stages.length > 0 ? (
                   <>
                     {/* Overall metrics for pour over */}
                     <div className="flex items-start gap-3">
                       <Clock className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-500 mb-1">Extraction Time</p>
-                        <p className="text-sm text-gray-900">{formatExtractionTime(parseFloat(extraction.extractionTime))}</p>
+                        <p className="text-sm text-gray-900">{formatExtractionTime(parseFloat(brew.brewTime))}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Droplet className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-500 mb-1">Final Weight</p>
-                        <p className="text-sm text-gray-900">{extraction.finalWeight} grams</p>
+                        <p className="text-sm text-gray-900">{brew.finalWeight} grams</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -208,8 +209,8 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
                           <div className="text-sm text-gray-500 text-right">End Weight</div>
                         </div>
                         {/* Table Rows */}
-                        {extraction.stages.map((stage, index) => {
-                          const startTime = index === 0 ? 0 : extraction.stages![index - 1].endTime;
+                        {brew.stages.map((stage, index) => {
+                          const startTime = index === 0 ? 0 : brew.stages![index - 1].endTime;
                           const endTime = stage.endTime;
                           return (
                             <div key={index} className="grid grid-cols-3 gap-4 py-3 border-b border-gray-100 last:border-0">
@@ -231,14 +232,14 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
                       <Clock className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-500 mb-1">Extraction Time</p>
-                        <p className="text-sm text-gray-900">{formatExtractionTime(parseFloat(extraction.extractionTime))}</p>
+                        <p className="text-sm text-gray-900">{formatExtractionTime(parseFloat(brew.brewTime))}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <Droplet className="w-5 h-5 text-gray-500 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-500 mb-1">Final Weight</p>
-                        <p className="text-sm text-gray-900">{extraction.finalWeight} grams</p>
+                        <p className="text-sm text-gray-900">{brew.finalWeight} grams</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -257,10 +258,10 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
             <div className="border-t border-gray-200 pt-6 mb-6">
               <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Extraction Quality</h3>
               <div className="flex items-center gap-3 mb-4">
-                {extraction.quality && extraction.quality > 0 ? (
+                {brew.quality && brew.quality > 0 ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-3xl">{getRatingEmoji(extraction.quality)}</span>
-                    <span className="text-sm text-gray-900">{getRatingText(extraction.quality)}</span>
+                    <span className="text-3xl">{getRatingEmoji(brew.quality)}</span>
+                    <span className="text-sm text-gray-900">{getRatingText(brew.quality)}</span>
                   </div>
                 ) : (
                   <span className="text-sm text-gray-500">Not rated</span>
@@ -269,12 +270,12 @@ export function ExtractionDetail({ extraction, onClose, onEdit, onNavigatePrev, 
 
               {/* Extraction Notes */}
               {(() => {
-                if (!extraction.tastingNotes || extraction.tastingNotes.trim() === '') {
+                if (!brew.tastingNotes || brew.tastingNotes.trim() === '') {
                   return (
                     <p className="text-sm text-gray-500">No notes added</p>
                   );
                 }
-                const notes = extraction.tastingNotes.split(', ').filter(n => n.trim());
+                const notes = brew.tastingNotes.split(', ').filter(n => n.trim());
                 if (notes.length === 0) {
                   return (
                     <p className="text-sm text-gray-500">No notes added</p>

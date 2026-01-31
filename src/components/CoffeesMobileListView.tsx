@@ -3,14 +3,14 @@ import { getRatingEmoji } from '../utils/formatters';
 
 interface CoffeesMobileListViewProps {
   coffees: Coffee[];
-  extractions: Extraction[];
+  brews: Brew[];
   onSelectCoffee: (coffee: Coffee) => void;
   groupBy?: 'month' | 'coffee';
 }
 
 export function CoffeesMobileListView({
   coffees,
-  extractions,
+  brews,
   onSelectCoffee,
   groupBy = 'month',
 }: CoffeesMobileListViewProps) {
@@ -65,15 +65,15 @@ export function CoffeesMobileListView({
 
   // Get coffee average rating
   const getCoffeeAverageRating = (coffeeId: string): number => {
-    const coffeeExtractions = extractions.filter(e => e.coffeeId === coffeeId && e.quality);
-    if (coffeeExtractions.length === 0) return 0;
-    const sum = coffeeExtractions.reduce((acc, e) => acc + (e.quality || 0), 0);
-    return Math.round(sum / coffeeExtractions.length);
+    const coffeeBrews = brews.filter(e => e.coffeeId === coffeeId && e.quality);
+    if (coffeeBrews.length === 0) return 0;
+    const sum = coffeeBrews.reduce((acc, e) => acc + (e.quality || 0), 0);
+    return Math.round(sum / coffeeBrews.length);
   };
 
-  // Get extraction count for a coffee
-  const getExtractionCount = (coffeeId: string): number => {
-    return extractions.filter(e => e.coffeeId === coffeeId).length;
+  // Get brew count for a coffee
+  const getBrewCount = (coffeeId: string): number => {
+    return brews.filter(e => e.coffeeId === coffeeId).length;
   };
 
   // Format roast date for display
@@ -156,10 +156,10 @@ export function CoffeesMobileListView({
           </div>
           
           {/* Coffee List */}
-          <div className="bg-white border-y border-gray-200 overflow-hidden mobile-extraction-card">
+          <div className="bg-white border-y border-gray-200 overflow-hidden mobile-brew-card">
             {groupCoffees.map((coffee, index) => {
               const avgRating = getCoffeeAverageRating(coffee.id);
-              const extractionCount = getExtractionCount(coffee.id);
+              const brewCount = getBrewCount(coffee.id);
               
               return (
                 <div key={coffee.id}>
@@ -173,22 +173,22 @@ export function CoffeesMobileListView({
                       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                         {/* Line 1: Roaster – Coffee Name */}
                         <div 
-                          className="text-gray-900"
-                          style={{ fontWeight: 'var(--font-weight-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          className="text-gray-900 truncate"
+                          style={{ fontWeight: 'var(--font-weight-medium)' }}
                         >
                           {coffee.roaster} – {coffee.name}
                         </div>
                         
                         {/* Line 2: Roasted date and age */}
-                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div className="text-sm text-gray-500 truncate">
                           Roasted {formatRoastDate(coffee.roastDate)} • {getDaysOld(coffee.roastDate)}
                         </div>
                         
-                        {/* Line 3: Extraction count */}
-                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {extractionCount > 0 
-                            ? `${extractionCount} ${extractionCount === 1 ? 'extraction' : 'extractions'}`
-                            : 'No extractions'
+                        {/* Line 3: Brew count */}
+                        <div className="text-sm text-gray-500 truncate">
+                          {brewCount > 0 
+                            ? `${brewCount} ${brewCount === 1 ? 'brew' : 'brews'}`
+                            : 'No brews'
                           }
                         </div>
                       </div>

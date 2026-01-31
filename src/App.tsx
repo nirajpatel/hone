@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Extraction, Coffee, User, BrewMethod, Equipment } from './types';
-import { ExtractionDetail } from './components/ExtractionDetail';
+import { Brew, Coffee, User, BrewMethod, Equipment } from './types';
+import { BrewDetail } from './components/BrewDetail';
 import { CoffeeDetail } from './components/CoffeeDetail';
-import { NewExtractionFlow } from './components/NewExtractionFlow';
+import { NewBrewFlow } from './components/NewBrewFlow';
 import { AddCoffeeForm } from './components/AddCoffeeForm';
 import { QRCodeDialog } from './components/QRCodeDialog';
 import { Login } from './components/Login';
-import { ExtractionsTableView } from './components/ExtractionsTableView';
-import { ExtractionsTimelineView } from './components/ExtractionsTimelineView';
+import { BrewsTableView } from './components/BrewsTableView';
+import { BrewsTimelineView } from './components/BrewsTimelineView';
 import { CoffeesShelvesView } from './components/CoffeesShelvesView';
 import { CoffeesTableView } from './components/CoffeesTableView';
 import { Profile } from './components/Profile';
@@ -61,15 +61,15 @@ import { SimpleTooltip } from './components/ui/simple-tooltip';
 import { supabase } from './utils/supabase/client';
 
 export default function App() {
-  const [extractions, setExtractions] = useState<Extraction[]>([]);
+  const [brews, setBrews] = useState<Brew[]>([]);
   const [coffees, setCoffees] = useState<Coffee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedExtraction, setSelectedExtraction] = useState<Extraction | null>(null);
+  const [selectedBrew, setSelectedBrew] = useState<Extraction | null>(null);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
   const [showNewExtraction, setShowNewExtraction] = useState(false);
   const [showAddCoffee, setShowAddCoffee] = useState(false);
-  const [activeView, setActiveView] = useState<'extractions' | 'coffees' | 'profile'>('extractions');
+  const [activeView, setActiveView] = useState<'brews' | 'coffees' | 'profile'>('brews');
   const [filterMethod, setFilterMethod] = useState<BrewMethod | 'all'>('all');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -85,13 +85,13 @@ export default function App() {
   const [groupBy, setGroupBy] = useState<'month' | 'coffee'>('month');
   const [showProfile, setShowProfile] = useState(false);
   const [showEquipment, setShowEquipment] = useState(false);
-  const [hoveredExtractionRating, setHoveredExtractionRating] = useState<{ id: string, rating: number } | null>(null);
+  const [hoveredBrewRating, setHoveredBrewRating] = useState<{ id: string, rating: number } | null>(null);
   const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
   const [equipmentChangeCounter, setEquipmentChangeCounter] = useState(0);
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [serverVersion, setServerVersion] = useState<string | null>(null);
   const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('table');
-  const [extractionsView, setExtractionsView] = useState<'table' | 'timeline'>('table');
+  const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('table');
   const [equipment, setEquipment] = useState<Equipment[]>([]);
 
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
@@ -300,7 +300,7 @@ export default function App() {
       if (res.ok) {
         const userData = await res.json();
         setCurrentUser(userData);
-        // Fetch extractions and coffees after successful auth
+        // Fetch brews and coffees after successful auth
         await fetchData(token);
       } else {
         toast.error('Failed to set up user');
@@ -321,8 +321,8 @@ export default function App() {
     }
 
     try {
-      const [extractionsRes, coffeesRes, usersRes, equipmentRes] = await Promise.all([
-        fetch(`${apiUrl}/extractions`, {
+      const [brewsRes, coffeesRes, usersRes, equipmentRes] = await Promise.all([
+        fetch(`${apiUrl}/brews`, {
           headers: { Authorization: `Bearer ${authToken}` },
         }),
         fetch(`${apiUrl}/coffees`, {
@@ -336,12 +336,12 @@ export default function App() {
         }),
       ]);
 
-      if (extractionsRes.ok && coffeesRes.ok && usersRes.ok && equipmentRes.ok) {
-        const extractionsData = await extractionsRes.json();
+      if (brewsRes.ok && coffeesRes.ok && usersRes.ok && equipmentRes.ok) {
+        const brewsData = await brewsRes.json();
         const coffeesData = await coffeesRes.json();
         const usersData = await usersRes.json();
         const equipmentData = await equipmentRes.json();
-        setExtractions(extractionsData);
+        setBrews(brewsData);
         setCoffees(coffeesData);
         setUsers(usersData);
         setEquipment(equipmentData);
@@ -355,9 +355,9 @@ export default function App() {
     }
   };
 
-  const handleAddExtraction = async (extraction: Omit<Extraction, 'id' | 'createdAt'>) => {
+  const handleAddExtraction = async (brew: Omit<Extraction, 'id' | 'createdAt'>) => {
     if (!accessToken) {
-      toast.error('Please sign in to create extractions');
+      toast.error('Please sign in to create brews');
       return;
     }
 
@@ -380,14 +380,14 @@ export default function App() {
       // E.g., PST is -480 (UTC-8), EST is -300 (UTC-5), JST is 540 (UTC+9)
       const timezoneOffset = new Date().getTimezoneOffset();
 
-      const res = await fetch(`${apiUrl}/extractions`, {
+      const res = await fetch(`${apiUrl}/brews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${freshToken}`,
         },
         body: JSON.stringify({
-          ...extraction,
+          ...brew,
           localTimestamp, // Add local timestamp for SMS display
           timezoneOffset, // Add timezone offset for day boundary calculation
         }),
@@ -395,23 +395,23 @@ export default function App() {
 
       if (res.ok) {
         const newExtraction = await res.json();
-        setExtractions([...extractions, newExtraction]);
+        setBrews([...brews, newExtraction]);
         setShowNewExtraction(false);
         toast.success('Extraction logged');
       } else {
         const error = await res.json();
-        console.error('Failed to create extraction:', error);
-        toast.error(error.error || 'Failed to log extraction');
+        console.error('Failed to create brew:', error);
+        toast.error(error.error || 'Failed to log brew');
       }
     } catch (error) {
-      console.error('Error creating extraction:', error);
-      toast.error('Error logging extraction');
+      console.error('Error creating brew:', error);
+      toast.error('Error logging brew');
     }
   };
 
   const handleUpdateQuality = async (id: string, quality: number) => {
     if (!accessToken) {
-      toast.error('Please sign in to update extractions');
+      toast.error('Please sign in to update brews');
       return;
     }
 
@@ -419,7 +419,7 @@ export default function App() {
       // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
 
-      const res = await fetch(`${apiUrl}/extractions/${id}`, {
+      const res = await fetch(`${apiUrl}/brews/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -430,16 +430,16 @@ export default function App() {
 
       if (res.ok) {
         const updated = await res.json();
-        setExtractions(extractions.map((e) => (e.id === id ? updated : e)));
-        setSelectedExtraction(null);
+        setBrews(brews.map((e) => (e.id === id ? updated : e)));
+        setSelectedBrew(null);
         toast.success('Quality updated');
       } else {
         const error = await res.json();
-        console.error('Failed to update extraction:', error);
+        console.error('Failed to update brew:', error);
         toast.error(error.error || 'Failed to update quality');
       }
     } catch (error) {
-      console.error('Error updating extraction:', error);
+      console.error('Error updating brew:', error);
       toast.error('Error updating quality');
     }
   };
@@ -493,14 +493,14 @@ export default function App() {
     }
   };
 
-  const handleDuplicateExtraction = (extraction: Extraction) => {
-    setDuplicateExtractionData(extraction);
+  const handleDuplicateExtraction = (brew: Extraction) => {
+    setDuplicateExtractionData(brew);
     setShowNewExtraction(true);
   };
 
   const handleDeleteExtraction = async (id: string) => {
     if (!accessToken) {
-      toast.error('Please sign in to delete extractions');
+      toast.error('Please sign in to delete brews');
       return;
     }
 
@@ -508,7 +508,7 @@ export default function App() {
       // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
 
-      const res = await fetch(`${apiUrl}/extractions/${id}`, {
+      const res = await fetch(`${apiUrl}/brews/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${freshToken}`,
@@ -516,17 +516,17 @@ export default function App() {
       });
 
       if (res.ok) {
-        setExtractions(extractions.filter((e) => e.id !== id));
+        setBrews(brews.filter((e) => e.id !== id));
         toast.success('Extraction deleted');
         setDeletingExtractionId(null);
       } else {
         const error = await res.json();
-        console.error('Failed to delete extraction:', error);
-        toast.error(error.error || 'Failed to delete extraction');
+        console.error('Failed to delete brew:', error);
+        toast.error(error.error || 'Failed to delete brew');
       }
     } catch (error) {
-      console.error('Error deleting extraction:', error);
-      toast.error('Error deleting extraction');
+      console.error('Error deleting brew:', error);
+      toast.error('Error deleting brew');
     }
   };
 
@@ -608,10 +608,10 @@ export default function App() {
     }
   };
 
-  const handleEditExtraction = (extraction: Extraction) => {
-    setShowNewExtraction(false); // Close new extraction form if open
+  const handleEditExtraction = (brew: Extraction) => {
+    setShowNewExtraction(false); // Close new brew form if open
     setDuplicateExtractionData(null); // Clear any duplicate data
-    setEditingExtraction(extraction);
+    setEditingExtraction(brew);
   };
 
   const handleUpdateExtraction = async (
@@ -622,7 +622,7 @@ export default function App() {
       userId: string;
       grindSetting: string;
       dosage: number;
-      extractionTime: number;
+      brewTime: number;
       finalWeight: number;
       quality?: number;
       waterTemp?: number;
@@ -636,7 +636,7 @@ export default function App() {
     }
   ) => {
     if (!accessToken) {
-      toast.error('Please sign in to update extractions');
+      toast.error('Please sign in to update brews');
       return;
     }
 
@@ -644,7 +644,7 @@ export default function App() {
       // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
 
-      // Get coffee and user details for the updated extraction
+      // Get coffee and user details for the updated brew
       const coffee = coffees.find(o => o.id === data.coffeeId);
       const user = users.find(u => u.id === data.userId);
       
@@ -660,7 +660,7 @@ export default function App() {
         userName: user.name || user.email,
       };
 
-      const res = await fetch(`${apiUrl}/extractions/${id}`, {
+      const res = await fetch(`${apiUrl}/brews/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -671,17 +671,17 @@ export default function App() {
 
       if (res.ok) {
         const updated = await res.json();
-        setExtractions(extractions.map((e) => (e.id === id ? updated : e)));
+        setBrews(brews.map((e) => (e.id === id ? updated : e)));
         setEditingExtraction(null);
         toast.success('Extraction updated successfully');
       } else {
         const error = await res.json();
-        console.error('Failed to update extraction:', error);
-        toast.error(error.error || 'Failed to update extraction');
+        console.error('Failed to update brew:', error);
+        toast.error(error.error || 'Failed to update brew');
       }
     } catch (error) {
-      console.error('Error updating extraction:', error);
-      toast.error('Error updating extraction');
+      console.error('Error updating brew:', error);
+      toast.error('Error updating brew');
     }
   };
 
@@ -775,15 +775,15 @@ export default function App() {
   };
 
   const getCoffeeAverageRating = (coffeeId: string): { rating: number; count: number } => {
-    const coffeeExtractions = extractions.filter(
-      (extraction) => extraction.coffeeId === coffeeId && extraction.quality && extraction.quality > 0
+    const coffeeExtractions = brews.filter(
+      (brew) => brew.coffeeId === coffeeId && brew.quality && brew.quality > 0
     );
     
     if (coffeeExtractions.length === 0) {
       return { rating: 0, count: 0 };
     }
 
-    const sum = coffeeExtractions.reduce((acc, extraction) => acc + (extraction.quality || 0), 0);
+    const sum = coffeeExtractions.reduce((acc, brew) => acc + (brew.quality || 0), 0);
     const average = sum / coffeeExtractions.length;
     const rounded = Math.round(average); // This rounds 0.5 and above up, below 0.5 down
     
@@ -791,7 +791,7 @@ export default function App() {
   };
 
   // Filter data
-  const filteredExtractions = extractions.filter(
+  const filteredExtractions = brews.filter(
     (e) => filterMethod === 'all' || e.brewMethod === filterMethod
   );
 
@@ -800,39 +800,39 @@ export default function App() {
   );
 
   // Group data
-  const groupExtractionsByMonth = (extractions: Extraction[]) => {
-    const sorted = [...extractions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const groupExtractionsByMonth = (brews: Extraction[]) => {
+    const sorted = [...brews].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const grouped: { [key: string]: Extraction[] } = {};
     
-    sorted.forEach(extraction => {
-      const date = new Date(extraction.createdAt);
+    sorted.forEach(brew => {
+      const date = new Date(brew.createdAt);
       const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       if (!grouped[monthYear]) {
         grouped[monthYear] = [];
       }
-      grouped[monthYear].push(extraction);
+      grouped[monthYear].push(brew);
     });
     
     return grouped;
   };
 
-  const groupExtractionsByRoaster = (extractions: Extraction[]) => {
+  const groupExtractionsByRoaster = (brews: Extraction[]) => {
     const grouped: { [key: string]: Extraction[] } = {};
     
-    extractions.forEach(extraction => {
-      const key = `${extraction.roaster} – ${extraction.coffeeName}`;
+    brews.forEach(brew => {
+      const key = `${brew.roaster} – ${brew.coffeeName}`;
       if (!grouped[key]) {
         grouped[key] = [];
       }
-      grouped[key].push(extraction);
+      grouped[key].push(brew);
     });
     
-    // Sort each group's extractions by date (newest first)
+    // Sort each group's brews by date (newest first)
     Object.keys(grouped).forEach(key => {
       grouped[key].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     });
     
-    // Sort groups by the most recent extraction date in each group (newest first)
+    // Sort groups by the most recent brew date in each group (newest first)
     const sortedGrouped: { [key: string]: Extraction[] } = {};
     Object.keys(grouped)
       .sort((a, b) => {
@@ -963,7 +963,7 @@ export default function App() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-          <Feed extractions={extractions} coffees={coffees} />
+          <Feed brews={brews} coffees={coffees} />
         </div>
       </div>
     );
@@ -975,7 +975,7 @@ export default function App() {
         currentUser={currentUser}
         users={users}
         coffees={coffees}
-        extractions={extractions}
+        brews={brews}
         accessToken={accessToken!}
         onNewExtraction={() => {
           setShowNewExtraction(true);
@@ -987,8 +987,8 @@ export default function App() {
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
-        onEditExtraction={(extraction) => {
-          setEditingExtraction(extraction);
+        onEditExtraction={(brew) => {
+          setEditingExtraction(brew);
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }}
@@ -999,8 +999,8 @@ export default function App() {
           setCurrentRoute('/');
         }}
         onDeleteCoffee={handleDeleteCoffee}
-        onDuplicateExtraction={(extraction) => {
-          setDuplicateExtractionData(extraction);
+        onDuplicateExtraction={(brew) => {
+          setDuplicateExtractionData(brew);
           setShowNewExtraction(true);
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
@@ -1032,11 +1032,11 @@ export default function App() {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center gap-2">
                 <Button
-                  variant={activeView === 'extractions' ? 'default' : 'ghost'}
-                  onClick={() => setActiveView('extractions')}
+                  variant={activeView === 'brews' ? 'default' : 'ghost'}
+                  onClick={() => setActiveView('brews')}
                   className="cursor-pointer"
                 >
-                  <span>Extractions</span>
+                  <span>Brews</span>
                 </Button>
                 <Button
                   variant={activeView === 'coffees' ? 'default' : 'ghost'}
@@ -1050,8 +1050,8 @@ export default function App() {
               {/* Mobile Navigation - Emoji Buttons */}
               <div className="flex md:hidden items-center gap-2">
                 <Button
-                  variant={activeView === 'extractions' ? 'default' : 'ghost'}
-                  onClick={() => setActiveView('extractions')}
+                  variant={activeView === 'brews' ? 'default' : 'ghost'}
+                  onClick={() => setActiveView('brews')}
                   className="cursor-pointer h-9 w-9 p-0 text-xl"
                 >
                   ☕
@@ -1138,31 +1138,31 @@ export default function App() {
 
       {/* Main Content */}
       <div className="px-3 py-4 md:px-6 md:py-6">
-        {activeView === 'extractions' ? (
-          extractionsView === 'table' ? (
-            <ExtractionsTableView
-              extractions={extractions}
+        {activeView === 'brews' ? (
+          brewsView === 'table' ? (
+            <BrewsTableView
+              brews={brews}
               coffees={coffees}
               users={users}
               filterMethod={filterMethod}
               groupBy={groupBy}
               onFilterMethodChange={setFilterMethod}
               onGroupByChange={setGroupBy}
-              onNewExtraction={() => setShowNewExtraction(true)}
-              onSelectExtraction={setSelectedExtraction}
-              onEditExtraction={(extraction) => {
-                setEditingExtraction(extraction);
+              onNewBrew={() => setShowNewExtraction(true)}
+              onSelectBrew={setSelectedBrew}
+              onEditBrew={(brew) => {
+                setEditingExtraction(brew);
               }}
-              onDeleteExtraction={(id) => setDeletingExtractionId(id)}
-              onDuplicateExtraction={(extraction) => {
-                setDuplicateExtractionData(extraction);
+              onDeleteBrew={(id) => setDeletingExtractionId(id)}
+              onDuplicateBrew={(brew) => {
+                setDuplicateExtractionData(brew);
               }}
-              hoveredExtractionRating={hoveredExtractionRating}
-              onHoverExtractionRating={setHoveredExtractionRating}
-              view={extractionsView}
-              onViewChange={setExtractionsView}
+              hoveredBrewRating={hoveredBrewRating}
+              onHoverBrewRating={setHoveredBrewRating}
+              view={brewsView}
+              onViewChange={setBrewsView}
               equipment={equipment}
-              onAddExtractionForCoffee={(coffeeId, brewMethod) => {
+              onAddBrewForCoffee={(coffeeId, brewMethod) => {
                 setPrefilledCoffeeId(coffeeId);
                 setPrefilledBrewMethod(brewMethod);
                 setShowNewExtraction(true);
@@ -1171,18 +1171,18 @@ export default function App() {
               onOpenAddCoffee={() => setShowAddCoffee(true)}
             />
           ) : (
-            <ExtractionsTimelineView
-              extractions={extractions}
+            <BrewsTimelineView
+              brews={brews}
               coffees={coffees}
               users={users}
               filterMethod={filterMethod}
               onFilterMethodChange={setFilterMethod}
-              onNewExtraction={() => setShowNewExtraction(true)}
-              onSelectExtraction={setSelectedExtraction}
-              view={extractionsView}
-              onViewChange={setExtractionsView}
+              onNewBrew={() => setShowNewExtraction(true)}
+              onSelectBrew={setSelectedBrew}
+              view={brewsView}
+              onViewChange={setBrewsView}
               equipment={equipment}
-              onAddExtractionForCoffee={(coffeeId, brewMethod) => {
+              onAddBrewForCoffee={(coffeeId, brewMethod) => {
                 setPrefilledCoffeeId(coffeeId);
                 setPrefilledBrewMethod(brewMethod);
                 setShowNewExtraction(true);
@@ -1194,7 +1194,7 @@ export default function App() {
         ) : coffeesView === 'table' ? (
           <CoffeesTableView
             coffees={coffees}
-            extractions={extractions}
+            brews={brews}
             filterMethod={filterMethod}
             groupBy={groupBy}
             onFilterMethodChange={setFilterMethod}
@@ -1208,7 +1208,7 @@ export default function App() {
         ) : (
           <CoffeesShelvesView
             coffees={coffees}
-            extractions={extractions}
+            brews={brews}
             groupBy={groupBy}
             onGroupByChange={setGroupBy}
             onNewCoffee={() => setShowAddCoffee(true)}
@@ -1218,27 +1218,28 @@ export default function App() {
         )}
       </div>
 
-      {selectedExtraction && (() => {
-        // Get flat list of filtered extractions in table order
+      {selectedBrew && (() => {
+        // Get flat list of filtered brews in table order
         const flatExtractions: Extraction[] = [];
         Object.entries(groupedExtractions).forEach(([_, groupExtractions]) => {
           flatExtractions.push(...groupExtractions);
         });
         
-        const currentIndex = flatExtractions.findIndex(e => e.id === selectedExtraction.id);
+        const currentIndex = flatExtractions.findIndex(e => e.id === selectedBrew.id);
         const hasPrev = currentIndex > 0;
         const hasNext = currentIndex < flatExtractions.length - 1;
         
         return (
-          <ExtractionDetail
-            extraction={selectedExtraction}
-            onClose={() => setSelectedExtraction(null)}
-            onEdit={(extraction) => {
-              setSelectedExtraction(null);
-              setEditingExtraction(extraction);
+          <BrewDetail
+            brew={selectedBrew}
+            users={users}
+            onClose={() => setSelectedBrew(null)}
+            onEdit={(brew) => {
+              setSelectedBrew(null);
+              setEditingExtraction(brew);
             }}
-            onNavigatePrev={hasPrev ? () => setSelectedExtraction(flatExtractions[currentIndex - 1]) : undefined}
-            onNavigateNext={hasNext ? () => setSelectedExtraction(flatExtractions[currentIndex + 1]) : undefined}
+            onNavigatePrev={hasPrev ? () => setSelectedBrew(flatExtractions[currentIndex - 1]) : undefined}
+            onNavigateNext={hasNext ? () => setSelectedBrew(flatExtractions[currentIndex + 1]) : undefined}
             hasPrev={hasPrev}
             hasNext={hasNext}
           />
@@ -1259,7 +1260,7 @@ export default function App() {
         return (
           <CoffeeDetail
             coffee={selectedCoffee}
-            extractions={extractions}
+            brews={brews}
             onClose={() => setSelectedCoffee(null)}
             onEdit={(coffee) => {
               setSelectedCoffee(null);
@@ -1275,11 +1276,11 @@ export default function App() {
 
       {showNewExtraction && (
         currentUser ? (
-          <NewExtractionFlow
+          <NewBrewFlow
             coffees={coffees}
             users={users}
             currentUser={currentUser}
-            extractions={extractions}
+            brews={brews}
             accessToken={accessToken!}
             onClose={() => {
               setShowNewExtraction(false);
@@ -1297,7 +1298,7 @@ export default function App() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg p-6 max-w-md">
               <h2 className="text-gray-900 mb-4">Sign In Required</h2>
-              <p className="text-gray-600 mb-6">Please sign in to create extractions.</p>
+              <p className="text-gray-600 mb-6">Please sign in to create brews.</p>
               <Button onClick={() => setShowNewExtraction(false)}>Close</Button>
             </div>
           </div>
@@ -1318,11 +1319,11 @@ export default function App() {
       )}
 
       {editingExtraction && (
-        <NewExtractionFlow
+        <NewBrewFlow
           coffees={coffees}
           users={users}
           currentUser={currentUser!}
-          extractions={extractions}
+          brews={brews}
           accessToken={accessToken!}
           onClose={() => setEditingExtraction(null)}
           onSave={handleAddExtraction}
@@ -1356,7 +1357,7 @@ export default function App() {
               </div>
             </AlertDialogHeader>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the extraction.
+              This action cannot be undone. This will permanently delete the brew.
             </AlertDialogDescription>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setDeletingExtractionId(null)} className="cursor-pointer">Cancel</AlertDialogCancel>
@@ -1441,7 +1442,7 @@ export default function App() {
           accessToken={accessToken}
           onEquipmentChange={() => {
             setEquipmentChangeCounter(prev => prev + 1);
-            fetchData(); // Refetch extractions to get updated equipment names
+            fetchData(); // Refetch brews to get updated equipment names
           }}
         />
       )}

@@ -49,7 +49,7 @@ export interface Coffee {
   createdAt: string;
 }
 
-export interface Extraction {
+export interface Brew {
   id: string;
   coffeeId: string;
   coffeeName: string;
@@ -57,7 +57,7 @@ export interface Extraction {
   brewMethod: BrewMethod;
   grindSetting: string;
   dosage: number;
-  extractionTime: number;
+  brewTime: number;
   finalWeight: number;
   quality?: number;
   waterTemp?: number; // Water temperature in Fahrenheit

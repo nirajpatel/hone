@@ -12,7 +12,7 @@ import { CoffeesMobileListView } from './CoffeesMobileListView';
 
 interface CoffeesTableViewProps {
   coffees: Coffee[];
-  extractions: Extraction[];
+  brews: Brew[];
   filterMethod: BrewMethod | 'all';
   groupBy: 'month' | 'coffee';
   onFilterMethodChange: (method: BrewMethod | 'all') => void;
@@ -26,7 +26,7 @@ interface CoffeesTableViewProps {
 
 export function CoffeesTableView({
   coffees,
-  extractions,
+  brews,
   filterMethod,
   groupBy,
   onFilterMethodChange,
@@ -37,7 +37,7 @@ export function CoffeesTableView({
   onDeleteCoffee,
   onPrintQR,
 }: CoffeesTableViewProps) {
-  // Format date for display (same as extractions table)
+  // Format date for display (same as brews table)
   const formatDate = (dateString: string) => {
     if (!dateString) return '–';
     
@@ -121,20 +121,20 @@ export function CoffeesTableView({
 
   // Get coffee average rating
   const getCoffeeAverageRating = (coffeeId: string): { rating: number; count: number } => {
-    const coffeeExtractions = extractions.filter(e => e.coffeeId === coffeeId && e.quality);
-    if (coffeeExtractions.length === 0) return { rating: 0, count: 0 };
-    const sum = coffeeExtractions.reduce((acc, e) => acc + (e.quality || 0), 0);
+    const coffeeBrews = brews.filter(e => e.coffeeId === coffeeId && e.quality);
+    if (coffeeBrews.length === 0) return { rating: 0, count: 0 };
+    const sum = coffeeBrews.reduce((acc, e) => acc + (e.quality || 0), 0);
     return { 
-      rating: Math.round(sum / coffeeExtractions.length),
-      count: coffeeExtractions.length
+      rating: Math.round(sum / coffeeBrews.length),
+      count: coffeeBrews.length
     };
   };
 
   // Filter coffees
   const filteredCoffees = coffees.filter(coffee => {
     if (filterMethod === 'all') return true;
-    const coffeeExtractions = extractions.filter(e => e.coffeeId === coffee.id);
-    return coffeeExtractions.some(e => e.brewMethod === filterMethod);
+    const coffeeBrews = brews.filter(e => e.coffeeId === coffee.id);
+    return coffeeBrews.some(e => e.brewMethod === filterMethod);
   });
 
   // Sort coffees by roast date descending (most recent first)
@@ -229,7 +229,7 @@ export function CoffeesTableView({
           <div className="md:hidden">
             <CoffeesMobileListView
               coffees={filteredCoffees}
-              extractions={extractions}
+              brews={brews}
               onSelectCoffee={onSelectCoffee}
               groupBy={groupBy}
             />
@@ -282,7 +282,7 @@ export function CoffeesTableView({
                                   <span className="text-lg">{getRatingEmoji(rating)}</span>
                                   <span className="text-gray-900 text-sm">
                                     {getRatingText(rating)}
-                                    {count > 0 && ` (${count} extraction${count !== 1 ? 's' : ''})`}
+                                    {count > 0 && ` (${count} brew${count !== 1 ? 's' : ''})`}
                                   </span>
                                 </div>
                               );

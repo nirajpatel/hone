@@ -3,7 +3,7 @@ import { User, Coffee, Extraction, BrewMethod } from '../types';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { UserCircle2, MapPin, Calendar, Flame, Edit2 } from 'lucide-react';
-import { ExtractionsTableView } from './ExtractionsTableView';
+import { BrewsTableView } from './BrewsTableView';
 import { CoffeesTableView } from './CoffeesTableView';
 import { EditProfileDialog } from './EditProfileDialog';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
@@ -322,7 +322,7 @@ export function Profile({
 
             {/* Tab Content */}
             {activeTab === 'extractions' ? (
-              <ExtractionsTableView
+              <BrewsTableView
                 extractions={userExtractions}
                 coffees={coffees}
                 users={users}

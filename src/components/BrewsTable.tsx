@@ -1,4 +1,4 @@
-import { Extraction, Coffee, User } from '../types';
+import { Brew, Coffee, User } from '../types';
 import {
   Table,
   TableBody,
@@ -17,23 +17,23 @@ import { InteractiveStarRating } from './InteractiveStarRating';
 import { MoreVertical, Pencil, Trash2, Copy } from 'lucide-react';
 import { capitalizeBrewMethod } from '../utils/formatters';
 
-interface ExtractionsTableProps {
-  extractions: Extraction[];
+interface BrewsTableProps {
+  brews: Brew[];
   coffees: Coffee[];
   users: User[];
-  onEdit?: (extraction: Extraction) => void;
+  onEdit?: (brew: Brew) => void;
   onDelete?: (id: string) => void;
-  onDuplicate?: (extraction: Extraction) => void;
+  onDuplicate?: (brew: Brew) => void;
 }
 
-export function ExtractionsTable({
-  extractions,
+export function BrewsTable({
+  brews,
   coffees,
   users,
   onEdit,
   onDelete,
   onDuplicate,
-}: ExtractionsTableProps) {
+}: BrewsTableProps) {
   const getCoffee = (coffeeId: string) => {
     return coffees.find(c => c.id === coffeeId);
   };
@@ -76,46 +76,46 @@ export function ExtractionsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {extractions.length === 0 ? (
+          {brews.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                No extractions found.
+                No brews found.
               </TableCell>
             </TableRow>
           ) : (
-            extractions.map((extraction) => {
-              const coffee = getCoffee(extraction.coffeeId);
-              const user = getUser(extraction.userId);
+            brews.map((brew) => {
+              const coffee = getCoffee(brew.coffeeId);
+              const user = getUser(brew.userId);
 
               return (
-                <TableRow key={extraction.id} className="hover:bg-gray-50">
+                <TableRow key={brew.id} className="hover:bg-gray-50">
                   <TableCell className="px-6 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(extraction.createdAt)}</div>
-                    <div className="text-xs text-gray-500">{formatTime(extraction.createdAt)}</div>
+                    <div className="text-sm text-gray-900">{formatDate(brew.createdAt)}</div>
+                    <div className="text-xs text-gray-500">{formatTime(brew.createdAt)}</div>
                   </TableCell>
                   <TableCell className="px-6 whitespace-nowrap text-sm text-gray-900">
                     {user?.name || 'Unknown'}
                   </TableCell>
                   <TableCell className="px-6 text-sm text-gray-900">
-                    {extraction.roaster}
+                    {brew.roaster}
                   </TableCell>
                   <TableCell className="px-6 text-sm text-gray-900">
-                    {extraction.coffeeName}
+                    {brew.coffeeName}
                   </TableCell>
                   <TableCell className="px-6 whitespace-nowrap text-sm text-gray-900">
-                    {capitalizeBrewMethod(extraction.brewMethod)}
+                    {capitalizeBrewMethod(brew.brewMethod)}
                   </TableCell>
                   <TableCell className="px-6">
                     <div className="flex justify-center">
                       <InteractiveStarRating
-                        rating={extraction.quality}
+                        rating={brew.quality}
                         size="sm"
                         readOnly
                       />
                     </div>
                   </TableCell>
                   <TableCell className="px-6 text-sm text-gray-600">
-                    {extraction.tastingNotes || extraction.notes || '-'}
+                    {brew.tastingNotes || brew.notes || '-'}
                   </TableCell>
                   <TableCell className="px-6">
                     <DropdownMenu>
@@ -124,20 +124,20 @@ export function ExtractionsTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {onEdit && (
-                          <DropdownMenuItem onClick={() => onEdit(extraction)}>
+                          <DropdownMenuItem onClick={() => onEdit(brew)}>
                             <Pencil className="w-4 h-4" />
                             Edit
                           </DropdownMenuItem>
                         )}
                         {onDuplicate && (
-                          <DropdownMenuItem onClick={() => onDuplicate(extraction)}>
+                          <DropdownMenuItem onClick={() => onDuplicate(brew)}>
                             <Copy className="w-4 h-4" />
                             Duplicate
                           </DropdownMenuItem>
                         )}
                         {onDelete && (
                           <DropdownMenuItem 
-                            onClick={() => onDelete(extraction.id)}
+                            onClick={() => onDelete(brew.id)}
                             className="text-red-600"
                           >
                             <Trash2 className="w-4 h-4" />

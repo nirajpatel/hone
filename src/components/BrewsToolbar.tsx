@@ -5,57 +5,57 @@ import { BrewMethod, Equipment, Coffee } from '../types';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { SimpleTooltip } from './ui/simple-tooltip';
 
-interface ExtractionsToolbarProps {
+interface BrewsToolbarProps {
   view: 'table' | 'timeline';
   filterMethod: BrewMethod | 'all';
   groupBy?: 'month' | 'coffee';
   onViewChange: (view: 'table' | 'timeline') => void;
   onFilterMethodChange: (method: BrewMethod | 'all') => void;
   onGroupByChange?: (groupBy: 'month' | 'coffee') => void;
-  onNewExtraction: () => void;
+  onNewBrew: () => void;
   equipment: Equipment[];
   coffees: Coffee[];
 }
 
-export function ExtractionsToolbar({
+export function BrewsToolbar({
   view,
   filterMethod,
   groupBy,
   onViewChange,
   onFilterMethodChange,
   onGroupByChange,
-  onNewExtraction,
+  onNewBrew,
   equipment,
   coffees,
-}: ExtractionsToolbarProps) {
+}: BrewsToolbarProps) {
   const brewMethodConfigs = getAllBrewMethodConfigs();
 
   // Check if there's at least one coffee, one brewer, and one grinder
   const hasBrewers = equipment.some(e => e.type === 'brewer' && e.active);
   const hasGrinders = equipment.some(e => e.type === 'grinder' && e.active);
   const hasCoffees = coffees.length > 0;
-  const canCreateExtraction = hasBrewers && hasGrinders && hasCoffees;
+  const canCreateBrew = hasBrewers && hasGrinders && hasCoffees;
 
   // Generate tooltip text
   const getTooltipText = () => {
-    if (canCreateExtraction) return undefined;
+    if (canCreateBrew) return undefined;
     
     const missing = [];
     if (!hasCoffees) missing.push('at least one coffee');
     if (!hasBrewers) missing.push('at least one brewer');
     if (!hasGrinders) missing.push('at least one grinder');
     
-    return `Add ${missing.join(', ')} to create extractions`;
+    return `Add ${missing.join(', ')} to create brews`;
   };
 
   const button = (
     <Button 
-      onClick={onNewExtraction} 
+      onClick={onNewBrew} 
       className="cursor-pointer mobile-add-button"
-      disabled={!canCreateExtraction}
+      disabled={!canCreateBrew}
     >
       <Plus className="w-4 h-4" />
-      New Extraction
+      New Brew
     </Button>
   );
 
@@ -124,10 +124,10 @@ export function ExtractionsToolbar({
       
       {/* Mobile Header */}
       <h2 className="mobile-section-header">
-        Previous Extractions
+        Previous Brews
       </h2>
       
-      {!canCreateExtraction ? (
+      {!canCreateBrew ? (
         <SimpleTooltip content={getTooltipText()!}>
           {button}
         </SimpleTooltip>

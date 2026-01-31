@@ -322,17 +322,17 @@ html {
   }
   
   /* Previous extractions table mobile styles */
-  .previous-extractions-table thead {
+  .previous-brews-table thead {
     display: none;
   }
   
-  .previous-extractions-table tbody {
+  .previous-brews-table tbody {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
   
-  .previous-extractions-table tr {
+  .previous-brews-table tr {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -342,15 +342,15 @@ html {
     background: white;
   }
   
-  .previous-extractions-table tr.mobile-clickable-card {
+  .previous-brews-table tr.mobile-clickable-card {
     cursor: pointer;
   }
   
-  .previous-extractions-table tr:hover {
+  .previous-brews-table tr:hover {
     background: #f9fafb;
   }
   
-  .previous-extractions-table td {
+  .previous-brews-table td {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -358,14 +358,14 @@ html {
     border: none !important;
   }
   
-  .previous-extractions-table td::before {
+  .previous-brews-table td::before {
     content: attr(data-label);
     font-weight: 500;
     color: #374151;
     font-size: 0.875rem;
   }
   
-  .previous-extractions-table td.mobile-hide-use-button {
+  .previous-brews-table td.mobile-hide-use-button {
     display: none;
   }
   
@@ -454,7 +454,7 @@ html {
   }
   
   /* Remove table container background on mobile */
-  .bg-white.rounded-lg.border.border-gray-200:not(.mobile-timeline-card):not(.equipment-card):not(.mobile-extraction-card) {
+  .bg-white.rounded-lg.border.border-gray-200:not(.mobile-timeline-card):not(.equipment-card):not(.mobile-brew-card) {
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
@@ -468,7 +468,7 @@ html {
   }
   
   /* Keep mobile extraction cards styled properly */
-  .bg-white.rounded-lg.border.border-gray-200.mobile-extraction-card {
+  .bg-white.rounded-lg.border.border-gray-200.mobile-brew-card {
     background: white !important;
     border: 1px solid #e5e7eb !important;
     border-radius: 0.5rem !important;
@@ -658,7 +658,7 @@ html {
     margin: 0 !important;
   }
   
-  /* Add spacing to fixed modal cards (NewExtractionFlow, etc.) */
+  /* Add spacing to fixed modal cards (NewBrewFlow, etc.) */
   .fixed.inset-0 {
     padding: 1rem !important;
   }

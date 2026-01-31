@@ -11,7 +11,7 @@ import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface CoffeesShelvesViewProps {
   coffees: Coffee[];
-  extractions: Extraction[];
+  brews: Brew[];
   groupBy: 'month' | 'coffee';
   onGroupByChange: (groupBy: 'month' | 'coffee') => void;
   onNewCoffee: () => void;
@@ -21,7 +21,7 @@ interface CoffeesShelvesViewProps {
 
 export function CoffeesShelvesView({
   coffees,
-  extractions,
+  brews,
   groupBy,
   onGroupByChange,
   onNewCoffee,
@@ -143,17 +143,17 @@ export function CoffeesShelvesView({
 
   // Get coffee average rating for a specific coffee bag (by coffeeId)
   const getCoffeeBagRating = (coffeeId: string): number => {
-    const coffeeExtractions = extractions.filter(e => e.coffeeId === coffeeId && e.quality);
-    if (coffeeExtractions.length === 0) return 0;
-    const sum = coffeeExtractions.reduce((acc, e) => acc + (e.quality || 0), 0);
-    return sum / coffeeExtractions.length;
+    const coffeeBrews = brews.filter(e => e.coffeeId === coffeeId && e.quality);
+    if (coffeeBrews.length === 0) return 0;
+    const sum = coffeeBrews.reduce((acc, e) => acc + (e.quality || 0), 0);
+    return sum / coffeeBrews.length;
   };
 
   // Get average rating across all bags of the same coffee (by roaster + name)
   const getAggregatedCoffeeRating = (roaster: string, coffeeName: string): number => {
     const relatedCoffees = coffees.filter(c => c.roaster === roaster && c.name === coffeeName);
     const coffeeIds = relatedCoffees.map(c => c.id);
-    const relevantExtractions = extractions.filter(e => coffeeIds.includes(e.coffeeId) && e.quality);
+    const relevantExtractions = brews.filter(e => coffeeIds.includes(e.coffeeId) && e.quality);
     if (relevantExtractions.length === 0) return 0;
     const sum = relevantExtractions.reduce((acc, e) => acc + (e.quality || 0), 0);
     return sum / relevantExtractions.length;

@@ -1,40 +1,40 @@
-import { Extraction, BrewMethod, User } from '../types';
+import { Brew, BrewMethod, User } from '../types';
 import { capitalizeBrewMethod, getRatingEmoji } from '../utils/formatters';
 
-interface ExtractionsMobileListViewProps {
-  extractions: Extraction[];
-  onSelectExtraction: (extraction: Extraction) => void;
+interface BrewsMobileListViewProps {
+  brews: Brew[];
+  onSelectBrew: (brew: Brew) => void;
   groupBy?: 'month' | 'coffee';
   users?: User[];
 }
 
-export function ExtractionsMobileListView({
-  extractions,
-  onSelectExtraction,
+export function BrewsMobileListView({
+  brews,
+  onSelectBrew,
   groupBy = 'month',
   users = [],
-}: ExtractionsMobileListViewProps) {
-  // Sort extractions by date (most recent first)
-  const sortedExtractions = [...extractions].sort((a, b) => 
+}: BrewsMobileListViewProps) {
+  // Sort brews by date (most recent first)
+  const sortedBrews = [...brews].sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  // Group extractions by date or coffee
-  const grouped: Record<string, Extraction[]> = {};
+  // Group brews by date or coffee
+  const grouped: Record<string, Brew[]> = {};
   
   if (groupBy === 'coffee') {
     // Group by coffee (Roaster – Coffee Name)
-    sortedExtractions.forEach(extraction => {
-      const coffeeKey = `${extraction.roaster} – ${extraction.coffeeName}`;
+    sortedBrews.forEach(brew => {
+      const coffeeKey = `${brew.roaster} – ${brew.coffeeName}`;
       if (!grouped[coffeeKey]) {
         grouped[coffeeKey] = [];
       }
-      grouped[coffeeKey].push(extraction);
+      grouped[coffeeKey].push(brew);
     });
   } else {
     // Group by date
-    sortedExtractions.forEach(extraction => {
-      const date = new Date(extraction.createdAt);
+    sortedBrews.forEach(brew => {
+      const date = new Date(brew.createdAt);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const yesterday = new Date(today);
@@ -58,7 +58,7 @@ export function ExtractionsMobileListView({
       if (!grouped[dateLabel]) {
         grouped[dateLabel] = [];
       }
-      grouped[dateLabel].push(extraction);
+      grouped[dateLabel].push(brew);
     });
   }
 
@@ -87,18 +87,18 @@ export function ExtractionsMobileListView({
   };
 
   // Format recipe information (e.g., "18g → 38g • 0:28")
-  const formatRecipe = (extraction: Extraction) => {
+  const formatRecipe = (brew: Brew) => {
     const parts: string[] = [];
     
     // Add dose in → dose out
-    if (extraction.dosage !== undefined && extraction.finalWeight !== undefined) {
-      parts.push(`${extraction.dosage}g → ${extraction.finalWeight}g`);
+    if (brew.dosage !== undefined && brew.finalWeight !== undefined) {
+      parts.push(`${brew.dosage}g → ${brew.finalWeight}g`);
     }
     
-    // Add extraction time
-    if (extraction.extractionTime !== undefined) {
-      const minutes = Math.floor(extraction.extractionTime / 60);
-      const seconds = extraction.extractionTime % 60;
+    // Add brew time
+    if (brew.brewTime !== undefined) {
+      const minutes = Math.floor(brew.brewTime / 60);
+      const seconds = brew.brewTime % 60;
       const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       parts.push(timeStr);
     }
@@ -108,19 +108,19 @@ export function ExtractionsMobileListView({
 
   return (
     <div className="mobile-list-view -mx-3">
-      {Object.entries(grouped).map(([groupLabel, groupExtractions]) => (
+      {Object.entries(grouped).map(([groupLabel, groupBrews]) => (
         <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
           {/* Group Header */}
           <div className="px-3 pt-2 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
             {groupLabel}
           </div>
           
-          {/* Extraction List */}
-          <div className="bg-white border-y border-gray-200 overflow-hidden mobile-extraction-card">
-            {groupExtractions.map((extraction, index) => (
-              <div key={extraction.id}>
+          {/* Brew List */}
+          <div className="bg-white border-y border-gray-200 overflow-hidden mobile-brew-card">
+            {groupBrews.map((brew, index) => (
+              <div key={brew.id}>
                 <button
-                  onClick={() => onSelectExtraction(extraction)}
+                  onClick={() => onSelectBrew(brew)}
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                 >
                   {groupBy === 'coffee' ? (
@@ -131,28 +131,28 @@ export function ExtractionsMobileListView({
                       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                         {/* Line 1: Date */}
                         <div 
-                          className="text-gray-900"
-                          style={{ fontWeight: 'var(--font-weight-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          className="text-gray-900 truncate"
+                          style={{ fontWeight: 'var(--font-weight-medium)' }}
                         >
-                          {formatDate(extraction.createdAt)}
+                          {formatDate(brew.createdAt)}
                         </div>
                         
                         {/* Line 2: Brew Method and Recipe */}
-                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
+                        <div className="text-sm text-gray-500 truncate">
+                          {capitalizeBrewMethod(brew.brewMethod)}{formatRecipe(brew)}
                         </div>
                         
                         {/* Line 3: Time and optional First Name */}
-                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {formatTime(extraction.createdAt)}
-                          {isMultiUserHousehold && extraction.userName && ` • ${extraction.userName.split(' ')[0]}`}
+                        <div className="text-sm text-gray-500 truncate">
+                          {formatTime(brew.createdAt)}
+                          {isMultiUserHousehold && brew.userName && ` • ${brew.userName.split(' ')[0]}`}
                         </div>
                       </div>
                       
                       {/* Right side - Emoji rating (vertically centered) */}
                       <div className="flex-shrink-0 self-center">
-                        {extraction.quality ? (
-                          <span className="text-xl leading-none">{getRatingEmoji(extraction.quality)}</span>
+                        {brew.quality ? (
+                          <span className="text-xl leading-none">{getRatingEmoji(brew.quality)}</span>
                         ) : (
                           <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
                         )}
@@ -166,28 +166,28 @@ export function ExtractionsMobileListView({
                       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                         {/* Line 1: Roaster – Coffee Name */}
                         <div 
-                          className="text-gray-900"
-                          style={{ fontWeight: 'var(--font-weight-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          className="text-gray-900 truncate"
+                          style={{ fontWeight: 'var(--font-weight-medium)' }}
                         >
-                          {extraction.roaster} – {extraction.coffeeName}
+                          {brew.roaster} – {brew.coffeeName}
                         </div>
                         
                         {/* Line 2: Brew Method and Recipe */}
-                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
+                        <div className="text-sm text-gray-500 truncate">
+                          {capitalizeBrewMethod(brew.brewMethod)}{formatRecipe(brew)}
                         </div>
                         
                         {/* Line 3: Time and optional First Name */}
-                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {formatTime(extraction.createdAt)}
-                          {isMultiUserHousehold && extraction.userName && ` • ${extraction.userName.split(' ')[0]}`}
+                        <div className="text-sm text-gray-500 truncate">
+                          {formatTime(brew.createdAt)}
+                          {isMultiUserHousehold && brew.userName && ` • ${brew.userName.split(' ')[0]}`}
                         </div>
                       </div>
                       
                       {/* Right side - Emoji rating (vertically centered) */}
                       <div className="flex-shrink-0 self-center">
-                        {extraction.quality ? (
-                          <span className="text-xl leading-none">{getRatingEmoji(extraction.quality)}</span>
+                        {brew.quality ? (
+                          <span className="text-xl leading-none">{getRatingEmoji(brew.quality)}</span>
                         ) : (
                           <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
                         )}
@@ -197,7 +197,7 @@ export function ExtractionsMobileListView({
                 </button>
                 
                 {/* Separator line (except for last item) */}
-                {index < groupExtractions.length - 1 && (
+                {index < groupBrews.length - 1 && (
                   <div className="border-b border-gray-200" />
                 )}
               </div>
@@ -206,9 +206,9 @@ export function ExtractionsMobileListView({
         </div>
       ))}
       
-      {extractions.length === 0 && (
+      {brews.length === 0 && (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-sm">No extractions found</p>
+          <p className="text-sm">No brews found</p>
         </div>
       )}
     </div>

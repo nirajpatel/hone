@@ -1,4 +1,4 @@
-import * as kv from './kv_store.tsx';
+import * as kv from './kv_store.ts';
 
 /**
  * Get tasting note suggestions based on quality rating
@@ -33,7 +33,7 @@ export interface NotificationState {
 export function formatTime(timestamp: string): string {
   const date = new Date(timestamp);
   // toLocaleTimeString automatically converts UTC to the local timezone
-  // This matches the frontend's formatDate function in App.tsx
+  // This matches the frontend's formatDate function in App.ts
   return date.toLocaleTimeString('en-US', { 
     hour: 'numeric', 
     minute: '2-digit', 

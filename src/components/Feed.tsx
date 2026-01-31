@@ -5,16 +5,16 @@ import { capitalizeBrewMethod } from '../utils/formatters';
 import { Extraction, Coffee } from '../types';
 
 interface FeedProps {
-  extractions: Extraction[];
+  brews: Extraction[];
   coffees: Coffee[];
 }
 
 interface FeedCardProps {
-  extraction: Extraction;
+  brew: Extraction;
   coffeeImages?: string[];
 }
 
-const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
+const FeedCard = ({ brew, coffeeImages }: FeedCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(0);
   const [showComments, setShowComments] = useState(false);
@@ -74,7 +74,7 @@ const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
     }
   };
 
-  const brewRatio = formatBrewRatio(extraction.dosage, extraction.finalWeight);
+  const brewRatio = formatBrewRatio(brew.dosage, brew.finalWeight);
   const coffeeImage = coffeeImages && coffeeImages.length > 0 ? coffeeImages[0] : undefined;
 
   return (
@@ -84,19 +84,19 @@ const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             <span className="text-gray-600 font-medium text-sm">
-              {extraction.userName.charAt(0).toUpperCase()}
+              {brew.userName.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-gray-900">{extraction.userName}</p>
-            <p className="text-xs text-gray-500">{formatTimestamp(extraction.createdAt)}</p>
+            <p className="font-semibold text-gray-900">{brew.userName}</p>
+            <p className="text-xs text-gray-500">{formatTimestamp(brew.createdAt)}</p>
           </div>
         </div>
       </div>
 
       {/* Roaster Name */}
       <div className="px-4 pt-3 pb-2">
-        <h3 className="text-lg font-semibold text-gray-900">{extraction.roaster}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{brew.roaster}</h3>
       </div>
 
       {/* Content */}
@@ -107,7 +107,7 @@ const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
             <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
               <ImageWithFallback 
                 src={coffeeImage} 
-                alt={extraction.coffeeName}
+                alt={brew.coffeeName}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -117,15 +117,15 @@ const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
         {/* Details */}
         <div className="flex-1 min-w-0">
           <p className="font-medium text-gray-900 mb-1">
-            {extraction.roaster} – {extraction.coffeeName}
+            {brew.roaster} – {brew.coffeeName}
           </p>
           
           <div className="space-y-1 text-sm">
             <p className="text-gray-700">
-              <span className="text-gray-500">Method:</span> {capitalizeBrewMethod(extraction.brewMethod)}
+              <span className="text-gray-500">Method:</span> {capitalizeBrewMethod(brew.brewMethod)}
             </p>
             
-            {extraction.quality && extraction.quality > 0 && (
+            {brew.quality && brew.quality > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-gray-500">Quality:</span>
                 <div className="flex items-center gap-1">
@@ -133,21 +133,21 @@ const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
                     <Star
                       key={star}
                       className={`w-3.5 h-3.5 ${
-                        star <= extraction.quality!
+                        star <= brew.quality!
                           ? 'fill-yellow-400 text-yellow-400'
                           : 'text-gray-300'
                       }`}
                     />
                   ))}
-                  <span className="text-gray-700 ml-1">{getQualityLabel(extraction.quality)}</span>
+                  <span className="text-gray-700 ml-1">{getQualityLabel(brew.quality)}</span>
                 </div>
               </div>
             )}
 
-            {extraction.tastingNotes && extraction.tastingNotes.trim() && (
+            {brew.tastingNotes && brew.tastingNotes.trim() && (
               <div className="flex flex-wrap gap-1.5 items-center">
                 <span className="text-gray-500">Notes:</span>
-                {extraction.tastingNotes.split(',').map((note, idx) => (
+                {brew.tastingNotes.split(',').map((note, idx) => (
                   <span 
                     key={idx}
                     className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 border border-gray-200 text-gray-700"
@@ -236,9 +236,9 @@ const FeedCard = ({ extraction, coffeeImages }: FeedCardProps) => {
   );
 };
 
-export const Feed = ({ extractions, coffees }: FeedProps) => {
-  // Get last 5 extractions sorted by date
-  const recentExtractions = [...extractions]
+export const Feed = ({ brews, coffees }: FeedProps) => {
+  // Get last 5 brews sorted by date
+  const recentBrews = [...brews]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
@@ -250,11 +250,11 @@ export const Feed = ({ extractions, coffees }: FeedProps) => {
     }
   });
 
-  if (recentExtractions.length === 0) {
+  if (recentBrews.length === 0) {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-          <p className="text-gray-500">No extractions yet. Start logging your brews to see them here!</p>
+          <p className="text-gray-500">No brews yet. Start logging your brews to see them here!</p>
         </div>
       </div>
     );
@@ -263,11 +263,11 @@ export const Feed = ({ extractions, coffees }: FeedProps) => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="space-y-4">
-        {recentExtractions.map((extraction) => (
+        {recentBrews.map((brew) => (
           <FeedCard 
-            key={extraction.id} 
-            extraction={extraction}
-            coffeeImages={coffeeImageMap.get(extraction.coffeeId)}
+            key={brew.id} 
+            brew={brew}
+            coffeeImages={coffeeImageMap.get(brew.coffeeId)}
           />
         ))}
       </div>

@@ -1,48 +1,48 @@
 import { useState, useEffect, useRef } from 'react';
-import { Extraction, Coffee, User, BrewMethod, Equipment } from '../types';
+import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { MoreVertical, Pencil, Trash2, Copy, Check, Plus } from 'lucide-react';
 import { getRatingEmoji, capitalizeBrewMethod } from '../utils/formatters';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
-import { ExtractionsToolbar } from './ExtractionsToolbar';
+import { BrewsToolbar } from './BrewsToolbar';
 import { line, area, curveMonotoneX } from 'd3-shape';
 
-interface ExtractionsTimelineViewProps {
-  extractions: Extraction[];
+interface BrewsTimelineViewProps {
+  brews: Brew[];
   coffees: Coffee[];
   users: User[];
   filterMethod: BrewMethod | 'all';
   onFilterMethodChange: (method: BrewMethod | 'all') => void;
-  onNewExtraction: () => void;
-  onSelectExtraction: (extraction: Extraction) => void;
+  onNewBrew: () => void;
+  onSelectBrew: (brew: Brew) => void;
   view?: 'table' | 'timeline';
   onViewChange?: (view: 'table' | 'timeline') => void;
   equipment: Equipment[];
-  onAddExtractionForCoffee?: (coffeeId: string, brewMethod: BrewMethod) => void;
+  onAddBrewForCoffee?: (coffeeId: string, brewMethod: BrewMethod) => void;
   onOpenEquipment?: () => void;
   onOpenAddCoffee?: () => void;
 }
 
-export function ExtractionsTimelineView({
-  extractions,
+export function BrewsTimelineView({
+  brews,
   coffees,
   users,
   filterMethod,
   onFilterMethodChange,
-  onNewExtraction,
-  onSelectExtraction,
+  onNewBrew,
+  onSelectBrew,
   view,
   onViewChange,
   equipment,
-  onAddExtractionForCoffee,
+  onAddBrewForCoffee,
   onOpenEquipment,
   onOpenAddCoffee,
-}: ExtractionsTimelineViewProps) {
-  // Filter extractions
-  const filteredExtractions = filterMethod === 'all' 
-    ? extractions 
-    : extractions.filter(e => e.brewMethod === filterMethod);
+}: BrewsTimelineViewProps) {
+  // Filter brews
+  const filteredBrews = filterMethod === 'all' 
+    ? brews 
+    : brews.filter(b => b.brewMethod === filterMethod);
 
   // Get all brew method configs
   const brewMethodConfigs = getAllBrewMethodConfigs();
@@ -60,45 +60,45 @@ export function ExtractionsTimelineView({
     });
   };
 
-  // Group extractions by coffee (name + roaster) AND method
+  // Group brews by coffee (name + roaster) AND method
   const coffeeMethodGroups: Record<string, {
     coffeeName: string;
     roaster: string;
     method: string;
     methodLabel: string;
-    extractions: Extraction[];
+    brews: Brew[];
     lastExtractionDate: Date;
   }> = {};
 
-  filteredExtractions.forEach(extraction => {
-    const coffee = coffees.find(c => c.id === extraction.coffeeId);
+  filteredExtractions.forEach(brew => {
+    const coffee = coffees.find(c => c.id === brew.coffeeId);
     if (!coffee) return;
 
-    const methodConfig = brewMethodConfigs.find(c => c.id === extraction.brewMethod);
-    const methodLabel = methodConfig?.label || extraction.brewMethod;
-    const key = `${coffee.name}|||${coffee.roaster}|||${extraction.brewMethod}`;
+    const methodConfig = brewMethodConfigs.find(c => c.id === brew.brewMethod);
+    const methodLabel = methodConfig?.label || brew.brewMethod;
+    const key = `${coffee.name}|||${coffee.roaster}|||${brew.brewMethod}`;
     
     if (!coffeeMethodGroups[key]) {
       coffeeMethodGroups[key] = {
         coffeeName: coffee.name,
         roaster: coffee.roaster,
-        method: extraction.brewMethod,
+        method: brew.brewMethod,
         methodLabel: methodLabel,
-        extractions: [],
-        lastExtractionDate: new Date(extraction.createdAt),
+        brews: [],
+        lastExtractionDate: new Date(brew.createdAt),
       };
     }
 
-    // Update last extraction date
-    const extractionDate = new Date(extraction.createdAt);
-    if (extractionDate > coffeeMethodGroups[key].lastExtractionDate) {
-      coffeeMethodGroups[key].lastExtractionDate = extractionDate;
+    // Update last brew date
+    const brewDate = new Date(brew.createdAt);
+    if (brewDate > coffeeMethodGroups[key].lastExtractionDate) {
+      coffeeMethodGroups[key].lastExtractionDate = brewDate;
     }
 
-    coffeeMethodGroups[key].extractions.push(extraction);
+    coffeeMethodGroups[key].brews.push(brew);
   });
 
-  // Sort coffee+method groups by last extraction descending
+  // Sort coffee+method groups by last brew descending
   const sortedGroups = Object.entries(coffeeMethodGroups).sort((a, b) => 
     b[1].lastExtractionDate.getTime() - a[1].lastExtractionDate.getTime()
   );
@@ -151,10 +151,10 @@ export function ExtractionsTimelineView({
   return (
     <>
       {/* Toolbar */}
-      <ExtractionsToolbar
+      <BrewsToolbar
         filterMethod={filterMethod}
         onFilterMethodChange={onFilterMethodChange}
-        onNewExtraction={onNewExtraction}
+        onNewBrew={onNewBrew}
         view={view || 'timeline'}
         onViewChange={onViewChange!}
         equipment={equipment}
@@ -171,9 +171,9 @@ export function ExtractionsTimelineView({
               </h3>
               <p className="text-sm text-gray-600 mb-6">
                 {filterMethod !== 'all' ? (
-                  'Try changing the filter or create a new extraction'
+                  'Try changing the filter or create a new brew'
                 ) : (
-                  'Get started by adding equipment and coffee, then log your first extraction'
+                  'Get started by adding equipment and coffee, then log your first brew'
                 )}
               </p>
               {filterMethod === 'all' && (
@@ -218,12 +218,12 @@ export function ExtractionsTimelineView({
           </div>
         ) : (
           sortedGroups.map(([key, group]) => {
-            // Sort extractions by date ascending for timeline (oldest to newest left to right)
-            const sortedExtractions = [...group.extractions].sort((a, b) => 
+            // Sort brews by date ascending for timeline (oldest to newest left to right)
+            const sortedExtractions = [...group.brews].sort((a, b) => 
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             );
 
-            // Get the coffee ID from the first extraction
+            // Get the coffee ID from the first brew
             const coffeeId = sortedExtractions[0]?.coffeeId;
 
             return (
@@ -238,12 +238,12 @@ export function ExtractionsTimelineView({
 
                 {/* Timeline */}
                 <TimelineRow
-                  extractions={sortedExtractions}
-                  onSelectExtraction={onSelectExtraction}
+                  brews={sortedExtractions}
+                  onSelectBrew={onSelectBrew}
                   formatNodeDateTime={formatNodeDateTime}
                   coffeeId={coffeeId}
                   brewMethod={group.method as BrewMethod}
-                  onAddExtraction={onAddExtractionForCoffee}
+                  onAddExtraction={onAddBrewForCoffee}
                 />
               </div>
             );
@@ -258,15 +258,15 @@ export function ExtractionsTimelineView({
 let timelineIdCounter = 0;
 
 interface TimelineRowProps {
-  extractions: Extraction[];
-  onSelectExtraction: (extraction: Extraction) => void;
+  brews: Brew[];
+  onSelectBrew: (brew: Brew) => void;
   formatNodeDateTime: (dateString: string) => { date: string; time: string };
   coffeeId?: string;
   brewMethod?: BrewMethod;
   onAddExtraction?: (coffeeId: string, brewMethod: BrewMethod) => void;
 }
 
-function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coffeeId, brewMethod, onAddExtraction }: TimelineRowProps) {
+function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMethod, onAddExtraction }: TimelineRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
@@ -320,7 +320,7 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
       handleScroll();
       return () => scrollElement.removeEventListener('scroll', handleScroll);
     }
-  }, [extractions]);
+  }, [brews]);
 
   // Get dot color based on rating
   const getDotColor = (quality: number | null) => {
@@ -346,7 +346,7 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
 
   // Get Y position based on rating for graph
   const getYPosition = (quality: number | null, lastRatedQuality: number | null = null, isMobile: boolean = false) => {
-    // If unrated, use the last rated extraction's position
+    // If unrated, use the last rated brew's position
     if (!quality) {
       return lastRatedQuality ? getYPosition(lastRatedQuality, null, isMobile) : (isMobile ? 45 : 60);
     }
@@ -388,26 +388,26 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
   const desktopSvgHeight = 120;
   const hasButton = coffeeId && brewMethod && onAddExtraction;
 
-  // Calculate graph path for rated extractions
+  // Calculate graph path for rated brews
   const calculateGraphPath = (isMobile: boolean) => {
     const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
     const gap = isMobile ? mobileGap : desktopGap;
     const svgHeight = isMobile ? mobileSvgHeight : desktopSvgHeight;
     
-    // Track the last rated quality to use for unrated extractions
+    // Track the last rated quality to use for unrated brews
     let lastRatedQuality: number | null = null;
     
-    // Get ALL extractions with their positions (including unrated)
-    const allExtractions = extractions.map((extraction, index) => {
-      if (extraction.quality) {
-        lastRatedQuality = extraction.quality;
+    // Get ALL brews with their positions (including unrated)
+    const allExtractions = brews.map((brew, index) => {
+      if (brew.quality) {
+        lastRatedQuality = brew.quality;
       }
       
       return {
-        extraction,
+        brew,
         index,
         x: index * (containerWidth + gap) + containerWidth / 2, // Center of each node
-        y: getYPosition(extraction.quality, lastRatedQuality, isMobile),
+        y: getYPosition(brew.quality, lastRatedQuality, isMobile),
       };
     });
 
@@ -419,7 +419,7 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
     // If button exists, add intermediate point at 90% then button
     if (coffeeId && brewMethod && onAddExtraction) {
       const lastExtractionX = allExtractions[allExtractions.length - 1].x;
-      const buttonCenterX = extractions.length * (containerWidth + gap) + containerWidth / 2;
+      const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
       const buttonY = isMobile ? 45 : 60; // Responsive center position
       
       // Add intermediate point at 90% of the distance, at vertical center
@@ -447,20 +447,20 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
     const gap = isMobile ? mobileGap : desktopGap;
     const svgHeight = isMobile ? mobileSvgHeight : desktopSvgHeight;
     
-    // Track the last rated quality to use for unrated extractions
+    // Track the last rated quality to use for unrated brews
     let lastRatedQuality: number | null = null;
     
-    // Get ALL extractions with their positions (including unrated)
-    const allExtractions = extractions.map((extraction, index) => {
-      if (extraction.quality) {
-        lastRatedQuality = extraction.quality;
+    // Get ALL brews with their positions (including unrated)
+    const allExtractions = brews.map((brew, index) => {
+      if (brew.quality) {
+        lastRatedQuality = brew.quality;
       }
       
       return {
-        extraction,
+        brew,
         index,
         x: index * (containerWidth + gap) + containerWidth / 2,
-        y: getYPosition(extraction.quality, lastRatedQuality, isMobile),
+        y: getYPosition(brew.quality, lastRatedQuality, isMobile),
       };
     });
 
@@ -472,7 +472,7 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
     // If button exists, add intermediate point at 90% then button (match the line path)
     if (coffeeId && brewMethod && onAddExtraction) {
       const lastExtractionX = allExtractions[allExtractions.length - 1].x;
-      const buttonCenterX = extractions.length * (containerWidth + gap) + containerWidth / 2;
+      const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
       const buttonY = isMobile ? 45 : 60; // Responsive center position
       
       // Add intermediate point at 90% of the distance, at vertical center
@@ -495,11 +495,11 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
   const mobileFillPath = calculateFillPath(true);
   const desktopFillPath = calculateFillPath(false);
 
-  // Get the X position where the mask should cut off (at center of last extraction)
+  // Get the X position where the mask should cut off (at center of last brew)
   const getMaskCutoffX = (isMobile: boolean) => {
     const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
     const gap = isMobile ? mobileGap : desktopGap;
-    const lastExtractionX = (extractions.length - 1) * (containerWidth + gap) + containerWidth / 2;
+    const lastExtractionX = (brews.length - 1) * (containerWidth + gap) + containerWidth / 2;
     return {
       cutoffStart: lastExtractionX,
       cutoffEnd: lastExtractionX + 1 // Immediate fade over 1px
@@ -511,11 +511,11 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
 
   // Calculate SVG dimensions
   const mobileSvgWidth = hasButton 
-    ? extractions.length * (mobileContainerWidth + mobileGap) + mobileContainerWidth
-    : extractions.length * (mobileContainerWidth + mobileGap) + mobileContainerWidth;
+    ? brews.length * (mobileContainerWidth + mobileGap) + mobileContainerWidth
+    : brews.length * (mobileContainerWidth + mobileGap) + mobileContainerWidth;
   const desktopSvgWidth = hasButton
-    ? extractions.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth
-    : extractions.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth;
+    ? brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth
+    : brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth;
   
   return (
     <div>
@@ -626,36 +626,36 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
 
               {/* Nodes */}
               <div className="flex items-start gap-3 md:gap-8 relative"> {/* Reduced mobile gap */}
-                {extractions.map((extraction, index) => {
-                  const dotColor = getDotColor(extraction.quality);
-                  const dotBorderColor = getDotBorderColor(extraction.quality);
+                {brews.map((brew, index) => {
+                  const dotColor = getDotColor(brew.quality);
+                  const dotBorderColor = getDotBorderColor(brew.quality);
                   
                   // Calculate Y position with last rated quality tracking
                   let lastRatedQuality: number | null = null;
                   for (let i = 0; i < index; i++) {
-                    if (extractions[i].quality) {
-                      lastRatedQuality = extractions[i].quality;
+                    if (brews[i].quality) {
+                      lastRatedQuality = brews[i].quality;
                     }
                   }
                   
                   // Use window width to determine if mobile for node positioning
                   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-                  const yPos = getYPosition(extraction.quality, lastRatedQuality, isMobile);
-                  const isUnrated = !extraction.quality;
-                  const isNewest = index === extractions.length - 1;
+                  const yPos = getYPosition(brew.quality, lastRatedQuality, isMobile);
+                  const isUnrated = !brew.quality;
+                  const isNewest = index === brews.length - 1;
 
                   return (
-                    <div key={extraction.id} className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
+                    <div key={brew.id} className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
                       {/* Node Circle - centered on the curve */}
                       <button
-                        onClick={() => onSelectExtraction(extraction)}
+                        onClick={() => onSelectBrew(brew)}
                         className={`w-2.5 h-2.5 rounded-full transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
                           isUnrated 
                             ? 'border-dashed border-gray-400 bg-transparent hover:border-gray-600' 
                             : `${dotColor} ${dotBorderColor} hover:opacity-80 ${isNewest ? 'animate-radiate' : ''}`
                         }`}
                         style={{ marginTop: `${yPos - 5}px` }}
-                        title={isUnrated ? 'Click to rate this extraction' : ''}
+                        title={isUnrated ? 'Click to rate this brew' : ''}
                       >
                       </button>
                     </div>
@@ -690,11 +690,11 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
 
             {/* Date/Time labels below graph */}
             <div className="flex items-start gap-3 md:gap-8 relative mt-3"> {/* Match card padding spacing */}
-              {extractions.map((extraction) => {
-                const { date, time } = formatNodeDateTime(extraction.createdAt);
+              {brews.map((brew) => {
+                const { date, time } = formatNodeDateTime(brew.createdAt);
 
                 return (
-                  <div key={extraction.id} className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
+                  <div key={brew.id} className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
                     <div className="text-xs font-normal text-gray-900 whitespace-nowrap">{date}</div>
                     <div className="text-xs text-gray-500 whitespace-nowrap">{time}</div>
                   </div>

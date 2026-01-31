@@ -1,60 +1,60 @@
 import { useState } from 'react';
-import { Extraction, Coffee, User, BrewMethod, Equipment } from '../types';
+import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { MoreVertical, Pencil, Trash2, Copy, Check } from 'lucide-react';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
-import { ExtractionsToolbar } from './ExtractionsToolbar';
+import { BrewsToolbar } from './BrewsToolbar';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
-import { ExtractionsMobileListView } from './ExtractionsMobileListView';
+import { BrewsMobileListView } from './BrewsMobileListView';
 
-interface ExtractionsTableViewProps {
-  extractions: Extraction[];
+interface BrewsTableViewProps {
+  brews: Brew[];
   coffees: Coffee[];
   users: User[];
   filterMethod: BrewMethod | 'all';
   groupBy: 'month' | 'coffee';
   onFilterMethodChange: (method: BrewMethod | 'all') => void;
   onGroupByChange: (groupBy: 'month' | 'coffee') => void;
-  onNewExtraction: () => void;
-  onSelectExtraction: (extraction: Extraction) => void;
-  onEditExtraction: (extraction: Extraction) => void;
-  onDeleteExtraction: (id: string) => void;
-  onDuplicateExtraction: (extraction: Extraction) => void;
-  hoveredExtractionRating: { id: string; rating: number } | null;
-  onHoverExtractionRating: (data: { id: string; rating: number } | null) => void;
+  onNewBrew: () => void;
+  onSelectBrew: (brew: Brew) => void;
+  onEditBrew: (brew: Brew) => void;
+  onDeleteBrew: (id: string) => void;
+  onDuplicateBrew: (brew: Brew) => void;
+  hoveredBrewRating: { id: string; rating: number } | null;
+  onHoverBrewRating: (data: { id: string; rating: number } | null) => void;
   view?: 'table' | 'timeline';
   onViewChange?: (view: 'table' | 'timeline') => void;
   equipment: Equipment[];
-  onAddExtractionForCoffee?: (coffeeId: string, brewMethod: BrewMethod) => void;
+  onAddBrewForCoffee?: (coffeeId: string, brewMethod: BrewMethod) => void;
   onOpenEquipment?: () => void;
   onOpenAddCoffee?: () => void;
 }
 
-export function ExtractionsTableView({
-  extractions,
+export function BrewsTableView({
+  brews,
   coffees,
   users,
   filterMethod,
   groupBy,
   onFilterMethodChange,
   onGroupByChange,
-  onNewExtraction,
-  onSelectExtraction,
-  onEditExtraction,
-  onDeleteExtraction,
-  onDuplicateExtraction,
-  hoveredExtractionRating,
-  onHoverExtractionRating,
+  onNewBrew,
+  onSelectBrew,
+  onEditBrew,
+  onDeleteBrew,
+  onDuplicateBrew,
+  hoveredBrewRating,
+  onHoverBrewRating,
   view = 'table',
   onViewChange,
   equipment,
-  onAddExtractionForCoffee,
+  onAddBrewForCoffee,
   onOpenEquipment,
   onOpenAddCoffee,
-}: ExtractionsTableViewProps) {
+}: BrewsTableViewProps) {
   // Get all brew method configs
   const brewMethodConfigs = getAllBrewMethodConfigs();
 
@@ -115,47 +115,47 @@ export function ExtractionsTableView({
     }
   };
 
-  // Filter extractions
-  const filteredExtractions = filterMethod === 'all' 
-    ? extractions 
-    : extractions.filter(e => e.brewMethod === filterMethod);
+  // Filter brews
+  const filteredBrews = filterMethod === 'all' 
+    ? brews 
+    : brews.filter(b => b.brewMethod === filterMethod);
 
-  // Sort extractions by date (most recent first) before grouping
-  const sortedExtractions = [...filteredExtractions].sort((a, b) => 
+  // Sort brews by date (most recent first) before grouping
+  const sortedBrews = [...filteredBrews].sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  // Group extractions
-  const groupedExtractions: Record<string, Extraction[]> = {};
+  // Group brews
+  const groupedBrews: Record<string, Brew[]> = {};
   
   if (groupBy === 'month') {
-    sortedExtractions.forEach(extraction => {
-      const date = new Date(extraction.createdAt);
+    sortedBrews.forEach(brew => {
+      const date = new Date(brew.createdAt);
       const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      if (!groupedExtractions[monthYear]) {
-        groupedExtractions[monthYear] = [];
+      if (!groupedBrews[monthYear]) {
+        groupedBrews[monthYear] = [];
       }
-      groupedExtractions[monthYear].push(extraction);
+      groupedBrews[monthYear].push(brew);
     });
   } else {
-    sortedExtractions.forEach(extraction => {
-      const label = `${extraction.roaster} — ${extraction.coffeeName}`;
-      if (!groupedExtractions[label]) {
-        groupedExtractions[label] = [];
+    sortedBrews.forEach(brew => {
+      const label = `${brew.roaster} — ${brew.coffeeName}`;
+      if (!groupedBrews[label]) {
+        groupedBrews[label] = [];
       }
-      groupedExtractions[label].push(extraction);
+      groupedBrews[label].push(brew);
     });
   }
 
   return (
     <>
       {/* Toolbar */}
-      <ExtractionsToolbar
+      <BrewsToolbar
         filterMethod={filterMethod}
         groupBy={groupBy}
         onFilterMethodChange={onFilterMethodChange}
         onGroupByChange={onGroupByChange}
-        onNewExtraction={onNewExtraction}
+        onNewBrew={onNewBrew}
         view={view}
         onViewChange={onViewChange!}
         equipment={equipment}
@@ -163,17 +163,17 @@ export function ExtractionsTableView({
       />
 
       {/* Table */}
-      {filteredExtractions.length === 0 ? (
+      {filteredBrews.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
           <div className="max-w-md mx-auto">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {filterMethod !== 'all' ? 'No Extractions Found' : 'No Extractions Yet'}
+              {filterMethod !== 'all' ? 'No Brews Found' : 'No Brews Yet'}
             </h3>
             <p className="text-sm text-gray-600 mb-6">
               {filterMethod !== 'all' ? (
-                'Try changing the filter or create a new extraction'
+                'Try changing the filter or create a new brew'
               ) : (
-                'Get started by adding equipment and coffee, then log your first extraction'
+                'Get started by adding equipment and coffee, then log your first brew'
               )}
             </p>
             {filterMethod === 'all' && (
@@ -220,9 +220,9 @@ export function ExtractionsTableView({
         <>
           {/* Mobile View (iOS messages style) - shown on small screens */}
           <div className="md:hidden">
-            <ExtractionsMobileListView
-              extractions={filteredExtractions}
-              onSelectExtraction={onSelectExtraction}
+            <BrewsMobileListView
+              brews={filteredBrews}
+              onSelectBrew={onSelectBrew}
               groupBy={groupBy}
               users={users}
             />
@@ -244,15 +244,15 @@ export function ExtractionsTableView({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredExtractions.length === 0 ? (
+                {filteredBrews.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={showBaristaColumn ? 8 : 7} className="py-8 whitespace-normal">
                       <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-sm text-gray-500 font-normal max-w-md mx-auto">
                         {filterMethod !== 'all' ? (
-                          'No extractions found. Try changing the filter or create a new one!'
+                          'No brews found. Try changing the filter or create a new one!'
                         ) : (
                           <>
-                            No extractions found. Add{' '}
+                            No brews found. Add{' '}
                             <button
                               onClick={onOpenEquipment}
                               className="text-blue-600 hover:text-blue-800 underline cursor-pointer text-sm"
@@ -266,58 +266,58 @@ export function ExtractionsTableView({
                             >
                               coffee
                             </button>
-                            {' '}to log your first extraction.
+                            {' '}to log your first brew.
                           </>
                         )}
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  Object.entries(groupedExtractions).map(([groupLabel, groupExtractions]) => (
+                  Object.entries(groupedBrews).map(([groupLabel, groupBrews]) => (
                     <>
                       <TableRow key={`group-${groupLabel}`}>
                         <TableCell colSpan={showBaristaColumn ? 8 : 7} className="px-6 py-3 bg-gray-100 mobile-group-header">
                           <span className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{groupLabel}</span>
                         </TableCell>
                       </TableRow>
-                      {groupExtractions.map((extraction) => {
-                        const user = users.find(u => u.name === extraction.userName);
-                        const firstName = extraction.userName?.split(' ')[0] || '';
+                      {groupBrews.map((brew) => {
+                        const user = users.find(u => u.name === brew.userName);
+                        const firstName = brew.userName?.split(' ')[0] || '';
                         
                         return (
                         <TableRow
-                          key={extraction.id}
+                          key={brew.id}
                           className="hover:bg-gray-50"
                         >
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="Date & Time:">{formatDate(extraction.createdAt, groupBy !== 'month')}</TableCell>
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Date & Time:">{formatDate(brew.createdAt, groupBy !== 'month')}</TableCell>
                           {showBaristaColumn && (
-                            <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="By:">{firstName}</TableCell>
+                            <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="By:">{firstName}</TableCell>
                           )}
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="Coffee:">
-                            {extraction.roaster} <span className="text-gray-500">–</span> {extraction.coffeeName}
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Coffee:">
+                            {brew.roaster} <span className="text-gray-500">–</span> {brew.coffeeName}
                           </TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="Method:">{capitalizeBrewMethod(extraction.brewMethod)}</TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="Recipe:">
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Method:">{capitalizeBrewMethod(brew.brewMethod)}</TableCell>
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Recipe:">
                             <div className="text-sm">
-                              {extraction.dosage}g <span className="text-gray-500">→</span> {extraction.finalWeight}g <span className="text-gray-500">•</span> {formatTime(extraction.extractionTime)}
+                              {brew.dosage}g <span className="text-gray-500">→</span> {brew.finalWeight}g <span className="text-gray-500">•</span> {formatTime(brew.brewTime)}
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="Quality:">
-                            {extraction.quality ? (
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Quality:">
+                            {brew.quality ? (
                               <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-lg">{getRatingEmoji(extraction.quality)}</span>
-                                <span className="text-gray-900 text-sm">{getRatingText(extraction.quality)}</span>
+                                <span className="text-lg">{getRatingEmoji(brew.quality)}</span>
+                                <span className="text-gray-900 text-sm">{getRatingText(brew.quality)}</span>
                               </div>
                             ) : (
                               <span className="text-gray-400">—</span>
                             )}
                           </TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectExtraction(extraction)} data-label="Notes:">
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Notes:">
                             {(() => {
-                              if (!extraction.tastingNotes || extraction.tastingNotes.trim() === '') {
+                              if (!brew.tastingNotes || brew.tastingNotes.trim() === '') {
                                 return <span className="text-gray-400">—</span>;
                               }
-                              const notes = extraction.tastingNotes.split(', ').filter(n => n.trim());
+                              const notes = brew.tastingNotes.split(', ').filter(n => n.trim());
                               if (notes.length === 0) {
                                 return <span className="text-gray-400">—</span>;
                               }
@@ -358,15 +358,15 @@ export function ExtractionsTableView({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onSelect={() => onEditExtraction(extraction)}>
+                                <DropdownMenuItem onSelect={() => onEditBrew(brew)}>
                                   <Pencil className="w-4 h-4" />
                                   Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => onDuplicateExtraction(extraction)}>
+                                <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)}>
                                   <Copy className="w-4 h-4" />
                                   Duplicate
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => onDeleteExtraction(extraction.id)}>
+                                <DropdownMenuItem onSelect={() => onDeleteBrew(brew.id)}>
                                   <Trash2 className="w-4 h-4" />
                                   Delete
                                 </DropdownMenuItem>
