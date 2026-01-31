@@ -405,9 +405,9 @@ export function UserProfileDialog({
             />
             <div className="flex-1" style={{ lineHeight: 1 }}>
               <label htmlFor="smsConsent" className="cursor-pointer" style={{ fontSize: '14px', fontWeight: 400, display: 'block' }}>
-                By checking this box, you agree to receive recurring SMS messages from Hone related to rating your coffee extractions. Message frequency varies (up to 2 messages per extraction). SMS consent is not required to use the app. Message and data rates may apply. Reply STOP to unsubscribe or HELP for help. See{' '}
+                By checking this box, you agree to receive recurring SMS messages from Hone related to rating your coffee brews. Message frequency varies (up to 2 messages per brew). SMS consent is not required to use the app. Message and data rates may apply. Reply STOP to unsubscribe or HELP for help. See{' '}
                 <a 
-                  href="https://start-erase-30181626.figma.site/terms" 
+                  href="https://hone.coffee/terms" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-800 underline"
