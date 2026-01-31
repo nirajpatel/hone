@@ -121,27 +121,6 @@ export function BrewsTimelineView({
     };
   };
 
-  // Format last extracted date (without time)
-  const formatLastExtractedDate = (date: Date) => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-    
-    if (checkDate.getTime() === now.getTime()) {
-      return 'today';
-    } else if (checkDate.getTime() === yesterday.getTime()) {
-      return 'yesterday';
-    }
-    
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const month = months[date.getMonth()];
-    const day = date.getDate();
-    return `${month} ${day}`;
-  };
-
   // Calculate trend from rated brews
   const calculateTrend = (brews: Brew[]) => {
     // Filter to only rated brews
@@ -311,7 +290,7 @@ export function BrewsTimelineView({
                 <div className="mb-3">
                   <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
                   <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
-                    <span>Last extracted {formatLastExtractedDate(group.lastExtractionDate)}</span>
+                    <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     {trendInfo && (
                       <>
                         <span>•</span>
