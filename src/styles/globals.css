@@ -1,0 +1,739 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #030213;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+  --accent: #e9ebef;
+  --accent-foreground: #030213;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-bold: 700;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Prevent number input scroll behavior globally */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Custom animation for faster brewing pulse */
+@keyframes brewing-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.animate-brewing-pulse {
+  animation: brewing-pulse 1.25s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Radiating animation for timeline dots */
+@keyframes radiate {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: 0.6;
+  }
+  100% {
+    box-shadow: 0 0 0 4px currentColor;
+    opacity: 0;
+  }
+}
+
+.animate-radiate {
+  position: relative;
+}
+
+.animate-radiate::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  animation: radiate 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide mobile instruction text on desktop by default */
+.mobile-card-instruction {
+  display: none;
+}
+
+/* Mobile-specific viewport fix for iOS and iPad */
+@media (max-width: 767px) {
+  html, body {
+    height: 100%;
+    overflow: auto;
+    position: relative;
+    width: 100%;
+  }
+
+  #root {
+    height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Support for browsers that support dvh (dynamic viewport height) */
+  @supports (height: 100dvh) {
+    html, body {
+      height: 100dvh;
+    }
+  }
+  
+  /* Login and Loading pages - no scroll, centered content */
+  #root:has(.min-h-screen.flex.items-center.justify-center) {
+    overflow: hidden;
+    height: 100vh;
+  }
+  
+  @supports (height: 100dvh) {
+    #root:has(.min-h-screen.flex.items-center.justify-center) {
+      height: 100dvh;
+    }
+  }
+  
+  /* Login/Loading pages should fill viewport without scroll */
+  .min-h-screen.flex.items-center.justify-center {
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  @supports (height: 100dvh) {
+    .min-h-screen.flex.items-center.justify-center {
+      min-height: 100dvh;
+      height: 100dvh;
+    }
+  }
+  
+  /* Mobile toolbar adjustments */
+  .p-6:not([data-slot="dialog-content"]):not([data-slot="sheet-content"]) {
+    padding: 0.75rem !important;
+  }
+  
+  /* Use small input size for all inputs and dropdowns on mobile */
+  input,
+  button[role="combobox"],
+  [data-slot="select-trigger"] {
+    font-size: 0.875rem !important;
+  }
+  
+  /* View picker should maintain fixed size on mobile */
+  .flex.items-center.gap-0\\.5.border.border-gray-200.rounded-md.p-0\\.5.shrink-0 {
+    min-width: fit-content !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Previous extractions table mobile styles */
+  .previous-extractions-table thead {
+    display: none;
+  }
+  
+  .previous-extractions-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .previous-extractions-table tr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background: white;
+  }
+  
+  .previous-extractions-table tr.mobile-clickable-card {
+    cursor: pointer;
+  }
+  
+  .previous-extractions-table tr:hover {
+    background: #f9fafb;
+  }
+  
+  .previous-extractions-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 !important;
+    border: none !important;
+  }
+  
+  .previous-extractions-table td::before {
+    content: attr(data-label);
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.875rem;
+  }
+  
+  .previous-extractions-table td.mobile-hide-use-button {
+    display: none;
+  }
+  
+  /* Show mobile instruction text on mobile */
+  .mobile-card-instruction {
+    display: block !important;
+  }
+  
+  /* Ensure dialogs keep their padding on mobile */
+  [data-slot="dialog-content"] {
+    padding: 1rem !important;
+  }
+  
+  /* Ensure sheets keep their padding on mobile */
+  [data-slot="sheet-content"] {
+    padding: 1rem !important;
+  }
+  
+  /* Toolbar - header and filters in gray area */
+  .flex.items-center.justify-between.mb-4:not(.equipment-section-header) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    background-color: transparent;
+    padding: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  /* Order: Button first - standalone with margin */
+  .flex.items-center.justify-between.mb-4:not(.equipment-section-header) .mobile-add-button {
+    order: 1;
+    width: 100%;
+    margin: 0;
+    margin-top: -0.25rem;
+    margin-bottom: -0.25rem;
+  }
+  
+  /* Order: Header second */
+  .flex.items-center.justify-between.mb-4 .mobile-section-header {
+    order: 2;
+    margin-bottom: -0.75rem;
+    background-color: #f9fafb;
+    padding: 0.75rem;
+    padding-bottom: 0.25rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #111827;
+  }
+  
+  /* Order: Gray container with header and filters */
+  .flex.items-center.justify-between.mb-4 .desktop-filters {
+    order: 3;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.5rem;
+    display: flex !important;
+    background-color: #f9fafb;
+    padding: 0.75rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.5rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    margin-bottom: -0.25rem;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+  
+  /* Make selects equal width on mobile */
+  .flex.items-center.gap-2 > div:not(.view-toggle) {
+    width: 50% !important;
+    flex: 1;
+  }
+  
+  /* Mobile-friendly table styling - convert to cards */
+  table {
+    display: block;
+    background: transparent;
+  }
+  
+  /* Remove table container background on mobile */
+  .bg-white.rounded-lg.border.border-gray-200:not(.mobile-timeline-card):not(.equipment-card):not(.mobile-extraction-card) {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+  
+  /* Keep timeline cards styled properly on mobile - make this very specific to override the generic rule */
+  .bg-white.rounded-lg.border.border-gray-200.mobile-timeline-card {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+  }
+  
+  /* Keep mobile extraction cards styled properly */
+  .bg-white.rounded-lg.border.border-gray-200.mobile-extraction-card {
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+  }
+  
+  thead {
+    display: none;
+  }
+  
+  tbody {
+    display: block;
+    background: transparent;
+  }
+  
+  tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: white;
+    padding: 0.75rem;
+    position: relative;
+  }
+  
+  /* Group headers - target rows containing cells with colspan - NO CARD STYLING */
+  tbody tr:has(td[colspan]),
+  tbody tr:has(.mobile-group-header) {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 0.5rem !important;
+    margin-top: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  /* First group header - no top margin */
+  tbody tr:first-child:has(td[colspan]),
+  tbody tr:first-child:has(.mobile-group-header) {
+    margin-top: 0 !important;
+  }
+  
+  /* Target the td cells inside group header rows */
+  tbody td[colspan],
+  tbody td.mobile-group-header {
+    padding: 0 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    background: transparent !important;
+    border: none !important;
+    display: block !important;
+    font-weight: 600 !important;
+    position: static !important;
+    width: 100% !important;
+  }
+  
+  tbody td[colspan]:before,
+  tbody td.mobile-group-header:before {
+    display: none !important;
+  }
+  
+  /* Target spans inside group header cells */
+  tbody td[colspan] span,
+  tbody td.mobile-group-header span {
+    text-align: left !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  td {
+    display: block;
+    text-align: left !important;
+    padding: 0.25rem 0 !important;
+    border: none !important;
+  }
+  
+  td:before {
+    content: attr(data-label) " ";
+    font-weight: 500;
+    display: inline-block;
+    width: 90px;
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  /* Quality rating - align with other values */
+  td[data-label="Quality:"] {
+    display: block !important;
+  }
+  
+  td[data-label="Quality:"]:before {
+    content: attr(data-label) " ";
+    font-weight: 500;
+    display: inline-block;
+    width: 90px;
+    color: #6b7280;
+    font-size: 0.875rem;
+    vertical-align: middle;
+  }
+  
+  td[data-label="Quality:"] > div {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: nowrap;
+    vertical-align: middle;
+  }
+  
+  td[data-label="Quality:"] span {
+    white-space: nowrap;
+  }
+  
+  /* Notes - align with other values on same line */
+  td[data-label="Notes:"] {
+    display: block !important;
+  }
+  
+  td[data-label="Notes:"]:before {
+    content: attr(data-label) " ";
+    font-weight: 500;
+    display: inline-block;
+    width: 90px;
+    color: #6b7280;
+    font-size: 0.875rem;
+    vertical-align: top;
+  }
+  
+  td[data-label="Notes:"] > div {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    vertical-align: top;
+    max-width: calc(100% - 90px);
+  }
+
+  /* Position menu button in top-right */
+  td:last-child {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: auto !important;
+    padding: 0 !important;
+  }
+  
+  td:last-child:before {
+    display: none !important;
+  }
+  
+  /* Hide empty cells */
+  td:empty {
+    display: none;
+  }
+  
+  /* Make dialogs and sheets scrollable */
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="popover-content"] {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Add vertical spacing and centering for dialogs */
+  [data-slot="dialog-content"] {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 2rem) !important;
+    margin: 1rem !important;
+    padding: 1rem !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Add padding for sheets */
+  [data-slot="sheet-content"] {
+    padding: 1rem;
+  }
+  
+  /* Ensure dialog children are scrollable */
+  [data-slot="dialog-content"] > div {
+    max-height: calc(90vh - 6rem);
+    overflow-y: auto;
+  }
+  
+  /* Add padding to dialog/sheet containers */
+  [role="dialog"],
+  [role="alertdialog"] {
+    margin: 0 !important;
+  }
+  
+  /* Add spacing to fixed modal cards (NewExtractionFlow, etc.) */
+  .fixed.inset-0 {
+    padding: 1rem !important;
+  }
+  
+  /* Adjust max-height for cards inside fixed modals */
+  .fixed.inset-0 .max-h-\[90vh\] {
+    max-height: calc(90vh - 2rem) !important;
+  }
+  
+  .fixed.inset-0 .max-h-\[80vh\] {
+    max-height: calc(80vh - 2rem) !important;
+  }
+  
+  /* Ensure card content has proper padding */
+  .fixed.inset-0 .max-h-\[90vh\] > .p-6,
+  .fixed.inset-0 .max-h-\[80vh\] > .p-6 {
+    padding: 1rem !important;
+  }
+  
+  /* Ensure all cards in fixed modals have consistent padding */
+  .fixed.inset-0 > * > .p-6 {
+    padding: 1rem !important;
+  }
+  
+  /* Handle modals without explicit max-height (AddCoffeeForm, EditCoffeeForm) */
+  .fixed.inset-0 > .max-w-lg,
+  .fixed.inset-0 > .max-w-xl,
+  .fixed.inset-0 > .max-w-2xl {
+    max-height: calc(90vh - 2rem) !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Desktop and Tablet overrides - reset mobile-specific toolbar styling */
+@media (min-width: 768px) {
+  .timeline-line {
+    width: var(--desktop-width) !important;
+  }
+  
+  /* Reset toolbar to default horizontal layout */
+  .flex.items-center.justify-between.mb-4 {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Reset filters to appear on left (order 0, default) */
+  .flex.items-center.justify-between.mb-4 .desktop-filters {
+    order: 0 !important;
+  }
+  
+  /* Reset button to appear on right (order 1) */
+  .flex.items-center.justify-between.mb-4 .mobile-add-button {
+    order: 1 !important;
+    width: auto !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Hide mobile header on desktop */
+  .mobile-section-header {
+    display: none !important;
+  }
+  
+  /* Reset select widths */
+  .flex.items-center.gap-2 > div {
+    width: auto !important;
+    flex: 0 !important;
+  }
+}
