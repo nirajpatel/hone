@@ -158,11 +158,11 @@ export function BrewsMobileListView({
                       </div>
                       
                       {/* Right side - Emoji rating (vertically centered) */}
-                      <div className="flex-shrink-0 self-center">
+                      <div className="flex-shrink-0 self-center flex items-center justify-center w-6">
                         {brew.quality ? (
-                          <span className="text-xl leading-none">{getRatingEmoji(brew.quality)}</span>
+                          <span className="text-xl leading-none block text-center">{getRatingEmoji(brew.quality)}</span>
                         ) : (
-                          <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
+                          <span className="text-gray-500 text-xl leading-none block text-center">–</span>
                         )}
                       </div>
                     </div>
@@ -193,11 +193,11 @@ export function BrewsMobileListView({
                       </div>
                       
                       {/* Right side - Emoji rating (vertically centered) */}
-                      <div className="flex-shrink-0 self-center">
+                      <div className="flex-shrink-0 self-center flex items-center justify-center w-6">
                         {brew.quality ? (
-                          <span className="text-xl leading-none">{getRatingEmoji(brew.quality)}</span>
+                          <span className="text-xl leading-none block text-center">{getRatingEmoji(brew.quality)}</span>
                         ) : (
-                          <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
+                          <span className="text-gray-500 text-xl leading-none block text-center">–</span>
                         )}
                       </div>
                     </div>

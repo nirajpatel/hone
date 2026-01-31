@@ -198,13 +198,13 @@ export function CoffeesMobileListView({
                       </div>
                       
                       {/* Right side - Emoji rating only (vertically centered) */}
-                      <div className="flex-shrink-0 self-center">
+                      <div className="flex-shrink-0 self-center flex items-center justify-center w-6">
                         {avgRating > 0 ? (
-                          <span className="text-xl leading-none">
+                          <span className="text-xl leading-none block text-center">
                             {getRatingEmoji(avgRating)}
                           </span>
                         ) : (
-                          <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
+                          <span className="text-gray-500 text-xl leading-none block text-center">–</span>
                         )}
                       </div>
                     </div>
