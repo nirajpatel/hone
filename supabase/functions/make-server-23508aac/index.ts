@@ -2519,7 +2519,7 @@ app.notFound((c) => {
 
 // Version endpoint for client-side update detection
 app.get('/make-server-23508aac/version', (c) => {
-  return c.json({ version: '2026-01-28-v3' });
+  return c.json({ version: '2026-01-31-brews-refactor' });
 });
 
 // Wrap the app.fetch with timeout handling (but exclude streaming endpoints)
