@@ -136,7 +136,7 @@ export function BrewsTimelineView({
     const currentYear = new Date().getFullYear();
     
     if (year !== currentYear) {
-      return `${month} ${day} '${year.toString().slice(-2)}`;
+      return `${month} ${day}, ${year}`;
     }
     return `${month} ${day}`;
   };
@@ -311,8 +311,8 @@ export function BrewsTimelineView({
                   <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
                   <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
-                    <span>•</span>
-                    <span>Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
+                    <span className="hidden md:inline">•</span>
+                    <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
                     {trendInfo && (
                       <>
                         <span>•</span>
