@@ -167,52 +167,42 @@ export function CoffeesMobileListView({
                     onClick={() => onSelectCoffee(coffee)}
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                   >
-                    {/* Line 1: Coffee Name and Rating with Count */}
-                    <div className="flex items-start gap-2 mb-1">
-                      <div 
-                        className="text-gray-900 truncate flex-1 min-w-0"
-                        style={{ fontWeight: 'var(--font-weight-medium)' }}
-                      >
-                        {coffee.name}
+                    {/* Three-line layout with emoji vertically centered on the right */}
+                    <div className="flex items-center gap-3">
+                      {/* Left side content - 3 lines */}
+                      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                        {/* Line 1: Roaster – Coffee Name */}
+                        <div 
+                          className="text-gray-900"
+                          style={{ fontWeight: 'var(--font-weight-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                        >
+                          {coffee.roaster} – {coffee.name}
+                        </div>
+                        
+                        {/* Line 2: Roasted date and age */}
+                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          Roasted {formatRoastDate(coffee.roastDate)} • {getDaysOld(coffee.roastDate)}
+                        </div>
+                        
+                        {/* Line 3: Extraction count */}
+                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {extractionCount > 0 
+                            ? `${extractionCount} ${extractionCount === 1 ? 'extraction' : 'extractions'}`
+                            : 'No extractions'
+                          }
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
+                      
+                      {/* Right side - Emoji rating only (vertically centered) */}
+                      <div className="flex-shrink-0 self-center">
                         {avgRating > 0 ? (
-                          <>
-                            <span className="text-xl leading-none">
-                              {getRatingEmoji(avgRating)}
-                            </span>
-                            {extractionCount > 0 && (
-                              <span className="text-sm text-gray-500">
-                                ({extractionCount})
-                              </span>
-                            )}
-                          </>
+                          <span className="text-xl leading-none">
+                            {getRatingEmoji(avgRating)}
+                          </span>
                         ) : (
-                          <span className="text-sm text-gray-500">Unrated</span>
+                          <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
                         )}
                       </div>
-                    </div>
-
-                    {/* Line 2: Different content based on groupBy */}
-                    <div className="flex items-center gap-2 text-sm">
-                      {groupBy === 'month' ? (
-                        // When grouped by date, show roaster (left) and age (right)
-                        <>
-                          <div className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ flex: '1 1 auto', minWidth: 0 }}>
-                            {coffee.roaster}
-                          </div>
-                          <div className="text-gray-500 whitespace-nowrap text-right" style={{ flex: '0 0 auto' }}>
-                            {getDaysOld(coffee.roastDate)} 
-                          </div>
-                        </>
-                      ) : (
-                        // When grouped by roaster, show roast date (left) and age (right)
-                        <>
-                          <div className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ flex: '1 1 auto', minWidth: 0 }}>
-                            Roasted {formatRoastDate(coffee.roastDate)} • {getDaysOld(coffee.roastDate)}
-                          </div>
-                        </>
-                      )}
                     </div>
                   </button>
                   

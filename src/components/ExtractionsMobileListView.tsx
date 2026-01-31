@@ -88,7 +88,7 @@ export function ExtractionsMobileListView({
 
   // Format recipe information (e.g., "18g → 38g • 0:28")
   const formatRecipe = (extraction: Extraction) => {
-    const parts = [];
+    const parts: string[] = [];
     
     // Add dose in → dose out
     if (extraction.dosage !== undefined && extraction.finalWeight !== undefined) {
@@ -124,35 +124,40 @@ export function ExtractionsMobileListView({
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer"
                 >
                   {groupBy === 'coffee' ? (
-                    // When grouped by coffee: Show date on line 1, brew method/recipe and time on line 2
-                    <>
-                      {/* Line 1: Date and Quality */}
-                      <div className="flex items-start gap-2 mb-1">
+                    // When grouped by coffee: Show date on line 1, brew method on line 2, time on line 3
+                    // Emoji vertically centered on the right
+                    <div className="flex items-center gap-3">
+                      {/* Left side content - 3 lines */}
+                      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                        {/* Line 1: Date */}
                         <div 
-                          className="text-gray-900 truncate flex-1 min-w-0"
-                          style={{ fontWeight: 'var(--font-weight-medium)' }}
+                          className="text-gray-900"
+                          style={{ fontWeight: 'var(--font-weight-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         >
                           {formatDate(extraction.createdAt)}
                         </div>
-                        <div className="flex-shrink-0 whitespace-nowrap">
-                          {extraction.quality ? (
-                            <span className="text-xl leading-none">{getRatingEmoji(extraction.quality)}</span>
-                          ) : (
-                            <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
-                          )}
+                        
+                        {/* Line 2: Brew Method and Recipe */}
+                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
+                        </div>
+                        
+                        {/* Line 3: Time and optional First Name */}
+                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {formatTime(extraction.createdAt)}
+                          {isMultiUserHousehold && extraction.userName && ` • ${extraction.userName.split(' ')[0]}`}
                         </div>
                       </div>
                       
-                      {/* Line 2: Brew Method, Recipe, and Time */}
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap" style={{ flex: '1 1 auto', minWidth: 0 }}>
-                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
-                        </div>
-                        <div className="text-gray-500 whitespace-nowrap text-right" style={{ flex: '0 0 auto' }}>
-                          {formatTime(extraction.createdAt)}
-                        </div>
+                      {/* Right side - Emoji rating (vertically centered) */}
+                      <div className="flex-shrink-0 self-center">
+                        {extraction.quality ? (
+                          <span className="text-xl leading-none">{getRatingEmoji(extraction.quality)}</span>
+                        ) : (
+                          <span className="text-gray-500" style={{ fontSize: '20px' }}>–</span>
+                        )}
                       </div>
-                    </>
+                    </div>
                   ) : (
                     // When grouped by date: Show coffee name on line 1, brew method on line 2, time on line 3
                     // Emoji vertically centered on the right
@@ -161,19 +166,19 @@ export function ExtractionsMobileListView({
                       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                         {/* Line 1: Roaster – Coffee Name */}
                         <div 
-                          className="text-gray-900 overflow-hidden text-ellipsis whitespace-nowrap"
-                          style={{ fontWeight: 'var(--font-weight-medium)' }}
+                          className="text-gray-900"
+                          style={{ fontWeight: 'var(--font-weight-medium)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         >
                           {extraction.roaster} – {extraction.coffeeName}
                         </div>
                         
                         {/* Line 2: Brew Method and Recipe */}
-                        <div className="text-sm text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
                         </div>
                         
                         {/* Line 3: Time and optional First Name */}
-                        <div className="text-sm text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <div className="text-sm text-gray-500" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {formatTime(extraction.createdAt)}
                           {isMultiUserHousehold && extraction.userName && ` • ${extraction.userName.split(' ')[0]}`}
                         </div>
