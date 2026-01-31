@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { MoreVertical, Pencil, Trash2, Copy, Check, Plus } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Copy, Check, Plus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { getRatingEmoji, capitalizeBrewMethod } from '../utils/formatters';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsToolbar } from './BrewsToolbar';
@@ -121,7 +121,7 @@ export function BrewsTimelineView({
     };
   };
 
-  // Format last extracted date
+  // Format last extracted date (without time)
   const formatLastExtractedDate = (date: Date) => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
@@ -130,22 +130,98 @@ export function BrewsTimelineView({
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
     
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    
     if (checkDate.getTime() === now.getTime()) {
-      return `today at ${displayHours}:${displayMinutes}${ampm}`;
+      return 'today';
     } else if (checkDate.getTime() === yesterday.getTime()) {
-      return `yesterday at ${displayHours}:${displayMinutes}${ampm}`;
+      return 'yesterday';
     }
     
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
     const day = date.getDate();
-    return `${month} ${day} at ${displayHours}:${displayMinutes}${ampm}`;
+    return `${month} ${day}`;
+  };
+
+  // Calculate trend from rated brews
+  const calculateTrend = (brews: Brew[]) => {
+    // Filter to only rated brews
+    const ratedBrews = brews.filter(b => b.quality);
+    const count = ratedBrews.length;
+    
+    // If less than 2 rated brews: show "No trend"
+    if (count < 2) {
+      return { 
+        trend: 'no trend', 
+        icon: <Minus className="w-3.5 h-3.5" />
+      };
+    }
+    
+    // Check if last 2 are both Bad (quality === 1)
+    if (count >= 2) {
+      const last2 = ratedBrews.slice(-2);
+      if (last2[0].quality === 1 && last2[1].quality === 1) {
+        return { 
+          trend: 'needs work', 
+          icon: <TrendingDown className="w-3.5 h-3.5" />
+        };
+      }
+    }
+    
+    // If 4 or more rated brews: use split-halves average
+    if (count >= 4) {
+      const last4 = ratedBrews.slice(-4);
+      const ratings = last4.map(b => b.quality!);
+      
+      // Split into halves: first 2 (earlier) and last 2 (recent)
+      const earlier = ratings.slice(0, 2);
+      const recent = ratings.slice(2, 4);
+      
+      // Calculate averages
+      const avgEarlier = (earlier[0] + earlier[1]) / 2;
+      const avgRecent = (recent[0] + recent[1]) / 2;
+      
+      // Determine trend
+      const diff = avgRecent - avgEarlier;
+      
+      if (diff >= 0.5) {
+        return { 
+          trend: 'improving', 
+          icon: <TrendingUp className="w-3.5 h-3.5" />
+        };
+      } else if (diff <= -0.5) {
+        return { 
+          trend: 'needs work', 
+          icon: <TrendingDown className="w-3.5 h-3.5" />
+        };
+      } else {
+        return { 
+          trend: 'stable', 
+          icon: <Minus className="w-3.5 h-3.5" />
+        };
+      }
+    }
+    
+    // Else (2 or 3 rated brews): compare first vs last
+    const firstQuality = ratedBrews[0].quality!;
+    const lastQuality = ratedBrews[ratedBrews.length - 1].quality!;
+    const diff = lastQuality - firstQuality;
+    
+    if (diff >= 0.5) {
+      return { 
+        trend: 'improving', 
+        icon: <TrendingUp className="w-3.5 h-3.5" />
+      };
+    } else if (diff <= -0.5) {
+      return { 
+        trend: 'needs work', 
+        icon: <TrendingDown className="w-3.5 h-3.5" />
+      };
+    } else {
+      return { 
+        trend: 'stable', 
+        icon: <Minus className="w-3.5 h-3.5" />
+      };
+    }
   };
 
   return (
@@ -226,13 +302,25 @@ export function BrewsTimelineView({
             // Get the coffee ID from the first brew
             const coffeeId = sortedExtractions[0]?.coffeeId;
 
+            // Calculate trend for this group
+            const trendInfo = calculateTrend(sortedExtractions);
+
             return (
               <div key={key} className="bg-white rounded-lg border border-gray-200 p-3 md:p-4 mobile-timeline-card">
                 {/* Header with Coffee and Method */}
                 <div className="mb-3">
                   <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">
-                    Last extracted {formatLastExtractedDate(group.lastExtractionDate)}
+                  <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1.5">
+                    <span>Last extracted {formatLastExtractedDate(group.lastExtractionDate)}</span>
+                    {trendInfo && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          {trendInfo.icon}
+                          <span className="capitalize">{trendInfo.trend}</span>
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
 
