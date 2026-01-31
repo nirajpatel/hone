@@ -109,14 +109,20 @@ export function BrewsTimelineView({
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
     const day = date.getDate();
+    const year = date.getFullYear();
+    const currentYear = new Date().getFullYear();
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
     
+    const dateStr = year !== currentYear 
+      ? `${month} ${day} '${year.toString().slice(-2)}`
+      : `${month} ${day}`;
+    
     return {
-      date: `${month} ${day}`,
+      date: dateStr,
       time: `${displayHours}:${displayMinutes} ${ampm}`,
     };
   };
@@ -130,7 +136,7 @@ export function BrewsTimelineView({
     const currentYear = new Date().getFullYear();
     
     if (year !== currentYear) {
-      return `${month} ${day}, ${year}`;
+      return `${month} ${day} '${year.toString().slice(-2)}`;
     }
     return `${month} ${day}`;
   };

@@ -36,7 +36,7 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onNavigatePrev, o
   const formatRoastDate = (dateString: string) => {
     const [year, monthNum, day] = dateString.split('-').map(Number);
     const date = new Date(year, monthNum - 1, day);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const month = months[date.getMonth()];
     return `${month} ${day}, ${year}`;
   };
