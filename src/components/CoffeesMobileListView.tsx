@@ -149,7 +149,7 @@ export function CoffeesMobileListView({
   return (
     <div className="mobile-list-view -mx-3">
       {Object.entries(grouped).map(([groupLabel, groupCoffees]) => (
-        <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing) * 2)' }}>
+        <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
           {/* Group Header */}
           <div className="px-3 py-2 text-sm text-gray-600">
             {groupLabel}

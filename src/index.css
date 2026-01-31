@@ -3740,13 +3740,13 @@ html {
     background-color: #0000;
     flex-direction: column;
     align-items: stretch;
-    gap: .75rem;
-    margin-top: .75rem;
+    gap: .5rem;
+    margin-top: .5rem;
     margin-left: 0;
     margin-right: 0;
     padding: 0;
     display: flex;
-    margin-bottom: .5rem !important;
+    margin-bottom: .25rem !important;
   }
 
   .flex.items-center.justify-between.mb-4:not(.equipment-section-header) .mobile-add-button {
