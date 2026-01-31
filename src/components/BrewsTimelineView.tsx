@@ -109,14 +109,20 @@ export function BrewsTimelineView({
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
     const day = date.getDate();
+    const year = date.getFullYear();
+    const currentYear = new Date().getFullYear();
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes < 10 ? `0${minutes}` : minutes;
     
+    const dateStr = year !== currentYear 
+      ? `${month} ${day} '${year.toString().slice(-2)}`
+      : `${month} ${day}`;
+    
     return {
-      date: `${month} ${day}`,
+      date: dateStr,
       time: `${displayHours}:${displayMinutes} ${ampm}`,
     };
   };
@@ -305,8 +311,8 @@ export function BrewsTimelineView({
                   <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
                   <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
-                    <span>•</span>
-                    <span>Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
+                    <span className="hidden md:inline">•</span>
+                    <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
                     {trendInfo && (
                       <>
                         <span>•</span>
