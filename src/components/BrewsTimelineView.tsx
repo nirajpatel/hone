@@ -203,6 +203,14 @@ export function BrewsTimelineView({
       // Determine trend
       const diff = avgRecent - avgEarlier;
       
+      // If both averages round down to 1 (bad), always show "needs work"
+      if (Math.floor(avgEarlier) === 1 && Math.floor(avgRecent) === 1) {
+        return { 
+          trend: 'needs work', 
+          icon: <TrendingDown className="w-3.5 h-3.5" />
+        };
+      }
+      
       if (diff >= 0.5) {
         return { 
           trend: 'improving', 
@@ -225,6 +233,14 @@ export function BrewsTimelineView({
     const firstQuality = ratedBrews[0].quality!;
     const lastQuality = ratedBrews[ratedBrews.length - 1].quality!;
     const diff = lastQuality - firstQuality;
+    
+    // If both qualities are 1 (bad), always show "needs work"
+    if (firstQuality === 1 && lastQuality === 1) {
+      return { 
+        trend: 'needs work', 
+        icon: <TrendingDown className="w-3.5 h-3.5" />
+      };
+    }
     
     if (diff >= 0.5) {
       return { 
@@ -258,7 +274,7 @@ export function BrewsTimelineView({
       />
 
       {/* Timeline Cards */}
-      <div className="space-y-4">
+      <div className="space-y-2 md:space-y-4">
         {sortedGroups.length === 0 ? (
           <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
             <div className="max-w-md mx-auto">
