@@ -12,13 +12,13 @@ export function EspressoLoading() {
         {/* Portafilter shape - vertical lines with horizontal bar */}
         <path d="M 25 16 L 25 20 L 50 20 L 50 16"
               stroke="black" 
-              strokeWidth="3" 
+              strokeWidth="3.25" 
               strokeLinejoin="miter"
               strokeLinecap="square"
               fill="none" />
 
         {/* Drip */}
-        <circle cx="38.5" cy="30" r="3" fill="black" clipPath="url(#belowLine)">
+        <circle cx="38.5" cy="30" r="3.25" fill="black" clipPath="url(#belowLine)">
           {/* Fall - start above the line, end below */}
           <animate
             attributeName="cy"
