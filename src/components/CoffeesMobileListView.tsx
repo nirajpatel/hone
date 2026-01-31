@@ -194,7 +194,7 @@ export function CoffeesMobileListView({
                       {groupBy === 'month' ? (
                         // When grouped by date, show roaster (left) and age (right)
                         <>
-                          <div className="text-gray-600 truncate flex-1 min-w-0">
+                          <div className="text-gray-500 truncate flex-1 min-w-0">
                             {coffee.roaster}
                           </div>
                           <div className="text-gray-500 flex-shrink-0 whitespace-nowrap text-right">
@@ -204,7 +204,7 @@ export function CoffeesMobileListView({
                       ) : (
                         // When grouped by roaster, show roast date (left) and age (right)
                         <>
-                          <div className="text-gray-600 truncate flex-1 min-w-0">
+                          <div className="text-gray-500 truncate flex-1 min-w-0">
                             {formatRoastDate(coffee.roastDate)}
                           </div>
                           <div className="text-gray-500 flex-shrink-0 whitespace-nowrap text-right">

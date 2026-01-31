@@ -171,7 +171,7 @@ export function ExtractionsMobileListView({
                       
                       {/* Line 2: Brew Method, Recipe, and Time */}
                       <div className="flex items-center gap-2 text-sm">
-                        <div className="text-gray-600 truncate flex-1 min-w-0">
+                        <div className="text-gray-500 truncate flex-1 min-w-0">
                           {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
                         </div>
                         <div className="text-gray-500 flex-shrink-0 whitespace-nowrap text-right">
