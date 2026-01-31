@@ -49,11 +49,15 @@ export function CoffeesMobileListView({
       } else if (checkDate.getTime() === yesterday.getTime()) {
         dateLabel = 'Yesterday';
       } else {
-        dateLabel = date.toLocaleDateString('en-US', { 
+        const currentYear = new Date().getFullYear();
+        const options: Intl.DateTimeFormatOptions = { 
           month: 'long', 
-          day: 'numeric', 
-          year: 'numeric' 
-        });
+          day: 'numeric'
+        };
+        if (date.getFullYear() !== currentYear) {
+          options.year = 'numeric';
+        }
+        dateLabel = date.toLocaleDateString('en-US', options);
       }
       
       if (!grouped[dateLabel]) {

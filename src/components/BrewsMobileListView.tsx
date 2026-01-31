@@ -48,11 +48,15 @@ export function BrewsMobileListView({
       } else if (checkDate.getTime() === yesterday.getTime()) {
         dateLabel = 'Yesterday';
       } else {
-        dateLabel = date.toLocaleDateString('en-US', { 
+        const currentYear = new Date().getFullYear();
+        const options: Intl.DateTimeFormatOptions = { 
           month: 'long', 
-          day: 'numeric', 
-          year: 'numeric' 
-        });
+          day: 'numeric'
+        };
+        if (date.getFullYear() !== currentYear) {
+          options.year = 'numeric';
+        }
+        dateLabel = date.toLocaleDateString('en-US', options);
       }
       
       if (!grouped[dateLabel]) {
@@ -76,14 +80,18 @@ export function BrewsMobileListView({
     return `${displayHours}:${displayMinutes}${ampm}`;
   };
 
-  // Format date for display when grouped by coffee (e.g., "Jan 30, 2026")
+  // Format date for display when grouped by coffee (e.g., "January 30, 2026" or "January 30")
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
+    const currentYear = new Date().getFullYear();
+    const options: Intl.DateTimeFormatOptions = { 
+      month: 'long', 
+      day: 'numeric'
+    };
+    if (date.getFullYear() !== currentYear) {
+      options.year = 'numeric';
+    }
+    return date.toLocaleDateString('en-US', options);
   };
 
   // Format recipe information (e.g., "18g → 38g • 0:28")

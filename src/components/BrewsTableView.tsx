@@ -108,7 +108,10 @@ export function BrewsTableView({
     } else if (checkDate.getTime() === yesterday.getTime()) {
       return `Yesterday at ${displayHours}:${displayMinutes}${ampm}`;
     } else {
-      const dateStr = showYear 
+      // Only show year if different from current year
+      const currentYear = new Date().getFullYear();
+      const shouldShowYear = showYear && year !== currentYear;
+      const dateStr = shouldShowYear 
         ? `${month} ${day}, ${year}` 
         : `${month} ${day}`;
       return `${dateStr} at ${displayHours}:${displayMinutes}${ampm}`;
