@@ -492,7 +492,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
   // Calculate SVG dimensions (needed for fill path calculation)
   const mobileContainerWidth = 60; // 25% reduction from 80px
   const desktopContainerWidth = 80;
-  const mobileGap = 12; // gap-3 (12px / 0.75rem)
+  const mobileGap = 8; // gap-2 (8px / 0.5rem)
   const desktopGap = 32;
   const mobileSvgHeight = 90; // 25% reduction from 120px
   const desktopSvgHeight = 120;
@@ -735,7 +735,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
               </svg>
 
               {/* Nodes */}
-              <div className="flex items-start gap-3 md:gap-8 relative"> {/* Mobile gap-3 (12px) */}
+              <div className="flex items-start gap-2 md:gap-8 relative"> {/* Mobile gap-2 (8px) */}
                 {brews.map((brew, index) => {
                   const dotColor = getDotColor(brew.quality);
                   const dotBorderColor = getDotBorderColor(brew.quality);
@@ -799,7 +799,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
             </div>
 
             {/* Date/Time labels below graph */}
-            <div className="flex items-start gap-3 md:gap-8 relative mt-3"> {/* Match node spacing gap-3 */}
+            <div className="flex items-start gap-2 md:gap-8 relative mt-3"> {/* Match node spacing gap-2 */}
               {brews.map((brew, index) => {
                 const { date, time } = formatNodeDateTime(brew.createdAt, index < brews.length - 1 ? brews[index + 1].createdAt : null);
 
