@@ -18,7 +18,7 @@ export function EspressoLoading() {
               fill="none" />
 
         {/* Drip */}
-        <circle cx="38.5" cy="30" r="3.25" fill="black" clipPath="url(#belowLine)">
+        <circle cx="38.5" cy="30" r="3" fill="black" clipPath="url(#belowLine)">
           {/* Fall - start above the line, end below */}
           <animate
             attributeName="cy"
