@@ -116,7 +116,7 @@ export function ExtractionsMobileListView({
       {Object.entries(grouped).map(([groupLabel, groupExtractions]) => (
         <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
           {/* Group Header */}
-          <div className="px-3 pt-2 pb-1 text-sm" style={{ color: 'var(--color-gray-500)' }}>
+          <div className="px-3 pt-2 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)' }}>
             {groupLabel}
           </div>
           
