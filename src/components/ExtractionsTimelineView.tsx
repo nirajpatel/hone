@@ -597,7 +597,7 @@ function TimelineRow({ extractions, onSelectExtraction, formatNodeDateTime, coff
               >
                 <defs>
                   <linearGradient id={`${uniqueId}-desktopGradient`} x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#d1d5db" stopOpacity="0.45" />
+                    <stop offset="0%" stopColor="#d1d5db" stopOpacity="0.5" />
                     <stop offset="100%" stopColor="#d1d5db" stopOpacity="0" />
                   </linearGradient>
                   <linearGradient id={`${uniqueId}-desktopFadeMask`} x1="0%" y1="0%" x2="100%" y2="0%">
