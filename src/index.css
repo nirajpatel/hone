@@ -3786,7 +3786,7 @@ html {
     display: flex !important;
   }
 
-  .flex.items-center.gap-2 > div:not(.view-toggle) {
+  .desktop-filters.flex.items-center.gap-2 > div:not(.view-toggle) {
     flex: 1;
     width: 50% !important;
   }
@@ -4024,7 +4024,7 @@ html {
     display: none !important;
   }
 
-  .flex.items-center.gap-2 > div {
+  .desktop-filters.flex.items-center.gap-2 > div {
     flex: 0 !important;
     width: auto !important;
   }

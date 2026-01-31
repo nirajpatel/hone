@@ -442,7 +442,7 @@ html {
   }
   
   /* Make selects equal width on mobile */
-  .flex.items-center.gap-2 > div:not(.view-toggle) {
+  .desktop-filters.flex.items-center.gap-2 > div:not(.view-toggle) {
     width: 50% !important;
     flex: 1;
   }
@@ -732,7 +732,7 @@ html {
   }
   
   /* Reset select widths */
-  .flex.items-center.gap-2 > div {
+  .desktop-filters.flex.items-center.gap-2 > div {
     width: auto !important;
     flex: 0 !important;
   }
