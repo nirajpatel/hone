@@ -91,6 +91,26 @@ export function ExtractionsMobileListView({
     });
   };
 
+  // Format recipe information (e.g., "18g → 38g • 0:28")
+  const formatRecipe = (extraction: Extraction) => {
+    const parts = [];
+    
+    // Add dose in → dose out
+    if (extraction.dosage !== undefined && extraction.finalWeight !== undefined) {
+      parts.push(`${extraction.dosage}g → ${extraction.finalWeight}g`);
+    }
+    
+    // Add extraction time
+    if (extraction.extractionTime !== undefined) {
+      const minutes = Math.floor(extraction.extractionTime / 60);
+      const seconds = extraction.extractionTime % 60;
+      const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      parts.push(timeStr);
+    }
+    
+    return parts.length > 0 ? ` • ${parts.join(' • ')}` : '';
+  };
+
   return (
     <div className="mobile-list-view -mx-3">
       {Object.entries(grouped).map(([groupLabel, groupExtractions]) => (
@@ -111,13 +131,13 @@ export function ExtractionsMobileListView({
                   {groupBy === 'coffee' ? (
                     // When grouped by coffee: Show brew method on line 1, date/time and quality on line 2
                     <>
-                      {/* Line 1: Brew Method */}
+                      {/* Line 1: Brew Method and Recipe */}
                       <div className="flex items-start gap-2 mb-1">
                         <div 
                           className="text-gray-900 truncate flex-1 min-w-0"
                           style={{ fontWeight: 'var(--font-weight-medium)' }}
                         >
-                          {capitalizeBrewMethod(extraction.brewMethod)}
+                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
                         </div>
                         {extraction.quality && (
                           <div className="text-lg leading-none flex-shrink-0 whitespace-nowrap">
@@ -149,10 +169,10 @@ export function ExtractionsMobileListView({
                         )}
                       </div>
                       
-                      {/* Line 2: Brew Method and Time */}
+                      {/* Line 2: Brew Method, Recipe, and Time */}
                       <div className="flex items-center gap-2 text-sm">
                         <div className="text-gray-600 truncate flex-1 min-w-0">
-                          {capitalizeBrewMethod(extraction.brewMethod)}
+                          {capitalizeBrewMethod(extraction.brewMethod)}{formatRecipe(extraction)}
                         </div>
                         <div className="text-gray-500 flex-shrink-0 whitespace-nowrap text-right">
                           {formatTime(extraction.createdAt)}
