@@ -589,8 +589,59 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     return lineGenerator(points) || '';
   };
 
+  // Calculate gradient mask stops for highlight effect (desktop only)
+  // Returns the X positions for the gradient stops to create a fade effect
+  const calculateHighlightGradientStops = (hoveredIndex: number | null) => {
+    if (hoveredIndex === null || hoveredIndex < 0 || hoveredIndex >= brews.length) {
+      return null;
+    }
+
+    const containerWidth = desktopContainerWidth;
+    const gap = desktopGap;
+    
+    const hoveredX = hoveredIndex * (containerWidth + gap) + containerWidth / 2;
+    const nodeSpacing = containerWidth + gap;
+    const fadeDistance = nodeSpacing * 0.3; // Fade distance for smooth transitions
+    
+    // Calculate X positions for gradient stops
+    const prevNodeX = hoveredIndex > 0 
+      ? (hoveredIndex - 1) * (containerWidth + gap) + containerWidth / 2
+      : hoveredX - nodeSpacing;
+    const nextNodeX = hoveredIndex < brews.length - 1
+      ? (hoveredIndex + 1) * (containerWidth + gap) + containerWidth / 2
+      : hoveredX + nodeSpacing;
+    
+    // Second nodes out (for 80% opacity zone)
+    const secondLeftX = hoveredIndex > 1
+      ? (hoveredIndex - 2) * (containerWidth + gap) + containerWidth / 2
+      : prevNodeX - nodeSpacing;
+    const secondRightX = hoveredIndex < brews.length - 2
+      ? (hoveredIndex + 2) * (containerWidth + gap) + containerWidth / 2
+      : nextNodeX + nodeSpacing;
+    
+    return {
+      hoveredX,
+      // 100% opacity zone: segments to left and right of node (including node)
+      immediateLeftX: prevNodeX,
+      immediateRightX: nextNodeX,
+      // 80% opacity zone: segments to left of left segment and right of right segment
+      secondLeftX,
+      secondRightX,
+      // Fade boundaries
+      leftFadeStart: Math.max(0, prevNodeX),
+      leftFadeEnd: hoveredX - fadeDistance,
+      rightFadeStart: hoveredX + fadeDistance,
+      rightFadeEnd: nextNodeX,
+    };
+  };
+
   const mobileGraphPath = calculateGraphPath(true);
   const desktopGraphPath = calculateGraphPath(false);
+
+  // Calculate gradient stops for highlight effect (desktop only)
+  const desktopGradientStops = hoveredNodeIndex !== null && hoveredNodeIndex < brews.length
+    ? calculateHighlightGradientStops(hoveredNodeIndex)
+    : null;
 
   // Calculate fill area path using area generator with the same curve
   const calculateFillPath = (isMobile: boolean) => {
@@ -791,37 +842,21 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
               ref={graphContainerRef}
               className="relative h-[90px] md:h-[120px]"
             >
-              {/* Vertical indicator line - positioned relative to content */}
+              {/* Vertical indicator line - desktop only (hover doesn't work on mobile) */}
               {/* Don't show line if add button is closest */}
               {hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length && mouseX !== null && (
-                <>
-                  {/* Mobile line - stops at graph height */}
-                  <div
-                    className="absolute pointer-events-none md:hidden"
-                    style={{
-                      left: `${mouseX}px`,
-                      top: '0px',
-                      height: '90px',
-                      width: '2px',
-                      background: 'repeating-linear-gradient(to bottom, var(--color-gray-300) 0px, var(--color-gray-300) 4px, transparent 4px, transparent 8px)',
-                      transform: 'translateX(-50%)',
-                      zIndex: 0
-                    }}
-                  />
-                  {/* Desktop line - stops at graph height */}
-                  <div
-                    className="absolute pointer-events-none hidden md:block"
-                    style={{
-                      left: `${mouseX}px`,
-                      top: '0px',
-                      height: '120px',
-                      width: '2px',
-                      background: 'repeating-linear-gradient(to bottom, var(--color-gray-300) 0px, var(--color-gray-300) 4px, transparent 4px, transparent 8px)',
-                      transform: 'translateX(-50%)',
-                      zIndex: 0
-                    }}
-                  />
-                </>
+                <div
+                  className="absolute pointer-events-none hidden md:block"
+                  style={{
+                    left: `${mouseX}px`,
+                    top: '0px',
+                    height: '120px',
+                    width: '2px',
+                    background: 'repeating-linear-gradient(to bottom, var(--color-gray-300) 0px, var(--color-gray-300) 4px, transparent 4px, transparent 8px)',
+                    transform: 'translateX(-50%)',
+                    zIndex: 0
+                  }}
+                />
               )}
               {/* SVG Graph - Mobile */}
               <svg 
@@ -844,11 +879,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} fill={`url(#${uniqueId}-mobileFadeMask)`} />
                   </mask>
                 </defs>
+                {/* Mobile: Base graph always at 100% opacity (no hover effects) */}
                 <path
                   d={mobileFillPath}
                   fill={`url(#${uniqueId}-mobileGradient)`}
                   mask={`url(#${uniqueId}-mobileMask)`}
-                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
+                  opacity="1"
                 />
                 <path
                   d={mobileGraphPath}
@@ -857,7 +893,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
+                  opacity="1"
                 />
               </svg>
 
@@ -881,13 +917,190 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   <mask id={`${uniqueId}-desktopMask`}>
                     <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFadeMask)`} />
                   </mask>
+                  {/* Gradient mask for highlight effect - peaks at hovered node, fades to 0 at edges */}
+                  {desktopGradientStops && (() => {
+                    const { hoveredX, leftFadeStart, leftFadeEnd, rightFadeStart, rightFadeEnd, immediateLeftX, immediateRightX, secondLeftX, secondRightX } = desktopGradientStops;
+                    const leftFadeStartPercent = (leftFadeStart / desktopSvgWidth) * 100;
+                    const leftFadeEndPercent = (leftFadeEnd / desktopSvgWidth) * 100;
+                    const hoveredPercent = (hoveredX / desktopSvgWidth) * 100;
+                    const rightFadeStartPercent = (rightFadeStart / desktopSvgWidth) * 100;
+                    const rightFadeEndPercent = Math.min((rightFadeEnd / desktopSvgWidth) * 100, 100);
+                    const immediateLeftPercent = Math.max(0, (immediateLeftX / desktopSvgWidth) * 100);
+                    const immediateRightPercent = Math.min((immediateRightX / desktopSvgWidth) * 100, 100);
+                    const secondLeftPercent = Math.max(0, (secondLeftX / desktopSvgWidth) * 100);
+                    const secondRightPercent = Math.min((secondRightX / desktopSvgWidth) * 100, 100);
+                    const fadeCutoffPercent = (desktopMaskCutoff.cutoffStart / desktopSvgWidth) * 100;
+                    
+                    return (
+                      <>
+                        {/* Line opacity masks: 100% for immediate segments, 80% for second segments, 60% elsewhere */}
+                        {/* 100% opacity mask: segments connecting to hovered node - linear transition 100% to 80% */}
+                        <linearGradient 
+                          id={`${uniqueId}-desktopLine100Gradient`} 
+                          x1="0%" 
+                          y1="0%" 
+                          x2="100%" 
+                          y2="0%"
+                        >
+                          <stop offset="0%" stopColor="white" stopOpacity="0" />
+                          {/* Hidden before immediate segments */}
+                          <stop offset={`${Math.max(0, immediateLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="0" />
+                          {/* Linear transition from 80% (at node 1 step away) to 100% (at hovered node) */}
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${hoveredPercent}%`} stopColor="white" stopOpacity="1" />
+                          {/* Linear transition from 100% (at hovered node) to 80% (at node 1 step away) */}
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${Math.min(100, immediateRightPercent + 0.001)}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset="100%" stopColor="white" stopOpacity="0" />
+                        </linearGradient>
+                        <mask id={`${uniqueId}-desktopLine100Mask`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine100Gradient)`} />
+                        </mask>
+                        {/* 80% opacity mask: segments connecting nodes 1 step away to nodes 2 steps away - linear transition 80% to 60% */}
+                        <linearGradient 
+                          id={`${uniqueId}-desktopLine80Gradient`} 
+                          x1="0%" 
+                          y1="0%" 
+                          x2="100%" 
+                          y2="0%"
+                        >
+                          <stop offset="0%" stopColor="white" stopOpacity="0" />
+                          {/* Hidden before second segments */}
+                          <stop offset={`${Math.max(0, secondLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="0" />
+                          {/* Linear transition from 60% (at node 2 steps away) to 80% (at node 1 step away) */}
+                          <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="0.6" />
+                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0.8" />
+                          {/* Hidden in immediate segments (100% zone) */}
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${immediateRightPercent - 0.001}%`} stopColor="white" stopOpacity="0" />
+                          {/* Linear transition from 80% (at node 1 step away) to 60% (at node 2 steps away) */}
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="0.6" />
+                          <stop offset={`${Math.min(100, secondRightPercent + 0.001)}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset="100%" stopColor="white" stopOpacity="0" />
+                        </linearGradient>
+                        <mask id={`${uniqueId}-desktopLine80Mask`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine80Gradient)`} />
+                        </mask>
+                        {/* 60% opacity mask: everywhere else (shows at 60% visibility) */}
+                        <linearGradient 
+                          id={`${uniqueId}-desktopLine60Gradient`} 
+                          x1="0%" 
+                          y1="0%" 
+                          x2="100%" 
+                          y2="0%"
+                        >
+                          <stop offset="0%" stopColor="white" stopOpacity="0.6" />
+                          {/* Show 60% layer everywhere - ends exactly at center of nodes 2 steps away */}
+                          <stop offset={`${secondLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0.6" />
+                          {/* Hide in 80% and 100% zones - starts exactly at center of nodes 2 steps away */}
+                          <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0" />
+                          {/* Show 60% layer again - starts exactly at center of nodes 2 steps away */}
+                          <stop offset={`${secondRightPercent - 0.001}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="0.6" />
+                          <stop offset="100%" stopColor="white" stopOpacity="0.6" />
+                        </linearGradient>
+                        <mask id={`${uniqueId}-desktopLine60Mask`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine60Gradient)`} />
+                        </mask>
+                        {/* Legacy masks for backward compatibility - will be removed */}
+                        <mask id={`${uniqueId}-desktopHighlightMask`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine100Gradient)`} />
+                        </mask>
+                        <mask id={`${uniqueId}-desktopDimmingMask`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine60Gradient)`} />
+                        </mask>
+                        {/* Fill opacity gradient: overlay shows in 100% and 80% zones, hidden in 60% zones (where base layer shows) */}
+                        <linearGradient 
+                          id={`${uniqueId}-desktopFillOpacityGradient`} 
+                          x1="0%" 
+                          y1="0%" 
+                          x2="100%" 
+                          y2="0%"
+                        >
+                          <stop offset="0%" stopColor="white" stopOpacity="0" />
+                          {/* Overlay hidden in 60% zones - base layer shows here */}
+                          <stop offset={`${Math.max(0, secondLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="0" />
+                          {/* Linear transition from 0% (at node 2 steps away) to 80% (at node 1 step away) */}
+                          <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0.8" />
+                          {/* Linear transition from 80% (at node 1 step away) to 100% (at hovered node) */}
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${hoveredPercent}%`} stopColor="white" stopOpacity="1" />
+                          {/* Linear transition from 100% (at hovered node) to 80% (at node 1 step away) */}
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          {/* Linear transition from 80% (at node 1 step away) to 0% (at node 2 steps away) */}
+                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${Math.min(100, secondRightPercent + 0.001)}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${Math.min(fadeCutoffPercent, secondRightPercent + 5)}%`} stopColor="white" stopOpacity="0" />
+                          {/* Original fade mask cutoff - overlay hidden */}
+                          <stop offset={`${fadeCutoffPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset="100%" stopColor="white" stopOpacity="0" />
+                        </linearGradient>
+                        <mask id={`${uniqueId}-desktopFillOpacityMask`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFillOpacityGradient)`} />
+                        </mask>
+                        {/* Base fill mask: completely hide base layer in highlighted areas (100% and 80% zones), show it elsewhere */}
+                        <linearGradient 
+                          id={`${uniqueId}-desktopFillBaseMask`} 
+                          x1="0%" 
+                          y1="0%" 
+                          x2="100%" 
+                          y2="0%"
+                        >
+                          <stop offset="0%" stopColor="white" stopOpacity="1" />
+                          {/* Show base layer (60% opacity) everywhere - linear transition to 0% at nodes 2 steps away */}
+                          <stop offset={`${Math.max(0, secondLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="1" />
+                          {/* Linear transition from 1 (60% visible) to 0 (hidden) as overlay fades in from 0% to 80% */}
+                          <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="1" />
+                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0" />
+                          {/* Hidden in 80% and 100% zones */}
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${immediateRightPercent - 0.001}%`} stopColor="white" stopOpacity="0" />
+                          {/* Linear transition from 0 (hidden) to 1 (60% visible) as overlay fades out from 80% to 0% */}
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0" />
+                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="1" />
+                          {/* Original fade mask cutoff - base layer should fade out here */}
+                          <stop offset={`${fadeCutoffPercent}%`} stopColor="white" stopOpacity="1" />
+                          <stop offset="100%" stopColor="white" stopOpacity="0" />
+                        </linearGradient>
+                        <mask id={`${uniqueId}-desktopFillBaseMaskElement`}>
+                          <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFillBaseMask)`} />
+                        </mask>
+                      </>
+                    );
+                  })()}
                 </defs>
+                {/* Base fill - always rendered, opacity controlled for smooth transitions */}
+                {/* Smooth transition when entering hover, no transition when leaving to prevent darker appearance */}
                 <path
                   d={desktopFillPath}
                   fill={`url(#${uniqueId}-desktopGradient)`}
-                  mask={`url(#${uniqueId}-desktopMask)`}
-                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
+                  mask={desktopGradientStops ? `url(#${uniqueId}-desktopFillBaseMaskElement)` : `url(#${uniqueId}-desktopMask)`}
+                  opacity={desktopGradientStops ? "0.6" : "1"}
+                  style={desktopGradientStops ? { 
+                    transition: 'opacity 0.2s ease-out',
+                  } : {
+                    // No transition when not hovering - ensures instant update
+                  }}
                 />
+                {/* Fill overlay with gradient opacity - 100% for immediate segments, 80% for second segments, 60% for rest */}
+                {/* Appears instantly when entering, disappears instantly when leaving to prevent darker appearance */}
+                <path
+                  d={desktopFillPath}
+                  fill={`url(#${uniqueId}-desktopGradient)`}
+                  mask={desktopGradientStops ? `url(#${uniqueId}-desktopFillOpacityMask)` : `url(#${uniqueId}-desktopMask)`}
+                  opacity={desktopGradientStops ? "1" : "0"}
+                  style={{ 
+                    transition: 'opacity 0s',
+                    pointerEvents: 'none',
+                    willChange: 'opacity',
+                  }}
+                />
+                {/* Base line - always rendered, opacity controlled for smooth transitions */}
+                {/* Line at 60% opacity - mask controls visibility to 60% */}
                 <path
                   d={desktopGraphPath}
                   fill="none"
@@ -895,7 +1108,44 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
+                  mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine60Mask)` : undefined}
+                  opacity={desktopGradientStops ? "1" : "0"}
+                  style={{ transition: 'opacity 0.2s ease-out' }}
+                />
+                {/* Line at 80% opacity - mask controls visibility to 80% */}
+                <path
+                  d={desktopGraphPath}
+                  fill="none"
+                  stroke="#d1d5db"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine80Mask)` : undefined}
+                  opacity={desktopGradientStops ? "1" : "0"}
+                  style={{ transition: 'opacity 0.2s ease-out' }}
+                />
+                {/* Line at 100% opacity - mask controls visibility to 100% */}
+                <path
+                  d={desktopGraphPath}
+                  fill="none"
+                  stroke="#d1d5db"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine100Mask)` : undefined}
+                  opacity={desktopGradientStops ? "1" : "0"}
+                  style={{ transition: 'opacity 0.2s ease-out' }}
+                />
+                {/* Base line at full opacity when not hovering */}
+                <path
+                  d={desktopGraphPath}
+                  fill="none"
+                  stroke="#d1d5db"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity={desktopGradientStops ? "0" : "1"}
+                  style={{ transition: 'opacity 0.2s ease-out' }}
                 />
               </svg>
 
@@ -920,13 +1170,25 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   const isNewest = index === brews.length - 1;
 
                   const isHovered = hoveredNodeIndex === index;
+                  
+                  // Calculate opacity: desktop only - hovered node = 1.0, adjacent nodes = 0.8, others = 0.6
+                  let nodeOpacity = 1;
+                  if (!isMobile && hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length) {
+                    if (isHovered) {
+                      nodeOpacity = 1.0; // Hovered node at full opacity
+                    } else if (Math.abs(index - hoveredNodeIndex) === 1) {
+                      nodeOpacity = 0.8; // Adjacent nodes at 80%
+                    } else {
+                      nodeOpacity = 0.6; // Everything else at 60%
+                    }
+                  }
 
                   return (
                     <div 
                       key={brew.id} 
                       ref={(el) => { nodeRefs.current[index] = el; }}
                       className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
-                      style={{ opacity: hoveredNodeIndex !== null && hoveredNodeIndex !== index ? 0.6 : 1, transition: 'opacity 0.2s' }}
+                      style={{ opacity: nodeOpacity, transition: 'opacity 0.2s' }}
                     >
                       {/* Node Circle - centered on the curve */}
                       <button
@@ -992,12 +1254,25 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
               {brews.map((brew, index) => {
                 const { date, time } = formatNodeDateTime(brew.createdAt, index < brews.length - 1 ? brews[index + 1].createdAt : null);
                 const isHovered = hoveredNodeIndex === index;
+                
+                // Calculate opacity: desktop only - hovered node = 1.0, adjacent nodes = 0.8, others = 0.6
+                let labelOpacity = 1;
+                const isMobileView = typeof window !== 'undefined' && window.innerWidth < 768;
+                if (!isMobileView && hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length) {
+                  if (isHovered) {
+                    labelOpacity = 1.0; // Hovered node at full opacity
+                  } else if (Math.abs(index - hoveredNodeIndex) === 1) {
+                    labelOpacity = 0.8; // Adjacent nodes at 80%
+                  } else {
+                    labelOpacity = 0.6; // Everything else at 60%
+                  }
+                }
 
                 return (
                   <div 
                     key={brew.id} 
                     className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"
-                    style={{ opacity: hoveredNodeIndex !== null && hoveredNodeIndex !== index ? 0.6 : 1, transition: 'opacity 0.2s' }}
+                    style={{ opacity: labelOpacity, transition: 'opacity 0.2s' }}
                   >
                     <div 
                       className="text-xs text-gray-900 whitespace-nowrap"
