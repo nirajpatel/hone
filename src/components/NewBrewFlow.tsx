@@ -1818,7 +1818,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   ) : (
                     <>
                       <QrCode className="w-4 h-4" />
-                      <span>Scan Label</span>
+                      {!isMobile && <span>Scan Label</span>}
                     </>
                   )}
                 </Button>
