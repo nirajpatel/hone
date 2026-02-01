@@ -142,7 +142,7 @@ export function QRCodeDialog({ coffee, onClose }: QRCodeDialogProps) {
     <StandardDialog 
       open={!!coffee} 
       onOpenChange={onClose}
-      title="QR Code"
+      title="Label"
       maxWidth="28rem"
     >
       <div className="space-y-4">
@@ -156,9 +156,12 @@ export function QRCodeDialog({ coffee, onClose }: QRCodeDialogProps) {
         <div className="flex justify-center bg-white p-4 rounded border" ref={qrRef}>
           <QRCodeCanvas value={coffee.id} size={256} level="H" />
         </div>
+        <div className="text-sm text-gray-600 text-center">
+          This label can be used to track beans and scanned whenever adding a new brew.
+        </div>
         <Button onClick={handlePrint} className="w-full cursor-pointer">
           <Printer className="w-4 h-4 mr-2" />
-          Print QR Code
+          Print Label
         </Button>
       </div>
     </StandardDialog>

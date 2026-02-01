@@ -303,7 +303,7 @@ export function CoffeesTableView({
                                 {onPrintQR && (
                                   <DropdownMenuItem onSelect={() => onPrintQR(coffee)} className="cursor-pointer">
                                     <QrCode className="w-4 h-4" />
-                                    Print QR Code
+                                    Print Label
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onSelect={() => onDeleteCoffee(coffee.id)} className="cursor-pointer">

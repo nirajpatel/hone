@@ -481,8 +481,6 @@ export default function App() {
         setCoffees([...coffees, newCoffee]);
         setShowAddCoffee(false);
         toast.success('Coffee added');
-        // Show QR code dialog after adding
-        setQrCodeCoffee(newCoffee);
       } else {
         const error = await res.json();
         console.error('Failed to create coffee:', error);

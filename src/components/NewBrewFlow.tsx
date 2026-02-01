@@ -1550,7 +1550,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error processing QR code:', error);
-      toast.error('Failed to scan QR code');
+      toast.error('Failed to scan label');
       setIsScanning(false);
     }
   };
@@ -1818,7 +1818,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   ) : (
                     <>
                       <QrCode className="w-4 h-4" />
-                      <span>Scan QR</span>
+                      <span>Scan Label</span>
                     </>
                   )}
                 </Button>
@@ -2997,7 +2997,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             <Card className="w-full max-w-2xl" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Scan QR Code</h3>
+                  <h3 className="text-lg font-semibold">Scan Label</h3>
                   <Button 
                     type="button"
                     variant="ghost" 
