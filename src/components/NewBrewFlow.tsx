@@ -981,13 +981,18 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       setUserId(duplicateData.userId);
       setGrindSetting(duplicateData.grindSetting);
       setDosage(duplicateData.dosage.toString());
-      setExtractionTime(duplicateData.brewTime.toString());
-      setFinalWeight(duplicateData.finalWeight.toString());
-      setQuality(duplicateData.quality || 0);
+      // Don't copy extraction time - leave empty for duplicate
+      setExtractionTime('');
+      // Don't copy final weight - leave empty for duplicate
+      setFinalWeight('');
+      // Don't copy quality - reset to 0 for duplicate
+      setQuality(0);
       setWaterTemp(duplicateData.waterTemp ? duplicateData.waterTemp.toString() : '');
       setCoffeeTemperature(duplicateData.coffeeTemperature);
       if (duplicateData.brewerId) setBrewerId(duplicateData.brewerId);
       if (duplicateData.grinderId) setGrinderId(duplicateData.grinderId);
+      // Don't copy tasting notes - leave empty for duplicate
+      setTastingNotesPills([]);
     }
   }, [duplicateData]);
 
@@ -3090,7 +3095,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               {/* Instruction text */}
               <div className="absolute bottom-20 left-0 right-0 text-center px-4">
                 <p className="text-white px-4 py-2 inline-block">
-                  Position QR code within frame
+                  Position label within frame
                 </p>
               </div>
             </div>

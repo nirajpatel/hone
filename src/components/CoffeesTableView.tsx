@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { Plus, MoreVertical, Pencil, Trash2, QrCode } from 'lucide-react';
+import { Plus, MoreVertical, Pencil, Trash2, QrCode, Copy } from 'lucide-react';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
@@ -20,6 +20,7 @@ interface CoffeesTableViewProps {
   onNewCoffee: () => void;
   onSelectCoffee: (coffee: Coffee) => void;
   onEditCoffee: (coffee: Coffee) => void;
+  onDuplicateCoffee?: (coffee: Coffee) => void;
   onDeleteCoffee: (id: string) => void;
   onPrintQR?: (coffee: Coffee) => void;
 }
@@ -34,6 +35,7 @@ export function CoffeesTableView({
   onNewCoffee,
   onSelectCoffee,
   onEditCoffee,
+  onDuplicateCoffee,
   onDeleteCoffee,
   onPrintQR,
 }: CoffeesTableViewProps) {
@@ -300,6 +302,12 @@ export function CoffeesTableView({
                                   <Pencil className="w-4 h-4" />
                                   Edit
                                 </DropdownMenuItem>
+                                {onDuplicateCoffee && (
+                                  <DropdownMenuItem onSelect={() => onDuplicateCoffee(coffee)} className="cursor-pointer">
+                                    <Copy className="w-4 h-4" />
+                                    Duplicate
+                                  </DropdownMenuItem>
+                                )}
                                 {onPrintQR && (
                                   <DropdownMenuItem onSelect={() => onPrintQR(coffee)} className="cursor-pointer">
                                     <QrCode className="w-4 h-4" />

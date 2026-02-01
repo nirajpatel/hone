@@ -74,6 +74,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [duplicateBrewData, setDuplicateBrewData] = useState<Brew | null>(null);
+  const [duplicateCoffeeData, setDuplicateCoffeeData] = useState<Coffee | null>(null);
   const [prefilledCoffeeId, setPrefilledCoffeeId] = useState<string | null>(null);
   const [prefilledBrewMethod, setPrefilledBrewMethod] = useState<BrewMethod | null>(null);
   const [editingCoffee, setEditingCoffee] = useState<Coffee | null>(null);
@@ -574,7 +575,8 @@ export default function App() {
   };
 
   const handleDuplicateCoffee = (coffee: Coffee) => {
-    setEditingCoffee(coffee);
+    setDuplicateCoffeeData(coffee);
+    setEditingCoffee(null); // Clear edit data to ensure it's treated as new
     setShowAddCoffee(true);
   };
 
@@ -1172,6 +1174,7 @@ export default function App() {
               onDeleteBrew={(id) => setDeletingBrewId(id)}
               onDuplicateBrew={(brew) => {
                 setDuplicateBrewData(brew);
+                setShowNewBrew(true);
               }}
               hoveredBrewRating={hoveredBrewRating}
               onHoverBrewRating={setHoveredBrewRating}
@@ -1218,6 +1221,7 @@ export default function App() {
             onNewCoffee={() => setShowAddCoffee(true)}
             onSelectCoffee={setSelectedCoffee}
             onEditCoffee={handleEditCoffee}
+            onDuplicateCoffee={handleDuplicateCoffee}
             onDeleteCoffee={(id) => setDeletingCoffeeId(id)}
             onPrintQR={setQrCodeCoffee}
           />
@@ -1326,9 +1330,11 @@ export default function App() {
           onClose={() => {
             setShowAddCoffee(false);
             setEditingCoffee(null);
+            setDuplicateCoffeeData(null);
           }}
           onSave={handleAddCoffee}
           editData={editingCoffee}
+          duplicateData={duplicateCoffeeData}
           onUpdate={handleUpdateCoffee}
           existingCoffees={coffees}
         />

@@ -25,6 +25,7 @@ interface AddCoffeeFormProps {
     roastDate: string;
   }) => void;
   editData?: Coffee | null;
+  duplicateData?: Coffee | null;
   onUpdate?: (id: string, data: Omit<Coffee, 'id' | 'createdAt'>) => void;
   existingCoffees?: Coffee[];
 }
@@ -37,7 +38,7 @@ const toTitleCase = (str: string): string => {
     .join(' ');
 };
 
-export function AddCoffeeForm({ onClose, onSave, editData, onUpdate, existingCoffees = [] }: AddCoffeeFormProps) {
+export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpdate, existingCoffees = [] }: AddCoffeeFormProps) {
   const [roaster, setRoaster] = useState('');
   const [name, setName] = useState('');
   const [roastDate, setRoastDate] = useState('');
@@ -86,37 +87,45 @@ export function AddCoffeeForm({ onClose, onSave, editData, onUpdate, existingCof
   }, [onClose]);
 
   useEffect(() => {
-    if (editData) {
-      setRoaster(editData.roaster);
-      setName(editData.name);
-      // Convert date format for iOS (yyyy-mm-dd to mm/dd/yyyy)
-      if (isIOS && editData.roastDate) {
-        const [year, month, day] = editData.roastDate.split('-');
-        setRoastDate(`${month}/${day}/${year}`);
+    const dataToUse = editData || duplicateData;
+    if (dataToUse) {
+      setRoaster(dataToUse.roaster);
+      setName(dataToUse.name);
+      // For duplicates, don't copy roast date - leave it empty
+      // For edits, keep the roast date
+      if (editData) {
+        // Convert date format for iOS (yyyy-mm-dd to mm/dd/yyyy)
+        if (isIOS && dataToUse.roastDate) {
+          const [year, month, day] = dataToUse.roastDate.split('-');
+          setRoastDate(`${month}/${day}/${year}`);
+        } else {
+          setRoastDate(dataToUse.roastDate);
+        }
       } else {
-        setRoastDate(editData.roastDate);
+        // Duplicate - clear roast date
+        setRoastDate('');
       }
       // Parse region and notes into pills
-      if (editData.region) {
-        setRegionPills(editData.region.split(',').map(s => s.trim()).filter(Boolean));
+      if (dataToUse.region) {
+        setRegionPills(dataToUse.region.split(',').map(s => s.trim()).filter(Boolean));
       }
-      if (editData.notes) {
-        setNotesPills(editData.notes.split(',').map(s => s.trim()).filter(Boolean));
+      if (dataToUse.notes) {
+        setNotesPills(dataToUse.notes.split(',').map(s => s.trim()).filter(Boolean));
       }
       // Load existing image if available
-      if (editData.imageUrl) {
-        setImages([editData.imageUrl]);
+      if (dataToUse.imageUrl) {
+        setImages([dataToUse.imageUrl]);
       }
       // Load existing images if available
-      if (editData.imageUrls && editData.imageUrls.length > 0) {
-        setImages(editData.imageUrls);
+      if (dataToUse.imageUrls && dataToUse.imageUrls.length > 0) {
+        setImages(dataToUse.imageUrls);
       }
       // Set roast level if available
-      if (editData.roastLevel) {
-        setRoastLevel(editData.roastLevel);
+      if (dataToUse.roastLevel) {
+        setRoastLevel(dataToUse.roastLevel);
       }
     }
-  }, [editData, isIOS]);
+  }, [editData, duplicateData, isIOS]);
 
   // Auto-fill region and notes based on roaster and name from previous entries
   // Only trigger when both fields have text and neither is focused
@@ -335,7 +344,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, onUpdate, existingCof
     }
   }, [name, roaster, existingCoffees, editData]);
 
-  const canSave = roaster && name;
+  const canSave = roaster && name && !roastLevelLoading && !regionLoading && !notesLoading;
 
   // Convert file to base64
   const fileToBase64 = (file: File): Promise<string> => {
@@ -592,8 +601,14 @@ export function AddCoffeeForm({ onClose, onSave, editData, onUpdate, existingCof
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to lookup roast level');
+        let errorMessage = 'Failed to lookup roast level';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If JSON parsing fails, use default error message
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -634,8 +649,14 @@ export function AddCoffeeForm({ onClose, onSave, editData, onUpdate, existingCof
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to lookup region');
+        let errorMessage = 'Failed to lookup region';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If JSON parsing fails, use default error message
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -678,8 +699,14 @@ export function AddCoffeeForm({ onClose, onSave, editData, onUpdate, existingCof
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to lookup tasting notes');
+        let errorMessage = 'Failed to lookup tasting notes';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If JSON parsing fails, use default error message
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
