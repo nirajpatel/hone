@@ -957,10 +957,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
                   const buttonMarginTop = isMobile ? 33 : 48; // Mobile: 45-12=33, Desktop: 60-12=48
                   
+                  const isOtherNodeHovered = hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length;
+                  
                   return (
                     <div 
                       className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
-                      style={{ opacity: hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length ? 0.6 : 1, transition: 'opacity 0.2s' }}
+                      style={{ opacity: 1 }}
                     >
                       {/* Vertically centered button - responsive for mobile height */}
                       <button
@@ -970,7 +972,10 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                         className="w-6 h-6 rounded-full text-white flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10"
                         style={{ 
                           marginTop: `${buttonMarginTop}px`,
-                          backgroundColor: (isButtonHovered || hoveredNodeIndex === brews.length) ? '#111827' : '#b7bcc5',
+                          backgroundColor: (isButtonHovered || hoveredNodeIndex === brews.length) 
+                            ? '#111827' 
+                            : (isOtherNodeHovered ? '#d1d5db' : '#b7bcc5'),
+                          transition: 'background-color 0.2s',
                           boxShadow: hoveredNodeIndex === brews.length ? '0 0 0 2px #d1d5db' : undefined
                         }}
                       >

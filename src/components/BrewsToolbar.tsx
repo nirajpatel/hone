@@ -4,6 +4,7 @@ import { Plus, Activity, Table as TableIcon } from 'lucide-react';
 import { BrewMethod, Equipment, Coffee } from '../types';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { SimpleTooltip } from './ui/simple-tooltip';
+import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
 
 interface BrewsToolbarProps {
   view: 'table' | 'timeline';
@@ -65,7 +66,7 @@ export function BrewsToolbar({
         {/* View Toggle Buttons */}
         <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
           <div className="hidden md:block">
-            <SimpleTooltip content="Table">
+            <DelayedHelpTooltip content="Table">
               <Button
                 variant={view === 'table' ? 'default' : 'ghost'}
                 size="sm"
@@ -74,7 +75,7 @@ export function BrewsToolbar({
               >
                 <TableIcon className="w-4 h-4" />
               </Button>
-            </SimpleTooltip>
+            </DelayedHelpTooltip>
           </div>
           <div className="md:hidden">
             <Button
@@ -87,7 +88,7 @@ export function BrewsToolbar({
             </Button>
           </div>
           <div className="hidden md:block">
-            <SimpleTooltip content="Timeline">
+            <DelayedHelpTooltip content="Timeline">
               <Button
                 variant={view === 'timeline' ? 'default' : 'ghost'}
                 size="sm"
@@ -96,7 +97,7 @@ export function BrewsToolbar({
               >
                 <Activity className="w-4 h-4" />
               </Button>
-            </SimpleTooltip>
+            </DelayedHelpTooltip>
           </div>
           <div className="md:hidden">
             <Button

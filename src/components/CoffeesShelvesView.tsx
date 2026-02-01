@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import VanillaTilt from 'vanilla-tilt';
 import { SimpleTooltip } from './ui/simple-tooltip';
+import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
 
 interface CoffeesShelvesViewProps {
   coffees: Coffee[];
@@ -460,7 +461,7 @@ export function CoffeesShelvesView({
           {/* View Toggle Buttons */}
           {onViewChange && (
             <div className="flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
-              <SimpleTooltip content="Table">
+              <DelayedHelpTooltip content="Table">
                 <Button
                   variant={view === 'table' ? 'default' : 'ghost'}
                   size="sm"
@@ -469,8 +470,8 @@ export function CoffeesShelvesView({
                 >
                   <TableIcon className="w-4 h-4" />
                 </Button>
-              </SimpleTooltip>
-              <SimpleTooltip content="Shelf">
+              </DelayedHelpTooltip>
+              <DelayedHelpTooltip content="Shelf">
                 <Button
                   variant={view === 'shelf' ? 'default' : 'ghost'}
                   size="sm"
@@ -479,7 +480,7 @@ export function CoffeesShelvesView({
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </Button>
-              </SimpleTooltip>
+              </DelayedHelpTooltip>
             </div>
           )}
           
