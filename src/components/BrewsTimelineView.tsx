@@ -1099,7 +1099,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     willChange: 'opacity',
                   }}
                 />
-                {/* Base line - always rendered, opacity controlled for smooth transitions */}
+                {/* Base line - always rendered, opacity controlled for instant transitions */}
                 {/* Line at 60% opacity - mask controls visibility to 60% */}
                 <path
                   d={desktopGraphPath}
@@ -1110,7 +1110,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine60Mask)` : undefined}
                   opacity={desktopGradientStops ? "1" : "0"}
-                  style={{ transition: 'opacity 0.2s ease-out' }}
                 />
                 {/* Line at 80% opacity - mask controls visibility to 80% */}
                 <path
@@ -1122,7 +1121,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine80Mask)` : undefined}
                   opacity={desktopGradientStops ? "1" : "0"}
-                  style={{ transition: 'opacity 0.2s ease-out' }}
                 />
                 {/* Line at 100% opacity - mask controls visibility to 100% */}
                 <path
@@ -1134,7 +1132,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine100Mask)` : undefined}
                   opacity={desktopGradientStops ? "1" : "0"}
-                  style={{ transition: 'opacity 0.2s ease-out' }}
                 />
                 {/* Base line at full opacity when not hovering */}
                 <path
@@ -1145,7 +1142,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   opacity={desktopGradientStops ? "0" : "1"}
-                  style={{ transition: 'opacity 0.2s ease-out' }}
                 />
               </svg>
 
