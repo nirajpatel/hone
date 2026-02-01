@@ -274,7 +274,7 @@ export function BrewsTimelineView({
       />
 
       {/* Timeline Cards */}
-      <div className="space-y-2 md:space-y-4">
+      <div className="space-y-2 md:space-y-4 md:mt-0 mt-4">
         {sortedGroups.length === 0 ? (
           <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
             <div className="max-w-md mx-auto">
@@ -394,9 +394,13 @@ interface TimelineRowProps {
 
 function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMethod, onAddExtraction }: TimelineRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const graphContainerRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+  const [hoveredNodeIndex, setHoveredNodeIndex] = useState<number | null>(null);
+  const [mouseX, setMouseX] = useState<number | null>(null);
 
   // Generate unique IDs for this timeline's SVG elements using incrementor
   const uniqueId = useRef(`timeline-${timelineIdCounter++}`).current;
@@ -448,12 +452,33 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     }
   }, [brews]);
 
+  // Set initial mouseX position for default display (first node) - TEMPORARY for styling
+  useEffect(() => {
+    if (brews.length > 0 && nodeRefs.current[0]) {
+      const nodeElement = nodeRefs.current[0];
+      const contentDiv = scrollRef.current?.querySelector('.relative.min-w-max') as HTMLElement;
+      if (nodeElement && contentDiv) {
+        const nodeRect = nodeElement.getBoundingClientRect();
+        const contentRect = contentDiv.getBoundingClientRect();
+        const nodeCenterX = nodeRect.left + nodeRect.width / 2 - contentRect.left;
+        setMouseX(nodeCenterX);
+      } else {
+        // Fallback to calculated position
+        const isMobile = window.innerWidth < 768;
+        const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
+        const gap = isMobile ? mobileGap : desktopGap;
+        const nodeX = 0 * (containerWidth + gap) + containerWidth / 2;
+        setMouseX(nodeX);
+      }
+    }
+  }, [brews.length]);
+
   // Get dot color based on rating
   const getDotColor = (quality: number | null) => {
     if (!quality) return 'bg-gray-300';
     switch (quality) {
       case 1: return '[background-color:oklch(58%_0.23_28)]'; // Bad
-      case 2: return '[background-color:oklch(68%_0.20_80)]'; // Decent
+      case 2: return '[background-color:oklch(0.76_0.18_88.84)]'; // Decent
       case 3: return '[background-color:oklch(58%_0.22_149)]'; // Good
       default: return 'bg-gray-300';
     }
@@ -464,7 +489,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     if (!quality) return 'border-gray-400';
     switch (quality) {
       case 1: return '[border-color:oklch(58%_0.23_28)]'; // Bad
-      case 2: return '[border-color:oklch(68%_0.20_80)]'; // Decent
+      case 2: return '[border-color:oklch(0.76_0.18_88.84)]'; // Decent
       case 3: return '[border-color:oklch(58%_0.22_149)]'; // Good
       default: return 'border-gray-400';
     }
@@ -635,6 +660,88 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
   const mobileMaskCutoff = getMaskCutoffX(true);
   const desktopMaskCutoff = getMaskCutoffX(false);
 
+  // Handle mouse move to find closest node
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!graphContainerRef.current || !scrollRef.current) return;
+    
+    const scrollRect = scrollRef.current.getBoundingClientRect();
+    const scrollLeft = scrollRef.current.scrollLeft;
+    // Account for padding (px-2 = 8px)
+    const padding = 8;
+    const x = e.clientX - scrollRect.left + scrollLeft - padding;
+    
+    const isMobile = window.innerWidth < 768;
+    const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
+    const gap = isMobile ? mobileGap : desktopGap;
+    
+    // Find closest node (including add button if it exists)
+    let closestIndex: number | null = 0;
+    let minDistance = Infinity;
+    const isButtonAvailable = coffeeId && brewMethod && onAddExtraction;
+    
+    // Check all brew nodes
+    brews.forEach((brew, index) => {
+      const nodeX = index * (containerWidth + gap) + containerWidth / 2;
+      const distance = Math.abs(x - nodeX);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+    
+    // Check add button position if it exists
+    if (isButtonAvailable) {
+      const buttonX = brews.length * (containerWidth + gap) + containerWidth / 2;
+      const buttonDistance = Math.abs(x - buttonX);
+      if (buttonDistance < minDistance) {
+        minDistance = buttonDistance;
+        closestIndex = brews.length; // Use brews.length as the index for the button
+      }
+    }
+    
+    setHoveredNodeIndex(closestIndex);
+    
+    // Get actual rendered position of the node/button
+    if (closestIndex === brews.length && isButtonAvailable) {
+      // Handle button position
+      const buttonX = brews.length * (containerWidth + gap) + containerWidth / 2;
+      setMouseX(buttonX);
+    } else if (closestIndex !== null && closestIndex < brews.length) {
+      // Handle regular node position - get position relative to graph container
+      const nodeElement = nodeRefs.current[closestIndex];
+      const graphContainer = graphContainerRef.current;
+      if (nodeElement && graphContainer) {
+        const nodeRect = nodeElement.getBoundingClientRect();
+        const graphRect = graphContainer.getBoundingClientRect();
+        // Calculate node center relative to graph container
+        const nodeCenterX = nodeRect.left + nodeRect.width / 2 - graphRect.left;
+        setMouseX(nodeCenterX);
+      } else {
+        // Fallback to calculated position
+        const nodeX = closestIndex * (containerWidth + gap) + containerWidth / 2;
+        setMouseX(nodeX);
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredNodeIndex(null);
+    setMouseX(null);
+  };
+
+  const handleClick = () => {
+    if (hoveredNodeIndex === null) return;
+    
+    // If clicking on the add button
+    if (hoveredNodeIndex === brews.length && coffeeId && brewMethod && onAddExtraction) {
+      onAddExtraction(coffeeId, brewMethod);
+    } 
+    // If clicking on a brew node
+    else if (hoveredNodeIndex < brews.length && brews[hoveredNodeIndex]) {
+      onSelectBrew(brews[hoveredNodeIndex]);
+    }
+  };
+
   // Calculate SVG dimensions
   const mobileSvgWidth = hasButton 
     ? brews.length * (mobileContainerWidth + mobileGap) + mobileContainerWidth
@@ -669,15 +776,53 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
         
         <div 
           ref={scrollRef}
-          className="overflow-x-auto pb-2"
+          className="relative overflow-x-auto pb-2 cursor-pointer"
           style={{ 
             scrollbarWidth: 'thin',
             scrollbarColor: '#cbd5e1 #f1f5f9'
           }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleClick}
         >
           <div className="relative min-w-max px-2">
             {/* Graph */}
-            <div className="relative h-[90px] md:h-[120px]"> {/* Responsive container height */}
+            <div 
+              ref={graphContainerRef}
+              className="relative h-[90px] md:h-[120px]"
+            >
+              {/* Vertical indicator line - positioned relative to content */}
+              {/* Don't show line if add button is closest */}
+              {hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length && mouseX !== null && (
+                <>
+                  {/* Mobile line - stops at graph height */}
+                  <div
+                    className="absolute pointer-events-none md:hidden"
+                    style={{
+                      left: `${mouseX}px`,
+                      top: '0px',
+                      height: '90px',
+                      width: '2px',
+                      background: 'repeating-linear-gradient(to bottom, var(--color-gray-300) 0px, var(--color-gray-300) 4px, transparent 4px, transparent 8px)',
+                      transform: 'translateX(-50%)',
+                      zIndex: 0
+                    }}
+                  />
+                  {/* Desktop line - stops at graph height */}
+                  <div
+                    className="absolute pointer-events-none hidden md:block"
+                    style={{
+                      left: `${mouseX}px`,
+                      top: '0px',
+                      height: '120px',
+                      width: '2px',
+                      background: 'repeating-linear-gradient(to bottom, var(--color-gray-300) 0px, var(--color-gray-300) 4px, transparent 4px, transparent 8px)',
+                      transform: 'translateX(-50%)',
+                      zIndex: 0
+                    }}
+                  />
+                </>
+              )}
               {/* SVG Graph - Mobile */}
               <svg 
                 className="absolute top-0 left-0 md:hidden pointer-events-none"
@@ -703,6 +848,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   d={mobileFillPath}
                   fill={`url(#${uniqueId}-mobileGradient)`}
                   mask={`url(#${uniqueId}-mobileMask)`}
+                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
                 />
                 <path
                   d={mobileGraphPath}
@@ -711,6 +857,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
                 />
               </svg>
 
@@ -739,6 +886,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   d={desktopFillPath}
                   fill={`url(#${uniqueId}-desktopGradient)`}
                   mask={`url(#${uniqueId}-desktopMask)`}
+                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
                 />
                 <path
                   d={desktopGraphPath}
@@ -747,6 +895,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  opacity={hoveredNodeIndex !== null && hoveredNodeIndex < brews.length ? 0.6 : 1}
                 />
               </svg>
 
@@ -770,17 +919,32 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   const isUnrated = !brew.quality;
                   const isNewest = index === brews.length - 1;
 
+                  const isHovered = hoveredNodeIndex === index;
+
                   return (
-                    <div key={brew.id} className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
+                    <div 
+                      key={brew.id} 
+                      ref={(el) => { nodeRefs.current[index] = el; }}
+                      className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
+                      style={{ opacity: hoveredNodeIndex !== null && hoveredNodeIndex !== index ? 0.6 : 1, transition: 'opacity 0.2s' }}
+                    >
                       {/* Node Circle - centered on the curve */}
                       <button
                         onClick={() => onSelectBrew(brew)}
-                        className={`w-2.5 h-2.5 rounded-full transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
+                        className={`w-2.5 h-2.5 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
                           isUnrated 
-                            ? 'border-dashed border-gray-400 bg-transparent hover:border-gray-600' 
-                            : `${dotColor} ${dotBorderColor} hover:opacity-80 ${isNewest ? 'animate-radiate' : ''}`
+                            ? 'border-dashed bg-transparent border-gray-400' 
+                            : `${dotColor} ${dotBorderColor} ${isNewest ? 'animate-radiate' : ''}`
                         }`}
-                        style={{ marginTop: `${yPos - 5}px` }}
+                        style={{ 
+                          marginTop: `${yPos - 5}px`,
+                          opacity: 1,
+                          backgroundColor: isUnrated ? 'transparent' : undefined,
+                          ...(brew.quality === 2 ? {
+                            backgroundColor: 'oklch(0.76 0.18 88.84)',
+                            borderColor: 'oklch(0.76 0.18 88.84)'
+                          } : {})
+                        }}
                         title={isUnrated ? 'Click to rate this brew' : ''}
                       >
                       </button>
@@ -794,16 +958,20 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   const buttonMarginTop = isMobile ? 33 : 48; // Mobile: 45-12=33, Desktop: 60-12=48
                   
                   return (
-                    <div className="flex flex-col items-center min-w-[60px] md:min-w-[80px]">
+                    <div 
+                      className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
+                      style={{ opacity: hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length ? 0.6 : 1, transition: 'opacity 0.2s' }}
+                    >
                       {/* Vertically centered button - responsive for mobile height */}
                       <button
                         onClick={() => onAddExtraction(coffeeId, brewMethod)}
                         onMouseEnter={() => setIsButtonHovered(true)}
                         onMouseLeave={() => setIsButtonHovered(false)}
-                        className="w-6 h-6 rounded-full text-white flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10"
+                        className="w-6 h-6 rounded-full text-white flex items-center justify-center transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10"
                         style={{ 
                           marginTop: `${buttonMarginTop}px`,
-                          backgroundColor: isButtonHovered ? '#111827' : '#b7bcc5'
+                          backgroundColor: (isButtonHovered || hoveredNodeIndex === brews.length) ? '#111827' : '#b7bcc5',
+                          boxShadow: hoveredNodeIndex === brews.length ? '0 0 0 2px #d1d5db' : undefined
                         }}
                       >
                         <Plus className="w-4 h-4" />
@@ -818,11 +986,30 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
             <div className="flex items-start gap-2 md:gap-8 relative mt-3"> {/* Match node spacing gap-2 */}
               {brews.map((brew, index) => {
                 const { date, time } = formatNodeDateTime(brew.createdAt, index < brews.length - 1 ? brews[index + 1].createdAt : null);
+                const isHovered = hoveredNodeIndex === index;
 
                 return (
-                  <div key={brew.id} className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"> {/* Responsive mobile width */}
-                    <div className="text-xs font-normal text-gray-900 whitespace-nowrap">{date}</div>
-                    <div className="text-xs text-gray-500 whitespace-nowrap">{time}</div>
+                  <div 
+                    key={brew.id} 
+                    className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"
+                    style={{ opacity: hoveredNodeIndex !== null && hoveredNodeIndex !== index ? 0.6 : 1, transition: 'opacity 0.2s' }}
+                  >
+                    <div 
+                      className="text-xs text-gray-900 whitespace-nowrap"
+                      style={{ 
+                        fontWeight: 'var(--font-weight-normal)'
+                      }}
+                    >
+                      {date}
+                    </div>
+                    <div 
+                      className="text-xs text-gray-500 whitespace-nowrap"
+                      style={{ 
+                        fontWeight: 'var(--font-weight-normal)'
+                      }}
+                    >
+                      {time}
+                    </div>
                   </div>
                 );
               })}

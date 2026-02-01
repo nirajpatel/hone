@@ -44,8 +44,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from './components/ui/sheet';
-import logoImage from 'figma:asset/94569b8fb43bbcd949c9029d468acf102e8cd92b.png';
-import coffeeBeansImage from './assets/coffee-beans.png';
+import coffeeBeansImage from './assets/coffee-beans.webp';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
 import { Coffee as CoffeeIcon, Plus, LogOut } from 'lucide-react';
@@ -221,10 +220,23 @@ export default function App() {
       setCurrentRoute(window.location.pathname);
     };
 
+    // Check route on mount and when pathname changes
+    const checkRoute = () => {
+      setCurrentRoute(window.location.pathname);
+    };
+
+    // Check immediately
+    checkRoute();
+
+    // Listen for popstate (back/forward)
     window.addEventListener('popstate', handlePopState);
+    
+    // Poll for route changes (for direct navigation)
+    const interval = setInterval(checkRoute, 100);
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
+      clearInterval(interval);
     };
   }, []);
 
