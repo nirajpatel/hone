@@ -580,6 +580,11 @@ export default function App() {
     setShowAddCoffee(true);
   };
 
+  const handleDuplicateBrew = (brew: Brew) => {
+    setDuplicateBrewData(brew);
+    setShowNewBrew(true);
+  };
+
   const handleEditCoffee = (coffee: Coffee) => {
     setEditingCoffee(coffee);
     setShowAddCoffee(true);
@@ -1258,6 +1263,14 @@ export default function App() {
               setSelectedBrew(null);
               setEditingBrew(brew);
             }}
+            onDuplicateBrew={(brew) => {
+              setSelectedBrew(null);
+              handleDuplicateBrew(brew);
+            }}
+            onDeleteBrew={(id) => {
+              setSelectedBrew(null);
+              setDeletingBrewId(id);
+            }}
             onNavigatePrev={hasPrev ? () => setSelectedBrew(flatBrews[currentIndex - 1]) : undefined}
             onNavigateNext={hasNext ? () => setSelectedBrew(flatBrews[currentIndex + 1]) : undefined}
             hasPrev={hasPrev}
@@ -1285,6 +1298,14 @@ export default function App() {
             onEdit={(coffee) => {
               setSelectedCoffee(null);
               handleEditCoffee(coffee);
+            }}
+            onDuplicateCoffee={(coffee) => {
+              setSelectedCoffee(null);
+              handleDuplicateCoffee(coffee);
+            }}
+            onDeleteCoffee={(id) => {
+              setSelectedCoffee(null);
+              setDeletingCoffeeId(id);
             }}
             onNavigatePrev={hasPrev ? () => setSelectedCoffee(flatCoffees[currentIndex - 1]) : undefined}
             onNavigateNext={hasNext ? () => setSelectedCoffee(flatCoffees[currentIndex + 1]) : undefined}

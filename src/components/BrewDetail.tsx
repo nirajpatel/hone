@@ -1,9 +1,10 @@
-import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User } from 'lucide-react';
+import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, Copy, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { formatTime, formatExtractionTime } from './TimeInput';
 import { Brew, BrewMethod, User as UserType } from '../types';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { BrewEquipmentIcon } from './icons/BrewEquipmentIcon';
 import { GrinderIcon } from './icons/GrinderIcon';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
@@ -14,13 +15,15 @@ interface BrewDetailProps {
   users: UserType[];
   onClose: () => void;
   onEdit: (brew: Brew) => void;
+  onDuplicateBrew?: (brew: Brew) => void;
+  onDeleteBrew?: (id: string) => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
   hasPrev?: boolean;
   hasNext?: boolean;
 }
 
-export function BrewDetail({ brew, users, onClose, onEdit, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: BrewDetailProps) {
+export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: BrewDetailProps) {
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
@@ -69,12 +72,37 @@ export function BrewDetail({ brew, users, onClose, onEdit, onNavigatePrev, onNav
     return `1:${rounded % 1 === 0 ? Math.round(rounded) : rounded.toFixed(1)}`;
   };
 
+  const headerActions = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="cursor-pointer">
+          <MoreVertical className="w-5 h-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {onDuplicateBrew && (
+          <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)} className="cursor-pointer">
+            <Copy className="w-4 h-4 mr-2" />
+            Duplicate
+          </DropdownMenuItem>
+        )}
+        {onDeleteBrew && (
+          <DropdownMenuItem onSelect={() => onDeleteBrew(brew.id)} className="cursor-pointer">
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <StandardDialog
       open={true}
       onOpenChange={(open) => !open && onClose()}
       title={`Brew on ${formatHeaderDate(brew.createdAt)}`}
       subtitle={`${brew.roaster} – ${brew.coffeeName} • ${capitalizeBrewMethod(brew.brewMethod)}`}
+      headerActions={headerActions}
       footerContent={
         <div className="flex gap-3">
           <Button variant="outline" onClick={onClose} className="cursor-pointer">

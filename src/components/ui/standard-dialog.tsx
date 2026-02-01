@@ -14,6 +14,7 @@ interface StandardDialogProps {
   hideCloseButton?: boolean;
   footerContent?: React.ReactNode;
   titleAlign?: 'start' | 'center';
+  headerActions?: React.ReactNode;
 }
 
 export function StandardDialog({
@@ -28,6 +29,7 @@ export function StandardDialog({
   hideCloseButton = false,
   footerContent,
   titleAlign = 'start',
+  headerActions,
 }: StandardDialogProps) {
   const handleClose = () => onOpenChange(false);
 
@@ -58,16 +60,19 @@ export function StandardDialog({
                   <div className="text-gray-600 mt-1 text-base font-normal break-words">{subtitle}</div>
                 )}
               </div>
-              {!hideCloseButton && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClose}
-                  className="cursor-pointer flex-shrink-0"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
-              )}
+              <div className="flex items-center gap-0 flex-shrink-0">
+                {headerActions}
+                {!hideCloseButton && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClose}
+                    className="cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                )}
+              </div>
             </DialogTitle>
           </DialogHeader>
 

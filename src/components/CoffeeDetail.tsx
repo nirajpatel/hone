@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { Coffee, Extraction } from '../types';
-import { MapPin, Calendar, FileText, Flame } from 'lucide-react';
+import { Coffee, Brew } from '../types';
+import { MapPin, Calendar, FileText, Flame, MoreVertical, Copy, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
 import { Badge } from './ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
 
 interface CoffeeDetailProps {
@@ -11,13 +12,15 @@ interface CoffeeDetailProps {
   brews: Brew[];
   onClose: () => void;
   onEdit: (coffee: Coffee) => void;
+  onDuplicateCoffee?: (coffee: Coffee) => void;
+  onDeleteCoffee?: (id: string) => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
   hasPrev?: boolean;
   hasNext?: boolean;
 }
 
-export function CoffeeDetail({ coffee, brews, onClose, onEdit, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: CoffeeDetailProps) {
+export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: CoffeeDetailProps) {
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
@@ -80,12 +83,37 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onNavigatePrev, o
     allImages.push(...coffee.imageUrls);
   }
 
+  const headerActions = (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="cursor-pointer">
+          <MoreVertical className="w-5 h-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {onDuplicateCoffee && (
+          <DropdownMenuItem onSelect={() => onDuplicateCoffee(coffee)} className="cursor-pointer">
+            <Copy className="w-4 h-4 mr-2" />
+            Duplicate
+          </DropdownMenuItem>
+        )}
+        {onDeleteCoffee && (
+          <DropdownMenuItem onSelect={() => onDeleteCoffee(coffee.id)} className="cursor-pointer">
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <StandardDialog
       open={true}
       onOpenChange={(open) => !open && onClose()}
       title={coffee.name}
       subtitle={coffee.roaster}
+      headerActions={headerActions}
       footerContent={
         <div className="flex gap-3">
           <Button variant="outline" onClick={onClose} className="cursor-pointer">
