@@ -775,12 +775,17 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
         <div>
           <div className="space-y-4">
             <div className="border-b border-gray-200 pb-4 mb-4">
-              <Label>Extract from Photos</Label>
+              <Label>Bag Photos</Label>
               
               <div className="flex items-center gap-3 mt-3">
-                <p className="text-sm text-gray-600 flex-1">
-                  Take photos of your coffee bag to automatically extract details including roaster, coffee name, and roast date.
-                </p>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">
+                    Auto-fill coffee details from your bag
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Saved with your coffee
+                  </p>
+                </div>
                 <Button
                   size="sm"
                   variant="outline"
