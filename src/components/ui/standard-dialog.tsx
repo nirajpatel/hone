@@ -62,16 +62,16 @@ export function StandardDialog({
               </div>
               <div className="flex items-center gap-0 flex-shrink-0">
                 {headerActions}
-                {!hideCloseButton && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClose}
+              {!hideCloseButton && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClose}
                     className="cursor-pointer"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                )}
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              )}
               </div>
             </DialogTitle>
           </DialogHeader>

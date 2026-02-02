@@ -1009,13 +1009,13 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         setBaselineMode('most-recent'); // Set mode to most-recent so it shows the baseline
       } else {
         // Fallback: if brew not found, set fields manually from duplicateData
-        setGrindSetting(duplicateData.grindSetting);
-        setDosage(duplicateData.dosage.toString());
-        setWaterTemp(duplicateData.waterTemp ? duplicateData.waterTemp.toString() : '');
-        setCoffeeTemperature(duplicateData.coffeeTemperature);
-        if (duplicateData.brewerId) setBrewerId(duplicateData.brewerId);
-        if (duplicateData.grinderId) setGrinderId(duplicateData.grinderId);
-      }
+      setGrindSetting(duplicateData.grindSetting);
+      setDosage(duplicateData.dosage.toString());
+      setWaterTemp(duplicateData.waterTemp ? duplicateData.waterTemp.toString() : '');
+      setCoffeeTemperature(duplicateData.coffeeTemperature);
+      if (duplicateData.brewerId) setBrewerId(duplicateData.brewerId);
+      if (duplicateData.grinderId) setGrinderId(duplicateData.grinderId);
+    }
     }
   }, [duplicateData, brews]);
 
