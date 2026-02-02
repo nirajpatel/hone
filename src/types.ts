@@ -46,6 +46,7 @@ export interface Coffee {
   notes?: string;
   roastLevel?: RoastLevel;
   imageUrls?: string[];
+  personalNotes?: string;
   createdAt: string;
 }
 
@@ -71,6 +72,7 @@ export interface Brew {
   createdAt: string;
   stages?: BrewStage[];
   tastingNotes?: string;
+  personalNotes?: string;
   localTimestamp?: string; // Local timestamp string for SMS display
   timezoneOffset: number; // Timezone offset in minutes for day boundary calculation (required)
 }

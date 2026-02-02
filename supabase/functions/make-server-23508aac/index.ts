@@ -1753,31 +1753,14 @@ You must respond with valid JSON only. No markdown, no code blocks, just raw JSO
       // Existing improvement prompt for coffees with history
       systemMessage = 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.';
       
-      // Find the target brew (the one we're basing suggestions on)
-      const targetBrew = brews.find((b: any) => b.id === targetBrewId) || brews[0];
-
-      // Find the best brew (highest quality rating)
-      const bestBrew = brews.reduce((best: any, current: any) => {
-        if (!best || (current.quality && (!best.quality || current.quality > best.quality))) {
-          return current;
-        }
-        return best;
-      }, null);
-
-      // Select brews to include in prompt:
-      // 1. Take the 5 most recent brews (already sorted most recent first)
-      const recentBrews = brews.slice(0, 5);
+      // Frontend sends: top 10 most recent + baseline brew + most recent Exceptional brew
+      // All brews are already filtered and tagged with isBaseline and isExceptional
+      // Use brews as-is (already sorted chronologically by frontend)
+      const brewsToInclude = brews;
       
-      // 2. Add the best brew if it's not already in the recent 5
-      const brewsToInclude = [...recentBrews];
-      if (bestBrew && !brewsToInclude.find((b: any) => b.id === bestBrew.id)) {
-        brewsToInclude.push(bestBrew);
-      }
-      
-      // Re-sort to maintain chronological order (most recent first)
-      brewsToInclude.sort((a: any, b: any) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      // Find the target brew (baseline) and exceptional brew using tags
+      const targetBrew = brews.find((b: any) => b.isBaseline) || brews.find((b: any) => b.id === targetBrewId) || brews[0];
+      const exceptionalBrew = brews.find((b: any) => b.isExceptional);
 
       // Helper function to get quality label
       const getQualityLabel = (quality: number | undefined) => {
@@ -1815,15 +1798,15 @@ BREW HISTORY (Most recent to oldest):
     // Add selected brews in chronological order (most recent first)
     brewsToInclude.forEach((brew: any, idx: number) => {
       const brewNum = idx + 1;
-      const isTarget = brew.id === targetBrew.id;
-      const isBest = bestBrew && brew.id === bestBrew.id;
+      const isTarget = brew.isBaseline || brew.id === targetBrew?.id;
+      const isExceptional = brew.isExceptional || (exceptionalBrew && brew.id === exceptionalBrew.id);
       
       let qualifiers = '';
-      if (isTarget && isBest) {
+      if (isTarget && isExceptional) {
         qualifiers = ' ⭐ REFERENCE BREW, 🏆 BEST RECORDED BREW';
       } else if (isTarget) {
         qualifiers = ' ⭐ REFERENCE BREW';
-      } else if (isBest) {
+      } else if (isExceptional) {
         qualifiers = ' 🏆 BEST RECORDED BREW';
       }
       

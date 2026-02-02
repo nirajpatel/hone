@@ -651,6 +651,7 @@ export default function App() {
       grinderName?: string;
       stages?: BrewStage[];
       tastingNotes?: string;
+      personalNotes?: string;
     }
   ) => {
     if (!accessToken) {

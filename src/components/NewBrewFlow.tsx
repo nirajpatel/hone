@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Coffee, BrewMethod, User, Extraction, CoffeeTemperature, BrewStage, Equipment } from '../types';
+import { Coffee, BrewMethod, User, Brew, CoffeeTemperature, BrewStage, Equipment } from '../types';
 import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale } from 'lucide-react';
 import { StandardDialog } from './ui/standard-dialog';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import {
   Select,
@@ -255,7 +256,7 @@ interface NewBrewFlowProps {
   coffees: Coffee[];
   users: User[];
   currentUser: User;
-  brews: Extraction[];
+  brews: Brew[];
   accessToken: string;
   onClose: () => void;
   onSave: (brew: {
@@ -278,8 +279,10 @@ interface NewBrewFlowProps {
     userName: string;
     stages?: BrewStage[];
     tastingNotes?: string;
+    personalNotes?: string;
   }) => void;
   duplicateData?: {
+    id: string;
     coffeeId: string;
     coffeeName: string;
     roaster: string;
@@ -313,6 +316,7 @@ interface NewBrewFlowProps {
     grinderName?: string;
     stages?: BrewStage[];
     tastingNotes?: string;
+    personalNotes?: string;
   }) => void;
   equipmentChangeCounter?: number;
 }
@@ -340,10 +344,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const [coffeeTemperature, setCoffeeTemperature] = useState<CoffeeTemperature | ''>('');
   const [waterTemp, setWaterTemp] = useState('');
   const [isScanning, setIsScanning] = useState(false);
-  const [showPreviousExtractions, setShowPreviousExtractions] = useState(false);
+  const [showPreviousBrews, setShowPreviousBrews] = useState(false);
   const [isPreFilled, setIsPreFilled] = useState(false);
   const [isPreFilledFromSelection, setIsPreFilledFromSelection] = useState(false);
-  const [preFilledExtraction, setPreFilledExtraction] = useState<Extraction | null>(null);
+  const [preFilledBrew, setPreFilledBrew] = useState<Brew | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // QR Scanner Modal
@@ -374,6 +378,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   // Tasting notes
   const [tastingNotesPills, setTastingNotesPills] = useState<string[]>([]);
   const [tastingNotesInput, setTastingNotesInput] = useState('');
+  const [personalNotes, setPersonalNotes] = useState('');
 
   // AI Suggestions
   const [suggestions, setSuggestions] = useState<string | AISuggestionsData | FirstTimeSuggestionsData | null>(null);
@@ -391,7 +396,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   // Baseline brew mode
   const [baselineMode, setBaselineMode] = useState<'most-recent' | 'best' | 'browse-all'>('most-recent');
   const [browseAllIndex, setBrowseAllIndex] = useState(0);
-  const lastSuggestionExtractionIdRef = useRef<string>('');
+  const lastSuggestionBrewIdRef = useRef<string>('');
 
   const isEditMode = !!editingBrew;
 
@@ -446,7 +451,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     });
 
     // Filter coffees extracted within last month
-    const recentlyExtractedCoffees = coffees.filter(coffee => {
+    const recentlyBrewedCoffees = coffees.filter(coffee => {
       const lastExtracted = coffeeLastExtracted.get(coffee.id);
       return lastExtracted && lastExtracted >= oneMonthAgo;
     });
@@ -454,10 +459,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     // If we have recently extracted coffees, sort by last extracted date (most recent first) and take top 8
     // Otherwise, show all coffees sorted alphabetically and take top 8
     let sortedCoffees: Coffee[];
-    const hasRecentExtractions = recentlyExtractedCoffees.length > 0;
+    const hasRecentBrews = recentlyBrewedCoffees.length > 0;
     
-    if (hasRecentExtractions) {
-      sortedCoffees = recentlyExtractedCoffees.sort((a, b) => {
+    if (hasRecentBrews) {
+      sortedCoffees = recentlyBrewedCoffees.sort((a, b) => {
         const aDate = coffeeLastExtracted.get(a.id)!;
         const bDate = coffeeLastExtracted.get(b.id)!;
         return bDate.getTime() - aDate.getTime();
@@ -473,16 +478,16 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     // Limit to top 8 options
     return {
       coffees: sortedCoffees.slice(0, 8),
-      hasRecentExtractions,
+      hasRecentBrews,
     };
   };
 
   // Get the dropdown label based on context
-  const getDropdownLabel = (searchQuery: string, hasRecentExtractions: boolean) => {
+  const getDropdownLabel = (searchQuery: string, hasRecentBrews: boolean) => {
     if (searchQuery) {
       return `Coffees matching "${searchQuery}"`;
     }
-    return hasRecentExtractions ? 'Recently used coffees' : 'All coffees';
+    return hasRecentBrews ? 'Recently used coffees' : 'All coffees';
   };
 
   // Fetch machine status (for polling)
@@ -962,8 +967,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (showPreviousExtractions) {
-          setShowPreviousExtractions(false);
+        if (showPreviousBrews) {
+          setShowPreviousBrews(false);
         } else {
           onClose();
         }
@@ -971,7 +976,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [onClose, showPreviousExtractions]);
+  }, [onClose, showPreviousBrews]);
 
   // Initialize with duplicate data if provided
   useEffect(() => {
@@ -979,22 +984,40 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       setCoffeeId(duplicateData.coffeeId);
       setBrewMethod(duplicateData.brewMethod);
       setUserId(duplicateData.userId);
-      setGrindSetting(duplicateData.grindSetting);
-      setDosage(duplicateData.dosage.toString());
       // Don't copy extraction time - leave empty for duplicate
       setExtractionTime('');
       // Don't copy final weight - leave empty for duplicate
       setFinalWeight('');
       // Don't copy quality - reset to 0 for duplicate
       setQuality(0);
-      setWaterTemp(duplicateData.waterTemp ? duplicateData.waterTemp.toString() : '');
-      setCoffeeTemperature(duplicateData.coffeeTemperature);
-      if (duplicateData.brewerId) setBrewerId(duplicateData.brewerId);
-      if (duplicateData.grinderId) setGrinderId(duplicateData.grinderId);
       // Don't copy tasting notes - leave empty for duplicate
       setTastingNotesPills([]);
+      // Don't copy personal notes - leave empty for duplicate
+      setPersonalNotes('');
+      
+        // Set the duplicated brew as the baseline brew
+      const baselineBrew = brews.find(b => b.id === duplicateData.id);
+      if (baselineBrew) {
+        // Apply baseline brew (same logic as applyBaselineBrew function)
+        setCoffeeTemperature(baselineBrew.coffeeTemperature);
+        setGrindSetting(baselineBrew.grindSetting);
+        setDosage(baselineBrew.dosage.toString());
+        setWaterTemp(baselineBrew.waterTemp ? baselineBrew.waterTemp.toString() : '');
+        if (baselineBrew.brewerId) setBrewerId(baselineBrew.brewerId);
+        if (baselineBrew.grinderId) setGrinderId(baselineBrew.grinderId);
+        setPreFilledBrew(baselineBrew);
+        setBaselineMode('most-recent'); // Set mode to most-recent so it shows the baseline
+      } else {
+        // Fallback: if brew not found, set fields manually from duplicateData
+        setGrindSetting(duplicateData.grindSetting);
+        setDosage(duplicateData.dosage.toString());
+        setWaterTemp(duplicateData.waterTemp ? duplicateData.waterTemp.toString() : '');
+        setCoffeeTemperature(duplicateData.coffeeTemperature);
+        if (duplicateData.brewerId) setBrewerId(duplicateData.brewerId);
+        if (duplicateData.grinderId) setGrinderId(duplicateData.grinderId);
+      }
     }
-  }, [duplicateData]);
+  }, [duplicateData, brews]);
 
   // Auto-select coffee and brew method from barista's last brew
   // Runs on mount and whenever barista (userId) changes
@@ -1002,15 +1025,15 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     // Only auto-select if not duplicating, editing, or prefilling
     if (!duplicateData && !editingBrew && !prefilledCoffeeId && !prefilledBrewMethod) {
       // Find the most recent brew for the selected barista
-      const baristaExtractions = brews
+      const baristaBrews = brews
         .filter(e => e.userId === userId)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       
-      if (baristaExtractions.length > 0) {
-        const lastExtraction = baristaExtractions[0];
+      if (baristaBrews.length > 0) {
+        const lastBrew = baristaBrews[0];
         // Auto-select coffee and brew method
-        setCoffeeId(lastExtraction.coffeeId);
-        setBrewMethod(lastExtraction.brewMethod);
+        setCoffeeId(lastBrew.coffeeId);
+        setBrewMethod(lastBrew.brewMethod);
       } else {
         // If the barista has no brews, clear the selections
         setCoffeeId('');
@@ -1048,6 +1071,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       // Load tasting notes
       if (editingBrew.tastingNotes) {
         setTastingNotesPills(editingBrew.tastingNotes.split(', ').filter(note => note.trim()));
+      }
+      
+      // Load personal notes
+      if (editingBrew.personalNotes) {
+        setPersonalNotes(editingBrew.personalNotes);
       }
       
       // For pour over, load stages if available, otherwise use brewTime and finalWeight
@@ -1094,15 +1122,15 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           setQuality(0);
           setIsPreFilled(false);
           setIsPreFilledFromSelection(false);
-          setPreFilledExtraction(null);
+          setPreFilledBrew(null);
           
           // Find the most recent brew with the same coffee and method
-          const matchingExtractions = brews
+          const matchingBrews = brews
             .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
           
-          if (matchingExtractions.length > 0) {
-            const mostRecent = matchingExtractions[0];
+          if (matchingBrews.length > 0) {
+            const mostRecent = matchingBrews[0];
             // Pre-fill from most recent brew
             setGrindSetting(mostRecent.grindSetting);
             setDosage(mostRecent.dosage.toString());
@@ -1129,7 +1157,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               }
             }
             setIsPreFilled(true);
-            setPreFilledExtraction(mostRecent);
+            setPreFilledBrew(mostRecent);
           } else {
           }
         }
@@ -1151,10 +1179,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       }
 
       // Only fetch if the baseline brew has changed since last fetch
-      const currentBaselineExtraction = getBaselineExtraction();
-      const currentExtractionId = currentBaselineExtraction?.id || '';
+      const currentBaselineBrew = getBaselineBrew();
+      const currentBrewId = currentBaselineBrew?.id || '';
       
-      if (lastSuggestionExtractionIdRef.current === currentExtractionId && 
+      if (lastSuggestionBrewIdRef.current === currentBrewId && 
           lastSuggestionCoffeeIdRef.current === coffeeId && 
           lastSuggestionBrewerIdRef.current === brewerId &&
           lastSuggestionGrinderIdRef.current === grinderId &&
@@ -1166,7 +1194,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       if (!selectedCoffee) return;
 
       // Find all brews with the same coffee and method
-      const matchingExtractions = brews
+      const matchingBrews = brews
         .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -1175,7 +1203,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       lastSuggestionBrewerIdRef.current = brewerId;
       lastSuggestionGrinderIdRef.current = grinderId;
       lastSuggestionBrewMethodRef.current = brewMethod;
-      lastSuggestionExtractionIdRef.current = currentExtractionId;
+      lastSuggestionBrewIdRef.current = currentBrewId;
 
       setLoadingSuggestions(true);
       setThinkingText('Analyzing');
@@ -1183,7 +1211,41 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
       try {
         // Determine if this is a first-time coffee (no previous brews)
-        const isFirstTime = matchingExtractions.length === 0;
+        const isFirstTime = matchingBrews.length === 0;
+        
+        let brewsToSend: Brew[] = [];
+        let baselineBrewId: string | null = null;
+        let exceptionalBrewId: string | null = null;
+        
+        if (!isFirstTime) {
+          // Take top 10 most recent brews
+          const top10Recent = matchingBrews.slice(0, 10);
+          const top10Ids = new Set(top10Recent.map(b => b.id));
+          
+          // Find baseline brew (the one being analyzed)
+          const baselineBrew = preFilledBrew || matchingBrews[0];
+          baselineBrewId = baselineBrew?.id || null;
+          
+          // Find most recent Exceptional brew (quality === 3)
+          const exceptionalBrew = matchingBrews.find(b => b.quality === 3);
+          exceptionalBrewId = exceptionalBrew?.id || null;
+          
+          // Start with top 10
+          brewsToSend = [...top10Recent];
+          
+          // Add baseline brew if not already in top 10
+          if (baselineBrewId && !top10Ids.has(baselineBrewId)) {
+            brewsToSend.push(baselineBrew);
+          }
+          
+          // Add exceptional brew if not already included
+          if (exceptionalBrew && !brewsToSend.find(b => b.id === exceptionalBrew.id)) {
+            brewsToSend.push(exceptionalBrew);
+          }
+          
+          // Re-sort chronologically (most recent first)
+          brewsToSend.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        }
         
         const brewer = brewerId ? equipment.find(e => e.id === brewerId) : undefined;
         const grinder = grinderId ? equipment.find(e => e.id === grinderId) : undefined;
@@ -1207,7 +1269,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                 region: selectedCoffee.region,
                 roastLevel: selectedCoffee.roastLevel,
               },
-              brews: isFirstTime ? [] : matchingExtractions.map(e => ({
+              brews: brewsToSend.map(e => ({
                 id: e.id,
                 grindSetting: e.grindSetting,
                 dosage: e.dosage,
@@ -1223,9 +1285,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                 grinderName: e.grinderName,
                 notes: e.notes,
                 createdAt: e.createdAt,
+                isBaseline: e.id === baselineBrewId,
+                isExceptional: e.id === exceptionalBrewId,
               })),
               brewMethod: brewMethod,
-              targetExtractionId: isFirstTime ? null : (preFilledExtraction?.id || matchingExtractions[0]?.id),
+              targetBrewId: baselineBrewId,
               brewerName,
               grinderName,
             }),
@@ -1299,8 +1363,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
       // For pour over, use the last stage's values as brewTime and finalWeight
       // Filter out empty final stage
-      let finalExtractionTime: number;
-      let finalExtractionWeight: number;
+      let finalBrewTime: number;
+      let finalBrewWeight: number;
 
       if (supportsStages(brewMethod)) {
         // Filter out the last stage if it's empty
@@ -1310,11 +1374,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           return;
         }
         const lastStage = validStages[validStages.length - 1];
-        finalExtractionTime = parseFloat(lastStage.endTime);
-        finalExtractionWeight = parseFloat(lastStage.endWeight);
+        finalBrewTime = parseFloat(lastStage.endTime);
+        finalBrewWeight = parseFloat(lastStage.endWeight);
       } else {
-        finalExtractionTime = parseFloat(brewTime);
-        finalExtractionWeight = parseFloat(finalWeight);
+        finalBrewTime = parseFloat(brewTime);
+        finalBrewWeight = parseFloat(finalWeight);
       }
 
       // Get equipment names
@@ -1333,8 +1397,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           userId,
           grindSetting,
           dosage: parseFloat(dosage),
-          brewTime: finalExtractionTime,
-          finalWeight: finalExtractionWeight,
+          brewTime: finalBrewTime,
+          finalWeight: finalBrewWeight,
           quality: quality > 0 ? quality : undefined,
           waterTemp: waterTemp ? parseFloat(waterTemp) : undefined,
           coffeeTemperature,
@@ -1347,6 +1411,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             endWeight: parseFloat(stage.endWeight),
           })) : undefined,
           tastingNotes: tastingNotesPills.join(', '),
+          personalNotes: personalNotes.trim() || undefined,
         });
       } else {
         // Create new brew
@@ -1357,8 +1422,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           brewMethod,
           grindSetting,
           dosage: parseFloat(dosage),
-          brewTime: finalExtractionTime,
-          finalWeight: finalExtractionWeight,
+          brewTime: finalBrewTime,
+          finalWeight: finalBrewWeight,
           quality: quality > 0 ? quality : undefined,
           waterTemp: waterTemp ? parseFloat(waterTemp) : undefined,
           coffeeTemperature,
@@ -1373,6 +1438,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             endWeight: parseFloat(stage.endWeight),
           })) : undefined,
           tastingNotes: tastingNotesPills.join(', '),
+          personalNotes: personalNotes.trim() || undefined,
         });
       }
     } catch (error) {
@@ -1384,19 +1450,19 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   };
 
   // Helper functions to get baseline brew
-  const getMatchingExtractions = () => {
+  const getMatchingBrews = () => {
     return brews
       .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   };
 
-  const getMostRecentExtraction = () => {
-    const matching = getMatchingExtractions();
+  const getMostRecentBrew = () => {
+    const matching = getMatchingBrews();
     return matching.length > 0 ? matching[0] : null;
   };
 
-  const getBestExtraction = () => {
-    const matching = getMatchingExtractions();
+  const getBestBrew = () => {
+    const matching = getMatchingBrews();
     if (matching.length === 0) return null;
     
     // Find highest quality rating
@@ -1406,23 +1472,23 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     if (maxQuality === 0) return matching[0];
     
     // Get all brews with max quality and return most recent
-    const bestExtractions = matching.filter(e => (e.quality || 0) === maxQuality);
-    return bestExtractions[0];
+    const bestBrews = matching.filter(e => (e.quality || 0) === maxQuality);
+    return bestBrews[0];
   };
 
-  const getBaselineExtraction = () => {
+  const getBaselineBrew = () => {
     if (baselineMode === 'most-recent') {
-      return getMostRecentExtraction();
+      return getMostRecentBrew();
     } else if (baselineMode === 'best') {
-      return getBestExtraction();
+      return getBestBrew();
     } else {
       // browse-all mode
-      const matching = getMatchingExtractions();
+      const matching = getMatchingBrews();
       return matching.length > 0 ? matching[browseAllIndex] : null;
     }
   };
 
-  const applyBaselineExtraction = (brew: Extraction | null) => {
+  const applyBaselineBrew = (brew: Brew | null) => {
     if (!brew) return;
     
     setCoffeeTemperature(brew.coffeeTemperature);
@@ -1431,11 +1497,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     setWaterTemp(brew.waterTemp ? brew.waterTemp.toString() : '');
     if (brew.brewerId) setBrewerId(brew.brewerId);
     if (brew.grinderId) setGrinderId(brew.grinderId);
-    setPreFilledExtraction(brew);
+    setPreFilledBrew(brew);
     
     // Collapse AI suggestions when baseline changes
     // Only clear suggestions if it's a different brew
-    if (lastSuggestionExtractionIdRef.current !== brew.id) {
+    if (lastSuggestionBrewIdRef.current !== brew.id) {
       setIsSuggestionsOpen(false);
     }
   };
@@ -1445,27 +1511,27 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     
     if (mode === 'browse-all') {
       setBrowseAllIndex(0);
-      const matching = getMatchingExtractions();
+      const matching = getMatchingBrews();
       if (matching.length > 0) {
-        applyBaselineExtraction(matching[0]);
+        applyBaselineBrew(matching[0]);
       }
     } else {
-      const brew = mode === 'most-recent' ? getMostRecentExtraction() : getBestExtraction();
-      applyBaselineExtraction(brew);
+      const brew = mode === 'most-recent' ? getMostRecentBrew() : getBestBrew();
+      applyBaselineBrew(brew);
     }
   };
 
   const handleBrowseNavigation = (direction: 'prev' | 'next') => {
-    const matching = getMatchingExtractions();
+    const matching = getMatchingBrews();
     const newIndex = direction === 'prev' ? browseAllIndex - 1 : browseAllIndex + 1;
     
     if (newIndex >= 0 && newIndex < matching.length) {
       setBrowseAllIndex(newIndex);
-      applyBaselineExtraction(matching[newIndex]);
+      applyBaselineBrew(matching[newIndex]);
     }
   };
 
-  const handleUseExtraction = (brew: Extraction) => {
+  const handleUseBrew = (brew: Brew) => {
     setCoffeeTemperature(brew.coffeeTemperature);
     setGrindSetting(brew.grindSetting);
     setDosage(brew.dosage.toString());
@@ -1474,8 +1540,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     if (brew.grinderId) setGrinderId(brew.grinderId);
     setIsPreFilled(true);
     setIsPreFilledFromSelection(true);
-    setPreFilledExtraction(brew);
-    setShowPreviousExtractions(false);
+    setPreFilledBrew(brew);
+    setShowPreviousBrews(false);
   };
 
   const getQualityLabel = (q: number) => {
@@ -1718,7 +1784,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         </div>
       )}
 
-      {!showQRScanner && !showPreviousExtractions && !(machineStatus?.state.toUpperCase() === 'BREWING' && !isEditMode) && (
+      {!showQRScanner && !showPreviousBrews && !(machineStatus?.state.toUpperCase() === 'BREWING' && !isEditMode) && (
       <StandardDialog
         open={true}
         onOpenChange={(open) => !open && onClose()}
@@ -1735,7 +1801,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   {isEditMode ? 'Saving...' : 'Adding...'}
                 </>
               ) : (
-                isEditMode ? 'Save Changes' : 'Add Extraction'
+                isEditMode ? 'Save Changes' : 'Add Brew'
               )}
             </Button>
           </div>
@@ -1803,8 +1869,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   placeholder="Search for a coffee"
                   className="flex-1"
                   getDropdownLabel={(searchQuery) => {
-                    const { hasRecentExtractions } = getCoffeesForDropdown();
-                    return getDropdownLabel(searchQuery, hasRecentExtractions);
+                    const { hasRecentBrews } = getCoffeesForDropdown();
+                    return getDropdownLabel(searchQuery, hasRecentBrews);
                   }}
                 />
                 <Button
@@ -2205,8 +2271,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               );
             })()}
 
-            {!duplicateData && !editingBrew && (() => {
-              const hasExtractions = coffeeId && brewMethod && brews.some(
+            {!editingBrew && (() => {
+              const hasBrews = coffeeId && brewMethod && brews.some(
                 e => e.coffeeId === coffeeId && e.brewMethod === brewMethod
               );
               
@@ -2232,7 +2298,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="px-3 pt-3 pb-2.5" style={{ borderTop: '1px solid #B6D3F2' }}>
-                        {!hasExtractions ? (
+                        {!hasBrews ? (
                           <p className="text-sm text-gray-600">
                             No previous brews with this coffee and method
                           </p>
@@ -2277,7 +2343,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
                         {/* Browse All Navigation */}
                         {baselineMode === 'browse-all' && (() => {
-                          const matching = getMatchingExtractions();
+                          const matching = getMatchingBrews();
                           const total = matching.length;
                           const current = browseAllIndex + 1;
                           
@@ -2296,7 +2362,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <ChevronLeft className="w-4 h-4" />
                               </button>
                               <span className="text-xs text-gray-600">
-                                Extraction {current} of {total}
+                                Brew {current} of {total}
                               </span>
                               <button
                                 type="button"
@@ -2314,7 +2380,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                           );
                         })()}
 
-                        {preFilledExtraction && (
+                        {preFilledBrew && (
                           <div className="mt-3 space-y-4">
                             {/* Basic Info Grid */}
                             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
@@ -2323,11 +2389,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <div className="min-w-0">
                                   <p className="text-xs text-gray-500 mb-0.5">Date & Time</p>
                                   <p className="text-xs text-gray-900">
-                                    {new Date(preFilledExtraction.createdAt).toLocaleDateString('en-US', { 
+                                    {new Date(preFilledBrew.createdAt).toLocaleDateString('en-US', { 
                                       month: 'short', 
                                       day: 'numeric', 
                                       year: 'numeric' 
-                                    })} at {new Date(preFilledExtraction.createdAt).toLocaleTimeString('en-US', {
+                                    })} at {new Date(preFilledBrew.createdAt).toLocaleTimeString('en-US', {
                                       hour: 'numeric',
                                       minute: '2-digit',
                                       hour12: true
@@ -2341,7 +2407,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <div className="min-w-0">
                                   <p className="text-xs text-gray-500 mb-0.5">Bean Temp</p>
                                   <p className="text-xs text-gray-900">
-                                    {preFilledExtraction.coffeeTemperature === 'frozen' ? 'Frozen' : 'Room Temp'}
+                                    {preFilledBrew.coffeeTemperature === 'frozen' ? 'Frozen' : 'Room Temp'}
                                   </p>
                                 </div>
                               </div>
@@ -2350,7 +2416,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <BrewEquipmentIcon className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                 <div className="min-w-0">
                                   <p className="text-xs text-gray-500 mb-0.5">Brewer</p>
-                                  <p className="text-xs text-gray-900">{preFilledExtraction.brewerName || 'N/A'}</p>
+                                  <p className="text-xs text-gray-900">{preFilledBrew.brewerName || 'N/A'}</p>
                                 </div>
                               </div>
 
@@ -2358,7 +2424,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <GrinderIcon className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                 <div className="min-w-0">
                                   <p className="text-xs text-gray-500 mb-0.5">Grinder</p>
-                                  <p className="text-xs text-gray-900">{preFilledExtraction.grinderName || 'N/A'}</p>
+                                  <p className="text-xs text-gray-900">{preFilledBrew.grinderName || 'N/A'}</p>
                                 </div>
                               </div>
                             </div>
@@ -2370,7 +2436,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                   <Gauge className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-xs text-gray-500 mb-0.5">Grind Setting</p>
-                                    <p className="text-xs text-gray-900">{preFilledExtraction.grindSetting || 'N/A'}</p>
+                                    <p className="text-xs text-gray-900">{preFilledBrew.grindSetting || 'N/A'}</p>
                                   </div>
                                 </div>
 
@@ -2378,7 +2444,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                   <Weight className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-xs text-gray-500 mb-0.5">Dosage</p>
-                                    <p className="text-xs text-gray-900">{preFilledExtraction.dosage ? `${preFilledExtraction.dosage}g` : 'N/A'}</p>
+                                    <p className="text-xs text-gray-900">{preFilledBrew.dosage ? `${preFilledBrew.dosage}g` : 'N/A'}</p>
                                   </div>
                                 </div>
 
@@ -2386,7 +2452,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                   <Droplet className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-xs text-gray-500 mb-0.5">Water Temp</p>
-                                    <p className="text-xs text-gray-900">{preFilledExtraction.waterTemp ? `${preFilledExtraction.waterTemp}°F` : 'N/A'}</p>
+                                    <p className="text-xs text-gray-900">{preFilledBrew.waterTemp ? `${preFilledBrew.waterTemp}°F` : 'N/A'}</p>
                                   </div>
                                 </div>
 
@@ -2394,7 +2460,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                   <Clock className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-xs text-gray-500 mb-0.5">Extraction Time</p>
-                                    <p className="text-xs text-gray-900">{preFilledExtraction.brewTime ? `${preFilledExtraction.brewTime}s` : 'N/A'}</p>
+                                    <p className="text-xs text-gray-900">{preFilledBrew.brewTime ? `${preFilledBrew.brewTime}s` : 'N/A'}</p>
                                   </div>
                                 </div>
 
@@ -2402,14 +2468,14 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                   <Scale className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-xs text-gray-500 mb-0.5">Final Weight</p>
-                                    <p className="text-xs text-gray-900">{preFilledExtraction.finalWeight ? `${preFilledExtraction.finalWeight}g` : 'N/A'}</p>
+                                    <p className="text-xs text-gray-900">{preFilledBrew.finalWeight ? `${preFilledBrew.finalWeight}g` : 'N/A'}</p>
                                   </div>
                                 </div>
                               </div>
                             </div>
 
                             {/* Brew Stages */}
-                            {preFilledExtraction.stages && preFilledExtraction.stages.length > 0 && (
+                            {preFilledBrew.stages && preFilledBrew.stages.length > 0 && (
                               <div className="border-t border-gray-200 pt-3">
                                 <p className="text-xs text-gray-500 mb-2">Brew Stages</p>
                                 <div className="space-y-1">
@@ -2420,8 +2486,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                     <div className="text-xs text-gray-500 text-right">Weight</div>
                                   </div>
                                   {/* Table Rows */}
-                                  {preFilledExtraction.stages.map((stage, index) => {
-                                    const startTime = index === 0 ? 0 : preFilledExtraction.stages![index - 1].endTime;
+                                  {preFilledBrew.stages.map((stage, index) => {
+                                    const startTime = index === 0 ? 0 : preFilledBrew.stages![index - 1].endTime;
                                     const endTime = stage.endTime;
                                     return (
                                       <div key={index} className="grid grid-cols-3 gap-3 py-1 border-b border-gray-100 last:border-0">
@@ -2441,11 +2507,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                             <div className="border-t border-gray-200 pt-3 space-y-2">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-500">Quality:</span>
-                                {preFilledExtraction.quality ? (
+                                {preFilledBrew.quality ? (
                                   <>
-                                    <span className="text-base">{getRatingEmoji(preFilledExtraction.quality)}</span>
+                                    <span className="text-base">{getRatingEmoji(preFilledBrew.quality)}</span>
                                     <span className="text-xs text-gray-900">
-                                      {getRatingText(preFilledExtraction.quality)}
+                                      {getRatingText(preFilledBrew.quality)}
                                     </span>
                                   </>
                                 ) : (
@@ -2454,8 +2520,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                               </div>
                               <div className="flex flex-wrap gap-1 items-center">
                                 <span className="text-xs text-gray-500">Tasting Notes:</span>
-                                {preFilledExtraction.tastingNotes ? (
-                                  preFilledExtraction.tastingNotes.split(',').map((note, idx) => (
+                                {preFilledBrew.tastingNotes ? (
+                                  preFilledBrew.tastingNotes.split(',').map((note, idx) => (
                                     <span 
                                       key={idx}
                                       className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 border border-gray-300"
@@ -2480,7 +2546,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             })()}
 
             {/* AI Suggestions */}
-            {!duplicateData && !editingBrew && (() => {
+            {!editingBrew && (() => {
               const canExpand = coffeeId && brewMethod;
               
               return (
@@ -2489,10 +2555,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   
                   setIsSuggestionsOpen(open);
                   // If opening and we need to fetch, set loading state immediately
-                  const currentBaselineExtraction = getBaselineExtraction();
-                  const currentExtractionId = currentBaselineExtraction?.id || '';
+                  const currentBaselineBrew = getBaselineBrew();
+                  const currentBrewId = currentBaselineBrew?.id || '';
                   if (open && !suggestions && 
-                      (lastSuggestionExtractionIdRef.current !== currentExtractionId ||
+                      (lastSuggestionBrewIdRef.current !== currentBrewId ||
                        lastSuggestionCoffeeIdRef.current !== coffeeId || 
                        lastSuggestionBrewerIdRef.current !== brewerId ||
                        lastSuggestionGrinderIdRef.current !== grinderId ||
@@ -2779,7 +2845,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               </div>
             </div>
 
-            <div className="mb-6">
+            <div>
               <Label htmlFor="tastingNotes">
                 Extraction Notes <span className="text-muted-foreground">(optional)</span>
               </Label>
@@ -2827,24 +2893,45 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                 </div>
               )}
             </div>
+
+            <div className="mb-6">
+              <Label htmlFor="personalNotes">
+                Personal Notes <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Textarea
+                id="personalNotes"
+                value={personalNotes}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 1000) {
+                    setPersonalNotes(value);
+                  }
+                }}
+                placeholder="Anything you want to remember…"
+                className="mt-2 resize-y"
+                style={{ minHeight: '40px', height: '72px' }}
+                maxLength={1000}
+              />
+              <p className="text-xs text-gray-500 mt-1">{personalNotes.length}/1000 characters</p>
+            </div>
           </div>
         </div>
       </StandardDialog>
       )}
 
-      {/* Previous Extractions Dialog */}
-      {showPreviousExtractions && coffeeId && selectedCoffee && (
+      {/* Previous Brews Dialog */}
+      {showPreviousBrews && coffeeId && selectedCoffee && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 60 }}>
           <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
             <div className="px-6 pt-6 pb-4 border-b border-gray-200">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-lg text-gray-900 font-semibold">Previous Extractions</h2>
+                  <h2 className="text-lg text-gray-900 font-semibold">Previous Brews</h2>
                   <p className="text-gray-600 mt-1">
                     {selectedCoffee.roaster} – {selectedCoffee.name} ({capitalizeBrewMethod(brewMethod)})
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setShowPreviousExtractions(false)} className="cursor-pointer">
+                <Button variant="ghost" size="sm" onClick={() => setShowPreviousBrews(false)} className="cursor-pointer">
                   <X className="w-5 h-5" />
                 </Button>
               </div>
@@ -2853,11 +2940,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             <div className="p-6">
 
               {(() => {
-                const previousExtractions = brews
+                const previousBrews = brews
                   .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
                   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-                if (previousExtractions.length === 0) {
+                if (previousBrews.length === 0) {
                   return (
                     <div className="text-center py-8 text-gray-500">
                       <Info className="w-12 h-12 mx-auto mb-3 text-gray-400" />
@@ -2884,7 +2971,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                         </tr>
                       </thead>
                       <tbody>
-                        {previousExtractions.map((brew, index) => {
+                        {previousBrews.map((brew, index) => {
                           const user = users.find(u => u.id === brew.userId);
                           return (
                             <tr
@@ -2893,7 +2980,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                               onClick={(e) => {
                                 // Only trigger on mobile when clicking the card itself (not the button)
                                 if (window.innerWidth <= 768 && !(e.target as HTMLElement).closest('button')) {
-                                  handleUseExtraction(brew);
+                                  handleUseBrew(brew);
                                 }
                               }}
                             >
@@ -2964,7 +3051,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => handleUseExtraction(brew)}
+                                  onClick={() => handleUseBrew(brew)}
                                   className="cursor-pointer text-sm px-2 py-1 whitespace-nowrap"
                                 >
                                   Use
@@ -2982,7 +3069,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               <div className="mt-6">
                 <Button 
                   variant="outline" 
-                  onClick={() => setShowPreviousExtractions(false)} 
+                  onClick={() => setShowPreviousBrews(false)} 
                   className="w-full cursor-pointer"
                 >
                   Close

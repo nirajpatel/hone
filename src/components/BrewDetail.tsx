@@ -1,4 +1,4 @@
-import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, Copy, Trash2 } from 'lucide-react';
+import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { formatTime, formatExtractionTime } from './TimeInput';
 import { Brew, BrewMethod, User as UserType } from '../types';
@@ -86,8 +86,8 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
       <DropdownMenuContent align="end">
         {onDuplicateBrew && (
           <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)} className="cursor-pointer">
-            <Copy className="w-4 h-4 mr-2" />
-            Duplicate
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Brew From This
           </DropdownMenuItem>
         )}
         {onDeleteBrew && (
@@ -327,6 +327,16 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
                   </div>
                 );
               })()}
+            </div>
+
+            {/* Personal Notes */}
+            <div className="border-t border-gray-200 pt-6 mb-6">
+              <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Personal Notes</h3>
+              {brew.personalNotes ? (
+                <p className="text-sm text-gray-900 whitespace-pre-wrap">{brew.personalNotes}</p>
+              ) : (
+                <p className="text-sm text-gray-500">No notes added</p>
+              )}
             </div>
       </div>
     </StandardDialog>

@@ -67,6 +67,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const [roastLevelLoading, setRoastLevelLoading] = useState(false);
   const [regionLoading, setRegionLoading] = useState(false);
   const [notesLoading, setNotesLoading] = useState(false);
+  const [personalNotes, setPersonalNotes] = useState('');
 
   // Detect iOS devices
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
@@ -123,6 +124,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       // Set roast level if available
       if (dataToUse.roastLevel) {
         setRoastLevel(dataToUse.roastLevel);
+      }
+      // Load personal notes if available
+      if (dataToUse.personalNotes) {
+        setPersonalNotes(dataToUse.personalNotes);
       }
     }
   }, [editData, duplicateData, isIOS]);
@@ -219,6 +224,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       notes: notesPills.join(', '),
       imageData: images.length > 0 ? images : undefined, // Send all images
       roastLevel,
+      personalNotes: personalNotes.trim() || undefined,
     } as any);
   };
 
@@ -241,6 +247,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       notes: notesPills.join(', '),
       imageData: images.length > 0 ? images : undefined, // Send all images
       roastLevel,
+      personalNotes: personalNotes.trim() || undefined,
     } as any);
   };
 
@@ -1013,7 +1020,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <p className="text-xs text-gray-500 mt-1">Press Enter to add each region</p>
             </div>
 
-            <div className="mb-6">
+            <div>
               <Label htmlFor="notes">
                 Tasting Notes <span className="text-muted-foreground">(optional)</span>
               </Label>
@@ -1053,6 +1060,27 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                 )}
               </div>
               <p className="text-xs text-gray-500 mt-1">Press Enter to add each tasting note</p>
+            </div>
+
+            <div className="mb-6">
+              <Label htmlFor="personalNotes">
+                Personal Notes <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Textarea
+                id="personalNotes"
+                value={personalNotes}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 1000) {
+                    setPersonalNotes(value);
+                  }
+                }}
+                placeholder="Anything you want to remember…"
+                className="mt-2 resize-y"
+                style={{ minHeight: '40px', height: '72px' }}
+                maxLength={1000}
+              />
+              <p className="text-xs text-gray-500 mt-1">{personalNotes.length}/1000 characters</p>
             </div>
           </div>
         </div>

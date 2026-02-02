@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Coffee, Brew } from '../types';
-import { MapPin, Calendar, FileText, Flame, MoreVertical, Copy, Trash2 } from 'lucide-react';
+import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
 import { Badge } from './ui/badge';
@@ -97,8 +97,8 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
       <DropdownMenuContent align="end">
         {onDuplicateCoffee && (
           <DropdownMenuItem onSelect={() => onDuplicateCoffee(coffee)} className="cursor-pointer">
-            <Copy className="w-4 h-4 mr-2" />
-            Duplicate
+            <Plus className="w-4 h-4 mr-2" />
+            Add Another Bag
           </DropdownMenuItem>
         )}
         {onDeleteCoffee && (
@@ -188,6 +188,16 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
                 </>
               ) : (
                 <p className="text-sm text-gray-500">No brews logged yet</p>
+              )}
+            </div>
+
+            {/* Personal Notes */}
+            <div className="border-t border-gray-200 pt-6 mb-6">
+              <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Personal Notes</h3>
+              {coffee.personalNotes ? (
+                <p className="text-sm text-gray-900 whitespace-pre-wrap">{coffee.personalNotes}</p>
+              ) : (
+                <p className="text-sm text-gray-500">No notes added</p>
               )}
             </div>
 

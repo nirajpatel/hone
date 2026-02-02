@@ -3,7 +3,7 @@ import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { MoreVertical, Pencil, Trash2, Copy, Check } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, RotateCcw, Check } from 'lucide-react';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
 import { BrewsToolbar } from './BrewsToolbar';
@@ -361,13 +361,13 @@ export function BrewsTableView({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)}>
+                                  <RotateCcw className="w-4 h-4" />
+                                  Brew From This
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onSelect={() => onEditBrew(brew)}>
                                   <Pencil className="w-4 h-4" />
                                   Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)}>
-                                  <Copy className="w-4 h-4" />
-                                  Duplicate
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onSelect={() => onDeleteBrew(brew.id)}>
                                   <Trash2 className="w-4 h-4" />
