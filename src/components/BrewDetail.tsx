@@ -75,7 +75,11 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
   const headerActions = (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="cursor-pointer">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="cursor-pointer data-[state=open]:bg-accent transition-colors"
+        >
           <MoreVertical className="w-5 h-5" />
         </Button>
       </DropdownMenuTrigger>
