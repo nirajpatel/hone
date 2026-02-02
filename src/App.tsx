@@ -1083,7 +1083,7 @@ export default function App() {
                     src={coffeeBeansImage} 
                     alt="Coffee beans" 
                     className="object-contain"
-                    style={{ width: '16px', height: '16px' }}
+                    style={{ width: '18px', height: '18px' }}
                     loading="lazy"
                   />
                 </Button>
