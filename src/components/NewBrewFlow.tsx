@@ -410,6 +410,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const initializedEditingIdRef = useRef<string | null>(null);
   const brewingStateTimestampRef = useRef<number | null>(null);
   const stalenessCheckIntervalRef = useRef<number | null>(null);
+  const previousBrewingStateRef = useRef<string | null>(null);
   
   const selectedCoffee = coffees.find(c => c.id === coffeeId);
   const isEspresso = brewMethod === 'espresso';
@@ -881,6 +882,29 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       }
     };
   }, [isEspresso, isEditMode, brewerId, equipment]);
+
+  // Scroll to extraction time field when brewing popover closes
+  useEffect(() => {
+    const currentBrewingState = machineStatus?.state.toUpperCase();
+    const wasBrewing = previousBrewingStateRef.current === 'BREWING';
+    const isNowNotBrewing = currentBrewingState !== 'BREWING';
+    
+    // If we transitioned from BREWING to non-BREWING, scroll to the extraction time field
+    if (wasBrewing && isNowNotBrewing && !isEditMode && isEspresso) {
+      // Use setTimeout to ensure the form is visible after popover closes
+      setTimeout(() => {
+        const brewTimeInput = document.getElementById('brewTime');
+        if (brewTimeInput) {
+          brewTimeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Optionally focus the field
+          (brewTimeInput as HTMLInputElement).focus();
+        }
+      }, 100);
+    }
+    
+    // Update the previous state
+    previousBrewingStateRef.current = currentBrewingState || null;
+  }, [machineStatus?.state, isEditMode, isEspresso]);
 
   // Fetch equipment on mount
   useEffect(() => {
