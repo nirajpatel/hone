@@ -66,28 +66,6 @@ export function BrewsToolbar({
         {/* View Toggle Buttons */}
         <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
           <div className="hidden md:block">
-            <DelayedHelpTooltip content="Table">
-              <Button
-                variant={view === 'table' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewChange('table')}
-                className="cursor-pointer h-8 px-2"
-              >
-                <TableIcon className="w-4 h-4" />
-              </Button>
-            </DelayedHelpTooltip>
-          </div>
-          <div className="md:hidden">
-            <Button
-              variant={view === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onViewChange('table')}
-              className="cursor-pointer h-8 px-2"
-            >
-              <TableIcon className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="hidden md:block">
             <DelayedHelpTooltip content="Timeline">
               <Button
                 variant={view === 'timeline' ? 'default' : 'ghost'}
@@ -107,6 +85,28 @@ export function BrewsToolbar({
               className="cursor-pointer h-8 px-2"
             >
               <Activity className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="hidden md:block">
+            <DelayedHelpTooltip content="Table">
+              <Button
+                variant={view === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onViewChange('table')}
+                className="cursor-pointer h-8 px-2"
+              >
+                <TableIcon className="w-4 h-4" />
+              </Button>
+            </DelayedHelpTooltip>
+          </div>
+          <div className="md:hidden">
+            <Button
+              variant={view === 'table' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => onViewChange('table')}
+              className="cursor-pointer h-8 px-2"
+            >
+              <TableIcon className="w-4 h-4" />
             </Button>
           </div>
         </div>

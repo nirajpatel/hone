@@ -92,7 +92,7 @@ export default function App() {
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [serverVersion, setServerVersion] = useState<string | null>(null);
   const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('table');
-  const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('table');
+  const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('timeline');
   const [equipment, setEquipment] = useState<Equipment[]>([]);
 
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;

@@ -52,7 +52,7 @@ export function BrewsTableView({
   onDuplicateBrew,
   hoveredBrewRating,
   onHoverBrewRating,
-  view = 'table',
+  view = 'timeline',
   onViewChange,
   equipment,
   onAddBrewForCoffee,
