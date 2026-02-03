@@ -692,6 +692,43 @@ html {
   }
 }
 
+/* Overlap arrow with popover border to hide the connection line */
+[data-slot="popover-arrow"][data-side="top"] {
+  margin-bottom: -2px;
+  z-index: 1;
+}
+
+/* Hide the top border of popover where arrow connects */
+[data-slot="popover-content"][data-side="bottom"] {
+  border-top: none;
+  padding-top: calc(0.75rem + 2px);
+}
+
+/* Add border back but hide it where arrow is */
+[data-slot="popover-content"][data-side="bottom"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+  z-index: 0;
+}
+
+/* Hide border where arrow overlaps */
+[data-slot="popover-content"][data-side="bottom"]::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  background: white;
+  z-index: 2;
+}
+
 /* Desktop and Tablet overrides - reset mobile-specific toolbar styling */
 @media (min-width: 768px) {
   .timeline-line {

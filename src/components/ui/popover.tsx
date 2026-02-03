@@ -45,4 +45,19 @@ function PopoverAnchor({
   return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
 }
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+function PopoverArrow({
+  className,
+  style,
+  ...props
+}: React.ComponentProps<typeof PopoverPrimitive.Arrow>) {
+  return (
+    <PopoverPrimitive.Arrow
+      data-slot="popover-arrow"
+      className={cn("fill-white stroke-gray-200", className)}
+      style={{ fill: 'white', stroke: '#e5e7eb', strokeWidth: 1.5, ...style }}
+      {...props}
+    />
+  );
+}
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverArrow };

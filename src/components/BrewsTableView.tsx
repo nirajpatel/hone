@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { MoreVertical, Pencil, Trash2, RotateCcw, Check } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger, PopoverArrow } from './ui/popover';
+import { MoreVertical, Pencil, Trash2, RotateCcw, Check, ChevronDown, X, Plus } from 'lucide-react';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
 import { BrewsToolbar } from './BrewsToolbar';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsMobileListView } from './BrewsMobileListView';
+import { getTastingNoteSuggestions } from '../utils/tastingNotes';
 
 interface BrewsTableViewProps {
   brews: Brew[];
@@ -31,6 +33,8 @@ interface BrewsTableViewProps {
   onAddBrewForCoffee?: (coffeeId: string, brewMethod: BrewMethod) => void;
   onOpenEquipment?: () => void;
   onOpenAddCoffee?: () => void;
+  onUpdateQuality?: (id: string, quality: number | undefined) => void;
+  onUpdateNotes?: (id: string, notes: string) => void;
 }
 
 export function BrewsTableView({
@@ -54,9 +58,96 @@ export function BrewsTableView({
   onAddBrewForCoffee,
   onOpenEquipment,
   onOpenAddCoffee,
+  onUpdateQuality,
+  onUpdateNotes,
 }: BrewsTableViewProps) {
   // Get all brew method configs
   const brewMethodConfigs = getAllBrewMethodConfigs();
+  
+  // Track which dropdowns are open
+  const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
+  // Track which row is hovered
+  const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
+  // Track which notes popover is open
+  const [openNotesPopover, setOpenNotesPopover] = useState<string | null>(null);
+  // Track notes editing state per brew
+  const [notesEditingState, setNotesEditingState] = useState<Record<string, { pills: string[]; input: string }>>({});
+  
+  const handleDropdownOpenChange = (brewId: string, open: boolean) => {
+    setOpenDropdowns(prev => {
+      const next = new Set(prev);
+      if (open) {
+        next.add(brewId);
+      } else {
+        next.delete(brewId);
+      }
+      return next;
+    });
+  };
+
+  // Notes editing helpers
+  const initializeNotesEditing = (brewId: string, existingNotes: string) => {
+    const notes = existingNotes ? existingNotes.split(', ').filter(n => n.trim()) : [];
+    setNotesEditingState(prev => ({
+      ...prev,
+      [brewId]: {
+        pills: notes,
+        input: '',
+      },
+    }));
+  };
+
+  const addNotesPill = (brewId: string) => {
+    const state = notesEditingState[brewId];
+    if (!state) return;
+    const trimmedInput = state.input.trim();
+    if (trimmedInput && !state.pills.includes(trimmedInput)) {
+      setNotesEditingState(prev => ({
+        ...prev,
+        [brewId]: {
+          pills: [...state.pills, trimmedInput],
+          input: '',
+        },
+      }));
+    }
+  };
+
+  const removeNotesPill = (brewId: string, index: number) => {
+    const state = notesEditingState[brewId];
+    if (!state) return;
+    setNotesEditingState(prev => ({
+      ...prev,
+      [brewId]: {
+        pills: state.pills.filter((_, i) => i !== index),
+        input: state.input,
+      },
+    }));
+  };
+
+  const handleNotesKeyPress = (e: KeyboardEvent<HTMLInputElement>, brewId: string) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addNotesPill(brewId);
+    }
+  };
+
+  const handleSaveNotes = (brewId: string) => {
+    const state = notesEditingState[brewId];
+    if (state && onUpdateNotes) {
+      const notesString = state.pills.join(', ');
+      onUpdateNotes(brewId, notesString);
+    }
+    setOpenNotesPopover(null);
+  };
+
+  const handleDiscardNotes = (brewId: string) => {
+    setOpenNotesPopover(null);
+    setNotesEditingState(prev => {
+      const next = { ...prev };
+      delete next[brewId];
+      return next;
+    });
+  };
 
   // Format time as MM:SS
   const formatTime = (seconds: number) => {
@@ -286,11 +377,14 @@ export function BrewsTableView({
                       {groupBrews.map((brew) => {
                         const user = users.find(u => u.name === brew.userName);
                         const firstName = brew.userName?.split(' ')[0] || '';
+                        const isDropdownOpen = openDropdowns.has(brew.id);
                         
                         return (
                         <TableRow
                           key={brew.id}
-                          className="hover:bg-gray-50"
+                          className="hover:bg-gray-50 group"
+                          onMouseEnter={() => setHoveredRowId(brew.id)}
+                          onMouseLeave={() => setHoveredRowId(null)}
                         >
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Date & Time:">{formatDate(brew.createdAt, groupBy !== 'month')}</TableCell>
                           {showBaristaColumn && (
@@ -305,53 +399,324 @@ export function BrewsTableView({
                               {brew.dosage}g <span className="text-gray-500">→</span> {brew.finalWeight}g <span className="text-gray-500">•</span> {formatTime(brew.brewTime)}
                             </div>
                           </TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Quality:">
-                            {brew.quality ? (
-                              <div className="flex items-center gap-1 md:gap-2">
-                                <span className="text-lg">{getRatingEmoji(brew.quality)}</span>
-                                <span className="text-gray-900 text-sm">{getRatingText(brew.quality)}</span>
-                              </div>
+                          <TableCell className="px-6 cursor-pointer relative" data-label="Quality:">
+                            {onUpdateQuality ? (
+                              <DropdownMenu open={isDropdownOpen} onOpenChange={(open) => handleDropdownOpenChange(brew.id, open)}>
+                                <DropdownMenuTrigger asChild>
+                                  <div className="flex items-center gap-1 md:gap-2 w-full pr-6 relative" onClick={(e) => e.stopPropagation()}>
+                                    {brew.quality ? (
+                                      <>
+                                        <span className="text-lg">{getRatingEmoji(brew.quality)}</span>
+                                        <span className="text-gray-900 text-sm">{getRatingText(brew.quality)}</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {hoveredRowId === brew.id || isDropdownOpen ? (
+                                          <span className="text-gray-500 text-sm">Rate</span>
+                                        ) : (
+                                          <span className="text-gray-400">—</span>
+                                        )}
+                                      </>
+                                    )}
+                                    <ChevronDown className={`absolute right-0 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-500 transition-opacity duration-150 pointer-events-none ${isDropdownOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                                  </div>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                  <DropdownMenuItem
+                                    className="gap-1.5"
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      onUpdateQuality(brew.id, 3);
+                                    }}
+                                  >
+                                    <span className="text-lg mr-0">🔥</span>
+                                    Exceptional
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="gap-1.5"
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      onUpdateQuality(brew.id, 2);
+                                    }}
+                                  >
+                                    <span className="text-lg mr-0">👍</span>
+                                    Decent
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="gap-1.5"
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      onUpdateQuality(brew.id, 1);
+                                    }}
+                                  >
+                                    <span className="text-lg mr-0">👎</span>
+                                    Bad
+                                  </DropdownMenuItem>
+                                  {brew.quality && (
+                                    <DropdownMenuItem
+                                      onSelect={(e) => {
+                                        e.preventDefault();
+                                        onUpdateQuality(brew.id, undefined);
+                                      }}
+                                    >
+                                      Clear rating
+                                    </DropdownMenuItem>
+                                  )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                             ) : (
-                              <span className="text-gray-400">—</span>
+                              <div className="flex items-center gap-1 md:gap-2" onClick={() => onSelectBrew(brew)}>
+                                {brew.quality ? (
+                                  <>
+                                    <span className="text-lg">{getRatingEmoji(brew.quality)}</span>
+                                    <span className="text-gray-900 text-sm">{getRatingText(brew.quality)}</span>
+                                  </>
+                                ) : (
+                                  <span className="text-gray-400">—</span>
+                                )}
+                              </div>
                             )}
                           </TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectBrew(brew)} data-label="Notes:">
-                            {(() => {
-                              if (!brew.tastingNotes || brew.tastingNotes.trim() === '') {
-                                return <span className="text-gray-400">—</span>;
-                              }
-                              const notes = brew.tastingNotes.split(', ').filter(n => n.trim());
-                              if (notes.length === 0) {
-                                return <span className="text-gray-400">—</span>;
-                              }
-                              const visibleNotes = notes.slice(0, 2);
-                              const hiddenNotes = notes.slice(2);
-                              const hiddenCount = hiddenNotes.length;
-                              return (
-                                <div className="flex flex-nowrap items-center gap-1">
-                                  {visibleNotes.map((note, index) => (
-                                    <span
-                                      key={index}
-                                      className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm whitespace-nowrap"
-                                    >
-                                      {note}
-                                    </span>
-                                  ))}
-                                  {hiddenCount > 0 && (
-                                    <div onClick={(e) => e.stopPropagation()}>
-                                      <SimpleTooltip 
-                                        content={hiddenNotes.join(', ')}
-                                        asChild={false}
-                                      >
-                                        <span className="text-gray-500 text-sm whitespace-nowrap ml-1 cursor-pointer">
-                                          +{hiddenCount} more
-                                        </span>
-                                      </SimpleTooltip>
-                                    </div>
-                                  )}
+                          <TableCell className="px-6 relative" data-label="Notes:" onClick={(e) => {
+                            if (!onUpdateNotes) {
+                              onSelectBrew(brew);
+                            }
+                          }}>
+                            {onUpdateNotes ? (
+                              <Popover open={openNotesPopover === brew.id} onOpenChange={(open) => {
+                                if (open) {
+                                  initializeNotesEditing(brew.id, brew.tastingNotes || '');
+                                  setOpenNotesPopover(brew.id);
+                                } else {
+                                  setOpenNotesPopover(null);
+                                }
+                              }}>
+                                <div className="flex flex-nowrap items-center gap-1 relative min-h-[24px] w-full">
+                                  {(() => {
+                                    if (!brew.tastingNotes || brew.tastingNotes.trim() === '') {
+                                      return (
+                                        <PopoverTrigger asChild>
+                                          <button
+                                            type="button"
+                                            className={`inline-flex items-center gap-1 border border-dashed border-gray-300 bg-transparent hover:bg-gray-50 px-2 py-0.5 rounded-full text-sm whitespace-nowrap text-gray-600 hover:text-gray-900 transition-opacity cursor-pointer ${hoveredRowId === brew.id ? 'opacity-100' : 'opacity-0'}`}
+                                            onClick={(e) => {
+                                              if (openNotesPopover !== brew.id) {
+                                                initializeNotesEditing(brew.id, brew.tastingNotes || '');
+                                                setOpenNotesPopover(brew.id);
+                                              }
+                                            }}
+                                          >
+                                            <Plus className="w-3 h-3" />
+                                            <span>Add Note</span>
+                                          </button>
+                                        </PopoverTrigger>
+                                      );
+                                    }
+                                    const notes = brew.tastingNotes.split(', ').filter(n => n.trim());
+                                    if (notes.length === 0) {
+                                      return (
+                                        <PopoverTrigger asChild>
+                                          <button
+                                            type="button"
+                                            className={`inline-flex items-center gap-1 border border-dashed border-gray-300 bg-transparent hover:bg-gray-50 px-2 py-0.5 rounded-full text-sm whitespace-nowrap text-gray-600 hover:text-gray-900 transition-opacity cursor-pointer ${hoveredRowId === brew.id ? 'opacity-100' : 'opacity-0'}`}
+                                            onClick={(e) => {
+                                              if (openNotesPopover !== brew.id) {
+                                                initializeNotesEditing(brew.id, brew.tastingNotes || '');
+                                                setOpenNotesPopover(brew.id);
+                                              }
+                                            }}
+                                          >
+                                            <Plus className="w-3 h-3" />
+                                            <span>Add Note</span>
+                                          </button>
+                                        </PopoverTrigger>
+                                      );
+                                    }
+                                    const visibleNotes = notes.slice(0, 2);
+                                    const hiddenNotes = notes.slice(2);
+                                    const hiddenCount = hiddenNotes.length;
+                                    return (
+                                      <>
+                                        <div className="flex flex-nowrap items-center gap-1 cursor-pointer" onClick={(e) => {
+                                          if (openNotesPopover !== brew.id) {
+                                            initializeNotesEditing(brew.id, brew.tastingNotes || '');
+                                            setOpenNotesPopover(brew.id);
+                                          }
+                                        }}>
+                                          {visibleNotes.map((note, index) => (
+                                            <span
+                                              key={index}
+                                              className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm whitespace-nowrap"
+                                            >
+                                              {note}
+                                            </span>
+                                          ))}
+                                        </div>
+                                        {hiddenCount > 0 && (
+                                          <div onClick={(e) => e.stopPropagation()}>
+                                            <SimpleTooltip 
+                                              content={hiddenNotes.join(', ')}
+                                              asChild={false}
+                                            >
+                                              <span className="text-gray-500 text-sm whitespace-nowrap ml-1 cursor-pointer">
+                                                +{hiddenCount} more
+                                              </span>
+                                            </SimpleTooltip>
+                                          </div>
+                                        )}
+                                        <PopoverTrigger asChild>
+                                          <button
+                                            type="button"
+                                            className={`inline-block text-gray-500 text-xs whitespace-nowrap ml-1 cursor-pointer hover:text-gray-900 transition-opacity bg-transparent border-none p-0 ${hoveredRowId === brew.id ? 'opacity-100' : 'opacity-0'}`}
+                                          >
+                                            Edit
+                                          </button>
+                                        </PopoverTrigger>
+                                      </>
+                                    );
+                                  })()}
                                 </div>
-                              );
-                            })()}
+                                <PopoverContent 
+                                  className="w-64 p-3 relative" 
+                                  align="center"
+                                  side="bottom"
+                                  sideOffset={8}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <PopoverArrow className="fill-white" width={20} height={10} style={{ fill: 'white' }} />
+                                  <div className="space-y-3">
+                                    <div>
+                                      <label className="text-xs font-medium mb-2 block text-gray-700">Notes</label>
+                                      <div className="flex flex-wrap items-center gap-1.5 px-3 py-1 min-h-[36px] border border-input rounded-md bg-input-background focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] transition-[color,box-shadow]">
+                                        {notesEditingState[brew.id]?.pills.map((pill, index) => (
+                                          <span
+                                            key={index}
+                                            className="inline-flex items-center gap-1 bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm"
+                                          >
+                                            {pill}
+                                            <button
+                                              type="button"
+                                              onClick={() => removeNotesPill(brew.id, index)}
+                                              className="hover:bg-gray-200 rounded-full p-0.5 cursor-pointer"
+                                            >
+                                              <X className="w-3 h-3" />
+                                            </button>
+                                          </span>
+                                        ))}
+                                        <input
+                                          value={notesEditingState[brew.id]?.input || ''}
+                                          onChange={(e) => setNotesEditingState(prev => ({
+                                            ...prev,
+                                            [brew.id]: {
+                                              ...prev[brew.id],
+                                              input: e.target.value,
+                                            },
+                                          }))}
+                                          onKeyDown={(e) => handleNotesKeyPress(e, brew.id)}
+                                          onBlur={() => addNotesPill(brew.id)}
+                                          placeholder={notesEditingState[brew.id]?.pills.length === 0 ? "Balanced, Sweet, Syrupy" : ""}
+                                          className="flex-1 min-w-[120px] outline-none bg-transparent placeholder:text-muted-foreground text-base md:text-sm"
+                                          autoFocus
+                                        />
+                                      </div>
+                                      {brew.quality && getTastingNoteSuggestions(brew.quality).length > 0 && (
+                                        <div className="mt-2.5 space-y-1.5">
+                                          <span className="text-xs text-gray-500">Suggestions:</span>
+                                          <div className="flex flex-wrap gap-1.5">
+                                            {getTastingNoteSuggestions(brew.quality).map((suggestion) => {
+                                            const state = notesEditingState[brew.id];
+                                            const isSelected = state?.pills.includes(suggestion);
+                                            return (
+                                              <button
+                                                key={suggestion}
+                                                type="button"
+                                                onClick={() => {
+                                                  if (!state) return;
+                                                  if (!isSelected) {
+                                                    setNotesEditingState(prev => ({
+                                                      ...prev,
+                                                      [brew.id]: {
+                                                        pills: [...state.pills, suggestion],
+                                                        input: state.input,
+                                                      },
+                                                    }));
+                                                  }
+                                                }}
+                                                className={`text-sm px-2 py-0.5 rounded-full border transition-colors ${
+                                                  isSelected
+                                                    ? 'bg-blue-100 border-blue-300 text-blue-900'
+                                                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                } cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                disabled={isSelected}
+                                              >
+                                                {suggestion}
+                                              </button>
+                                            );
+                                          })}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="flex justify-end gap-2 pt-2 mt-1 border-t">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-3 text-sm cursor-pointer"
+                                        onClick={() => handleDiscardNotes(brew.id)}
+                                      >
+                                        Discard
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        className="h-7 px-3 text-sm cursor-pointer"
+                                        onClick={() => handleSaveNotes(brew.id)}
+                                      >
+                                        Save
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <div className="flex flex-nowrap items-center gap-1">
+                                {(() => {
+                                  if (!brew.tastingNotes || brew.tastingNotes.trim() === '') {
+                                    return <span className="text-gray-400">—</span>;
+                                  }
+                                  const notes = brew.tastingNotes.split(', ').filter(n => n.trim());
+                                  if (notes.length === 0) {
+                                    return <span className="text-gray-400">—</span>;
+                                  }
+                                  const visibleNotes = notes.slice(0, 2);
+                                  const hiddenNotes = notes.slice(2);
+                                  const hiddenCount = hiddenNotes.length;
+                                  return (
+                                    <>
+                                      {visibleNotes.map((note, index) => (
+                                        <span
+                                          key={index}
+                                          className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm whitespace-nowrap"
+                                        >
+                                          {note}
+                                        </span>
+                                      ))}
+                                      {hiddenCount > 0 && (
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                          <SimpleTooltip 
+                                            content={hiddenNotes.join(', ')}
+                                            asChild={false}
+                                          >
+                                            <span className="text-gray-500 text-sm whitespace-nowrap ml-1 cursor-pointer">
+                                              +{hiddenCount} more
+                                            </span>
+                                          </SimpleTooltip>
+                                        </div>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="px-6">
                             <DropdownMenu>

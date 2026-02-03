@@ -423,7 +423,7 @@ export default function App() {
     }
   };
 
-  const handleUpdateQuality = async (id: string, quality: number) => {
+  const handleUpdateQuality = async (id: string, quality: number | undefined) => {
     if (!accessToken) {
       toast.error('Please sign in to update brews');
       return;
@@ -439,14 +439,14 @@ export default function App() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${freshToken}`,
         },
-        body: JSON.stringify({ quality }),
+        body: JSON.stringify({ quality: quality || null }),
       });
 
       if (res.ok) {
         const updated = await res.json();
         setBrews(brews.map((e) => (e.id === id ? updated : e)));
         setSelectedBrew(null);
-        toast.success('Quality updated');
+        toast.success(quality ? 'Quality updated' : 'Quality cleared');
       } else {
         const error = await res.json();
         console.error('Failed to update brew:', error);
@@ -455,6 +455,40 @@ export default function App() {
     } catch (error) {
       console.error('Error updating brew:', error);
       toast.error('Error updating quality');
+    }
+  };
+
+  const handleUpdateNotes = async (id: string, notes: string) => {
+    if (!accessToken) {
+      toast.error('Please sign in to update brews');
+      return;
+    }
+
+    try {
+      // Get fresh access token (auto-refreshed by Supabase if needed)
+      const freshToken = await getAccessToken();
+
+      const res = await fetch(`${apiUrl}/brews/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${freshToken}`,
+        },
+        body: JSON.stringify({ tastingNotes: notes || null }),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setBrews(brews.map((e) => (e.id === id ? updated : e)));
+        toast.success('Notes updated successfully');
+      } else {
+        const error = await res.json();
+        console.error('Failed to update notes:', error);
+        toast.error(error.error || 'Failed to update notes');
+      }
+    } catch (error) {
+      console.error('Error updating notes:', error);
+      toast.error('Error updating notes');
     }
   };
 
@@ -1195,6 +1229,8 @@ export default function App() {
               }}
               onOpenEquipment={() => setShowEquipment(true)}
               onOpenAddCoffee={() => setShowAddCoffee(true)}
+              onUpdateQuality={handleUpdateQuality}
+              onUpdateNotes={handleUpdateNotes}
             />
           ) : (
             <BrewsTimelineView
