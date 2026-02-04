@@ -601,8 +601,25 @@ app.delete('/make-server-23508aac/coffees/:id', async (c) => {
       return c.json({ error: 'Forbidden - coffee does not belong to your household' }, 403);
     }
 
+    // Find and delete all brews associated with this coffee (scoped to household)
+    const allBrews = await kv.getByPrefix('brew:');
+    const coffeeBrews = allBrews.filter((brew: any) => 
+      brew.coffeeId === id && 
+      brew.userId && 
+      householdMemberIds.includes(brew.userId)
+    );
+
+    // Delete all associated brews
+    const deletePromises = coffeeBrews.map((brew: any) => kv.del(`brew:${brew.id}`));
+    await Promise.all(deletePromises);
+
+    // Delete the coffee
     await kv.del(`coffee:${id}`);
-    return c.json({ success: true });
+
+    return c.json({ 
+      success: true, 
+      deletedBrews: coffeeBrews.length 
+    });
   } catch (error) {
     console.log('Error deleting coffee:', error);
     return c.json({ error: 'Failed to delete coffee' }, 500);
@@ -3251,7 +3268,7 @@ app.notFound((c) => {
 
 // Version endpoint for client-side update detection
 app.get('/make-server-23508aac/version', (c) => {
-  return c.json({ version: '2026-01-31-brews-refactor' });
+  return c.json({ version: '2026-01-31-cascade-delete' });
 });
 
 // Wrap the app.fetch with timeout handling (but exclude streaming endpoints)

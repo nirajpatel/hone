@@ -595,7 +595,9 @@ export default function App() {
 
       if (res.ok) {
         setCoffees(coffees.filter((o) => o.id !== id));
-        toast.success('Coffee deleted');
+        // Also remove all brews associated with this coffee
+        setBrews(brews.filter((b) => b.coffeeId !== id));
+        toast.success('Coffee and associated brews deleted');
         setDeletingCoffeeId(null);
       } else {
         const error = await res.json();
@@ -1465,7 +1467,7 @@ export default function App() {
               </div>
             </AlertDialogHeader>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the coffee.
+              This action cannot be undone. This will permanently delete the coffee and all associated brews.
             </AlertDialogDescription>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setDeletingCoffeeId(null)} className="cursor-pointer">Cancel</AlertDialogCancel>
