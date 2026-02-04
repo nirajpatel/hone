@@ -855,7 +855,6 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
     
     // If rating was added via web UI, clean up notification state
     if (body.quality && !existing.quality) {
-      console.log(`[UPDATE] Brew ${id} was rated via web UI, cleaning up notifications`);
       
       // Clear active notification if this brew is currently active
       const activeNotification = await notifications.getActiveNotification(existing.userId);
@@ -887,18 +886,13 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
         // Check if this is the newest brew for the coffee (scoped to user/household)
         const brewUserId = existing.userId || user.id;
         const coffeeId = existing.coffeeId || updated.coffeeId; // Use existing.coffeeId (shouldn't change)
-        console.log(`[UPDATE] Checking if brew ${id} is newest for coffee ${coffeeId} (userId: ${brewUserId})`);
         isNewestBrewForCoffee(id, coffeeId, brewUserId).then(isNewest => {
           if (!isNewest) {
-            console.log(`[UPDATE] Skipping suggestions for brew ${id} - not the newest brew for coffee ${coffeeId} in household`);
             return;
           }
-          
-          console.log(`[UPDATE] Generating suggestions for brew ${id} - it is the newest brew for coffee ${coffeeId}`);
           // Don't await - let it run in background
           generateBrewSuggestions(id, brewUserId).then(suggestions => {
             if (suggestions) {
-              console.log(`[UPDATE] Successfully generated suggestions for brew ${id}`);
               // Update brew with both concise and full suggestions
               kv.get(`brew:${id}`).then(existing => {
                 if (existing) {
@@ -909,13 +903,11 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
                       full: suggestions.full
                     }
                   });
-                  console.log(`[UPDATE] Saved suggestions to brew ${id}`);
                 }
               }).catch(error => {
                 console.log('Error updating brew with suggestions:', error);
               });
             } else {
-              console.log(`[UPDATE] No suggestions generated for brew ${id} (returned null)`);
               // If suggestions is null (no brew history), remove existing suggestion
               kv.get(`brew:${id}`).then(existing => {
                 if (existing && existing.suggestion) {
@@ -929,16 +921,15 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
           }).catch(error => {
             console.log('Error generating suggestions:', error);
           });
-        }).catch(error => {
-          console.log('Error checking if brew is newest:', error);
-        });
+          }).catch(error => {
+            console.log('Error checking if brew is newest:', error);
+          });
       } else {
         // Both quality and notes were removed - clear suggestions
         kv.get(`brew:${id}`).then(existing => {
           if (existing && existing.suggestion) {
             const { suggestion, ...rest } = existing;
             kv.set(`brew:${id}`, rest);
-            console.log(`[UPDATE] Removed suggestions for brew ${id} - quality and notes were removed`);
           }
         }).catch(error => {
           console.log('Error removing suggestion:', error);
@@ -1851,10 +1842,7 @@ async function isNewestBrewForCoffee(brewId: string, coffeeId: string, userId: s
     householdMemberIds.includes(b.userId)
   );
   
-  console.log(`[isNewestBrewForCoffee] Checking brew ${brewId} for coffee ${coffeeId}, found ${coffeeBrews.length} matching brews in household`);
-  
   if (coffeeBrews.length === 0) {
-    console.log(`[isNewestBrewForCoffee] No brews found for coffee ${coffeeId} in household`);
     return false;
   }
   
@@ -1865,7 +1853,6 @@ async function isNewestBrewForCoffee(brewId: string, coffeeId: string, userId: s
   
   const newestBrewId = coffeeBrews[0].id;
   const isNewest = newestBrewId === brewId;
-  console.log(`[isNewestBrewForCoffee] Newest brew is ${newestBrewId}, checking brew ${brewId}: ${isNewest}`);
   
   // Check if this brew is the most recent
   return isNewest;
@@ -1897,14 +1884,12 @@ async function generateBrewSuggestions(brewId: string, userId: string): Promise<
     // Fetch the baseline brew (the one that triggered the job)
     const baselineBrew = await kv.get(`brew:${brewId}`);
     if (!baselineBrew) {
-      console.log(`[generateBrewSuggestions] Brew ${brewId} not found`);
       return null;
     }
 
     // Fetch coffee data
     const coffee = await kv.get(`coffee:${baselineBrew.coffeeId}`);
     if (!coffee) {
-      console.log(`[generateBrewSuggestions] Coffee ${baselineBrew.coffeeId} not found`);
       return null;
     }
 
@@ -1960,7 +1945,6 @@ async function generateBrewSuggestions(brewId: string, userId: string): Promise<
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
-      console.log('[generateBrewSuggestions] OpenAI API key not configured');
       return null;
     }
 

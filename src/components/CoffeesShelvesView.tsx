@@ -175,6 +175,7 @@ export function CoffeesShelvesView({
 
   // Format roast date
   const formatRoastDate = (roastDate: string): string => {
+    if (!roastDate) return '—';
     const [year, monthNum, day] = roastDate.split('-').map(Number);
     const date = new Date(year, monthNum - 1, day);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -184,6 +185,7 @@ export function CoffeesShelvesView({
 
   // Calculate coffee age
   const getCoffeeAge = (roastDate: string): string => {
+    if (!roastDate) return '—';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -342,7 +344,13 @@ export function CoffeesShelvesView({
             )}
 
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Roasted:</span> {formatRoastDate(coffee.roastDate)} • {getCoffeeAge(coffee.roastDate)}
+              {!coffee.roastDate ? (
+                <span className="text-gray-400">—</span>
+              ) : (
+                <>
+                  <span className="font-medium">Roasted:</span> {formatRoastDate(coffee.roastDate)} • {getCoffeeAge(coffee.roastDate)}
+                </>
+              )}
             </p>
           </div>
 

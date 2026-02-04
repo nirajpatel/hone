@@ -41,7 +41,7 @@ export function CoffeesTableView({
 }: CoffeesTableViewProps) {
   // Format date for display (same as brews table)
   const formatDate = (dateString: string) => {
-    if (!dateString) return '–';
+    if (!dateString) return '—';
     
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day);
@@ -355,7 +355,7 @@ export function CoffeesTableView({
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roaster:">{coffee.roaster}</TableCell>
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Freshness:">
                             {!coffee.roastDate ? (
-                              <span className="text-sm text-gray-900">–</span>
+                              <span className="text-gray-400">—</span>
                             ) : freshness.tooltip ? (
                               <SimpleTooltip content={
                                 <div className="text-xs">
@@ -376,7 +376,13 @@ export function CoffeesTableView({
                               </div>
                             )}
                           </TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roast Date:">{formatDate(coffee.roastDate)}</TableCell>
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roast Date:">
+                            {!coffee.roastDate ? (
+                              <span className="text-gray-400">—</span>
+                            ) : (
+                              formatDate(coffee.roastDate)
+                            )}
+                          </TableCell>
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Quality:">
                             {(() => {
                               const { rating, count } = getCoffeeAverageRating(coffee.id);

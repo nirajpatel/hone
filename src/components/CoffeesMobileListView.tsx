@@ -272,7 +272,7 @@ export function CoffeesMobileListView({
                         {/* Line 2: Roasted date, freshness, and age */}
                         <div className="text-sm text-gray-500 truncate">
                           {!coffee.roastDate ? (
-                            '–'
+                            <span className="text-gray-400">—</span>
                           ) : (
                             <>
                               Roasted {formatRoastDate(coffee.roastDate)} • {(() => {
