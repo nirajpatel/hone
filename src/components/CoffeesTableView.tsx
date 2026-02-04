@@ -72,6 +72,52 @@ export function CoffeesTableView({
     return `${monthName} ${dayNum}`;
   };
 
+  // Get days old (numeric value)
+  const getDaysOldNumeric = (roastDate: string): number => {
+    if (!roastDate) return -1;
+    
+    const [year, month, day] = roastDate.split('-').map(Number);
+    const roast = new Date(year, month - 1, day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    roast.setHours(0, 0, 0, 0);
+    const diffTime = Math.abs(today.getTime() - roast.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Get freshness status
+  const getFreshness = (roastDate: string): { emoji: string; label: string; tooltip: string } => {
+    const daysOld = getDaysOldNumeric(roastDate);
+    if (daysOld < 0) return { emoji: '–', label: '–', tooltip: '' };
+    
+    if (daysOld <= 5) {
+      return { 
+        emoji: '🫧', 
+        label: 'Resting',
+        tooltip: 'Still releasing CO₂ after roasting\nFlavor will improve in a few days'
+      };
+    } else if (daysOld <= 21) {
+      return { 
+        emoji: '🟢', 
+        label: 'Peak',
+        tooltip: 'Optimal freshness window\nBest balance of aroma and clarity'
+      };
+    } else if (daysOld <= 35) {
+      return { 
+        emoji: '🟡', 
+        label: 'Fading',
+        tooltip: 'Aromas are starting to fade\nStill good, but past its peak'
+      };
+    } else {
+      return { 
+        emoji: '⚪️', 
+        label: 'Past Peak',
+        tooltip: 'Most aromatics have faded\nBest used soon or for milk drinks'
+      };
+    }
+  };
+
   // Get days old
   const getDaysOld = (roastDate: string): string => {
     if (!roastDate) return '–';
@@ -90,7 +136,7 @@ export function CoffeesTableView({
     if (diffDays < 7) return `${diffDays} days`;
     if (diffDays < 14) return '1 week';
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks`;
-    if (diffDays < 60) return '1 month';
+    if (diffDays < 60) return '1mo';
     
     // Calculate years and months for 365+ days
     if (diffDays >= 365) {
@@ -99,15 +145,15 @@ export function CoffeesTableView({
       const months = Math.floor(remainingDays / 30);
       
       if (months === 0) {
-        return years === 1 ? '1 year' : `${years} years`;
+        return years === 1 ? '1yr' : `${years}yr`;
       }
       
-      const yearText = years === 1 ? '1 year' : `${years} years`;
-      const monthText = months === 1 ? '1 month' : `${months} months`;
+      const yearText = years === 1 ? '1yr' : `${years}yr`;
+      const monthText = months === 1 ? '1mo' : `${months}mo`;
       return `${yearText} ${monthText}`;
     }
     
-    return `${Math.floor(diffDays / 30)} months`;
+    return `${Math.floor(diffDays / 30)}mo`;
   };
 
   const getExactDaysOld = (roastDate: string): string => {
@@ -242,10 +288,10 @@ export function CoffeesTableView({
             <Table>
               <TableHeader className="border-b-0">
                 <TableRow>
-                  <TableHead className="px-6">Roast Date</TableHead>
-                  <TableHead className="px-6">Age</TableHead>
-                  <TableHead className="px-6">Roaster</TableHead>
                   <TableHead className="px-6">Coffee Name</TableHead>
+                  <TableHead className="px-6">Roaster</TableHead>
+                  <TableHead className="px-6">Freshness</TableHead>
+                  <TableHead className="px-6">Roast Date</TableHead>
                   <TableHead className="px-6">Extraction Quality</TableHead>
                   <TableHead className="px-6 w-12"></TableHead>
                 </TableRow>
@@ -267,12 +313,34 @@ export function CoffeesTableView({
                           <span className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{groupLabel}</span>
                         </TableCell>
                       </TableRow>
-                      {groupCoffees.map((coffee) => (
+                      {groupCoffees.map((coffee) => {
+                        const freshness = getFreshness(coffee.roastDate);
+                        return (
                         <TableRow key={coffee.id} className="hover:bg-gray-50">
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roast Date:">{formatDate(coffee.roastDate)}</TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Age:">{getDaysOld(coffee.roastDate)}</TableCell>
-                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roaster:">{coffee.roaster}</TableCell>
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Coffee:">{coffee.name}</TableCell>
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roaster:">{coffee.roaster}</TableCell>
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Freshness:">
+                            {freshness.tooltip ? (
+                              <SimpleTooltip content={
+                                <div className="text-xs">
+                                  {freshness.tooltip.split('\n').map((line, index) => (
+                                    <div key={index}>{line}</div>
+                                  ))}
+                                </div>
+                              }>
+                                <div className="flex items-center gap-2 cursor-help">
+                                  <span>{freshness.emoji}</span>
+                                  <span className="text-sm text-gray-900">{freshness.label} • {getDaysOld(coffee.roastDate)}</span>
+                                </div>
+                              </SimpleTooltip>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <span>{freshness.emoji}</span>
+                                <span className="text-sm text-gray-900">{freshness.label} • {getDaysOld(coffee.roastDate)}</span>
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roast Date:">{formatDate(coffee.roastDate)}</TableCell>
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Quality:">
                             {(() => {
                               const { rating, count } = getCoffeeAverageRating(coffee.id);
@@ -322,7 +390,8 @@ export function CoffeesTableView({
                             </DropdownMenu>
                           </TableCell>
                         </TableRow>
-                      ))}
+                        );
+                      })}
                     </React.Fragment>
                   ))
                 )}

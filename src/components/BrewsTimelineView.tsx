@@ -827,11 +827,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
         
         <div 
           ref={scrollRef}
-          className="relative overflow-x-auto pb-2 cursor-pointer"
-          style={{ 
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#cbd5e1 #f1f5f9'
-          }}
+          className="relative overflow-x-auto pb-2 cursor-pointer scrollbar-hide"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onClick={handleClick}

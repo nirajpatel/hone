@@ -1,5 +1,6 @@
-import { Coffee, Extraction } from '../types';
+import { Coffee, Extraction, Brew } from '../types';
 import { getRatingEmoji } from '../utils/formatters';
+import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface CoffeesMobileListViewProps {
   coffees: Coffee[];
@@ -112,7 +113,53 @@ export function CoffeesMobileListView({
     return `${monthName} ${day}`;
   };
 
-  // Get days old
+  // Get days old (numeric value)
+  const getDaysOldNumeric = (roastDate: string): number => {
+    if (!roastDate) return -1;
+    
+    const [year, month, day] = roastDate.split('-').map(Number);
+    const roast = new Date(year, month - 1, day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    roast.setHours(0, 0, 0, 0);
+    const diffTime = Math.abs(today.getTime() - roast.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Get freshness status
+  const getFreshness = (roastDate: string): { emoji: string; label: string; tooltip: string } => {
+    const daysOld = getDaysOldNumeric(roastDate);
+    if (daysOld < 0) return { emoji: '–', label: '–', tooltip: '' };
+    
+    if (daysOld <= 5) {
+      return { 
+        emoji: '🫧', 
+        label: 'Resting',
+        tooltip: 'Still releasing CO₂ after roasting\nFlavor will improve in a few days'
+      };
+    } else if (daysOld <= 21) {
+      return { 
+        emoji: '🟢', 
+        label: 'Peak',
+        tooltip: 'Optimal freshness window\nBest balance of aroma and clarity'
+      };
+    } else if (daysOld <= 35) {
+      return { 
+        emoji: '🟡', 
+        label: 'Fading',
+        tooltip: 'Aromas are starting to fade\nStill good, but past its peak'
+      };
+    } else {
+      return { 
+        emoji: '⚪️', 
+        label: 'Past Peak',
+        tooltip: 'Most aromatics have faded\nBest used soon or for milk drinks'
+      };
+    }
+  };
+
+  // Get days old (abbreviated format)
   const getDaysOld = (roastDate: string): string => {
     if (!roastDate) return '—';
     
@@ -125,12 +172,12 @@ export function CoffeesMobileListView({
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     // Don't use Today/Yesterday for age - always show numeric age
-    if (diffDays === 0) return '0 days old';
-    if (diffDays === 1) return '1 day old';
-    if (diffDays < 7) return `${diffDays} days old`;
-    if (diffDays < 14) return '1 week old';
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks old`;
-    if (diffDays < 60) return '1 month old';
+    if (diffDays === 0) return '0 days';
+    if (diffDays === 1) return '1 day';
+    if (diffDays < 7) return `${diffDays} days`;
+    if (diffDays < 14) return '1 week';
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks`;
+    if (diffDays < 60) return '1mo';
     
     // Calculate years and months for 365+ days
     if (diffDays >= 365) {
@@ -139,15 +186,15 @@ export function CoffeesMobileListView({
       const months = Math.floor(remainingDays / 30);
       
       if (months === 0) {
-        return years === 1 ? '1 year old' : `${years} years old`;
+        return years === 1 ? '1yr' : `${years}yr`;
       }
       
-      const yearText = years === 1 ? '1 year' : `${years} years`;
-      const monthText = months === 1 ? '1 month' : `${months} months`;
-      return `${yearText} ${monthText} old`;
+      const yearText = years === 1 ? '1yr' : `${years}yr`;
+      const monthText = months === 1 ? '1mo' : `${months}mo`;
+      return `${yearText} ${monthText}`;
     }
     
-    return `${Math.floor(diffDays / 30)} months old`;
+    return `${Math.floor(diffDays / 30)}mo`;
   };
 
   return (
@@ -183,9 +230,27 @@ export function CoffeesMobileListView({
                           {coffee.roaster} – {coffee.name}
                         </div>
                         
-                        {/* Line 2: Roasted date and age */}
+                        {/* Line 2: Roasted date, freshness, and age */}
                         <div className="text-sm text-gray-500 truncate">
-                          Roasted {formatRoastDate(coffee.roastDate)} • {getDaysOld(coffee.roastDate)}
+                          Roasted {formatRoastDate(coffee.roastDate)} • {(() => {
+                            const freshness = getFreshness(coffee.roastDate);
+                            return freshness.tooltip ? (
+                              <SimpleTooltip content={
+                                <div className="text-xs">
+                                  {freshness.tooltip.split('\n').map((line, index) => (
+                                    <div key={index}>{line}</div>
+                                  ))}
+                                </div>
+                              }>
+                                <span className="inline-flex items-center gap-1 cursor-help">
+                                  <span>{freshness.emoji}</span>
+                                  <span>{freshness.label}</span>
+                                </span>
+                              </SimpleTooltip>
+                            ) : (
+                              <span>{freshness.emoji} {freshness.label}</span>
+                            );
+                          })()} • {getDaysOld(coffee.roastDate)}
                         </div>
                         
                         {/* Line 3: Brew count */}
