@@ -341,6 +341,11 @@ export function BrewsTimelineView({
             // Calculate trend for this group
             const trendInfo = calculateTrend(sortedExtractions);
 
+            // Get the newest brew (last in sorted array) for suggestion display
+            const newestBrew = sortedExtractions[sortedExtractions.length - 1];
+            const hasSuggestion = newestBrew?.suggestion?.concise && 
+              (newestBrew.suggestion.concise.confidence === 'Medium' || newestBrew.suggestion.concise.confidence === 'High');
+
             return (
               <div key={key} className="bg-white rounded-lg border border-gray-200 p-3 md:p-4 mobile-timeline-card">
                 {/* Header with Coffee and Method */}
@@ -360,6 +365,11 @@ export function BrewsTimelineView({
                       </>
                     )}
                   </p>
+                  {hasSuggestion && (
+                    <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+                      🧭 {newestBrew.suggestion.concise.goal} → {newestBrew.suggestion.concise.action}
+                    </p>
+                  )}
                 </div>
 
                 {/* Timeline */}
@@ -1259,6 +1269,9 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     labelOpacity = 0.6; // Everything else at 60%
                   }
                 }
+
+                const hasSuggestion = brew.suggestion?.concise && 
+                  (brew.suggestion.concise.confidence === 'Medium' || brew.suggestion.concise.confidence === 'High');
 
                 return (
                   <div 

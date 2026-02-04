@@ -697,6 +697,178 @@ app.post('/make-server-23508aac/cleanup-old-extractions', async (c) => {
   }
 });
 
+// Generate guidance for newest brews across all users/coffees (no auth required - admin script)
+app.post('/make-server-23508aac/generate-guidance-for-all', async (c) => {
+  try {
+    console.log('Starting guidance generation for all users/coffees...');
+
+    // Get all users, coffees, and brews
+    const allUsers = await kv.getByPrefix('user:');
+    const allCoffees = await kv.getByPrefix('coffee:');
+    const allBrews = await kv.getByPrefix('brew:');
+
+    console.log(`Found ${allUsers.length} users, ${allCoffees.length} coffees, ${allBrews.length} brews`);
+
+    const results = {
+      processed: 0,
+      generated: 0,
+      skipped: 0,
+      errors: [] as Array<{ userId: string; coffeeId: string; brewId: string; error: string }>
+    };
+
+    // Track processed households to avoid duplicates
+    const processedHouseholds = new Set<string>();
+
+    // Process each user
+    for (const userData of allUsers) {
+      const householdMemberIds = await getHouseholdMemberIds(userData.id);
+      
+      // Create a household key from sorted member IDs to avoid processing same household twice
+      const householdKey = householdMemberIds.sort().join(',');
+      if (processedHouseholds.has(householdKey)) {
+        continue;
+      }
+      processedHouseholds.add(householdKey);
+      
+      console.log(`Processing household with ${householdMemberIds.length} members`);
+      
+      // Get coffees for this household
+      const householdCoffees = allCoffees.filter((coffee: any) => 
+        coffee.createdByUserId && householdMemberIds.includes(coffee.createdByUserId)
+      );
+
+      // Get brews for this household
+      const householdBrews = allBrews.filter((brew: any) =>
+        brew.userId && householdMemberIds.includes(brew.userId)
+      );
+
+      console.log(`  Found ${householdCoffees.length} coffees and ${householdBrews.length} brews for this household`);
+
+      // Group brews by coffee
+      const brewsByCoffee: Record<string, any[]> = {};
+      householdBrews.forEach((brew: any) => {
+        if (!brewsByCoffee[brew.coffeeId]) {
+          brewsByCoffee[brew.coffeeId] = [];
+        }
+        brewsByCoffee[brew.coffeeId].push(brew);
+      });
+
+      // Process each coffee
+      for (const coffee of householdCoffees) {
+        const coffeeBrews = brewsByCoffee[coffee.id] || [];
+        
+        if (coffeeBrews.length === 0) {
+          continue;
+        }
+
+        // Sort brews by date (most recent first)
+        coffeeBrews.sort((a: any, b: any) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        const newestBrew = coffeeBrews[0];
+
+        // Validate brew has required fields
+        if (!newestBrew.userId) {
+          results.skipped++;
+          console.log(`    ✗ Skipping brew ${newestBrew.id} - missing userId`);
+          continue;
+        }
+
+        // Check if this is actually the newest brew for this coffee in the household
+        const isNewest = await isNewestBrewForCoffee(newestBrew.id, coffee.id, newestBrew.userId);
+        
+        if (!isNewest) {
+          results.skipped++;
+          continue;
+        }
+
+        // Skip if already has suggestions
+        if (newestBrew.suggestion) {
+          results.skipped++;
+          continue;
+        }
+
+        results.processed++;
+        console.log(`  Processing brew ${newestBrew.id} for coffee ${coffee.id} (${coffee.roaster} – ${coffee.name})`);
+
+        // Generate suggestions with retry logic
+        let suggestions: { concise: { goal: string; action: string; confidence: 'High' | 'Medium' | 'Low' }; full: { summary: string; primaryIssue: string; suggestions: any[] } } | null = null;
+        let retries = 3;
+        let lastError: Error | null = null;
+        
+        while (retries > 0 && !suggestions) {
+          try {
+            suggestions = await generateBrewSuggestions(newestBrew.id, newestBrew.userId);
+            break;
+          } catch (error) {
+            lastError = error as Error;
+            retries--;
+            if (retries > 0) {
+              // Wait before retry (exponential backoff)
+              const delay = 1000 * (4 - retries); // 1s, 2s, 3s
+              console.log(`    ⚠ Retry attempt ${4 - retries}/3 for brew ${newestBrew.id} after ${delay}ms`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        }
+          
+        if (suggestions) {
+          try {
+            // Update brew with suggestions
+            const updatedBrew = {
+              ...newestBrew,
+              suggestion: {
+                concise: suggestions.concise,
+                full: suggestions.full
+              }
+            };
+            await kv.set(`brew:${newestBrew.id}`, updatedBrew);
+            results.generated++;
+            console.log(`    ✓ Generated suggestions for brew ${newestBrew.id}`);
+          } catch (error) {
+            results.errors.push({
+              userId: newestBrew.userId,
+              coffeeId: coffee.id,
+              brewId: newestBrew.id,
+              error: `Failed to save suggestions: ${String(error)}`
+            });
+            console.error(`    ✗ Error saving suggestions for brew ${newestBrew.id}:`, error);
+          }
+        } else {
+          results.skipped++;
+          const errorMsg = lastError ? `: ${lastError.message}` : '';
+          console.log(`    ✗ No suggestions generated for brew ${newestBrew.id}${errorMsg}`);
+          if (lastError) {
+            results.errors.push({
+              userId: newestBrew.userId,
+              coffeeId: coffee.id,
+              brewId: newestBrew.id,
+              error: `Failed after retries: ${lastError.message}`
+            });
+          }
+        }
+      }
+    }
+
+    console.log('Guidance generation complete:', results);
+
+    return c.json({
+      success: true,
+      summary: {
+        processed: results.processed,
+        generated: results.generated,
+        skipped: results.skipped,
+        errors: results.errors.length
+      },
+      errors: results.errors
+    });
+  } catch (error) {
+    console.error('Error generating guidance for all:', error);
+    return c.json({ error: 'Failed to generate guidance', details: String(error) }, 500);
+  }
+});
+
 // Brews endpoints (formerly Extractions)
 app.get('/make-server-23508aac/brews', async (c) => {
   try {
@@ -1911,18 +2083,18 @@ async function generateBrewSuggestions(brewId: string, userId: string): Promise<
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    // Select brew history: top 10 most recent + baseline brew + exceptional brew
-    const top10Recent = matchingBrews.slice(0, 10);
-    const top10Ids = new Set(top10Recent.map((b: any) => b.id));
+    // Select brew history: top 7 most recent + baseline brew + exceptional brew
+    const top7Recent = matchingBrews.slice(0, 7);
+    const top7Ids = new Set(top7Recent.map((b: any) => b.id));
     
     // Find exceptional brew (most recent with quality === 3)
     const exceptionalBrew = matchingBrews.find((b: any) => b.quality === 3);
     
     // Build brew list to include
-    let brewsToInclude = [...top10Recent];
+    let brewsToInclude = [...top7Recent];
     
-    // Add baseline brew if not already in top 10
-    if (!top10Ids.has(brewId)) {
+    // Add baseline brew if not already in top 7
+    if (!top7Ids.has(brewId)) {
       brewsToInclude.push(baselineBrew);
     }
     
@@ -2003,21 +2175,20 @@ BREW #${brewNum} (${formatDate(brew.createdAt)})${qualifiers}:
     const considerations = `
 IMPORTANT CONSIDERATIONS:
 1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried and avoid suggesting the same adjustments that were already attempted.
-2. Grinder Direction: Different grinders have different scales. Some use lower numbers for finer grinds (e.g., Niche Zero, Fellow Ode), while others use higher numbers for finer grinds. Ensure your suggestion moves in the correct direction for the specific grinder being used.
-3. Grinder Sensitivity: Pay attention to how sensitive the grinder's adjustments are. Stepless grinders like the Niche Zero are highly sensitive (0.5 adjustments matter), while stepped grinders may need larger adjustments (2-3 steps).
-4. Equipment Context: Consider the brewer and grinder being used when making suggestions. Different equipment has different characteristics and optimal parameters.
-5. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
-6. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
-7. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
-8. Do not infer causes that are not supported by recorded data.
+2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
+3. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
+4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
+5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
+6. Do not infer causes that are not supported by recorded data.
 
 ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy (use this order unless history strongly suggests otherwise):
+A) Decision hierarchy and change magnitude (use this order unless history strongly suggests otherwise, prefer minimal changes):
    - Grind / flow behavior
    - Final weight / ratio
    - Water temperature
    - Dose
    - If flow issues indicate puck preparation or channeling, address distribution, tamping, or pre-infusion before changing core parameters.
+   - Prefer the smallest reasonable change that could plausibly fix the issue. Avoid large jumps unless history clearly shows they are necessary.
 
 B) Require directional reasoning (no vague advice):
    - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
@@ -2037,16 +2208,12 @@ E) Quality over quantity:
    - It is acceptable to provide only 1-2 suggestions if those are the most impactful changes.
    - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
 
-F) Learning from excellent brews:
-   - If the history contains an excellent brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
+F) Exceptional brews:
+   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
    - Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier excellent brew" without mentioning brew numbers.
+   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
 
-G) Prefer minimal changes:
-   - When suggesting adjustments, prefer the smallest reasonable change that could plausibly fix the issue.
-   - Avoid large jumps unless history clearly shows they are necessary.
-
-H) Stability check:
+G) Stability check:
    - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.`;
 
     // Build concise format prompt
@@ -2058,6 +2225,10 @@ GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced
 
 ${brewHistoryText}
 ${considerations}
+
+TONE AND VOICE:
+Use a calm, confident, craft-focused tone.
+Sound like an experienced specialty barista giving guidance.
 
 OUTPUT FORMAT:
 You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
@@ -2085,6 +2256,10 @@ GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced
 
 ${brewHistoryText}
 ${considerations}
+
+TONE AND VOICE:
+Use a calm, confident, craft-focused tone.
+Sound like an experienced specialty barista giving guidance.
 
 OUTPUT FORMAT:
 You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
@@ -2363,6 +2538,10 @@ COFFEE:
 
 GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced cup of coffee.
 
+TONE AND VOICE:
+Use a calm, confident, craft-focused tone.
+Sound like an experienced specialty barista giving guidance.
+
 BREW HISTORY (Most recent to oldest):
 `;
 
@@ -2403,21 +2582,20 @@ BREW #${brewNum} (${formatDate(brew.createdAt)})${qualifiers}:
     prompt += `
 IMPORTANT CONSIDERATIONS:
 1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried and avoid suggesting the same adjustments that were already attempted.
-2. Grinder Direction: Different grinders have different scales. Some use lower numbers for finer grinds (e.g., Niche Zero, Fellow Ode), while others use higher numbers for finer grinds. Ensure your suggestion moves in the correct direction for the specific grinder being used.
-3. Grinder Sensitivity: Pay attention to how sensitive the grinder's adjustments are. Stepless grinders like the Niche Zero are highly sensitive (0.5 adjustments matter), while stepped grinders may need larger adjustments (2-3 steps).
-4. Equipment Context: Consider the brewer and grinder being used when making suggestions. Different equipment has different characteristics and optimal parameters.
-5. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
-6. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
-7. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
-8. Do not infer causes that are not supported by recorded data.
+2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
+3. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
+4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
+5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
+6. Do not infer causes that are not supported by recorded data.
 
 ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy (use this order unless history strongly suggests otherwise):
+A) Decision hierarchy and change magnitude (use this order unless history strongly suggests otherwise, prefer minimal changes):
    - Grind / flow behavior
    - Final weight / ratio
    - Water temperature
    - Dose
    - If flow issues indicate puck preparation or channeling, address distribution, tamping, or pre-infusion before changing core parameters.
+   - Prefer the smallest reasonable change that could plausibly fix the issue. Avoid large jumps unless history clearly shows they are necessary.
 
 B) Require directional reasoning (no vague advice):
    - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
@@ -2437,16 +2615,12 @@ E) Quality over quantity:
    - It is acceptable to provide only 1-2 suggestions if those are the most impactful changes.
    - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
 
-F) Learning from excellent brews:
-   - If the history contains an excellent brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
+F) Exceptional brews:
+   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
    - Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier excellent brew" without mentioning brew numbers.
+   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
 
-G) Prefer minimal changes:
-   - When suggesting adjustments, prefer the smallest reasonable change that could plausibly fix the issue.
-   - Avoid large jumps unless history clearly shows they are necessary.
-
-H) Stability check:
+G) Stability check:
    - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.
 
 OUTPUT FORMAT:
@@ -3085,8 +3259,8 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const url = new URL(req.url);
     
-    // Don't apply timeout to streaming endpoints
-    if (url.pathname.includes('/stream') || url.pathname.includes('/lamarzocco')) {
+    // Don't apply timeout to streaming endpoints or long-running admin scripts
+    if (url.pathname.includes('/stream') || url.pathname.includes('/lamarzocco') || url.pathname.includes('/generate-guidance-for-all')) {
       return await app.fetch(req);
     }
     

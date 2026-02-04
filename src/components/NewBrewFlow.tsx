@@ -2621,7 +2621,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #FFD98A' }}>
                     <CollapsibleTrigger className="w-full" disabled={!canExpand}>
                       <div className={`flex items-center gap-2 px-3 py-2.5 ${canExpand ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`} style={{ backgroundColor: '#FFF2CC' }}>
-                        <span className="flex-shrink-0 leading-none" style={{ transform: 'translateY(-2px)' }}>🎯</span>
+                        <span className="flex-shrink-0 leading-none">🧭</span>
                         <p className="text-sm text-gray-900 font-medium flex-1 text-left">
                           Dial-In Guidance
                         </p>
