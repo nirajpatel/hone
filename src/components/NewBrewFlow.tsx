@@ -2932,7 +2932,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   }
                 }}
                 placeholder="Anything you want to remember…"
-                className="mt-2 resize-y text-base md:text-sm"
+                className="mt-2 resize-y"
                 style={{ minHeight: '40px', height: '72px' }}
                 maxLength={1000}
               />

@@ -309,10 +309,18 @@ html {
   }
   
   /* Use small input size for all inputs and dropdowns on mobile */
-  input,
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="email"],
+  input[type="password"],
+  input:not([type]),
   textarea,
   button[role="combobox"],
-  [data-slot="select-trigger"] {
+  [data-slot="select-trigger"],
+  [data-slot="input"],
+  [data-slot="textarea"] {
     font-size: 0.875rem !important;
   }
   
