@@ -222,21 +222,55 @@ export function CoffeesMobileListView({
           // Put "Unknown" group at the end
           if (a[0] === 'Unknown') return 1;
           if (b[0] === 'Unknown') return -1;
-          // For month grouping, sort by date descending (most recent first)
+          
+          // For month grouping, sort by roast date descending (most recent first)
           if (groupBy === 'month') {
-            // Try to parse as date
-            const dateA = new Date(a[0]);
-            const dateB = new Date(b[0]);
-            // If dates are invalid or special labels (Today/Yesterday), handle specially
+            // Handle special labels (Today/Yesterday) - they should come first
             if (a[0] === 'Today') return -1;
             if (b[0] === 'Today') return 1;
-            if (a[0] === 'Yesterday') return -1;
+            if (a[0] === 'Yesterday') {
+              if (b[0] === 'Today') return 1;
+              return -1;
+            }
             if (b[0] === 'Yesterday') return 1;
-            if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) return 0;
-            return dateB.getTime() - dateA.getTime();
+            
+            // For date strings, parse and sort descending
+            // Find the latest roast date in each group
+            const getLatestRoastDate = (coffees: Coffee[]): number => {
+              const dates = coffees
+                .map(c => c.roastDate)
+                .filter((d): d is string => !!d)
+                .map(d => {
+                  const [year, month, day] = d.split('-').map(Number);
+                  return new Date(year, month - 1, day).getTime();
+                });
+              return dates.length > 0 ? Math.max(...dates) : 0;
+            };
+            
+            const dateA = getLatestRoastDate(a[1]);
+            const dateB = getLatestRoastDate(b[1]);
+            return dateB - dateA; // Descending (most recent first)
           }
-          // For roaster grouping, sort alphabetically
-          return a[0].localeCompare(b[0]);
+          
+          // For roaster grouping, sort by latest roast date in that roaster group
+          if (groupBy === 'coffee') {
+            const getLatestRoastDate = (coffees: Coffee[]): number => {
+              const dates = coffees
+                .map(c => c.roastDate)
+                .filter((d): d is string => !!d)
+                .map(d => {
+                  const [year, month, day] = d.split('-').map(Number);
+                  return new Date(year, month - 1, day).getTime();
+                });
+              return dates.length > 0 ? Math.max(...dates) : 0;
+            };
+            
+            const dateA = getLatestRoastDate(a[1]);
+            const dateB = getLatestRoastDate(b[1]);
+            return dateB - dateA; // Descending (most recent first)
+          }
+          
+          return 0;
         })
         .map(([groupLabel, groupCoffees]) => (
         <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
