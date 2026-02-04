@@ -310,6 +310,7 @@ html {
   
   /* Use small input size for all inputs and dropdowns on mobile */
   input,
+  textarea,
   button[role="combobox"],
   [data-slot="select-trigger"] {
     font-size: 0.875rem !important;
