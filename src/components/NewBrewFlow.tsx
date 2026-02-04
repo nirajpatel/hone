@@ -1222,6 +1222,33 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+      // Check if baseline brew is the most recent brew
+      const mostRecentBrew = matchingBrews.length > 0 ? matchingBrews[0] : null;
+      const isBaselineMostRecent = currentBaselineBrew && mostRecentBrew && currentBaselineBrew.id === mostRecentBrew.id;
+
+      // If baseline brew is most recent and has stored full suggestion, use it (regardless of confidence)
+      // Note: If suggestions haven't been processed yet (background job still running), 
+      // suggestion?.full will be undefined and we'll fall through to make a live LLM call
+      if (isBaselineMostRecent && currentBaselineBrew.suggestion?.full) {
+        // Use stored full suggestion
+        setSuggestions(currentBaselineBrew.suggestion.full);
+        setLoadingSuggestions(false);
+        setThinkingText('');
+        
+        // Mark as analyzed
+        lastSuggestionCoffeeIdRef.current = coffeeId;
+        lastSuggestionBrewerIdRef.current = brewerId;
+        lastSuggestionGrinderIdRef.current = grinderId;
+        lastSuggestionBrewMethodRef.current = brewMethod;
+        lastSuggestionBrewIdRef.current = currentBrewId;
+        return;
+      }
+
+      // Fall through to live LLM call if:
+      // - Baseline brew is not most recent (newer brews exist)
+      // - Suggestions haven't been processed yet (background job still running)
+      // - No stored suggestions exist
+
       // Mark this coffee, equipment, brew method, and brew as analyzed
       lastSuggestionCoffeeIdRef.current = coffeeId;
       lastSuggestionBrewerIdRef.current = brewerId;

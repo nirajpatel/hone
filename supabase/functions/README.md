@@ -39,6 +39,29 @@ All endpoints are prefixed with `/make-server-23508aac/`:
 - **Cleanup**: POST `/cleanup-old-extractions`
 - **Version**: GET `/version`
 
+## Brew Suggestions (AI Guidance)
+
+The system automatically generates AI-powered brew suggestions to help improve coffee extraction quality.
+
+### When Suggestions Are Generated
+
+- **On brew creation**: If a brew has quality rating or notes, suggestions are generated (only for the newest brew per coffee)
+- **On brew update**: If quality rating or notes are added/changed, suggestions are regenerated (only for the newest brew per coffee)
+- **On removal**: If both quality rating and notes are removed, suggestions are cleared from the brew
+
+### Requirements
+
+- Suggestions are only generated for the **newest brew** for each coffee (by creation date)
+- The brew must have at least one of: quality rating, tasting notes, or personal notes
+- Suggestions can be generated even with just a single brew (no historical brew data required)
+- The AI uses brew parameters, coffee characteristics, and general brewing knowledge to provide suggestions
+
+### Suggestion Format
+
+Each brew can have a `suggestion` object containing:
+- **concise**: Short-form suggestion with goal, action, and confidence level
+- **full**: Detailed analysis with summary, primary issue, and multiple parameter-specific suggestions
+
 ## Notes
 
 - Functions use Deno runtime

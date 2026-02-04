@@ -16,9 +16,19 @@ export function CoffeesMobileListView({
   groupBy = 'month',
 }: CoffeesMobileListViewProps) {
   // Sort coffees by roast date (most recent first)
-  const sortedCoffees = [...coffees].sort((a, b) => 
-    new Date(b.roastDate).getTime() - new Date(a.roastDate).getTime()
-  );
+  // Coffees without roast dates go to the end
+  const sortedCoffees = [...coffees].sort((a, b) => {
+    // If both have roast dates, sort normally
+    if (a.roastDate && b.roastDate) {
+      return new Date(b.roastDate).getTime() - new Date(a.roastDate).getTime();
+    }
+    // If only a has no roast date, put it after b
+    if (!a.roastDate && b.roastDate) return 1;
+    // If only b has no roast date, put it after a
+    if (a.roastDate && !b.roastDate) return -1;
+    // If both have no roast date, maintain order
+    return 0;
+  });
 
   // Group coffees by date or roaster
   const grouped: Record<string, Coffee[]> = {};
@@ -35,36 +45,44 @@ export function CoffeesMobileListView({
   } else {
     // Group by date (day-level, not month)
     sortedCoffees.forEach(coffee => {
-      const [year, month, day] = coffee.roastDate.split('-').map(Number);
-      const date = new Date(year, month - 1, day);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const checkDate = new Date(date);
-      checkDate.setHours(0, 0, 0, 0);
-      
-      let dateLabel: string;
-      if (checkDate.getTime() === today.getTime()) {
-        dateLabel = 'Today';
-      } else if (checkDate.getTime() === yesterday.getTime()) {
-        dateLabel = 'Yesterday';
-      } else {
-        const currentYear = new Date().getFullYear();
-        const options: Intl.DateTimeFormatOptions = { 
-          month: 'long', 
-          day: 'numeric'
-        };
-        if (date.getFullYear() !== currentYear) {
-          options.year = 'numeric';
+      if (!coffee.roastDate) {
+        // Add to Unknown group
+        if (!grouped['Unknown']) {
+          grouped['Unknown'] = [];
         }
-        dateLabel = date.toLocaleDateString('en-US', options);
+        grouped['Unknown'].push(coffee);
+      } else {
+        const [year, month, day] = coffee.roastDate.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const checkDate = new Date(date);
+        checkDate.setHours(0, 0, 0, 0);
+        
+        let dateLabel: string;
+        if (checkDate.getTime() === today.getTime()) {
+          dateLabel = 'Today';
+        } else if (checkDate.getTime() === yesterday.getTime()) {
+          dateLabel = 'Yesterday';
+        } else {
+          const currentYear = new Date().getFullYear();
+          const options: Intl.DateTimeFormatOptions = { 
+            month: 'long', 
+            day: 'numeric'
+          };
+          if (date.getFullYear() !== currentYear) {
+            options.year = 'numeric';
+          }
+          dateLabel = date.toLocaleDateString('en-US', options);
+        }
+        
+        if (!grouped[dateLabel]) {
+          grouped[dateLabel] = [];
+        }
+        grouped[dateLabel].push(coffee);
       }
-      
-      if (!grouped[dateLabel]) {
-        grouped[dateLabel] = [];
-      }
-      grouped[dateLabel].push(coffee);
     });
   }
 
@@ -199,7 +217,28 @@ export function CoffeesMobileListView({
 
   return (
     <div className="mobile-list-view -mx-3">
-      {Object.entries(grouped).map(([groupLabel, groupCoffees]) => (
+      {Object.entries(grouped)
+        .sort((a, b) => {
+          // Put "Unknown" group at the end
+          if (a[0] === 'Unknown') return 1;
+          if (b[0] === 'Unknown') return -1;
+          // For month grouping, sort by date descending (most recent first)
+          if (groupBy === 'month') {
+            // Try to parse as date
+            const dateA = new Date(a[0]);
+            const dateB = new Date(b[0]);
+            // If dates are invalid or special labels (Today/Yesterday), handle specially
+            if (a[0] === 'Today') return -1;
+            if (b[0] === 'Today') return 1;
+            if (a[0] === 'Yesterday') return -1;
+            if (b[0] === 'Yesterday') return 1;
+            if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) return 0;
+            return dateB.getTime() - dateA.getTime();
+          }
+          // For roaster grouping, sort alphabetically
+          return a[0].localeCompare(b[0]);
+        })
+        .map(([groupLabel, groupCoffees]) => (
         <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
           {/* Group Header */}
           <div className="px-3 pt-2 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
@@ -232,25 +271,31 @@ export function CoffeesMobileListView({
                         
                         {/* Line 2: Roasted date, freshness, and age */}
                         <div className="text-sm text-gray-500 truncate">
-                          Roasted {formatRoastDate(coffee.roastDate)} • {(() => {
-                            const freshness = getFreshness(coffee.roastDate);
-                            return freshness.tooltip ? (
-                              <SimpleTooltip content={
-                                <div className="text-xs">
-                                  {freshness.tooltip.split('\n').map((line, index) => (
-                                    <div key={index}>{line}</div>
-                                  ))}
-                                </div>
-                              }>
-                                <span className="inline-flex items-center gap-1 cursor-help">
-                                  <span>{freshness.emoji}</span>
-                                  <span>{freshness.label}</span>
-                                </span>
-                              </SimpleTooltip>
-                            ) : (
-                              <span>{freshness.emoji} {freshness.label}</span>
-                            );
-                          })()} • {getDaysOld(coffee.roastDate)}
+                          {!coffee.roastDate ? (
+                            '–'
+                          ) : (
+                            <>
+                              Roasted {formatRoastDate(coffee.roastDate)} • {(() => {
+                                const freshness = getFreshness(coffee.roastDate);
+                                return freshness.tooltip ? (
+                                  <SimpleTooltip content={
+                                    <div className="text-xs">
+                                      {freshness.tooltip.split('\n').map((line, index) => (
+                                        <div key={index}>{line}</div>
+                                      ))}
+                                    </div>
+                                  }>
+                                    <span className="inline-flex items-center gap-1 cursor-help">
+                                      <span>{freshness.emoji}</span>
+                                      <span>{freshness.label}</span>
+                                    </span>
+                                  </SimpleTooltip>
+                                ) : (
+                                  <span>{freshness.emoji} {freshness.label}</span>
+                                );
+                              })()} • {getDaysOld(coffee.roastDate)}
+                            </>
+                          )}
                         </div>
                         
                         {/* Line 3: Brew count */}

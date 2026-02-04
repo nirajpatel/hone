@@ -186,10 +186,20 @@ export function CoffeesTableView({
   });
 
   // Sort coffees by roast date descending (most recent first)
+  // Coffees without roast dates go to the end
   const sortedCoffees = [...filteredCoffees].sort((a, b) => {
-    const dateA = new Date(a.roastDate);
-    const dateB = new Date(b.roastDate);
-    return dateB.getTime() - dateA.getTime();
+    // If both have roast dates, sort normally
+    if (a.roastDate && b.roastDate) {
+      const dateA = new Date(a.roastDate);
+      const dateB = new Date(b.roastDate);
+      return dateB.getTime() - dateA.getTime();
+    }
+    // If only a has no roast date, put it after b
+    if (!a.roastDate && b.roastDate) return 1;
+    // If only b has no roast date, put it after a
+    if (a.roastDate && !b.roastDate) return -1;
+    // If both have no roast date, maintain order
+    return 0;
   });
 
   // Group coffees
@@ -197,15 +207,23 @@ export function CoffeesTableView({
   
   if (groupBy === 'month') {
     sortedCoffees.forEach(coffee => {
-      const [year, monthNum] = coffee.roastDate.split('-').map(Number);
-      const date = new Date(year, monthNum - 1);
-      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      const month = months[date.getMonth()];
-      const monthYear = `${month} ${date.getFullYear()}`;
-      if (!groupedCoffees[monthYear]) {
-        groupedCoffees[monthYear] = [];
+      if (!coffee.roastDate) {
+        // Add to Unknown group
+        if (!groupedCoffees['Unknown']) {
+          groupedCoffees['Unknown'] = [];
+        }
+        groupedCoffees['Unknown'].push(coffee);
+      } else {
+        const [year, monthNum] = coffee.roastDate.split('-').map(Number);
+        const date = new Date(year, monthNum - 1);
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const month = months[date.getMonth()];
+        const monthYear = `${month} ${date.getFullYear()}`;
+        if (!groupedCoffees[monthYear]) {
+          groupedCoffees[monthYear] = [];
+        }
+        groupedCoffees[monthYear].push(coffee);
       }
-      groupedCoffees[monthYear].push(coffee);
     });
   } else {
     sortedCoffees.forEach(coffee => {
@@ -306,7 +324,23 @@ export function CoffeesTableView({
                     </TableCell>
                   </TableRow>
                 ) : (
-                  Object.entries(groupedCoffees).map(([groupLabel, groupCoffees]) => (
+                  Object.entries(groupedCoffees)
+                    .sort((a, b) => {
+                      // Put "Unknown" group at the end
+                      if (a[0] === 'Unknown') return 1;
+                      if (b[0] === 'Unknown') return -1;
+                      // For month grouping, sort by date descending (most recent first)
+                      if (groupBy === 'month') {
+                        const dateA = new Date(a[0]);
+                        const dateB = new Date(b[0]);
+                        // If dates are invalid (shouldn't happen), maintain order
+                        if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) return 0;
+                        return dateB.getTime() - dateA.getTime();
+                      }
+                      // For roaster grouping, sort alphabetically
+                      return a[0].localeCompare(b[0]);
+                    })
+                    .map(([groupLabel, groupCoffees]) => (
                     <React.Fragment key={`group-${groupLabel}`}>
                       <TableRow>
                         <TableCell colSpan={7} className="px-6 py-3 bg-gray-100 mobile-group-header" style={{ textAlign: 'left' }}>
@@ -320,7 +354,9 @@ export function CoffeesTableView({
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Coffee:">{coffee.name}</TableCell>
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Roaster:">{coffee.roaster}</TableCell>
                           <TableCell className="px-6 cursor-pointer" onClick={() => onSelectCoffee(coffee)} data-label="Freshness:">
-                            {freshness.tooltip ? (
+                            {!coffee.roastDate ? (
+                              <span className="text-sm text-gray-900">–</span>
+                            ) : freshness.tooltip ? (
                               <SimpleTooltip content={
                                 <div className="text-xs">
                                   {freshness.tooltip.split('\n').map((line, index) => (

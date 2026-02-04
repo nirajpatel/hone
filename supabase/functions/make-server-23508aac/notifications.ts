@@ -249,6 +249,14 @@ export async function handleNotesResponse(phoneNumber: string, notes: string): P
       return false;
     }
 
+    // Verify phone number belongs to brew owner
+    const user = await kv.get(`user:${brew.userId}`);
+    if (!user || user.phoneNumber !== phoneNumber) {
+      console.log(`[SECURITY] Phone number ${phoneNumber} does not match brew owner ${brew.userId}`);
+      await clearPendingNotes(phoneNumber);
+      return false;
+    }
+
     // Check if user wants to skip
     const skipKeywords = ['skip', 'no', 'none'];
     if (skipKeywords.includes(notes.trim().toLowerCase())) {
@@ -440,6 +448,14 @@ export async function handleRatingResponse(phoneNumber: string, rating: number):
 
     const brew = await kv.get(`brew:${brewId}`);
     if (!brew) {
+      await clearPendingResponse(phoneNumber);
+      return false;
+    }
+
+    // Verify phone number belongs to brew owner
+    const user = await kv.get(`user:${brew.userId}`);
+    if (!user || user.phoneNumber !== phoneNumber) {
+      console.log(`[SECURITY] Phone number ${phoneNumber} does not match brew owner ${brew.userId}`);
       await clearPendingResponse(phoneNumber);
       return false;
     }

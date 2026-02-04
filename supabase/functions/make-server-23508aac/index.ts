@@ -581,11 +581,26 @@ app.post('/make-server-23508aac/coffees', async (c) => {
 
 app.delete('/make-server-23508aac/coffees/:id', async (c) => {
   try {
+    const authHeader = c.req.header('Authorization');
+    const accessToken = authHeader?.split(' ')[1];
+    const user = await getUser(accessToken);
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
     const id = c.req.param('id');
     const existing = await kv.get(`coffee:${id}`);
     if (!existing) {
       return c.json({ error: 'Coffee not found' }, 404);
     }
+
+    // Verify coffee belongs to user's household
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!existing.createdByUserId || !householdMemberIds.includes(existing.createdByUserId)) {
+      return c.json({ error: 'Forbidden - coffee does not belong to your household' }, 403);
+    }
+
     await kv.del(`coffee:${id}`);
     return c.json({ success: true });
   } catch (error) {
@@ -596,11 +611,25 @@ app.delete('/make-server-23508aac/coffees/:id', async (c) => {
 
 app.put('/make-server-23508aac/coffees/:id', async (c) => {
   try {
+    const authHeader = c.req.header('Authorization');
+    const accessToken = authHeader?.split(' ')[1];
+    const user = await getUser(accessToken);
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
     const id = c.req.param('id');
     const body = await c.req.json();
     const existing = await kv.get(`coffee:${id}`);
     if (!existing) {
       return c.json({ error: 'Coffee not found' }, 404);
+    }
+
+    // Verify coffee belongs to user's household
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!existing.createdByUserId || !householdMemberIds.includes(existing.createdByUserId)) {
+      return c.json({ error: 'Forbidden - coffee does not belong to your household' }, 403);
     }
     
     // Handle multiple images upload if provided
@@ -696,11 +725,26 @@ app.get('/make-server-23508aac/brews', async (c) => {
 
 app.get('/make-server-23508aac/brews/:id', async (c) => {
   try {
+    const authHeader = c.req.header('Authorization');
+    const accessToken = authHeader?.split(' ')[1];
+    const user = await getUser(accessToken);
+
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
     const id = c.req.param('id');
     const brew = await kv.get(`brew:${id}`);
     if (!brew) {
       return c.json({ error: 'Brew not found' }, 404);
     }
+
+    // Verify brew belongs to user's household
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!brew.userId || !householdMemberIds.includes(brew.userId)) {
+      return c.json({ error: 'Forbidden - brew does not belong to your household' }, 403);
+    }
+
     return c.json(brew);
   } catch (error) {
     console.log('Error fetching brew:', error);
@@ -718,9 +762,18 @@ app.post('/make-server-23508aac/brews', async (c) => {
 
     const body = await c.req.json();
     const id = crypto.randomUUID();
+    
+    // Validate userId belongs to household (if provided)
+    const requestedUserId = body.userId || user.id;
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!householdMemberIds.includes(requestedUserId)) {
+      return c.json({ error: 'Forbidden - userId must belong to your household' }, 403);
+    }
+    
     const brew = {
       id,
       ...body,
+      userId: requestedUserId, // Ensure userId is set (defaults to logged-in user)
       createdAt: new Date().toISOString()
     };
     await kv.set(`brew:${id}`, brew);
@@ -730,6 +783,42 @@ app.post('/make-server-23508aac/brews', async (c) => {
       // Don't await - let it run in background
       notifications.startNotification(id).catch((error) => {
         console.log('Error starting notification:', error);
+      });
+    }
+    
+    // Generate suggestions if brew has quality rating or notes AND it's the newest brew for this coffee
+    if (brew.quality || brew.tastingNotes || brew.personalNotes) {
+      // Check if this is the newest brew for the coffee (scoped to user/household)
+      const brewUserId = brew.userId || user.id;
+      isNewestBrewForCoffee(id, brew.coffeeId, brewUserId).then(isNewest => {
+        if (!isNewest) {
+          console.log(`[CREATE] Skipping suggestions for brew ${id} - not the newest brew for coffee ${brew.coffeeId} in household`);
+          return;
+        }
+        
+        // Don't await - let it run in background
+        generateBrewSuggestions(id, brewUserId).then(suggestions => {
+          if (suggestions) {
+            // Update brew with both concise and full suggestions
+            kv.get(`brew:${id}`).then(existing => {
+              if (existing) {
+                kv.set(`brew:${id}`, {
+                  ...existing,
+                  suggestion: {
+                    concise: suggestions.concise,
+                    full: suggestions.full
+                  }
+                });
+              }
+            }).catch(error => {
+              console.log('Error updating brew with suggestions:', error);
+            });
+          }
+        }).catch(error => {
+          console.log('Error generating suggestions:', error);
+        });
+      }).catch(error => {
+        console.log('Error checking if brew is newest:', error);
       });
     }
     
@@ -754,6 +843,13 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
     if (!existing) {
       return c.json({ error: 'Brew not found' }, 404);
     }
+
+    // Verify brew belongs to user's household
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!existing.userId || !householdMemberIds.includes(existing.userId)) {
+      return c.json({ error: 'Forbidden - brew does not belong to your household' }, 403);
+    }
+
     const updated = { ...existing, ...body };
     await kv.set(`brew:${id}`, updated);
     
@@ -780,6 +876,76 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
       }
     }
     
+    // Regenerate suggestions if quality rating or notes were added/changed
+    const qualityChanged = body.quality !== undefined && body.quality !== existing.quality;
+    const tastingNotesChanged = body.tastingNotes !== undefined && body.tastingNotes !== existing.tastingNotes;
+    const personalNotesChanged = body.personalNotes !== undefined && body.personalNotes !== existing.personalNotes;
+    
+    if (qualityChanged || tastingNotesChanged || personalNotesChanged) {
+      // Check if brew has quality or notes (after update)
+      if (updated.quality || updated.tastingNotes || updated.personalNotes) {
+        // Check if this is the newest brew for the coffee (scoped to user/household)
+        const brewUserId = existing.userId || user.id;
+        const coffeeId = existing.coffeeId || updated.coffeeId; // Use existing.coffeeId (shouldn't change)
+        console.log(`[UPDATE] Checking if brew ${id} is newest for coffee ${coffeeId} (userId: ${brewUserId})`);
+        isNewestBrewForCoffee(id, coffeeId, brewUserId).then(isNewest => {
+          if (!isNewest) {
+            console.log(`[UPDATE] Skipping suggestions for brew ${id} - not the newest brew for coffee ${coffeeId} in household`);
+            return;
+          }
+          
+          console.log(`[UPDATE] Generating suggestions for brew ${id} - it is the newest brew for coffee ${coffeeId}`);
+          // Don't await - let it run in background
+          generateBrewSuggestions(id, brewUserId).then(suggestions => {
+            if (suggestions) {
+              console.log(`[UPDATE] Successfully generated suggestions for brew ${id}`);
+              // Update brew with both concise and full suggestions
+              kv.get(`brew:${id}`).then(existing => {
+                if (existing) {
+                  kv.set(`brew:${id}`, {
+                    ...existing,
+                    suggestion: {
+                      concise: suggestions.concise,
+                      full: suggestions.full
+                    }
+                  });
+                  console.log(`[UPDATE] Saved suggestions to brew ${id}`);
+                }
+              }).catch(error => {
+                console.log('Error updating brew with suggestions:', error);
+              });
+            } else {
+              console.log(`[UPDATE] No suggestions generated for brew ${id} (returned null)`);
+              // If suggestions is null (no brew history), remove existing suggestion
+              kv.get(`brew:${id}`).then(existing => {
+                if (existing && existing.suggestion) {
+                  const { suggestion, ...rest } = existing;
+                  kv.set(`brew:${id}`, rest);
+                }
+              }).catch(error => {
+                console.log('Error removing suggestion:', error);
+              });
+            }
+          }).catch(error => {
+            console.log('Error generating suggestions:', error);
+          });
+        }).catch(error => {
+          console.log('Error checking if brew is newest:', error);
+        });
+      } else {
+        // Both quality and notes were removed - clear suggestions
+        kv.get(`brew:${id}`).then(existing => {
+          if (existing && existing.suggestion) {
+            const { suggestion, ...rest } = existing;
+            kv.set(`brew:${id}`, rest);
+            console.log(`[UPDATE] Removed suggestions for brew ${id} - quality and notes were removed`);
+          }
+        }).catch(error => {
+          console.log('Error removing suggestion:', error);
+        });
+      }
+    }
+    
     return c.json(updated);
   } catch (error) {
     console.log('Error updating brew:', error);
@@ -800,9 +966,19 @@ app.delete('/make-server-23508aac/brews/:id', async (c) => {
     if (!existing) {
       return c.json({ error: 'Brew not found' }, 404);
     }
+
+    // Verify brew belongs to user's household
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!existing.userId || !householdMemberIds.includes(existing.userId)) {
+      return c.json({ error: 'Forbidden - brew does not belong to your household' }, 403);
+    }
     
     // Clean up notification state before deleting brew
     console.log(`[DELETE] Brew ${id} deleted, cleaning up notifications`);
+    
+    // Check if this was the newest brew for its coffee (scoped to user/household)
+    const brewUserId = existing.userId || user.id;
+    const wasNewest = await isNewestBrewForCoffee(id, existing.coffeeId, brewUserId);
     
     // Clear active notification if this brew is currently active
     const activeNotification = await notifications.getActiveNotification(existing.userId);
@@ -824,6 +1000,39 @@ app.delete('/make-server-23508aac/brews/:id', async (c) => {
     }
     
     await kv.del(`brew:${id}`);
+    
+    // If this was the newest brew, check if the new newest brew needs suggestions
+    if (wasNewest) {
+      getNewestBrewForCoffee(existing.coffeeId, brewUserId).then(newNewest => {
+        if (newNewest && (newNewest.quality || newNewest.tastingNotes || newNewest.personalNotes) && !newNewest.suggestion) {
+          console.log(`[DELETE] Generating suggestions for newly-newest brew ${newNewest.id} after deletion`);
+          // Don't await - let it run in background
+          generateBrewSuggestions(newNewest.id, brewUserId).then(suggestions => {
+            if (suggestions) {
+              // Update brew with both concise and full suggestions
+              kv.get(`brew:${newNewest.id}`).then(existingBrew => {
+                if (existingBrew) {
+                  kv.set(`brew:${newNewest.id}`, {
+                    ...existingBrew,
+                    suggestion: {
+                      concise: suggestions.concise,
+                      full: suggestions.full
+                    }
+                  });
+                }
+              }).catch(error => {
+                console.log('Error updating brew with suggestions:', error);
+              });
+            }
+          }).catch(error => {
+            console.log('Error generating suggestions:', error);
+          });
+        }
+      }).catch(error => {
+        console.log('Error getting new newest brew:', error);
+      });
+    }
+    
     return c.json({ success: true });
   } catch (error) {
     console.log('Error deleting brew:', error);
@@ -1632,6 +1841,384 @@ app.post('/make-server-23508aac/coffee-representative-image', async (c) => {
   }
 });
 
+// Helper function to check if a brew is the newest for its coffee (scoped to user/household)
+async function isNewestBrewForCoffee(brewId: string, coffeeId: string, userId: string): Promise<boolean> {
+  const householdMemberIds = await getHouseholdMemberIds(userId);
+  const allBrews = await kv.getByPrefix('brew:');
+  const coffeeBrews = allBrews.filter((b: any) => 
+    b.coffeeId === coffeeId && 
+    b.userId && 
+    householdMemberIds.includes(b.userId)
+  );
+  
+  console.log(`[isNewestBrewForCoffee] Checking brew ${brewId} for coffee ${coffeeId}, found ${coffeeBrews.length} matching brews in household`);
+  
+  if (coffeeBrews.length === 0) {
+    console.log(`[isNewestBrewForCoffee] No brews found for coffee ${coffeeId} in household`);
+    return false;
+  }
+  
+  // Sort by date (most recent first)
+  coffeeBrews.sort((a: any, b: any) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  
+  const newestBrewId = coffeeBrews[0].id;
+  const isNewest = newestBrewId === brewId;
+  console.log(`[isNewestBrewForCoffee] Newest brew is ${newestBrewId}, checking brew ${brewId}: ${isNewest}`);
+  
+  // Check if this brew is the most recent
+  return isNewest;
+}
+
+// Helper function to get the newest brew for a coffee (scoped to user/household)
+async function getNewestBrewForCoffee(coffeeId: string, userId: string): Promise<any | null> {
+  const householdMemberIds = await getHouseholdMemberIds(userId);
+  const allBrews = await kv.getByPrefix('brew:');
+  const coffeeBrews = allBrews.filter((b: any) => 
+    b.coffeeId === coffeeId && 
+    b.userId && 
+    householdMemberIds.includes(b.userId)
+  );
+  
+  if (coffeeBrews.length === 0) return null;
+  
+  // Sort by date (most recent first)
+  coffeeBrews.sort((a: any, b: any) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  
+  return coffeeBrews[0];
+}
+
+// Generate brew suggestions in background (both concise and full formats)
+async function generateBrewSuggestions(brewId: string, userId: string): Promise<{ concise: { goal: string; action: string; confidence: 'High' | 'Medium' | 'Low' }; full: { summary: string; primaryIssue: string; suggestions: any[] } } | null> {
+  try {
+    // Fetch the baseline brew (the one that triggered the job)
+    const baselineBrew = await kv.get(`brew:${brewId}`);
+    if (!baselineBrew) {
+      console.log(`[generateBrewSuggestions] Brew ${brewId} not found`);
+      return null;
+    }
+
+    // Fetch coffee data
+    const coffee = await kv.get(`coffee:${baselineBrew.coffeeId}`);
+    if (!coffee) {
+      console.log(`[generateBrewSuggestions] Coffee ${baselineBrew.coffeeId} not found`);
+      return null;
+    }
+
+    // Fetch all brews for the same coffee and brew method (scoped to user/household)
+    const householdMemberIds = await getHouseholdMemberIds(userId);
+    const allBrews = await kv.getByPrefix('brew:');
+    const matchingBrews = allBrews.filter((b: any) => 
+      b.coffeeId === baselineBrew.coffeeId && 
+      b.brewMethod === baselineBrew.brewMethod &&
+      b.userId &&
+      householdMemberIds.includes(b.userId)
+    );
+
+    // Allow suggestions even with just the baseline brew
+    // The AI can provide useful suggestions based on brew parameters and coffee characteristics
+
+    // Sort by date (most recent first)
+    matchingBrews.sort((a: any, b: any) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    // Select brew history: top 10 most recent + baseline brew + exceptional brew
+    const top10Recent = matchingBrews.slice(0, 10);
+    const top10Ids = new Set(top10Recent.map((b: any) => b.id));
+    
+    // Find exceptional brew (most recent with quality === 3)
+    const exceptionalBrew = matchingBrews.find((b: any) => b.quality === 3);
+    
+    // Build brew list to include
+    let brewsToInclude = [...top10Recent];
+    
+    // Add baseline brew if not already in top 10
+    if (!top10Ids.has(brewId)) {
+      brewsToInclude.push(baselineBrew);
+    }
+    
+    // Add exceptional brew if not already included
+    if (exceptionalBrew && !brewsToInclude.find((b: any) => b.id === exceptionalBrew.id)) {
+      brewsToInclude.push(exceptionalBrew);
+    }
+    
+    // Re-sort chronologically (most recent first)
+    brewsToInclude.sort((a: any, b: any) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    // Mark baseline and exceptional brews
+    const brewsWithTags = brewsToInclude.map((b: any) => ({
+      ...b,
+      isBaseline: b.id === brewId,
+      isExceptional: exceptionalBrew && b.id === exceptionalBrew.id
+    }));
+
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      console.log('[generateBrewSuggestions] OpenAI API key not configured');
+      return null;
+    }
+
+    // Helper functions
+    const getQualityLabel = (quality: number | undefined) => {
+      if (!quality) return 'Not rated';
+      return quality === 1 ? 'Bad' : quality === 2 ? 'Decent' : 'Excellent';
+    };
+
+    const formatDate = (dateStr: string) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // Build base prompt parts (shared between both formats)
+    const coffeeInfo = `COFFEE:
+- Name: ${coffee.name}
+- Roaster: ${coffee.roaster}
+- Brew Method: ${baselineBrew.brewMethod}${coffee.region ? `\n- Region: ${coffee.region}` : ''}${coffee.roastLevel ? `\n- Roast Level: ${coffee.roastLevel}` : ''}${coffee.notes ? `\n- Flavor Notes: ${coffee.notes}` : ''}`;
+
+    let brewHistoryText = `BREW HISTORY (Most recent to oldest):
+`;
+    
+    brewsWithTags.forEach((brew: any, idx: number) => {
+      const brewNum = idx + 1;
+      const isTarget = brew.isBaseline;
+      const isExceptional = brew.isExceptional;
+      
+      let qualifiers = '';
+      if (isTarget && isExceptional) {
+        qualifiers = ' ⭐ REFERENCE BREW, 🏆 BEST RECORDED BREW';
+      } else if (isTarget) {
+        qualifiers = ' ⭐ REFERENCE BREW';
+      } else if (isExceptional) {
+        qualifiers = ' 🏆 BEST RECORDED BREW';
+      }
+      
+      brewHistoryText += `
+BREW #${brewNum} (${formatDate(brew.createdAt)})${qualifiers}:
+- Brewer: ${brew.brewerName || 'Not specified'}
+- Grinder: ${brew.grinderName || 'Not specified'}
+- Bean Temperature: ${brew.coffeeTemperature === 'frozen' ? 'Frozen' : 'Room Temperature'}
+- Grind Setting: ${brew.grindSetting}
+- Dosage: ${brew.dosage}g
+- Water Temperature: ${brew.waterTemp ? `${brew.waterTemp}°F` : 'Not recorded'}`;
+
+      brewHistoryText += formatBrewForPrompt(brew, baselineBrew.brewMethod);
+
+      brewHistoryText += `
+- Quality Rating: ${getQualityLabel(brew.quality)}${brew.tastingNotes ? `
+- Tasting Notes: ${brew.tastingNotes}` : ''}${(brew.personalNotes || (brew as any).notes) ? `
+- Extraction Notes: ${brew.personalNotes || (brew as any).notes}` : ''}
+`;
+    });
+
+    const considerations = `
+IMPORTANT CONSIDERATIONS:
+1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried and avoid suggesting the same adjustments that were already attempted.
+2. Grinder Direction: Different grinders have different scales. Some use lower numbers for finer grinds (e.g., Niche Zero, Fellow Ode), while others use higher numbers for finer grinds. Ensure your suggestion moves in the correct direction for the specific grinder being used.
+3. Grinder Sensitivity: Pay attention to how sensitive the grinder's adjustments are. Stepless grinders like the Niche Zero are highly sensitive (0.5 adjustments matter), while stepped grinders may need larger adjustments (2-3 steps).
+4. Equipment Context: Consider the brewer and grinder being used when making suggestions. Different equipment has different characteristics and optimal parameters.
+5. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
+6. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
+7. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
+8. Do not infer causes that are not supported by recorded data.
+
+ADDITIONAL RULES TO FOLLOW:
+A) Decision hierarchy (use this order unless history strongly suggests otherwise):
+   - Grind / flow behavior
+   - Final weight / ratio
+   - Water temperature
+   - Dose
+   - If flow issues indicate puck preparation or channeling, address distribution, tamping, or pre-infusion before changing core parameters.
+
+B) Require directional reasoning (no vague advice):
+   - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
+   - Each suggestion must include the expected taste/texture impact (example: "should reduce sourness and increase body").
+
+C) Confidence score:
+   - Every suggestion must include a confidence score: High / Medium / Low.
+   - Confidence should reflect how strongly the brew history supports the change (e.g., repeated evidence vs weak signal).
+   - Use "High" only when supported by at least two prior brews or a direct comparison.
+
+D) Primary failure mode:
+   - Before listing suggestions, identify exactly ONE primary failure mode for the selected brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield").
+   - All suggestions must directly address this failure mode.
+
+E) Quality over quantity:
+   - If fewer than three high-quality, non-redundant suggestions exist, provide fewer suggestions rather than forcing additional ones.
+   - It is acceptable to provide only 1-2 suggestions if those are the most impactful changes.
+   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
+
+F) Learning from excellent brews:
+   - If the history contains an excellent brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
+   - Reverting to a previously successful setting is not considered repetition.
+   - When referring to it, use descriptive language like "an earlier excellent brew" without mentioning brew numbers.
+
+G) Prefer minimal changes:
+   - When suggesting adjustments, prefer the smallest reasonable change that could plausibly fix the issue.
+   - Avoid large jumps unless history clearly shows they are necessary.
+
+H) Stability check:
+   - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.`;
+
+    // Build concise format prompt
+    const concisePrompt = `You are an expert barista analyzing the brew history for a specific coffee to provide improvement suggestions.
+
+${coffeeInfo}
+
+GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced cup of coffee.
+
+${brewHistoryText}
+${considerations}
+
+OUTPUT FORMAT:
+You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
+
+{
+  "goal": "2-3 words describing the primary goal (e.g., 'Reduce sourness', 'Increase body', 'Fix channeling')",
+  "action": "2-4 words describing the action (e.g., 'Grind finer', 'Increase temperature', 'Reduce final weight')",
+  "confidence": "High" | "Medium" | "Low"
+}
+
+CRITICAL REQUIREMENTS:
+- Goal must be exactly 2-3 words - no complete sentences, no explanations
+- Action must be exactly 2-4 words - no complete sentences, no explanations
+- Prioritize the MOST IMPORTANT goal/action based on the baseline brew analysis
+- Goal and action must be based on improving the baseline brew (marked with ⭐ REFERENCE BREW) specifically
+- Identify the single most impactful change that addresses the primary failure mode of the baseline brew
+- Confidence should reflect how strongly the brew history supports this specific change`;
+
+    // Build full format prompt (same as existing endpoint)
+    const fullPrompt = `You are an expert barista analyzing the brew history for a specific coffee to provide improvement suggestions.
+
+${coffeeInfo}
+
+GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced cup of coffee.
+
+${brewHistoryText}
+${considerations}
+
+OUTPUT FORMAT:
+You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
+
+{
+  "summary": "Brief diagnostic summary (1-2 sentences). State the outcome (quality rating and key tasting notes) and what was missing or wrong. Avoid hedging language like 'likely', 'suggests', 'step in the right direction'. Collapse cause and effect into one sentence.",
+  "primaryIssue": "The primary failure mode (e.g., 'under-extracted due to fast flow' or 'over-extracted due to excessive yield')",
+  "suggestions": [
+    {
+      "parameter": "Parameter name",
+      "action": "Action with specific magnitude (no period at end)",
+      "effect": "Expected taste/texture effect as a complete sentence starting with 'This will' or 'This should' (no period at end)",
+      "reasoning": "Concise explanation (1 sentence) of why this works based on brew history. Do NOT reference brew numbers (no period at end)",
+      "confidence": "High" | "Medium" | "Low"
+    }
+  ]
+}
+
+REQUIREMENTS:
+- You must provide at least 1 suggestion and at most 3 suggestions
+- Each suggestion must follow the structure: Action → Expected effect → Why it matters (based on history)
+- Only include high-quality, non-redundant suggestions`;
+
+    // Call OpenAI API for both formats
+    const [conciseResponse, fullResponse] = await Promise.all([
+      fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiApiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-5.2',
+          messages: [
+            { role: 'system', content: 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.' },
+            { role: 'user', content: concisePrompt }
+          ],
+          temperature: 0.2,
+          max_completion_tokens: 200,
+          response_format: { type: 'json_object' }
+        }),
+      }),
+      fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiApiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-5.2',
+          messages: [
+            { role: 'system', content: 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.' },
+            { role: 'user', content: fullPrompt }
+          ],
+          temperature: 0.2,
+          max_completion_tokens: 1000,
+          response_format: { type: 'json_object' }
+        }),
+      })
+    ]);
+
+    if (!conciseResponse.ok || !fullResponse.ok) {
+      console.error('[generateBrewSuggestions] OpenAI API error', {
+        concise: conciseResponse.status,
+        full: fullResponse.status
+      });
+      return null;
+    }
+
+    const conciseData = await conciseResponse.json();
+    const fullData = await fullResponse.json();
+
+    const conciseContent = conciseData.choices?.[0]?.message?.content;
+    const fullContent = fullData.choices?.[0]?.message?.content;
+
+    if (!conciseContent || !fullContent) {
+      console.error('[generateBrewSuggestions] No content in OpenAI response');
+      return null;
+    }
+
+    try {
+      const concise = JSON.parse(conciseContent);
+      const full = JSON.parse(fullContent);
+
+      // Validate concise format
+      if (!concise.goal || !concise.action || !concise.confidence) {
+        console.error('[generateBrewSuggestions] Invalid concise format', concise);
+        return null;
+      }
+
+      // Validate full format
+      if (!full.summary || !full.primaryIssue || !Array.isArray(full.suggestions)) {
+        console.error('[generateBrewSuggestions] Invalid full format', full);
+        return null;
+      }
+
+      return {
+        concise: {
+          goal: concise.goal,
+          action: concise.action,
+          confidence: concise.confidence as 'High' | 'Medium' | 'Low'
+        },
+        full: {
+          summary: full.summary,
+          primaryIssue: full.primaryIssue,
+          suggestions: full.suggestions
+        }
+      };
+    } catch (parseError) {
+      console.error('[generateBrewSuggestions] Failed to parse JSON', parseError);
+      return null;
+    }
+  } catch (error) {
+    console.error('[generateBrewSuggestions] Error generating suggestions', error);
+    return null;
+  }
+}
+
 // Get AI suggestions for improving brew
 app.post('/make-server-23508aac/brew-suggestions', async (c) => {
   try {
@@ -2316,12 +2903,16 @@ app.put('/make-server-23508aac/equipment/:id', async (c) => {
 
     await kv.set(`equipment:${user.id}:${id}`, updated);
 
-    // Update denormalized equipment names in all brews using this equipment
+    // Update denormalized equipment names in all brews using this equipment (scoped to household)
     if (newName && newName !== existing.name) {
-      const brews = await kv.getByPrefix('brew:');
+      const householdMemberIds = await getHouseholdMemberIds(user.id);
+      const allBrews = await kv.getByPrefix('brew:');
+      const householdBrews = allBrews.filter((brew: any) => 
+        brew.userId && householdMemberIds.includes(brew.userId)
+      );
       const updates: Promise<void>[] = [];
 
-      for (const brew of brews) {
+      for (const brew of householdBrews) {
         let needsUpdate = false;
         const updatedBrew = { ...brew };
 

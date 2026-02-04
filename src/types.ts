@@ -75,4 +75,22 @@ export interface Brew {
   personalNotes?: string;
   localTimestamp?: string; // Local timestamp string for SMS display
   timezoneOffset: number; // Timezone offset in minutes for day boundary calculation (required)
+  suggestion?: {
+    concise: {
+      goal: string; // 2-3 words (e.g., "Reduce sourness")
+      action: string; // 2-4 words (e.g., "Grind finer")
+      confidence: 'High' | 'Medium' | 'Low'; // Always generated, frontend filters display
+    };
+    full: {
+      summary: string;
+      primaryIssue: string;
+      suggestions: Array<{
+        parameter: string;
+        action: string;
+        effect: string;
+        reasoning: string;
+        confidence: 'High' | 'Medium' | 'Low';
+      }>;
+    };
+  };
 }
