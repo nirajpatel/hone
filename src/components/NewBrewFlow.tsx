@@ -62,6 +62,15 @@ interface FirstTimeSuggestionsData {
 
 // Component to format and display AI suggestions with better readability
 const FormattedAISuggestions = ({ suggestions }: { suggestions: string | AISuggestionsData | FirstTimeSuggestionsData }) => {
+  // Handle exceptional baseline brew message
+  if (typeof suggestions === 'string' && suggestions.includes('dialed in')) {
+    return (
+      <p className="text-sm text-gray-900">
+        {suggestions}
+      </p>
+    );
+  }
+
   // Check if this is first-time suggestions (has 'introduction' field)
   if (typeof suggestions !== 'string' && 'introduction' in suggestions) {
     const data = suggestions as FirstTimeSuggestionsData;
@@ -1225,6 +1234,22 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       // Check if baseline brew is the most recent brew
       const mostRecentBrew = matchingBrews.length > 0 ? matchingBrews[0] : null;
       const isBaselineMostRecent = currentBaselineBrew && mostRecentBrew && currentBaselineBrew.id === mostRecentBrew.id;
+
+      // Check if baseline brew is exceptional (quality === 3)
+      // If so, show special message and skip LLM call
+      if (currentBaselineBrew?.quality === 3) {
+        setSuggestions("The baseline brew shows excellent balance and extraction. No adjustments are recommended — this recipe is dialed in.");
+        setLoadingSuggestions(false);
+        setThinkingText('');
+        
+        // Mark as analyzed
+        lastSuggestionCoffeeIdRef.current = coffeeId;
+        lastSuggestionBrewerIdRef.current = brewerId;
+        lastSuggestionGrinderIdRef.current = grinderId;
+        lastSuggestionBrewMethodRef.current = brewMethod;
+        lastSuggestionBrewIdRef.current = currentBrewId;
+        return;
+      }
 
       // If baseline brew is most recent and has stored full suggestion, use it (regardless of confidence)
       // Note: If suggestions haven't been processed yet (background job still running), 
