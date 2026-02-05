@@ -21,7 +21,7 @@ interface BrewsTableViewProps {
   onFilterMethodChange: (method: BrewMethod | 'all') => void;
   onGroupByChange: (groupBy: 'month' | 'coffee') => void;
   onNewBrew: () => void;
-  onSelectBrew: (brew: Brew) => void;
+  onSelectBrew: (brew: Brew, scrollToGuidance?: boolean) => void;
   onEditBrew: (brew: Brew) => void;
   onDeleteBrew: (id: string) => void;
   onDuplicateBrew: (brew: Brew) => void;

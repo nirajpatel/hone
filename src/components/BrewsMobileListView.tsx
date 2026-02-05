@@ -3,7 +3,7 @@ import { capitalizeBrewMethod, getRatingEmoji } from '../utils/formatters';
 
 interface BrewsMobileListViewProps {
   brews: Brew[];
-  onSelectBrew: (brew: Brew) => void;
+  onSelectBrew: (brew: Brew, scrollToGuidance?: boolean) => void;
   groupBy?: 'month' | 'coffee';
   users?: User[];
 }

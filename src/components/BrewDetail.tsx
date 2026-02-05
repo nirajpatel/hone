@@ -1,5 +1,5 @@
 import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { formatTime, formatExtractionTime } from './TimeInput';
 import { Brew, BrewMethod, User as UserType } from '../types';
 import { Button } from './ui/button';
@@ -9,6 +9,7 @@ import { BrewEquipmentIcon } from './icons/BrewEquipmentIcon';
 import { GrinderIcon } from './icons/GrinderIcon';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
 import { supportsStages } from '../utils/brewMethods';
+import { FormattedAISuggestions } from './DialInGuidance';
 
 interface BrewDetailProps {
   brew: Brew;
@@ -21,18 +22,105 @@ interface BrewDetailProps {
   onNavigateNext?: () => void;
   hasPrev?: boolean;
   hasNext?: boolean;
+  scrollToGuidance?: boolean;
+  onScrollComplete?: () => void;
 }
 
-export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: BrewDetailProps) {
+export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext, scrollToGuidance, onScrollComplete }: BrewDetailProps) {
+  const guidanceRef = useRef<HTMLDivElement>(null);
+  const hasScrolledRef = useRef(false);
+
+  // Scroll to guidance section
+  const scrollToGuidanceSection = (element: HTMLDivElement) => {
+    if (hasScrolledRef.current) return;
+    
+    // Use requestAnimationFrame to ensure DOM is ready and layout is complete
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (hasScrolledRef.current) return;
+        
+        // Find the scrollable parent container - StandardDialog has overflow-y-auto on a div
+        let scrollableParent: Element | null = element.parentElement;
+        
+        // Traverse up to find the scrollable container
+        while (scrollableParent && scrollableParent !== document.body) {
+          const styles = window.getComputedStyle(scrollableParent);
+          if (styles.overflowY === 'auto' || styles.overflowY === 'scroll') {
+            break;
+          }
+          scrollableParent = scrollableParent.parentElement;
+        }
+        
+        if (scrollableParent && scrollableParent !== document.body) {
+          // Calculate the position relative to the scrollable container
+          const elementRect = element.getBoundingClientRect();
+          const parentRect = scrollableParent.getBoundingClientRect();
+          const relativeTop = elementRect.top - parentRect.top + scrollableParent.scrollTop;
+          
+          scrollableParent.scrollTo({
+            top: Math.max(0, relativeTop - 20), // Add some padding from top
+            behavior: 'smooth'
+          });
+          
+          hasScrolledRef.current = true;
+          onScrollComplete?.();
+        } else {
+          // Fallback: try to find dialog content container
+          const dialogContent = document.querySelector('[data-slot="dialog-content"]');
+          if (dialogContent) {
+            const elementRect = element.getBoundingClientRect();
+            const parentRect = dialogContent.getBoundingClientRect();
+            const relativeTop = elementRect.top - parentRect.top + dialogContent.scrollTop;
+            
+            dialogContent.scrollTo({
+              top: Math.max(0, relativeTop - 20),
+              behavior: 'smooth'
+            });
+            
+            hasScrolledRef.current = true;
+            onScrollComplete?.();
+          } else {
+            // Final fallback to standard scrollIntoView
+            element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+            hasScrolledRef.current = true;
+            onScrollComplete?.();
+          }
+        }
+      });
+    });
+  };
+
+  // Reset scroll flag when brew changes
+  useEffect(() => {
+    hasScrolledRef.current = false;
+  }, [brew.id]);
+
+  // Handle scroll when scrollToGuidance is true and element is mounted
+  useEffect(() => {
+    if (scrollToGuidance && guidanceRef.current && !hasScrolledRef.current) {
+      scrollToGuidanceSection(guidanceRef.current);
+    }
+  }, [scrollToGuidance]);
+
+  // Ref callback that fires when element is mounted
+  const setGuidanceRef = (element: HTMLDivElement | null) => {
+    guidanceRef.current = element;
+    if (element && scrollToGuidance && !hasScrolledRef.current) {
+      scrollToGuidanceSection(element);
+    }
+  };
+
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
-      } else if (e.key === 'ArrowLeft' && hasPrev && onNavigatePrev) {
-        onNavigatePrev();
-      } else if (e.key === 'ArrowRight' && hasNext && onNavigateNext) {
+      } else if (e.key === 'ArrowLeft' && hasNext && onNavigateNext) {
+        // Left arrow = back in time (older brew)
         onNavigateNext();
+      } else if (e.key === 'ArrowRight' && hasPrev && onNavigatePrev) {
+        // Right arrow = forward in time (newer brew)
+        onNavigatePrev();
       }
     };
     window.addEventListener('keydown', handleKeyboard);
@@ -328,6 +416,14 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
                 );
               })()}
             </div>
+
+            {/* Dial-In Guidance */}
+            {brew.suggestion?.full && (
+              <div ref={setGuidanceRef} id="dial-in-guidance" className="border-t border-gray-200 pt-6 mb-6">
+                <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Dial-In Guidance</h3>
+                <FormattedAISuggestions suggestions={brew.suggestion.full} />
+              </div>
+            )}
 
             {/* Personal Notes */}
             <div className="border-t border-gray-200 pt-6 mb-6">

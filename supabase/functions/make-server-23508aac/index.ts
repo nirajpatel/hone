@@ -800,11 +800,11 @@ app.post('/make-server-23508aac/generate-guidance-for-all', async (c) => {
           continue;
         }
 
-        // Skip if already has suggestions
-        if (newestBrew.suggestion) {
-          results.skipped++;
-          continue;
-        }
+        // Skip check for existing suggestions - regenerate all
+        // if (newestBrew.suggestion) {
+        //   results.skipped++;
+        //   continue;
+        // }
 
         results.processed++;
         console.log(`  Processing brew ${newestBrew.id} for coffee ${coffee.id} (${coffee.roaster} – ${coffee.name})`);
@@ -2233,38 +2233,7 @@ F) Exceptional brews:
 G) Stability check:
    - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.`;
 
-    // Build concise format prompt
-    const concisePrompt = `You are an expert barista analyzing the brew history for a specific coffee to provide improvement suggestions.
-
-${coffeeInfo}
-
-GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced cup of coffee.
-
-${brewHistoryText}
-${considerations}
-
-TONE AND VOICE:
-Use a calm, confident, craft-focused tone.
-Sound like an experienced specialty barista giving guidance.
-
-OUTPUT FORMAT:
-You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
-
-{
-  "goal": "2-3 words describing the primary goal (e.g., 'Reduce sourness', 'Increase body', 'Fix channeling')",
-  "action": "2-4 words describing the action (e.g., 'Grind finer', 'Increase temperature', 'Reduce final weight')",
-  "confidence": "High" | "Medium" | "Low"
-}
-
-CRITICAL REQUIREMENTS:
-- Goal must be exactly 2-3 words - no complete sentences, no explanations
-- Action must be exactly 2-4 words - no complete sentences, no explanations
-- Prioritize the MOST IMPORTANT goal/action based on the baseline brew analysis
-- Goal and action must be based on improving the baseline brew (marked with ⭐ REFERENCE BREW) specifically
-- Identify the single most impactful change that addresses the primary failure mode of the baseline brew
-- Confidence should reflect how strongly the brew history supports this specific change`;
-
-    // Build full format prompt (same as existing endpoint)
+    // Build full format prompt (concise will be derived from first suggestion)
     const fullPrompt = `You are an expert barista analyzing the brew history for a specific coffee to provide improvement suggestions.
 
 ${coffeeInfo}
@@ -2284,6 +2253,11 @@ You must respond with valid JSON only. No markdown, no code blocks, just raw JSO
 {
   "summary": "Brief diagnostic summary (1-2 sentences). State the outcome (quality rating and key tasting notes) and what was missing or wrong. Avoid hedging language like 'likely', 'suggests', 'step in the right direction'. Collapse cause and effect into one sentence.",
   "primaryIssue": "The primary failure mode (e.g., 'under-extracted due to fast flow' or 'over-extracted due to excessive yield')",
+  "concise": {
+    "goal": "2-3 words describing the primary goal based on the FIRST suggestion (e.g., 'Reduce sourness', 'Increase body', 'Fix channeling')",
+    "action": "2-4 words describing the action from the FIRST suggestion (e.g., 'Grind finer', 'Increase temperature', 'Reduce final weight')",
+    "confidence": "High" | "Medium" | "Low" (same as first suggestion's confidence)
+  },
   "suggestions": [
     {
       "parameter": "Parameter name",
@@ -2298,86 +2272,96 @@ You must respond with valid JSON only. No markdown, no code blocks, just raw JSO
 REQUIREMENTS:
 - You must provide at least 1 suggestion and at most 3 suggestions
 - Each suggestion must follow the structure: Action → Expected effect → Why it matters (based on history)
-- Only include high-quality, non-redundant suggestions`;
+- Only include high-quality, non-redundant suggestions
+- CRITICAL: Order suggestions by importance - the first suggestion should be the highest confidence change with the greatest likely impact
+- The concise format MUST be derived from the FIRST suggestion in the suggestions array
+- Concise goal must be exactly 2-3 words - extract the primary goal from the first suggestion's effect text
+- Concise action must be exactly 2-4 words - extract from the first suggestion's action, removing magnitude/details (e.g., "Increase water temperature by 2-3°F" becomes "Increase temperature")
+- Concise confidence must match the first suggestion's confidence exactly`;
 
-    // Call OpenAI API for both formats
-    const [conciseResponse, fullResponse] = await Promise.all([
-      fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openaiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-5.2',
-          messages: [
-            { role: 'system', content: 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.' },
-            { role: 'user', content: concisePrompt }
-          ],
-          temperature: 0.2,
-          max_completion_tokens: 200,
-          response_format: { type: 'json_object' }
-        }),
+    // Call OpenAI API for full format only (concise will be derived from first suggestion)
+    const fullResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openaiApiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-5.2',
+        messages: [
+          { role: 'system', content: 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.' },
+          { role: 'user', content: fullPrompt }
+        ],
+        temperature: 0.2,
+        max_completion_tokens: 1000,
+        response_format: { type: 'json_object' }
       }),
-      fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openaiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-5.2',
-          messages: [
-            { role: 'system', content: 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.' },
-            { role: 'user', content: fullPrompt }
-          ],
-          temperature: 0.2,
-          max_completion_tokens: 1000,
-          response_format: { type: 'json_object' }
-        }),
-      })
-    ]);
+    });
 
-    if (!conciseResponse.ok || !fullResponse.ok) {
+    if (!fullResponse.ok) {
       console.error('[generateBrewSuggestions] OpenAI API error', {
-        concise: conciseResponse.status,
         full: fullResponse.status
       });
       return null;
     }
 
-    const conciseData = await conciseResponse.json();
     const fullData = await fullResponse.json();
-
-    const conciseContent = conciseData.choices?.[0]?.message?.content;
     const fullContent = fullData.choices?.[0]?.message?.content;
 
-    if (!conciseContent || !fullContent) {
+    if (!fullContent) {
       console.error('[generateBrewSuggestions] No content in OpenAI response');
       return null;
     }
 
     try {
-      const concise = JSON.parse(conciseContent);
       const full = JSON.parse(fullContent);
 
-      // Validate concise format
-      if (!concise.goal || !concise.action || !concise.confidence) {
-        console.error('[generateBrewSuggestions] Invalid concise format', concise);
-        return null;
-      }
-
       // Validate full format
-      if (!full.summary || !full.primaryIssue || !Array.isArray(full.suggestions)) {
+      if (!full.summary || !full.primaryIssue || !Array.isArray(full.suggestions) || full.suggestions.length === 0) {
         console.error('[generateBrewSuggestions] Invalid full format', full);
         return null;
       }
 
+      // Sort suggestions by confidence (High > Medium > Low) to ensure highest confidence is first
+      // The LLM determines importance/priority, we just ensure highest confidence comes first
+      const confidenceOrder = { 'High': 0, 'Medium': 1, 'Low': 2 };
+      full.suggestions.sort((a: any, b: any) => {
+        const aConf = confidenceOrder[a.confidence as keyof typeof confidenceOrder] ?? 999;
+        const bConf = confidenceOrder[b.confidence as keyof typeof confidenceOrder] ?? 999;
+        return aConf - bConf;
+      });
+
+      // Validate concise format (now included in full response)
+      if (!full.concise || !full.concise.goal || !full.concise.action || !full.concise.confidence) {
+        console.error('[generateBrewSuggestions] Invalid concise format in response', full.concise);
+        // Fallback: extract from first suggestion (now guaranteed to be highest confidence)
+        const firstSuggestion = full.suggestions[0];
+        return {
+          concise: {
+            goal: 'Improve balance', // Generic fallback
+            action: firstSuggestion.action.split(/\s+/).slice(0, 4).join(' '), // First 4 words
+            confidence: firstSuggestion.confidence as 'High' | 'Medium' | 'Low'
+          },
+          full: {
+            summary: full.summary,
+            primaryIssue: full.primaryIssue,
+            suggestions: full.suggestions
+          }
+        };
+      }
+
+      // Ensure concise matches the first (highest confidence) suggestion
+      const firstSuggestion = full.suggestions[0];
+      if (full.concise.confidence !== firstSuggestion.confidence) {
+        console.warn('[generateBrewSuggestions] Concise confidence does not match first suggestion, updating to match');
+        full.concise.confidence = firstSuggestion.confidence;
+      }
+
       return {
         concise: {
-          goal: concise.goal,
-          action: concise.action,
-          confidence: concise.confidence as 'High' | 'Medium' | 'Low'
+          goal: full.concise.goal,
+          action: full.concise.action,
+          confidence: full.concise.confidence as 'High' | 'Medium' | 'Low'
         },
         full: {
           summary: full.summary,

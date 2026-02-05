@@ -66,6 +66,7 @@ export default function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBrew, setSelectedBrew] = useState<Extraction | null>(null);
+  const [scrollToGuidance, setScrollToGuidance] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
   const [showNewBrew, setShowNewBrew] = useState(false);
   const [showAddCoffee, setShowAddCoffee] = useState(false);
@@ -1210,7 +1211,10 @@ export default function App() {
               onFilterMethodChange={setFilterMethod}
               onGroupByChange={setGroupBy}
               onNewBrew={() => setShowNewBrew(true)}
-              onSelectBrew={setSelectedBrew}
+              onSelectBrew={(brew, scrollToGuidance) => {
+                setSelectedBrew(brew);
+                setScrollToGuidance(scrollToGuidance || false);
+              }}
               onEditBrew={(brew) => {
                 setEditingBrew(brew);
               }}
@@ -1242,7 +1246,10 @@ export default function App() {
               filterMethod={filterMethod}
               onFilterMethodChange={setFilterMethod}
               onNewBrew={() => setShowNewBrew(true)}
-              onSelectBrew={setSelectedBrew}
+              onSelectBrew={(brew, scrollToGuidance) => {
+                setSelectedBrew(brew);
+                setScrollToGuidance(scrollToGuidance || false);
+              }}
               view={brewsView}
               onViewChange={setBrewsView}
               equipment={equipment}
@@ -1298,7 +1305,10 @@ export default function App() {
           <BrewDetail
             brew={selectedBrew}
             users={users}
-            onClose={() => setSelectedBrew(null)}
+            onClose={() => {
+              setSelectedBrew(null);
+              setScrollToGuidance(false);
+            }}
             onEdit={(brew) => {
               setSelectedBrew(null);
               setEditingBrew(brew);
@@ -1311,10 +1321,18 @@ export default function App() {
               setSelectedBrew(null);
               setDeletingBrewId(id);
             }}
-            onNavigatePrev={hasPrev ? () => setSelectedBrew(flatBrews[currentIndex - 1]) : undefined}
-            onNavigateNext={hasNext ? () => setSelectedBrew(flatBrews[currentIndex + 1]) : undefined}
+            onNavigatePrev={hasPrev ? () => {
+              setScrollToGuidance(false);
+              setSelectedBrew(flatBrews[currentIndex - 1]);
+            } : undefined}
+            onNavigateNext={hasNext ? () => {
+              setScrollToGuidance(false);
+              setSelectedBrew(flatBrews[currentIndex + 1]);
+            } : undefined}
             hasPrev={hasPrev}
             hasNext={hasNext}
+            scrollToGuidance={scrollToGuidance}
+            onScrollComplete={() => setScrollToGuidance(false)}
           />
         );
       })()}

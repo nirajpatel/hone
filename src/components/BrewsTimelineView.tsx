@@ -15,7 +15,7 @@ interface BrewsTimelineViewProps {
   filterMethod: BrewMethod | 'all';
   onFilterMethodChange: (method: BrewMethod | 'all') => void;
   onNewBrew: () => void;
-  onSelectBrew: (brew: Brew) => void;
+  onSelectBrew: (brew: Brew, scrollToGuidance?: boolean) => void;
   view?: 'table' | 'timeline';
   onViewChange?: (view: 'table' | 'timeline') => void;
   equipment: Equipment[];
@@ -344,8 +344,9 @@ export function BrewsTimelineView({
             // Get the newest brew (last in sorted array) for suggestion display
             const newestBrew = sortedExtractions[sortedExtractions.length - 1];
             const isExceptional = newestBrew?.quality === 3;
-            const hasSuggestion = newestBrew?.suggestion?.concise && 
-              (newestBrew.suggestion.concise.confidence === 'Medium' || newestBrew.suggestion.concise.confidence === 'High');
+            const firstSuggestion = newestBrew?.suggestion?.full?.suggestions?.[0];
+            const hasSuggestion = firstSuggestion && 
+              (firstSuggestion.confidence === 'Medium' || firstSuggestion.confidence === 'High');
             
             // Override trend for exceptional brews
             const displayTrendInfo = isExceptional 
@@ -376,14 +377,83 @@ export function BrewsTimelineView({
                       {isExceptional ? (
                         'No adjustment needed'
                       ) : (
-                        (() => {
-                          const action = newestBrew.suggestion.concise.action;
-                          const goal = newestBrew.suggestion.concise.goal;
-                          // Capitalize first letter of action, lowercase first letter of goal
-                          const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
-                          const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
-                          return `${capitalizedAction} to ${lowercasedGoal}`;
-                        })()
+                        <button
+                          type="button"
+                          onClick={() => onSelectBrew(newestBrew, true)}
+                          className="text-sm text-gray-500 text-left hover:underline cursor-pointer"
+                        >
+                          {(() => {
+                            if (!firstSuggestion) return '';
+                            
+                            // Extract action: remove magnitude/details, keep core action (2-4 words)
+                            let action = firstSuggestion.action;
+                            action = action.replace(/\s+by\s+.*$/i, '');
+                            action = action.replace(/\s+to\s+\d+.*$/i, '');
+                            action = action.replace(/\s+~?[\d.–-]+.*$/i, '');
+                            action = action.replace(/\s+on\s+.*$/i, '');
+                            action = action.trim();
+                            const actionWords = action.split(/\s+/);
+                            if (actionWords.length > 4) {
+                              action = actionWords.slice(0, 4).join(' ');
+                            }
+                            
+                            // Extract goal from effect: look for key phrases (2-3 words)
+                            let goal = '';
+                            const effect = firstSuggestion.effect || '';
+                            
+                            // Common goal patterns - prioritize negative outcomes to fix
+                            const goalPatterns = [
+                              /(?:reduce|decrease|fix|eliminate|minimize)\s+(?:sourness|bitterness|astringency|channeling|under[- ]extraction|over[- ]extraction|acidity|harshness)/i,
+                              /(?:increase|improve|enhance|boost)\s+(?:strength|body|extraction|balance|clarity|sweetness|viscosity)/i,
+                              /(?:fix|resolve|address|prevent)\s+(?:channeling|uneven\s+extraction|flow\s+issues)/i,
+                            ];
+                            
+                            for (const pattern of goalPatterns) {
+                              const match = effect.match(pattern);
+                              if (match) {
+                                const matchedText = match[0];
+                                const words = matchedText.split(/\s+/);
+                                goal = words.slice(0, Math.min(3, words.length)).join(' ');
+                                goal = goal.charAt(0).toUpperCase() + goal.slice(1);
+                                break;
+                              }
+                            }
+                            
+                            // Fallback: extract from effect text more generically
+                            if (!goal) {
+                              if (effect.match(/reduce.*sour/i)) {
+                                goal = 'Reduce sourness';
+                              } else if (effect.match(/increase.*strength/i)) {
+                                goal = 'Increase strength';
+                              } else if (effect.match(/increase.*body/i)) {
+                                goal = 'Increase body';
+                              } else if (effect.match(/reduce.*bitter/i)) {
+                                goal = 'Reduce bitterness';
+                              } else if (effect.match(/improve.*extraction/i)) {
+                                goal = 'Improve extraction';
+                              } else {
+                                // Final fallback based on parameter and action direction
+                                const parameter = (firstSuggestion.parameter || '').toLowerCase();
+                                const actionLower = action.toLowerCase();
+                                
+                                if (parameter.includes('grind')) {
+                                  goal = actionLower.includes('finer') ? 'Increase extraction' : 'Reduce bitterness';
+                                } else if (parameter.includes('temperature')) {
+                                  goal = actionLower.includes('increase') ? 'Increase extraction' : 'Reduce bitterness';
+                                } else if (parameter.includes('weight') || parameter.includes('ratio')) {
+                                  goal = actionLower.includes('increase') ? 'Increase strength' : 'Reduce bitterness';
+                                } else {
+                                  goal = 'Improve balance';
+                                }
+                              }
+                            }
+                            
+                            // Capitalize first letter of action, lowercase first letter of goal
+                            const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
+                            const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
+                            return `${capitalizedAction} to ${lowercasedGoal}`;
+                          })()}
+                        </button>
                       )}
                     </p>
                   )}
@@ -412,7 +482,7 @@ let timelineIdCounter = 0;
 
 interface TimelineRowProps {
   brews: Brew[];
-  onSelectBrew: (brew: Brew) => void;
+  onSelectBrew: (brew: Brew, scrollToGuidance?: boolean) => void;
   formatNodeDateTime: (dateString: string, nextDateString?: string | null) => { date: string; time: string };
   coffeeId?: string;
   brewMethod?: BrewMethod;
@@ -1287,8 +1357,9 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   }
                 }
 
-                const hasSuggestion = brew.suggestion?.concise && 
-                  (brew.suggestion.concise.confidence === 'Medium' || brew.suggestion.concise.confidence === 'High');
+                const firstSuggestion = brew.suggestion?.full?.suggestions?.[0];
+                const hasSuggestion = firstSuggestion && 
+                  (firstSuggestion.confidence === 'Medium' || firstSuggestion.confidence === 'High');
 
                 return (
                   <div 
