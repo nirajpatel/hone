@@ -190,9 +190,9 @@ export function CoffeesTableView({
   const sortedCoffees = [...filteredCoffees].sort((a, b) => {
     // If both have roast dates, sort normally
     if (a.roastDate && b.roastDate) {
-      const dateA = new Date(a.roastDate);
-      const dateB = new Date(b.roastDate);
-      return dateB.getTime() - dateA.getTime();
+    const dateA = new Date(a.roastDate);
+    const dateB = new Date(b.roastDate);
+    return dateB.getTime() - dateA.getTime();
     }
     // If only a has no roast date, put it after b
     if (!a.roastDate && b.roastDate) return 1;
@@ -214,15 +214,15 @@ export function CoffeesTableView({
         }
         groupedCoffees['Unknown'].push(coffee);
       } else {
-        const [year, monthNum] = coffee.roastDate.split('-').map(Number);
-        const date = new Date(year, monthNum - 1);
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const month = months[date.getMonth()];
-        const monthYear = `${month} ${date.getFullYear()}`;
-        if (!groupedCoffees[monthYear]) {
-          groupedCoffees[monthYear] = [];
-        }
-        groupedCoffees[monthYear].push(coffee);
+      const [year, monthNum] = coffee.roastDate.split('-').map(Number);
+      const date = new Date(year, monthNum - 1);
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const month = months[date.getMonth()];
+      const monthYear = `${month} ${date.getFullYear()}`;
+      if (!groupedCoffees[monthYear]) {
+        groupedCoffees[monthYear] = [];
+      }
+      groupedCoffees[monthYear].push(coffee);
       }
     });
   } else {

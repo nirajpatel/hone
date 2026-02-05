@@ -355,19 +355,26 @@ export function BrewsTimelineView({
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     <span className="hidden md:inline">•</span>
                     <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
-                    {trendInfo && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          {trendInfo.icon}
-                          <span className="capitalize">{trendInfo.trend}</span>
-                        </span>
-                      </>
-                    )}
                   </p>
                   {hasSuggestion && (
                     <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
-                      🧭 {newestBrew.suggestion.concise.goal} → {newestBrew.suggestion.concise.action}
+                      {trendInfo && (
+                        <>
+                          <span className="flex items-center gap-1">
+                            {trendInfo.icon}
+                            <span>{trendInfo.trend.charAt(0).toUpperCase() + trendInfo.trend.slice(1)}</span>
+                          </span>
+                          <span>•</span>
+                        </>
+                      )}
+                      {(() => {
+                        const action = newestBrew.suggestion.concise.action;
+                        const goal = newestBrew.suggestion.concise.goal;
+                        // Capitalize first letter of action, lowercase first letter of goal
+                        const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
+                        const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
+                        return `${capitalizedAction} to ${lowercasedGoal}`;
+                      })()}
                     </p>
                   )}
                 </div>
