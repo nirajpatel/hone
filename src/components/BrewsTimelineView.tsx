@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { MoreVertical, Pencil, Trash2, Copy, Check, Plus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Copy, Check, Plus, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react';
 import { getRatingEmoji, capitalizeBrewMethod } from '../utils/formatters';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsToolbar } from './BrewsToolbar';
@@ -343,8 +343,14 @@ export function BrewsTimelineView({
 
             // Get the newest brew (last in sorted array) for suggestion display
             const newestBrew = sortedExtractions[sortedExtractions.length - 1];
+            const isExceptional = newestBrew?.quality === 3;
             const hasSuggestion = newestBrew?.suggestion?.concise && 
               (newestBrew.suggestion.concise.confidence === 'Medium' || newestBrew.suggestion.concise.confidence === 'High');
+            
+            // Override trend for exceptional brews
+            const displayTrendInfo = isExceptional 
+              ? { trend: 'Dialed In', icon: <Sparkles className="w-3.5 h-3.5" /> }
+              : trendInfo;
 
             return (
               <div key={key} className="bg-white rounded-lg border border-gray-200 p-3 md:p-4 mobile-timeline-card">
@@ -356,25 +362,29 @@ export function BrewsTimelineView({
                     <span className="hidden md:inline">•</span>
                     <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
                   </p>
-                  {hasSuggestion && (
+                  {(hasSuggestion || isExceptional) && (
                     <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
-                      {trendInfo && (
+                      {displayTrendInfo && (
                         <>
                           <span className="flex items-center gap-1">
-                            {trendInfo.icon}
-                            <span>{trendInfo.trend.charAt(0).toUpperCase() + trendInfo.trend.slice(1)}</span>
+                            {displayTrendInfo.icon}
+                            <span>{displayTrendInfo.trend.charAt(0).toUpperCase() + displayTrendInfo.trend.slice(1)}</span>
                           </span>
                           <span>•</span>
                         </>
                       )}
-                      {(() => {
-                        const action = newestBrew.suggestion.concise.action;
-                        const goal = newestBrew.suggestion.concise.goal;
-                        // Capitalize first letter of action, lowercase first letter of goal
-                        const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
-                        const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
-                        return `${capitalizedAction} to ${lowercasedGoal}`;
-                      })()}
+                      {isExceptional ? (
+                        'No adjustment needed'
+                      ) : (
+                        (() => {
+                          const action = newestBrew.suggestion.concise.action;
+                          const goal = newestBrew.suggestion.concise.goal;
+                          // Capitalize first letter of action, lowercase first letter of goal
+                          const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
+                          const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
+                          return `${capitalizedAction} to ${lowercasedGoal}`;
+                        })()
+                      )}
                     </p>
                   )}
                 </div>
