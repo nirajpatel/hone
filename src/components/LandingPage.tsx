@@ -59,7 +59,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
               margin: '0 0 16px 0'
             }}
           >
-            Dial in any bean, perfectly.
+            Dial in any bean, perfectly
           </h1>
           
           <p 
@@ -74,7 +74,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
               margin: '0 0 24px 0'
             }}
           >
-            Your personal coffee coach. Know exactly what to tweak next.
+            Brew smarter with personalized guidance
           </p>
 
           {!submitted ? (
