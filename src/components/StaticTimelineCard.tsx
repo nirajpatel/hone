@@ -399,7 +399,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
       >
       {/* Header */}
       <div className="mb-3">
-        <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>
+        <h3 className="text-gray-600" style={{ fontWeight: 'var(--font-weight-medium)' }}>
           {coffee.roaster} – {coffee.name} • {capitalizeBrewMethod(brewMethod)}
         </h3>
         <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
@@ -570,7 +570,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
                     key={brew.id}
                     className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"
                   >
-                    <div className="text-xs text-gray-900 whitespace-nowrap">
+                    <div className="text-xs text-gray-500 whitespace-nowrap">
                       {dateStr}
                     </div>
                   </div>

@@ -28,23 +28,23 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   };
 
   return (
-    <div className="landing-page-wrapper" style={{ minHeight: '100vh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div className="landing-page-wrapper" style={{ minHeight: '100vh', height: '100vh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {/* Desktop Header - Top Left */}
-      <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, padding: '0 16px' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '16px 0' }}>
+      <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px', padding: '0 16px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center' }}>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
         </div>
       </nav>
 
       {/* Mobile/Tablet Header - Centered Top */}
-      <nav className="landing-mobile-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
-        <div style={{ padding: '16px', textAlign: 'center' }}>
+      <nav className="landing-mobile-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px' }}>
+        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px' }}>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
         </div>
       </nav>
 
-      <div className="landing-page" style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 16px' }}>
-        <div style={{ maxWidth: '1400px', width: '100%', display: 'flex', alignItems: 'center', gap: '64px', flexWrap: 'wrap' }}>
+      <div className="landing-page" style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 16px', overflow: 'auto' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', alignItems: 'center', gap: '64px', flexWrap: 'wrap' }}>
         {/* Hero Section - Left */}
         <section className="landing-section" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', order: 2 }}>
         <div className="landing-text-content" style={{ textAlign: 'left', width: '100%' }}>
@@ -173,6 +173,13 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         @media (max-width: 1024px) {
           .landing-mobile-header {
             display: block !important;
+            height: 60px !important;
+          }
+          .landing-mobile-header > div {
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
           .landing-desktop-header {
             display: none !important;
@@ -180,24 +187,36 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-page-wrapper {
             position: relative !important;
             height: 100vh !important;
+            max-height: 100vh !important;
             overflow: hidden !important;
           }
           .landing-page {
-            height: calc(100vh - 60px) !important;
-            min-height: calc(100vh - 60px) !important;
-            max-height: calc(100vh - 60px) !important;
-            overflow: hidden !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
             padding: 0 !important;
+            flex: 1 1 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
           }
           .landing-page > div {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            height: 100% !important;
+            min-height: 100% !important;
             gap: 0 !important;
-            padding: 32px 16px !important;
-            padding-bottom: 16px !important;
+            padding: 16px !important;
+            padding-top: 60px !important;
+            padding-bottom: 60px !important;
             position: relative !important;
+            flex: 0 0 auto !important;
+            width: 100% !important;
+            max-width: 1400px !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            box-sizing: border-box !important;
           }
           .landing-section {
             order: 2 !important;
@@ -210,6 +229,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             z-index: 1 !important;
             margin-top: 0 !important;
             padding-top: 0 !important;
+            margin-bottom: 16px !important;
           }
           .landing-text-content {
             width: 100% !important;
@@ -222,7 +242,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content h1 {
             margin-top: 0 !important;
+            margin-bottom: 12px !important;
+            font-size: clamp(1.75rem, 4vw, 2.5rem) !important;
+          }
+          .landing-text-content .landing-subtitle {
             margin-bottom: 16px !important;
+            font-size: clamp(1rem, 2vw, 1.125rem) !important;
           }
           .landing-graph-container {
             position: relative !important;
@@ -230,7 +255,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             z-index: 0 !important;
             order: 1 !important;
             min-width: auto !important;
-            margin-bottom: 48px !important;
+            margin-bottom: 56px !important;
             padding-bottom: 0 !important;
             flex: 0 0 auto !important;
             display: block !important;
@@ -272,6 +297,23 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
         }
         @media (max-width: 768px) {
+          .landing-page > div {
+            padding: 12px !important;
+            padding-top: 60px !important;
+            padding-bottom: 60px !important;
+            justify-content: center !important;
+          }
+          .landing-graph-container {
+            margin-bottom: 32px !important;
+          }
+          .landing-text-content h1 {
+            margin-bottom: 8px !important;
+            font-size: clamp(1.5rem, 5vw, 2rem) !important;
+          }
+          .landing-text-content .landing-subtitle {
+            margin-bottom: 12px !important;
+            font-size: clamp(0.875rem, 2vw, 1rem) !important;
+          }
           .landing-text-content form {
             maxWidth: 100% !important;
             width: 100% !important;
@@ -283,8 +325,21 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content input[type="email"] {
             text-align: left !important;
           }
+          .landing-footer-text {
+            height: 60px !important;
+            padding: 0 16px !important;
+            font-size: 0.75rem !important;
+          }
         }
         @media (min-width: 1025px) {
+          .landing-page-wrapper {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow: visible !important;
+          }
+          .landing-page {
+            overflow: visible !important;
+          }
           .landing-section {
             order: 1 !important;
           }
@@ -293,32 +348,68 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-desktop-header {
             display: block !important;
+            height: 60px !important;
+            padding: 0 16px !important;
+          }
+          .landing-desktop-header > div {
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            max-width: 1400px !important;
+            margin: 0 auto !important;
           }
           .landing-mobile-header {
             display: none !important;
           }
+          .landing-footer-text {
+            height: 60px !important;
+            justify-content: flex-start !important;
+          }
+          .landing-footer-text > div {
+            text-align: left !important;
+            margin: 0 auto !important;
+            max-width: 1400px !important;
+          }
         }
         .landing-footer-text {
+          text-align: left !important;
+          height: 60px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+        }
+        .landing-footer-text > div {
           text-align: left !important;
         }
         @media (max-width: 1024px) {
           .landing-footer-text {
             text-align: center !important;
-            display: block !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             visibility: visible !important;
             position: absolute !important;
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            padding: 16px !important;
+            padding: 0 16px !important;
             background-color: rgb(255, 255, 255) !important;
+            z-index: 5 !important;
+            margin: 0 !important;
+            height: 60px !important;
+          }
+          .landing-footer-text > div {
+            width: 100% !important;
+            text-align: center !important;
+            max-width: 1400px !important;
+            margin: 0 auto !important;
           }
         }
       `}</style>
 
       {/* Footer */}
-      <footer className="landing-footer-text" style={{ padding: '32px 16px', fontSize: '0.875rem', color: '#6b7280' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <footer className="landing-footer-text" style={{ padding: '0 16px', fontSize: '0.875rem', color: '#6b7280', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', textAlign: 'left' }}>
           © 2026 Hone • Privacy • Terms
         </div>
       </footer>
