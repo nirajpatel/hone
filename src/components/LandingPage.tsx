@@ -321,7 +321,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             -webkit-overflow-scrolling: touch !important;
           }
           .landing-graph-container {
-            margin-bottom: 48px !important;
+            margin-bottom: 24px !important;
           }
           .landing-text-content h1 {
             margin-bottom: 8px !important;
