@@ -28,7 +28,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   };
 
   return (
-    <div className="landing-page-wrapper" style={{ minHeight: '100vh', height: '100vh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+    <div className="landing-page-wrapper" style={{ minHeight: '100dvh', height: '100dvh', maxHeight: '100dvh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {/* Desktop Header - Top Left */}
       <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px', padding: '0 2rem' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center' }}>
@@ -187,13 +187,17 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-page-wrapper {
             position: relative !important;
             height: 100vh !important;
+            height: 100dvh !important;
             max-height: 100vh !important;
+            max-height: 100dvh !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
             overflow: hidden !important;
           }
           .landing-page {
-            height: 100vh !important;
+            height: 100% !important;
             min-height: 0 !important;
-            max-height: 100vh !important;
+            max-height: 100% !important;
             overflow: hidden !important;
             padding: 0 !important;
             flex: 1 1 0 !important;
@@ -218,7 +222,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             box-sizing: border-box !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
-            min-height: 0 !important;
+            -webkit-overflow-scrolling: touch !important;
           }
           .landing-section {
             order: 2 !important;
@@ -299,15 +303,22 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
         }
         @media (max-width: 768px) {
+          .landing-page-wrapper {
+            height: 100vh !important;
+            height: 100dvh !important;
+            max-height: 100vh !important;
+            max-height: 100dvh !important;
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+          }
           .landing-page > div {
             padding: 12px !important;
             padding-top: 60px !important;
             padding-bottom: 60px !important;
             justify-content: flex-start !important;
             min-height: 0 !important;
-            max-height: calc(100vh - 0px) !important;
-            height: calc(100vh - 0px) !important;
             overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
           }
           .landing-graph-container {
             margin-bottom: 48px !important;
