@@ -533,7 +533,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             </div>
 
             {/* Date labels */}
-            <div className="flex items-start md:gap-8 relative mt-3 justify-end mobile-gap-container">
+            <div className="flex items-start md:gap-8 relative mt-3 justify-end mobile-gap-container" style={{ display: 'none' }}>
               {sortedBrews.map((brew, index) => {
                 // Calculate date: last node is today, subtract one day for each node to the left
                 const today = new Date();
