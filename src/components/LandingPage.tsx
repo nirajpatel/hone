@@ -328,7 +328,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             font-size: clamp(2rem, 6vw, 2.5rem) !important;
           }
           .landing-text-content .landing-subtitle {
-            margin-bottom: 12px !important;
+            margin-bottom: 24px !important;
             font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
           }
           .landing-text-content form {
