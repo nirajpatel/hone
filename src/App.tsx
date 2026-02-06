@@ -6,6 +6,7 @@ import { NewBrewFlow } from './components/NewBrewFlow';
 import { AddCoffeeForm } from './components/AddCoffeeForm';
 import { QRCodeDialog } from './components/QRCodeDialog';
 import { Login } from './components/Login';
+import { LandingPage } from './components/LandingPage';
 import { BrewsTableView } from './components/BrewsTableView';
 import { BrewsTimelineView } from './components/BrewsTimelineView';
 import { CoffeesShelvesView } from './components/CoffeesShelvesView';
@@ -974,6 +975,10 @@ export default function App() {
 
   if (currentRoute === '/a2p-optin-proof') {
     return <A2POptInProof onBack={handleNavigateBack} />;
+  }
+
+  if (currentRoute === '/landing') {
+    return <LandingPage onLoginSuccess={() => checkAuth()} />;
   }
 
   if (currentRoute === '/coffee-bag') {
