@@ -79,7 +79,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
 
           {!submitted ? (
             <form onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' }}>
                 <input
                   type="email"
                   value={email}
