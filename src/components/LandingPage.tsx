@@ -207,7 +207,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-page > div {
             flex-direction: column !important;
             align-items: center !important;
-            justify-content: flex-start !important;
+            justify-content: center !important;
             min-height: 0 !important;
             gap: 0 !important;
             padding: 16px !important;
@@ -268,6 +268,17 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             align-items: normal !important;
             justify-content: normal !important;
           }
+          .landing-graph-container::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 50% !important;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 1)) !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+          }
           .landing-graph-container > div {
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
@@ -275,6 +286,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .static-timeline-card {
             margin-bottom: 0 !important;
             margin-top: 0 !important;
+            transform: scale(0.9) !important;
+            transform-origin: center !important;
           }
           .landing-text-content {
             text-align: center !important;
@@ -315,13 +328,24 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding: 12px !important;
             padding-top: 60px !important;
             padding-bottom: 60px !important;
-            justify-content: flex-start !important;
+            justify-content: center !important;
             min-height: 0 !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch !important;
           }
           .landing-graph-container {
             margin-bottom: 48px !important;
+          }
+          .landing-graph-container::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 50% !important;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 1)) !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
           }
           .landing-text-content h1 {
             margin-bottom: 8px !important;
