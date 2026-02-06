@@ -55,11 +55,52 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
       // Array is oldest to newest, so reverse: [1, 2, 2, 1, 2, 1, 2, 3, 3, 3, 3]
       qualities = [1, 2, 2, 1, 2, 1, 2, 3, 3, 3, 3];
     } else {
-      // Desktop: Keep last 6 nodes from original data
+      // Desktop: Keep last 6 nodes from original data, then add a green node at the end
       const sortedOriginal = [...brews].sort((a, b) => 
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
-      return sortedOriginal.slice(-6);
+      const last6Nodes = sortedOriginal.slice(-6);
+      
+      // Add a green node at the end
+      const today = new Date();
+      const baseBrew: Omit<Brew, 'id' | 'quality'> = {
+        coffeeId: sortedOriginal[0]?.coffeeId || coffee.id,
+        coffeeName: sortedOriginal[0]?.coffeeName || coffee.name,
+        roaster: sortedOriginal[0]?.roaster || coffee.roaster,
+        brewMethod: sortedOriginal[0]?.brewMethod || 'espresso',
+        grindSetting: sortedOriginal[0]?.grindSetting || '5',
+        dosage: sortedOriginal[0]?.dosage || 18,
+        brewTime: sortedOriginal[0]?.brewTime || 30,
+        finalWeight: sortedOriginal[0]?.finalWeight || 36,
+        coffeeTemperature: sortedOriginal[0]?.coffeeTemperature || 'room-temperature',
+        userId: sortedOriginal[0]?.userId || 'static-user-1',
+        userName: sortedOriginal[0]?.userName || 'User',
+        createdAt: '',
+        timezoneOffset: sortedOriginal[0]?.timezoneOffset || -480,
+      };
+      
+      const newGreenNode: Brew = {
+        ...baseBrew,
+        id: `desktop-green-node-${Date.now()}`,
+        quality: 3,
+        createdAt: today.toISOString(),
+        suggestion: {
+          concise: { goal: 'Improve extraction', action: 'Increase temperature', confidence: 'High' },
+          full: {
+            summary: 'Excellent balance achieved',
+            primaryIssue: 'None',
+            suggestions: [{
+              parameter: 'Temperature',
+              action: 'Increase temperature',
+              effect: 'Improve extraction',
+              reasoning: 'Current recipe is dialed in',
+              confidence: 'High'
+            }]
+          }
+        }
+      } as Brew;
+      
+      return [...last6Nodes, newGreenNode];
     }
 
     // Generate brews with hardcoded qualities
@@ -313,12 +354,49 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
   const brewMethod = sortedBrews[0]?.brewMethod || 'espresso';
 
   return (
-    <div 
-      className="bg-white rounded-lg p-3 md:p-4 mobile-timeline-card static-timeline-card" 
-      style={{ 
-        borderRadius: '0.5rem'
-      }}
-    >
+    <>
+      <style>{`
+        .mobile-timeline-card {
+          padding: 0 !important;
+        }
+        @media (min-width: 768px) and (max-width: 1024px) {
+          .static-timeline-card {
+            width: 75% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          .static-timeline-card .mb-3 {
+            text-align: center !important;
+          }
+          .static-timeline-card h3 {
+            text-align: center !important;
+            font-size: 14px !important;
+          }
+          .static-timeline-card p {
+            text-align: center !important;
+            justify-content: center !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .static-timeline-card .mb-3 {
+            text-align: center !important;
+          }
+          .static-timeline-card h3 {
+            text-align: center !important;
+            font-size: 14px !important;
+          }
+          .static-timeline-card p {
+            text-align: center !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
+      <div 
+        className="bg-white rounded-lg p-3 md:p-4 mobile-timeline-card static-timeline-card" 
+        style={{ 
+          borderRadius: '0.5rem'
+        }}
+      >
       {/* Header */}
       <div className="mb-3">
         <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>
@@ -503,5 +581,6 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }

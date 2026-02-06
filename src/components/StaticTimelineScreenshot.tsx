@@ -39,7 +39,7 @@ const staticBrews1: Brew[] = [
 
 export function StaticTimelineScreenshot() {
   return (
-    <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '0 16px 0' }}>
+    <div style={{ width: '100%', maxWidth: 'none', margin: '0', padding: '0' }}>
       <StaticTimelineCard coffee={staticCoffee1} brews={staticBrews1} />
     </div>
   );
