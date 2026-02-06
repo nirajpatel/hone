@@ -352,6 +352,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-page-wrapper {
             height: auto !important;
             min-height: 100vh !important;
+            min-height: 100dvh !important;
             overflow: visible !important;
           }
           .landing-page {
