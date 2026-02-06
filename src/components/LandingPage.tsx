@@ -191,9 +191,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             overflow: hidden !important;
           }
           .landing-page {
-            height: 100% !important;
+            height: 100vh !important;
             min-height: 0 !important;
-            max-height: 100% !important;
+            max-height: 100vh !important;
             overflow: hidden !important;
             padding: 0 !important;
             flex: 1 1 0 !important;
@@ -210,14 +210,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-top: 60px !important;
             padding-bottom: 60px !important;
             position: relative !important;
-            flex: 0 0 auto !important;
+            flex: 1 1 0 !important;
             width: 100% !important;
             max-width: 1400px !important;
             margin: 0 auto !important;
             display: flex !important;
             box-sizing: border-box !important;
             overflow-y: auto !important;
-            max-height: 100% !important;
+            overflow-x: hidden !important;
+            min-height: 0 !important;
           }
           .landing-section {
             order: 2 !important;
@@ -304,7 +305,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-bottom: 60px !important;
             justify-content: flex-start !important;
             min-height: 0 !important;
-            max-height: 100% !important;
+            max-height: calc(100vh - 0px) !important;
+            height: calc(100vh - 0px) !important;
             overflow-y: auto !important;
           }
           .landing-graph-container {
