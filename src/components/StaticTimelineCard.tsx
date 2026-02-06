@@ -45,15 +45,15 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
     let qualities: (number | null)[] = [];
 
     if (windowWidth < 768) {
-      // Mobile: 11 nodes
-      // Right to left: green, green, green, yellow, yellow, red, yellow, yellow, red, yellow, yellow
-      // Array is oldest to newest, so reverse: [2, 2, 1, 2, 1, 2, 2, 3, 3, 3, 3]
-      qualities = [2, 2, 1, 2, 1, 2, 2, 3, 3, 3, 3];
+      // Mobile: 10 nodes
+      // Right to left (newest to oldest): green, green, green, yellow, yellow, red, yellow, yellow, red, red
+      // Array is oldest to newest, so: [1, 1, 2, 2, 1, 2, 2, 3, 3, 3]
+      qualities = [1, 1, 2, 2, 1, 2, 2, 3, 3, 3];
     } else if (windowWidth <= 1024) {
-      // 1024px: 11 nodes
-      // Right to left: green, green, green, green, yellow, red, yellow, red, yellow, yellow, red
-      // Array is oldest to newest, so reverse: [1, 2, 2, 1, 2, 1, 2, 3, 3, 3, 3]
-      qualities = [1, 2, 2, 1, 2, 1, 2, 3, 3, 3, 3];
+      // Tablet: 8 nodes
+      // Right to left (newest to oldest): green, green, green, yellow, yellow, red, yellow, red
+      // Array is oldest to newest, so: [1, 2, 1, 2, 2, 3, 3, 3]
+      qualities = [1, 2, 1, 2, 2, 3, 3, 3];
     } else {
       // Desktop: Keep last 6 nodes from original data, then add a green node at the end
       const sortedOriginal = [...brews].sort((a, b) => 
@@ -239,15 +239,15 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
   // Calculate SVG dimensions
   const mobileContainerWidth = 60;
   const desktopContainerWidth = 80;
-  const mobileGap = 8;
+  const mobileGap = 24;
   const desktopGap = 32;
   const mobileSvgHeight = 90;
   const desktopSvgHeight = 120;
 
-  // Calculate graph path - use desktop spacing for both mobile and desktop on landing page
+  // Calculate graph path
   const calculateGraphPath = (isMobile: boolean) => {
-    const containerWidth = desktopContainerWidth; // Always use desktop width
-    const gap = desktopGap; // Always use desktop gap
+    const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
+    const gap = isMobile ? mobileGap : desktopGap;
     const svgHeight = isMobile ? mobileSvgHeight : desktopSvgHeight;
     
     // Calculate SVG width to match node distribution
@@ -289,10 +289,10 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
     return lineGenerator(points) || '';
   };
 
-  // Calculate fill path - use desktop spacing for both mobile and desktop on landing page
+  // Calculate fill path
   const calculateFillPath = (isMobile: boolean) => {
-    const containerWidth = desktopContainerWidth; // Always use desktop width
-    const gap = desktopGap; // Always use desktop gap
+    const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
+    const gap = isMobile ? mobileGap : desktopGap;
     const svgHeight = isMobile ? mobileSvgHeight : desktopSvgHeight;
     
     // Calculate SVG width to match node distribution
@@ -341,14 +341,15 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
   const desktopFillPath = calculateFillPath(false);
 
   // Calculate SVG width - ensure it extends to the rightmost node
-  // For 7 nodes with desktop spacing: 7 * 80 + 6 * 32 = 560 + 192 = 752
-  // But we want it to extend fully, so calculate based on actual node positions
+  // Mobile: For 7 nodes with mobile spacing: 7 * 60 + 6 * 24 = 420 + 144 = 564
+  // Desktop: For 7 nodes with desktop spacing: 7 * 80 + 6 * 32 = 560 + 192 = 752
   const nodeCount = sortedBrews.length;
-  const calculatedSvgWidth = nodeCount > 1 
+  const mobileSvgWidth = nodeCount > 1 
+    ? (nodeCount - 1) * (mobileContainerWidth + mobileGap) + mobileContainerWidth
+    : mobileContainerWidth;
+  const desktopSvgWidth = nodeCount > 1 
     ? (nodeCount - 1) * (desktopContainerWidth + desktopGap) + desktopContainerWidth
     : desktopContainerWidth;
-  const mobileSvgWidth = calculatedSvgWidth;
-  const desktopSvgWidth = calculatedSvgWidth;
 
   // Get brew method
   const brewMethod = sortedBrews[0]?.brewMethod || 'espresso';
@@ -389,6 +390,9 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             text-align: center !important;
             justify-content: center !important;
           }
+          .static-timeline-card .mobile-gap-container {
+            gap: 24px !important;
+          }
         }
       `}</style>
       <div 
@@ -417,8 +421,8 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             background: 'linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)'
           }}
         />
-        <div className="relative pb-2 flex justify-end">
-          <div className="relative min-w-max px-2">
+        <div className="relative pb-2 flex justify-end" style={{ marginRight: 0, paddingRight: 0 }}>
+          <div className="relative min-w-max pl-2" style={{ marginRight: 0, paddingRight: 0 }}>
             {/* Graph */}
             <div className="relative h-[90px] md:h-[120px]">
               {/* SVG Graph - Mobile */}
@@ -484,7 +488,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
               </svg>
 
               {/* Nodes */}
-              <div className="flex items-start gap-2 md:gap-8 relative justify-end">
+              <div className="flex items-start md:gap-8 relative justify-end mobile-gap-container">
                 {sortedBrews.map((brew, index) => {
                   const dotColor = getDotColor(brew.quality);
                   const dotBorderColor = getDotBorderColor(brew.quality);
@@ -529,7 +533,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             </div>
 
             {/* Date labels */}
-            <div className="flex items-start gap-2 md:gap-8 relative mt-3 justify-end">
+            <div className="flex items-start md:gap-8 relative mt-3 justify-end mobile-gap-container">
               {sortedBrews.map((brew, index) => {
                 // Calculate date: last node is today, subtract one day for each node to the left
                 const today = new Date();

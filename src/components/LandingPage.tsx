@@ -30,7 +30,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   return (
     <div className="landing-page-wrapper" style={{ minHeight: '100vh', height: '100vh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {/* Desktop Header - Top Left */}
-      <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px', padding: '0 16px' }}>
+      <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px', padding: '0 2rem' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center' }}>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
         </div>
@@ -43,7 +43,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         </div>
       </nav>
 
-      <div className="landing-page" style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 16px', overflow: 'auto' }}>
+      <div className="landing-page" style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 2rem', overflow: 'auto' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', alignItems: 'center', gap: '64px', flexWrap: 'wrap' }}>
         {/* Hero Section - Left */}
         <section className="landing-section" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', order: 2 }}>
@@ -304,15 +304,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             justify-content: center !important;
           }
           .landing-graph-container {
-            margin-bottom: 32px !important;
+            margin-bottom: 48px !important;
           }
           .landing-text-content h1 {
             margin-bottom: 8px !important;
-            font-size: clamp(1.5rem, 5vw, 2rem) !important;
+            font-size: clamp(2rem, 6vw, 2.5rem) !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 12px !important;
-            font-size: clamp(0.875rem, 2vw, 1rem) !important;
+            font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
           }
           .landing-text-content form {
             maxWidth: 100% !important;
@@ -339,6 +339,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page {
             overflow: visible !important;
+            padding: 64px 2rem !important;
           }
           .landing-section {
             order: 1 !important;
@@ -349,7 +350,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-desktop-header {
             display: block !important;
             height: 60px !important;
-            padding: 0 16px !important;
+            padding: 0 2rem !important;
           }
           .landing-desktop-header > div {
             height: 100% !important;
@@ -364,6 +365,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-footer-text {
             height: 60px !important;
             justify-content: flex-start !important;
+            padding: 0 2rem !important;
           }
           .landing-footer-text > div {
             text-align: left !important;
@@ -377,6 +379,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           display: flex !important;
           align-items: center !important;
           justify-content: flex-start !important;
+          padding: 0 2rem !important;
         }
         .landing-footer-text > div {
           text-align: left !important;
@@ -408,7 +411,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       `}</style>
 
       {/* Footer */}
-      <footer className="landing-footer-text" style={{ padding: '0 16px', fontSize: '0.875rem', color: '#6b7280', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+      <footer className="landing-footer-text" style={{ padding: '0 2rem', fontSize: '0.875rem', color: '#6b7280', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', textAlign: 'left' }}>
           © 2026 Hone • Privacy • Terms
         </div>
