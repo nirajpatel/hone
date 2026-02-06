@@ -2,6 +2,7 @@ import { Button } from './ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
+import { supabase } from '../utils/supabase/client';
 
 interface LandingPageProps {
   onLoginSuccess?: () => void;
@@ -27,19 +28,66 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
     }, 500);
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      // Force localhost:3000 for development
+      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const redirectUrl = isDev ? 'http://localhost:3000/' : `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: false,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        console.error('OAuth error:', error);
+        alert(`OAuth Error: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert(`Login Error: ${error}`);
+    }
+  };
+
   return (
     <div className="landing-page-wrapper" style={{ minHeight: '100dvh', height: '100dvh', maxHeight: '100dvh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {/* Desktop Header - Top Left */}
       <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px', padding: '0 2rem' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
+          <Button 
+            onClick={handleGoogleLogin}
+            variant="ghost"
+            className="text-gray-900 hover:bg-gray-100 cursor-pointer"
+            style={{ fontWeight: 500 }}
+          >
+            Log in
+          </Button>
         </div>
       </nav>
 
       {/* Mobile/Tablet Header - Centered Top */}
       <nav className="landing-mobile-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px' }}>
-        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px' }}>
+        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
+          <div style={{ flex: 1 }}></div>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button 
+              onClick={handleGoogleLogin}
+              variant="ghost"
+              className="text-gray-900 hover:bg-gray-100 cursor-pointer"
+              style={{ fontWeight: 500, padding: '4px 12px' }}
+            >
+              Log in
+            </Button>
+          </div>
         </div>
       </nav>
 
@@ -179,7 +227,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             height: 100% !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
+            justify-content: space-between !important;
           }
           .landing-desktop-header {
             display: none !important;
@@ -374,6 +422,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             height: 100% !important;
             display: flex !important;
             align-items: center !important;
+            justify-content: space-between !important;
             max-width: 1400px !important;
             margin: 0 auto !important;
           }

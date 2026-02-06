@@ -1002,7 +1002,7 @@ export default function App() {
   }
 
   if (!currentUser) {
-    return <Login onLoginSuccess={() => checkAuth()} />;
+    return <LandingPage onLoginSuccess={() => checkAuth()} />;
   }
 
   if (currentRoute === '/feed') {
