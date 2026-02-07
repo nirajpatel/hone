@@ -240,40 +240,54 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           {!submitted ? (
             <form onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0', position: 'relative' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch', position: 'relative' }}>
-                <div style={{ position: 'relative', width: '100%', minHeight: '48px', isolation: 'isolate' }}>
-                  <input
-                    ref={emailInputRef}
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    disabled={isSubmitting}
-                    style={{
-                      width: '100%',
-                      padding: '10px 16px',
-                      paddingRight: '40px', // Make room for LastPass icon
-                      fontSize: '1rem',
-                      lineHeight: '1.5',
-                      color: '#111827',
-                      backgroundColor: 'rgb(255, 255, 255)',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      outline: 'none',
-                      transition: 'border-color 0.15s ease',
-                      textAlign: 'left',
-                      boxSizing: 'border-box',
-                      height: '42px',
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#111827';
-                      // Prevent any scroll behavior
-                      e.currentTarget.scrollIntoView({ behavior: 'instant', block: 'nearest' });
-                    }}
-                    onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                  />
+                {/* Email Section */}
+                <div className="email-section" style={{ width: '100%' }}>
+                  <label className="email-label" style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 400,
+                    color: '#6b7280',
+                    marginBottom: '6px',
+                    marginTop: '-2px',
+                    textAlign: 'left',
+                  }}>
+                    Email
+                  </label>
+                  <div style={{ position: 'relative', width: '100%', minHeight: '42px', isolation: 'isolate' }}>
+                    <input
+                      ref={emailInputRef}
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      disabled={isSubmitting}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        paddingRight: '40px', // Make room for LastPass icon
+                        fontSize: '1rem',
+                        lineHeight: '1.5',
+                        color: '#111827',
+                        backgroundColor: 'rgb(255, 255, 255)',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        outline: 'none',
+                        transition: 'border-color 0.15s ease',
+                        textAlign: 'left',
+                        boxSizing: 'border-box',
+                        height: '42px',
+                        position: 'relative',
+                        zIndex: 1,
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#111827';
+                        // Prevent any scroll behavior
+                        e.currentTarget.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+                      }}
+                      onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
+                    />
+                  </div>
                 </div>
                 
                 {/* Coffee Methods Multi-Select Pills */}
@@ -283,7 +297,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                     display: 'block',
                     fontSize: '0.875rem',
                     fontWeight: 400,
-                    color: '#374151',
+                    color: '#6b7280',
                     marginBottom: '6px',
                     marginTop: '-2px',
                     textAlign: 'left',
@@ -312,7 +326,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                           className={`inline-flex items-center gap-1 rounded-full text-sm border transition-colors ${
                             isSelected
                               ? 'bg-gray-900 border-gray-900 text-white hover:bg-gray-800'
-                              : 'bg-transparent border-gray-300 text-gray-900 hover:bg-gray-100'
+                              : 'bg-transparent border-gray-300 text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                           } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                           style={{
                             paddingLeft: '16px',
@@ -420,6 +434,21 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           padding-bottom: 4px !important;
           height: auto !important;
           min-height: auto !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900) {
+          color: #6b7280 !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):hover {
+          color: #111827 !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"].bg-gray-900 {
+          color: #ffffff !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900) span {
+          color: inherit !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):hover span {
+          color: inherit !important;
         }
         button[type="button"] span {
           text-align: left !important;
@@ -687,7 +716,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content .brew-methods-label,
           .landing-text-content .brew-methods-section label,
           .landing-text-content form label.brew-methods-label,
-          .landing-text-content form .brew-methods-section label {
+          .landing-text-content form .brew-methods-section label,
+          .landing-text-content .email-label,
+          .landing-text-content form label.email-label {
             text-align: left !important;
             margin-bottom: 6px !important;
             margin-top: -2px !important;
@@ -695,7 +726,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-right: auto !important;
             display: block !important;
           }
-          .landing-text-content form .brew-methods-section {
+          .landing-text-content form .brew-methods-section,
+          .landing-text-content form .email-section {
             text-align: left !important;
             margin-left: 0 !important;
             margin-right: auto !important;
@@ -704,7 +736,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-right: 0 !important;
           }
           .landing-text-content form .brew-methods-label,
-          .landing-text-content form .brew-methods-section label {
+          .landing-text-content form .brew-methods-section label,
+          .landing-text-content form .email-label,
+          .landing-text-content form label.email-label {
             padding-left: 0 !important;
             padding-right: 0 !important;
             margin-left: 0 !important;
@@ -758,7 +792,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding: 6px 10px !important;
           }
           .landing-text-content form label.brew-methods-label,
-          .landing-text-content form .brew-methods-section label {
+          .landing-text-content form .brew-methods-section label,
+          .landing-text-content form label.email-label,
+          .landing-text-content form .email-label {
             padding: 0 !important;
             padding-bottom: 0 !important;
             margin-top: -2px !important;
