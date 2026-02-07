@@ -37,13 +37,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       setTimeout(() => {
         emailInputRef.current?.focus();
       }, 100);
-    } else {
-      // Auto-focus on desktop (min-width: 1025px)
-      if (window.innerWidth >= 1025) {
-        setTimeout(() => {
-          emailInputRef.current?.focus();
-        }, 100);
-      }
     }
   }, []);
 
@@ -256,7 +249,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                     placeholder="Enter your email"
                     required
                     disabled={isSubmitting}
-                    autoFocus={typeof window !== 'undefined' && window.innerWidth >= 1025}
                     style={{
                       width: '100%',
                       padding: '10px 16px',
@@ -290,12 +282,13 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                   <label className="brew-methods-label" style={{
                     display: 'block',
                     fontSize: '0.875rem',
-                    fontWeight: 500,
+                    fontWeight: 400,
                     color: '#374151',
-                    marginBottom: '8px',
+                    marginBottom: '6px',
+                    marginTop: '-2px',
                     textAlign: 'left',
                   }}>
-                    Your brew methods
+                    Brew methods
                   </label>
                   
                   {/* All Method Pills */}
@@ -696,7 +689,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content form label.brew-methods-label,
           .landing-text-content form .brew-methods-section label {
             text-align: left !important;
-            margin-bottom: 0 !important;
+            margin-bottom: 6px !important;
+            margin-top: -2px !important;
             margin-left: 0 !important;
             margin-right: auto !important;
             display: block !important;
@@ -714,6 +708,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-left: 0 !important;
             padding-right: 0 !important;
             margin-left: 0 !important;
+            margin-top: -2px !important;
+            margin-bottom: 6px !important;
           }
           .landing-text-content input[type="email"],
           .landing-text-content button:not(.brew-methods-pills-container button) {
@@ -751,8 +747,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content button[type="submit"] {
             font-size: 0.875rem !important;
-            height: 40px !important;
-            min-height: 40px !important;
+            height: 42px !important;
+            min-height: 42px !important;
             padding: 10px 16px !important;
           }
           .landing-text-content label span {
@@ -764,7 +760,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content form label.brew-methods-label,
           .landing-text-content form .brew-methods-section label {
             padding: 0 !important;
-            padding-bottom: 8px !important;
+            padding-bottom: 0 !important;
+            margin-top: -2px !important;
+            margin-bottom: 6px !important;
           }
           .landing-text-content form > div > div > div > div {
             padding: 4px !important;
@@ -830,6 +828,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content .landing-subtitle {
             margin-top: 0 !important;
+          }
+          .landing-text-content button[type="submit"] {
+            height: 42px !important;
+            min-height: 42px !important;
           }
           .landing-text-content form > div > div:first-child {
             min-height: 36px !important;
