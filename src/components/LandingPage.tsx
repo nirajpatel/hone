@@ -664,6 +664,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content form .brew-methods-section {
             margin-bottom: 12px !important;
           }
+          .landing-text-content .brew-methods-pills-container button[type="button"] {
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+          }
         }
         @media (max-width: 768px) {
           .landing-page-wrapper {
@@ -687,6 +691,153 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             display: none !important;
           }
           .landing-mobile-header > div {
+            display: flex !important;
+            grid-template-columns: none !important;
+            justify-content: space-between !important;
+          }
+          .landing-mobile-header > div > div:first-child {
+            position: static !important;
+            left: auto !important;
+            transform: none !important;
+            grid-column: auto !important;
+            justify-self: auto !important;
+          }
+          .landing-mobile-header > div > div:last-child {
+            grid-column: auto !important;
+            justify-self: auto !important;
+          }
+          .landing-text-content {
+            align-items: flex-start !important;
+            text-align: left !important;
+          }
+          .landing-text-content h1 {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            width: 100% !important;
+          }
+          .landing-text-content .landing-subtitle {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            width: 100% !important;
+          }
+          .landing-text-content * {
+            text-align: left !important;
+          }
+          .landing-text-content h1,
+          .landing-text-content .landing-subtitle {
+            text-align: left !important;
+          }
+          .landing-text-content form {
+            maxWidth: 100% !important;
+            width: 100% !important;
+            text-align: left !important;
+            align-items: flex-start !important;
+          }
+          .landing-text-content form > div {
+            text-align: left !important;
+            align-items: flex-start !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .landing-text-content form > div > div {
+            text-align: left !important;
+            align-items: flex-start !important;
+          }
+          .landing-text-content .brew-methods-label,
+          .landing-text-content .brew-methods-section label,
+          .landing-text-content form label.brew-methods-label,
+          .landing-text-content form .brew-methods-section label,
+          .landing-text-content .email-label,
+          .landing-text-content form label.email-label {
+            text-align: left !important;
+            margin-bottom: 6px !important;
+            margin-top: -2px !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            display: block !important;
+          }
+          .landing-text-content form .brew-methods-section,
+          .landing-text-content form .email-section {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+          .landing-text-content form .brew-methods-section {
+            margin-top: 6px !important;
+          }
+          .landing-text-content form .brew-methods-label,
+          .landing-text-content form .brew-methods-section label,
+          .landing-text-content form .email-label,
+          .landing-text-content form label.email-label {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-top: -2px !important;
+            margin-bottom: 6px !important;
+          }
+          .landing-text-content input[type="email"],
+          .landing-text-content button:not(.brew-methods-pills-container button) {
+            width: 100% !important;
+          }
+          .landing-text-content form > div > div:first-child {
+            min-height: 42px !important;
+          }
+          .landing-text-content input[type="email"] {
+            text-align: left !important;
+            font-size: 0.875rem !important;
+            height: 42px !important;
+            min-height: 42px !important;
+            padding: 10px 14px !important;
+          }
+          .landing-text-content button[type="button"]:not(.brew-methods-pills-container *) {
+            text-align: left !important;
+            font-size: 0.875rem !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            padding: 10px 14px !important;
+          }
+          .landing-text-content .brew-methods-pills-container button[type="button"] {
+            height: auto !important;
+            min-height: auto !important;
+            padding-left: 16px !important;
+            padding-right: 14px !important;
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
+          }
+          .landing-text-content button[type="button"] span {
+            text-align: left !important;
+            font-size: 0.875rem !important;
+            line-height: 1.5 !important;
+          }
+          .landing-text-content button[type="submit"] {
+            font-size: 0.875rem !important;
+            height: 42px !important;
+            min-height: 42px !important;
+            padding: 10px 16px !important;
+          }
+          .landing-text-content label span {
+            font-size: 0.875rem !important;
+          }
+          .landing-text-content form label {
+            padding: 6px 10px !important;
+          }
+          .landing-text-content form label.brew-methods-label,
+          .landing-text-content form .brew-methods-section label,
+          .landing-text-content form label.email-label,
+          .landing-text-content form .email-label {
+            padding: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: -2px !important;
+            margin-bottom: 6px !important;
+          }
+        }
+        @media (min-width: 513px) and (max-width: 768px) {
+          .landing-mobile-header > div {
             display: grid !important;
             grid-template-columns: 1fr auto 1fr !important;
             align-items: center !important;
@@ -704,15 +855,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             align-items: center !important;
           }
           .landing-text-content h1 {
-            margin-bottom: 6px !important;
             text-align: center !important;
-            line-height: 1.1 !important;
             margin-left: auto !important;
             margin-right: auto !important;
           }
           .landing-text-content .landing-subtitle {
-            margin-bottom: 20px !important;
-            font-size: clamp(1.125rem, 2.5vw, 1.25rem) !important;
             text-align: center !important;
             margin-left: auto !important;
             margin-right: auto !important;
@@ -944,6 +1091,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 36px !important;
             padding: 8px 16px !important;
           }
+          .landing-text-content .brew-methods-pills-container button[type="button"] {
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+          }
         }
         @media (min-width: 769px) {
           .landing-text-content form > div > div:first-child {
@@ -998,14 +1149,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         }
         .landing-footer-text a:hover {
           text-decoration: underline !important;
-        }
-        .landing-text-content .brew-methods-pills-container button[type="button"] {
-          height: auto !important;
-          min-height: auto !important;
-          padding-left: 16px !important;
-          padding-right: 16px !important;
-          padding-top: 4px !important;
-          padding-bottom: 4px !important;
         }
       `}</style>
 
