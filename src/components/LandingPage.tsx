@@ -1,5 +1,5 @@
 import { Button } from './ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
@@ -8,11 +8,23 @@ interface LandingPageProps {
   onLoginSuccess?: () => void;
 }
 
+const PREDEFINED_METHODS = [
+  'Espresso',
+  'Pour Over (V60, Chemex, etc.)',
+  'AeroPress',
+  'French Press',
+  'Other',
+];
+
 export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   const [email, setEmail] = useState('');
+  const [selectedMethods, setSelectedMethods] = useState<string[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Focus email field if coming from request access link
   useEffect(() => {
@@ -27,9 +39,49 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
     }
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+        // Remove focus from button when closing dropdown
+        const button = dropdownRef.current.querySelector('button');
+        if (button && document.activeElement === button) {
+          button.blur();
+        }
+      }
+    };
+
+    const preventScroll = (e: Event) => {
+      if (isDropdownOpen) {
+        e.preventDefault();
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      // Prevent scroll when dropdown is open
+      window.addEventListener('scroll', preventScroll, { passive: false });
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('scroll', preventScroll);
+      };
+    }
+  }, [isDropdownOpen]);
+
+  const toggleMethod = (method: string) => {
+    setSelectedMethods(prev => 
+      prev.includes(method) 
+        ? prev.filter(m => m !== method)
+        : [...prev, method]
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || isSubmitting) return;
+    setHasAttemptedSubmit(true);
+    
+    if (!email || selectedMethods.length === 0 || isSubmitting) return;
 
     setIsSubmitting(true);
     
@@ -41,7 +93,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${publicAnonKey}`,
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          email,
+          methods: selectedMethods,
+        }),
       });
 
       if (!response.ok) {
@@ -51,12 +106,16 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       setSubmitted(true);
       setIsSubmitting(false);
       setEmail('');
+      setSelectedMethods([]);
+      setHasAttemptedSubmit(false);
     } catch (error) {
       console.error('Error submitting early access request:', error);
       setIsSubmitting(false);
       // Still show success to user even if email fails (graceful degradation)
       setSubmitted(true);
       setEmail('');
+      setSelectedMethods([]);
+      setHasAttemptedSubmit(false);
     }
   };
 
@@ -135,40 +194,222 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           </p>
 
           {!submitted ? (
-            <form onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' }}>
-                <input
-                  ref={emailInputRef}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  disabled={isSubmitting}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    fontSize: '1rem',
-                    lineHeight: '1.5',
-                    color: '#111827',
-                    backgroundColor: 'rgb(255, 255, 255)',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '8px',
-                    outline: 'none',
-                    transition: 'border-color 0.15s ease',
-                    textAlign: 'left',
-                  }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = '#111827'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                />
+            <form onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0', position: 'relative' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch', position: 'relative' }}>
+                <div style={{ position: 'relative', width: '100%', minHeight: '48px', isolation: 'isolate' }}>
+                  <input
+                    ref={emailInputRef}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    disabled={isSubmitting}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      paddingRight: '40px', // Make room for LastPass icon
+                      fontSize: '1rem',
+                      lineHeight: '1.5',
+                      color: '#111827',
+                      backgroundColor: 'rgb(255, 255, 255)',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      outline: 'none',
+                      transition: 'border-color 0.15s ease',
+                      textAlign: 'left',
+                      boxSizing: 'border-box',
+                      height: '48px',
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#111827';
+                      // Prevent any scroll behavior
+                      e.currentTarget.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+                    }}
+                    onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
+                  />
+                </div>
+                
+                {/* Coffee Methods Multi-Select Dropdown */}
+                <div ref={dropdownRef} style={{ width: '100%', position: 'relative', zIndex: isDropdownOpen ? 10 : 1, isolation: 'isolate' }}>
+                  {/* Dropdown Trigger */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const wasOpen = isDropdownOpen;
+                      setIsDropdownOpen(!wasOpen);
+                      
+                      // Prevent scroll when opening dropdown
+                      if (!wasOpen) {
+                        // Store current scroll position
+                        const scrollY = window.scrollY;
+                        const scrollX = window.scrollX;
+                        
+                        // Prevent any scroll behavior
+                        requestAnimationFrame(() => {
+                          window.scrollTo(scrollX, scrollY);
+                        });
+                      }
+                    }}
+                    disabled={isSubmitting}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      fontSize: '1rem',
+                      lineHeight: '1.5',
+                      color: '#111827',
+                      backgroundColor: 'rgb(255, 255, 255)',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      outline: 'none',
+                      transition: 'border-color 0.15s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      textAlign: 'left',
+                      boxSizing: 'border-box',
+                      height: '48px',
+                      minHeight: '48px',
+                      position: 'relative',
+                      fontFamily: 'inherit',
+                      fontWeight: 'inherit',
+                    }}
+                    onFocus={(e) => {
+                      if (isDropdownOpen) {
+                        e.currentTarget.style.borderColor = '#111827';
+                      } else {
+                        e.currentTarget.style.borderColor = '#111827';
+                        // Prevent scroll on focus
+                        e.currentTarget.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+                      }
+                    }}
+                    onBlur={(e) => {
+                      // Always remove focus border when blurring
+                      e.currentTarget.style.borderColor = '#d1d5db';
+                    }}
+                  >
+                    <span style={{ 
+                      flex: 1, 
+                      textAlign: 'left', 
+                      fontSize: 'inherit', 
+                      lineHeight: 'inherit', 
+                      fontFamily: 'inherit', 
+                      fontWeight: 'inherit',
+                      color: selectedMethods.length > 0 ? '#111827' : 'rgba(17, 24, 39, 0.5)',
+                    }}>
+                      {selectedMethods.length > 0 
+                        ? `${selectedMethods.length} method${selectedMethods.length > 1 ? 's' : ''} selected`
+                        : 'Select your brew methods'}
+                    </span>
+                    <ChevronDown 
+                      className="w-4 h-4" 
+                      style={{ 
+                        transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease',
+                        color: selectedMethods.length > 0 ? '#111827' : 'rgba(17, 24, 39, 0.5)',
+                      }} 
+                    />
+                  </button>
+                  
+                  {/* Dropdown Content */}
+                  {isDropdownOpen && (
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        right: 0,
+                        backgroundColor: 'rgb(255, 255, 255)',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        zIndex: 1000,
+                        maxHeight: '300px',
+                        overflowY: 'auto',
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Predefined Methods + Other */}
+                      <div style={{
+                        padding: '8px',
+                      }}>
+                        {PREDEFINED_METHODS.map((method) => (
+                          <label
+                            key={method}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              cursor: 'pointer',
+                              padding: '8px 12px',
+                              borderRadius: '6px',
+                              backgroundColor: selectedMethods.includes(method) ? '#f3f4f6' : 'transparent',
+                              transition: 'background-color 0.15s ease',
+                              textAlign: 'left',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!selectedMethods.includes(method)) {
+                                e.currentTarget.style.backgroundColor = '#f9fafb';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!selectedMethods.includes(method)) {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedMethods.includes(method)}
+                              onChange={() => toggleMethod(method)}
+                              disabled={isSubmitting}
+                              style={{
+                                marginRight: '10px',
+                                width: '16px',
+                                height: '16px',
+                                cursor: 'pointer',
+                                accentColor: '#111827',
+                                borderRadius: '4px',
+                              }}
+                            />
+                            <span style={{
+                              fontSize: '1rem',
+                              lineHeight: '1.5',
+                              color: '#111827',
+                              flex: 1,
+                              textAlign: 'left',
+                            }}>
+                              {method}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedMethods.length === 0 && hasAttemptedSubmit && (
+                    <p style={{
+                      fontSize: '0.8125rem',
+                      color: '#ef4444',
+                      marginTop: '4px',
+                    }}>
+                      Please select at least one coffee method
+                    </p>
+                  )}
+                </div>
+                
                 <Button 
                   type="submit"
                   size="lg"
-                  disabled={isSubmitting || !email}
+                  disabled={isSubmitting || !email || selectedMethods.length === 0}
                   className="bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer px-8 py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
                     fontWeight: 500,
-                    width: '100%'
+                    width: '100%',
                   }}
                 >
                   {isSubmitting ? 'Requesting...' : 'Request Early Access'}
@@ -227,6 +468,17 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         }
         input[type="email"]:focus {
           border-color: #111827 !important;
+        }
+        button[type="button"] {
+          text-align: left !important;
+          font-size: 1rem !important;
+        }
+        button[type="button"] span {
+          text-align: left !important;
+          font-size: inherit !important;
+        }
+        input[type="checkbox"] {
+          border-radius: 4px !important;
         }
         @media (max-width: 1024px) {
           .landing-mobile-header {
@@ -340,6 +592,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content * {
             text-align: center !important;
           }
+          .landing-text-content button[type="button"],
+          .landing-text-content button[type="button"] span,
+          .landing-text-content label,
+          .landing-text-content label span {
+            text-align: left !important;
+          }
           .landing-text-content form {
             margin-left: auto !important;
             margin-right: auto !important;
@@ -397,8 +655,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content button {
             width: 100% !important;
           }
-          .landing-text-content input[type="email"] {
+          .landing-text-content input[type="email"],
+          .landing-text-content button[type="button"] {
             text-align: left !important;
+            font-size: 1rem !important;
+          }
+          .landing-text-content button[type="button"] span {
+            text-align: left !important;
+            font-size: 1rem !important;
+            line-height: 1.5 !important;
           }
           .landing-footer-text {
             height: 60px !important;

@@ -3417,14 +3417,27 @@ app.post('/make-server-23508aac/admin/migrate-existing-users', async (c) => {
 // Early access request endpoint
 app.post('/make-server-23508aac/early-access', async (c) => {
   try {
-    const { email } = await c.req.json();
+    const { email, methods } = await c.req.json();
 
     if (!email || typeof email !== 'string' || !email.includes('@')) {
       return c.json({ error: 'Valid email is required' }, 400);
     }
 
+    if (!methods || !Array.isArray(methods) || methods.length === 0) {
+      return c.json({ error: 'At least one coffee method is required' }, 400);
+    }
+
     // Normalize email to lowercase
     const normalizedEmail = email.toLowerCase().trim();
+    
+    // Normalize methods (trim and filter empty)
+    const normalizedMethods = methods
+      .map((m: string) => m.trim())
+      .filter((m: string) => m.length > 0);
+
+    if (normalizedMethods.length === 0) {
+      return c.json({ error: 'At least one coffee method is required' }, 400);
+    }
 
     // Check if this is a new request or a duplicate
     const { data: existing } = await supabase
@@ -3443,6 +3456,7 @@ app.post('/make-server-23508aac/early-access', async (c) => {
           email: normalizedEmail,
           created_at: new Date().toISOString(),
           status: 'pending',
+          methods: normalizedMethods,
         },
         {
           onConflict: 'email',
@@ -3457,10 +3471,13 @@ app.post('/make-server-23508aac/early-access', async (c) => {
 
     // Only send email notification for new requests
     if (isNewRequest) {
+      const methodsList = normalizedMethods.map((m: string) => `• ${m}`).join('<br>');
       const emailSubject = 'New Early Access Request';
       const emailHtml = `
         <h2>New Early Access Request</h2>
         <p><strong>Email:</strong> ${normalizedEmail}</p>
+        <p><strong>Brew Methods:</strong></p>
+        <p>${methodsList}</p>
         <p><strong>Requested at:</strong> ${new Date().toISOString()}</p>
       `;
 
@@ -3475,6 +3492,9 @@ app.post('/make-server-23508aac/early-access', async (c) => {
         // Still return success to user even if email fails
       }
     }
+    
+    // Log methods for debugging (methods are always saved to DB, even for duplicates)
+    console.log(`Early access request processed: ${normalizedEmail}, Methods: ${normalizedMethods.join(', ')}`);
 
     return c.json({ 
       success: true,

@@ -2,7 +2,8 @@
 CREATE TABLE IF NOT EXISTS early_access_requests (
   email TEXT PRIMARY KEY,
   created_at TIMESTAMP DEFAULT NOW(),
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected'))
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  methods TEXT[] DEFAULT '{}' -- Array of coffee methods
 );
 
 -- Enable RLS
