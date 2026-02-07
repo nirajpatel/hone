@@ -259,7 +259,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      placeholder="you@example.com"
                       required
                       disabled={isSubmitting}
                       style={{
@@ -291,7 +291,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                 </div>
                 
                 {/* Coffee Methods Multi-Select Pills */}
-                <div className="brew-methods-section" style={{ width: '100%', marginTop: '8px', marginBottom: '8px' }}>
+                <div className="brew-methods-section" style={{ width: '100%', marginTop: '8px', marginBottom: '10px' }}>
                   {/* Header */}
                   <label className="brew-methods-label" style={{
                     display: 'block',
