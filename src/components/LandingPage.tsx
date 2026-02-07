@@ -27,16 +27,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const headlineContainerRef = useRef<HTMLDivElement>(null);
 
-  // Focus email field if coming from request access link
+  // Clear requestAccess query parameter if present
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('requestAccess') === 'true') {
       // Clear the query parameter
       window.history.replaceState({}, '', '/');
-      // Focus the email input after a short delay to ensure it's rendered
-      setTimeout(() => {
-        emailInputRef.current?.focus();
-      }, 100);
     }
   }, []);
 
