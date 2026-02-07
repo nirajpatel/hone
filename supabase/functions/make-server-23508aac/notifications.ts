@@ -81,6 +81,43 @@ export async function sendSMS(to: string, message: string): Promise<boolean> {
   }
 }
 
+// Send email via Resend
+export async function sendEmail(to: string, subject: string, html: string, from: string = 'Hone <noreply@hone.coffee>'): Promise<boolean> {
+  try {
+    const apiKey = Deno.env.get('RESEND_API_KEY');
+
+    if (!apiKey) {
+      console.error('RESEND_API_KEY is not set');
+      return false;
+    }
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to,
+        subject,
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Resend API error (${response.status}): ${errorText}`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error sending email to ${to}:`, error);
+    return false;
+  }
+}
+
 // Get all brews for a specific user on a specific date with same coffee and method
 export async function getBrewsForCoffeeAndMethodOnDate(
   userId: string,

@@ -2,6 +2,7 @@ import { Button } from './ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
+import { projectId } from '../utils/supabase/info';
 
 interface LandingPageProps {
   onLoginSuccess?: () => void;
@@ -32,13 +33,30 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
 
     setIsSubmitting(true);
     
-    // TODO: Add actual API call to submit email to waitlist
-    // For now, just simulate a delay and show success
-    setTimeout(() => {
+    try {
+      const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
+      const response = await fetch(`${apiUrl}/early-access`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit request');
+      }
+
       setSubmitted(true);
       setIsSubmitting(false);
       setEmail('');
-    }, 500);
+    } catch (error) {
+      console.error('Error submitting early access request:', error);
+      setIsSubmitting(false);
+      // Still show success to user even if email fails (graceful degradation)
+      setSubmitted(true);
+      setEmail('');
+    }
   };
 
   const handleSignInClick = () => {

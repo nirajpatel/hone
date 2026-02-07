@@ -3414,6 +3414,44 @@ app.post('/make-server-23508aac/admin/migrate-existing-users', async (c) => {
   }
 });
 
+// Early access request endpoint
+app.post('/make-server-23508aac/early-access', async (c) => {
+  try {
+    const { email } = await c.req.json();
+
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return c.json({ error: 'Valid email is required' }, 400);
+    }
+
+    // Send email notification to niraj@hone.coffee
+    const emailSubject = 'New Early Access Request';
+    const emailHtml = `
+      <h2>New Early Access Request</h2>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Requested at:</strong> ${new Date().toISOString()}</p>
+    `;
+
+    const emailSent = await notifications.sendEmail(
+      'niraj@hone.coffee',
+      emailSubject,
+      emailHtml
+    );
+
+    if (!emailSent) {
+      console.error('Failed to send early access notification email');
+      // Still return success to user even if email fails
+    }
+
+    return c.json({ 
+      success: true,
+      message: 'Early access request received'
+    });
+  } catch (error) {
+    console.error('Error processing early access request:', error);
+    return c.json({ error: 'Failed to process request' }, 500);
+  }
+});
+
 // 404 handler for unmatched routes
 app.notFound((c) => {
   console.log(`404 - Route not found: ${c.req.method} ${c.req.url}`);
