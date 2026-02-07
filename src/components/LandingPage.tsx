@@ -23,8 +23,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [headlineFontSize, setHeadlineFontSize] = useState<number | null>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const headlineContainerRef = useRef<HTMLDivElement>(null);
 
   // Focus email field if coming from request access link
   useEffect(() => {
@@ -68,6 +71,78 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       };
     }
   }, [isDropdownOpen]);
+
+  // Dynamic font sizing for headline on mobile
+  useEffect(() => {
+    const adjustHeadlineFontSize = () => {
+      if (!headlineRef.current || !headlineContainerRef.current) return;
+      
+      // Only adjust on mobile (max-width: 768px)
+      if (window.innerWidth > 768) {
+        setHeadlineFontSize(null);
+        return;
+      }
+
+      const container = headlineContainerRef.current;
+      const headline = headlineRef.current;
+      const text = headline.textContent || '';
+      
+      if (!text) return;
+
+      // Get container width (accounting for padding)
+      const containerStyle = window.getComputedStyle(container);
+      const containerPadding = parseFloat(containerStyle.paddingLeft) + parseFloat(containerStyle.paddingRight);
+      const availableWidth = container.offsetWidth - containerPadding;
+
+      // Binary search for optimal font size
+      let minSize = 12; // Minimum font size in pixels
+      let maxSize = 32; // Maximum font size in pixels
+      let optimalSize = maxSize;
+
+      // Create a temporary element to measure text width
+      const measureElement = document.createElement('span');
+      measureElement.style.position = 'absolute';
+      measureElement.style.visibility = 'hidden';
+      measureElement.style.whiteSpace = 'nowrap';
+      measureElement.style.fontWeight = '700';
+      measureElement.style.letterSpacing = '-0.02em';
+      measureElement.style.fontFamily = window.getComputedStyle(headline).fontFamily;
+      measureElement.textContent = text;
+      document.body.appendChild(measureElement);
+
+      // Binary search
+      while (minSize <= maxSize) {
+        const midSize = Math.floor((minSize + maxSize) / 2);
+        measureElement.style.fontSize = `${midSize}px`;
+        const textWidth = measureElement.offsetWidth;
+
+        if (textWidth <= availableWidth) {
+          optimalSize = midSize;
+          minSize = midSize + 1;
+        } else {
+          maxSize = midSize - 1;
+        }
+      }
+
+      document.body.removeChild(measureElement);
+      setHeadlineFontSize(optimalSize);
+    };
+
+    adjustHeadlineFontSize();
+    
+    const handleResize = () => {
+      adjustHeadlineFontSize();
+    };
+
+    window.addEventListener('resize', handleResize);
+    // Also adjust after a short delay to ensure layout is complete
+    const timeoutId = setTimeout(adjustHeadlineFontSize, 100);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const toggleMethod = (method: string) => {
     setSelectedMethods(prev => 
@@ -162,10 +237,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', alignItems: 'center', gap: '64px', flexWrap: 'wrap' }}>
         {/* Hero Section - Left */}
         <section className="landing-section" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', order: 2 }}>
-        <div className="landing-text-content" style={{ textAlign: 'left', width: '100%' }}>
+        <div ref={headlineContainerRef} className="landing-text-content" style={{ textAlign: 'left', width: '100%' }}>
           <h1 
+            ref={headlineRef}
             style={{ 
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+              fontSize: headlineFontSize ? `${headlineFontSize}px` : 'clamp(2.5rem, 5vw, 4rem)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               lineHeight: '1.1',
@@ -658,8 +734,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content h1 {
             margin-bottom: 8px !important;
-            font-size: clamp(2rem, 6vw, 2.5rem) !important;
             text-align: left !important;
+            line-height: 1.1 !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 24px !important;
