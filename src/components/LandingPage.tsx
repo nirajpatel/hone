@@ -1,8 +1,7 @@
 import { Button } from './ui/button';
 import { ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
-import { supabase } from '../utils/supabase/client';
 
 interface LandingPageProps {
   onLoginSuccess?: () => void;
@@ -12,6 +11,20 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus email field if coming from request access link
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('requestAccess') === 'true') {
+      // Clear the query parameter
+      window.history.replaceState({}, '', '/');
+      // Focus the email input after a short delay to ensure it's rendered
+      setTimeout(() => {
+        emailInputRef.current?.focus();
+      }, 100);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,32 +41,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
     }, 500);
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      // Force localhost:3000 for development
-      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const redirectUrl = isDev ? 'http://localhost:3000/' : `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          skipBrowserRedirect: false,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-
-      if (error) {
-        console.error('OAuth error:', error);
-        alert(`OAuth Error: ${error.message}`);
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert(`Login Error: ${error}`);
-    }
+  const handleSignInClick = () => {
+    window.history.pushState({}, '', '/login');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   return (
@@ -63,7 +53,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
           <Button 
-            onClick={handleGoogleLogin}
+            onClick={handleSignInClick}
             variant="ghost"
             className="text-gray-900 hover:bg-gray-100 cursor-pointer"
             style={{ fontWeight: 500 }}
@@ -80,7 +70,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
           <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
             <Button 
-              onClick={handleGoogleLogin}
+              onClick={handleSignInClick}
               variant="ghost"
               className="text-gray-900 hover:bg-gray-100 cursor-pointer"
               style={{ fontWeight: 500, padding: '4px 12px' }}
@@ -129,6 +119,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             <form onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch' }}>
                 <input
+                  ref={emailInputRef}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}

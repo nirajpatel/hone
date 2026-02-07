@@ -7,6 +7,7 @@ import { AddCoffeeForm } from './components/AddCoffeeForm';
 import { QRCodeDialog } from './components/QRCodeDialog';
 import { Login } from './components/Login';
 import { LandingPage } from './components/LandingPage';
+import { SignInPage } from './components/SignInPage';
 import { BrewsTableView } from './components/BrewsTableView';
 import { BrewsTimelineView } from './components/BrewsTimelineView';
 import { CoffeesShelvesView } from './components/CoffeesShelvesView';
@@ -263,6 +264,9 @@ export default function App() {
 
   const checkAuth = async () => {
     try {
+      // Skip error handling if we're on /login route (let SignInPage handle it)
+      const isLoginRoute = window.location.pathname === '/login';
+      
       // Check for OAuth errors in URL
       const urlParams = new URLSearchParams(window.location.search);
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -270,10 +274,16 @@ export default function App() {
       const error = urlParams.get('error') || hashParams.get('error');
       const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
       
-      if (error) {
+      if (error && !isLoginRoute) {
         toast.error(`OAuth Error: ${errorDescription || error}`);
         setLoading(false);
         window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+      
+      // If on login route and there's an error, let SignInPage handle it
+      if (error && isLoginRoute) {
+        setLoading(false);
         return;
       }
       
@@ -319,11 +329,30 @@ export default function App() {
         // Fetch brews and coffees after successful auth
         await fetchData(token);
       } else {
-        toast.error('Failed to set up user');
+        const errorData = await res.json().catch(() => ({}));
+        
+        // Handle 403 (access denied) - sign out user and redirect to login
+        if (res.status === 403) {
+          await supabase.auth.signOut();
+          setCurrentUser(null);
+          setAccessToken(null);
+          window.history.pushState({}, '', '/login');
+          window.dispatchEvent(new PopStateEvent('popstate'));
+          // Don't show toast - SignInPage will handle the error display
+        } else {
+          // Other errors - show toast only if not on login page
+          const isLoginRoute = window.location.pathname === '/login';
+          if (!isLoginRoute) {
+            toast.error(errorData.error || 'Failed to set up user');
+          }
+        }
       }
     } catch (error) {
       console.error('Error creating/getting user:', error);
-      toast.error('Error setting up user');
+      const isLoginRoute = window.location.pathname === '/login';
+      if (!isLoginRoute) {
+        toast.error('Error setting up user');
+      }
     } finally {
       setLoading(false);
     }
@@ -979,6 +1008,10 @@ export default function App() {
 
   if (currentRoute === '/landing') {
     return <LandingPage onLoginSuccess={() => checkAuth()} />;
+  }
+
+  if (currentRoute === '/login') {
+    return <SignInPage onLoginSuccess={() => checkAuth()} />;
   }
 
   if (currentRoute === '/coffee-bag') {

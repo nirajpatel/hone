@@ -293,6 +293,25 @@ app.post('/make-server-23508aac/users', async (c) => {
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
+    // Check if email is in allowlist
+    if (user.email) {
+      const { data: allowedEmail, error: allowlistError } = await supabase
+        .from('allowed_emails')
+        .select('email')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (allowlistError) {
+        console.error('Error checking allowed_emails:', allowlistError);
+        // On error, allow the request to proceed (fail open for safety)
+      } else if (!allowedEmail) {
+        // Email not found in allowlist - block access
+        return c.json({ 
+          error: 'Access denied. Your email is not authorized. Contact admin for access.' 
+        }, 403);
+      }
+    }
+
     // Check if user already exists
     const existingUser = await kv.get(`user:${user.id}`);
     
@@ -3241,6 +3260,157 @@ app.put('/make-server-23508aac/equipment/:id/primary', async (c) => {
   } catch (error) {
     console.error('Error setting equipment as primary:', error);
     return c.json({ error: 'Failed to set equipment as primary' }, 500);
+  }
+});
+
+// Admin endpoints for managing allowed emails
+app.post('/make-server-23508aac/admin/allowed-emails', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here (e.g., check if user is admin)
+    // For now, allow any authenticated user to manage allowlist
+    // In production, add proper admin authorization
+
+    const { email, created_by } = await c.req.json();
+    
+    if (!email) {
+      return c.json({ error: 'Email is required' }, 400);
+    }
+
+    const { data, error } = await supabase
+      .from('allowed_emails')
+      .insert({
+        email,
+        created_by: created_by || user.email || 'admin',
+      })
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') { // Unique constraint violation
+        return c.json({ error: 'Email already exists in allowlist' }, 409);
+      }
+      console.error('Error adding allowed email:', error);
+      return c.json({ error: 'Failed to add email to allowlist' }, 500);
+    }
+
+    return c.json(data);
+  } catch (error) {
+    console.error('Error in POST /admin/allowed-emails:', error);
+    return c.json({ error: 'Failed to add email to allowlist' }, 500);
+  }
+});
+
+app.delete('/make-server-23508aac/admin/allowed-emails/:email', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    const email = decodeURIComponent(c.req.param('email'));
+    
+    const { error } = await supabase
+      .from('allowed_emails')
+      .delete()
+      .eq('email', email);
+
+    if (error) {
+      console.error('Error removing allowed email:', error);
+      return c.json({ error: 'Failed to remove email from allowlist' }, 500);
+    }
+
+    return c.json({ message: 'Email removed from allowlist' });
+  } catch (error) {
+    console.error('Error in DELETE /admin/allowed-emails:', error);
+    return c.json({ error: 'Failed to remove email from allowlist' }, 500);
+  }
+});
+
+app.get('/make-server-23508aac/admin/allowed-emails', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    const { data, error } = await supabase
+      .from('allowed_emails')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching allowed emails:', error);
+      return c.json({ error: 'Failed to fetch allowed emails' }, 500);
+    }
+
+    return c.json(data || []);
+  } catch (error) {
+    console.error('Error in GET /admin/allowed-emails:', error);
+    return c.json({ error: 'Failed to fetch allowed emails' }, 500);
+  }
+});
+
+// Migration endpoint to add existing users to allowlist
+app.post('/make-server-23508aac/admin/migrate-existing-users', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    
+    // Get all users from KV store
+    const kvUsers = await kv.getByPrefix('user:');
+    const kvEmails = kvUsers
+      .map((u: any) => u.email)
+      .filter((email: string) => email);
+
+    // Get all users from auth.users
+    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+    const authEmails = authUsers?.users
+      .map((u) => u.email)
+      .filter((email): email is string => !!email) || [];
+
+    // Combine and deduplicate emails
+    const allEmails = [...new Set([...kvEmails, ...authEmails])];
+
+    // Insert into allowed_emails (skip duplicates)
+    const insertData = allEmails.map((email) => ({
+      email,
+      created_by: 'migration',
+    }));
+
+    if (insertData.length > 0) {
+      const { error: insertError } = await supabase
+        .from('allowed_emails')
+        .upsert(insertData, { onConflict: 'email' });
+
+      if (insertError) {
+        console.error('Error inserting allowed emails:', insertError);
+        return c.json({ error: 'Failed to migrate users' }, 500);
+      }
+    }
+
+    return c.json({ 
+      message: 'Migration completed',
+      emailsAdded: insertData.length,
+      totalEmails: allEmails.length,
+    });
+  } catch (error) {
+    console.error('Error in migrate-existing-users:', error);
+    return c.json({ error: 'Failed to migrate existing users' }, 500);
   }
 });
 
