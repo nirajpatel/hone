@@ -716,13 +716,13 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             width: 100% !important;
           }
           .landing-text-content form > div > div:first-child {
-            min-height: 40px !important;
+            min-height: 42px !important;
           }
           .landing-text-content input[type="email"] {
             text-align: left !important;
             font-size: 0.875rem !important;
-            height: 40px !important;
-            min-height: 40px !important;
+            height: 42px !important;
+            min-height: 42px !important;
             padding: 10px 14px !important;
           }
           .landing-text-content button[type="button"]:not(.brew-methods-pills-container *) {
