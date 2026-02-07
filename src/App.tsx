@@ -231,6 +231,18 @@ export default function App() {
     updateMetaTag('application-name', 'Hone');
     updateMetaTag('apple-mobile-web-app-capable', 'yes');
     updateMetaTag('apple-mobile-web-app-status-bar-style', 'default');
+    
+    // SEO meta tags
+    updateMetaTag('robots', 'index, follow');
+    
+    // Canonical link
+    let canonicalLink = document.querySelector("link[rel='canonical']") as HTMLLinkElement;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.setAttribute('href', 'https://hone.coffee');
   }, []);
 
   useEffect(() => {
