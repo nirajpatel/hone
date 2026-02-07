@@ -1,5 +1,5 @@
 import { Button } from './ui/button';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
@@ -10,7 +10,7 @@ interface LandingPageProps {
 
 const PREDEFINED_METHODS = [
   'Espresso',
-  'Pour Over (V60, Chemex, etc.)',
+  'Pour Over',
   'AeroPress',
   'French Press',
   'Other',
@@ -19,13 +19,11 @@ const PREDEFINED_METHODS = [
 export function LandingPage({ onLoginSuccess }: LandingPageProps) {
   const [email, setEmail] = useState('');
   const [selectedMethods, setSelectedMethods] = useState<string[]>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [headlineFontSize, setHeadlineFontSize] = useState<number | null>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const headlineContainerRef = useRef<HTMLDivElement>(null);
 
@@ -42,35 +40,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
     }
   }, []);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-        // Remove focus from button when closing dropdown
-        const button = dropdownRef.current.querySelector('button');
-        if (button && document.activeElement === button) {
-          button.blur();
-        }
-      }
-    };
-
-    const preventScroll = (e: Event) => {
-      if (isDropdownOpen) {
-        e.preventDefault();
-      }
-    };
-
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      // Prevent scroll when dropdown is open
-      window.addEventListener('scroll', preventScroll, { passive: false });
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-        window.removeEventListener('scroll', preventScroll);
-      };
-    }
-  }, [isDropdownOpen]);
 
   // Dynamic font sizing for headline on mobile
   useEffect(() => {
@@ -307,170 +276,64 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                   />
                 </div>
                 
-                {/* Coffee Methods Multi-Select Dropdown */}
-                <div ref={dropdownRef} style={{ width: '100%', position: 'relative', zIndex: isDropdownOpen ? 10 : 1, isolation: 'isolate' }}>
-                  {/* Dropdown Trigger */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const wasOpen = isDropdownOpen;
-                      setIsDropdownOpen(!wasOpen);
-                      
-                      // Prevent scroll when opening dropdown
-                      if (!wasOpen) {
-                        // Store current scroll position
-                        const scrollY = window.scrollY;
-                        const scrollX = window.scrollX;
-                        
-                        // Prevent any scroll behavior
-                        requestAnimationFrame(() => {
-                          window.scrollTo(scrollX, scrollY);
-                        });
-                      }
-                    }}
-                    disabled={isSubmitting}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      fontSize: '1rem',
-                      lineHeight: '1.5',
-                      color: '#111827',
-                      backgroundColor: 'rgb(255, 255, 255)',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      outline: 'none',
-                      transition: 'border-color 0.15s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                      textAlign: 'left',
-                      boxSizing: 'border-box',
-                      height: '48px',
-                      minHeight: '48px',
-                      position: 'relative',
-                      fontFamily: 'inherit',
-                      fontWeight: 'inherit',
-                    }}
-                    onFocus={(e) => {
-                      if (isDropdownOpen) {
-                        e.currentTarget.style.borderColor = '#111827';
-                      } else {
-                        e.currentTarget.style.borderColor = '#111827';
-                        // Prevent scroll on focus
-                        e.currentTarget.scrollIntoView({ behavior: 'instant', block: 'nearest' });
-                      }
-                    }}
-                    onBlur={(e) => {
-                      // Always remove focus border when blurring
-                      e.currentTarget.style.borderColor = '#d1d5db';
-                    }}
-                  >
-                    <span style={{ 
-                      flex: 1, 
-                      textAlign: 'left', 
-                      fontSize: 'inherit', 
-                      lineHeight: 'inherit', 
-                      fontFamily: 'inherit', 
-                      fontWeight: 'inherit',
-                      color: selectedMethods.length > 0 ? '#111827' : 'rgba(17, 24, 39, 0.5)',
-                    }}>
-                      {selectedMethods.length > 0 
-                        ? `${selectedMethods.length} method${selectedMethods.length > 1 ? 's' : ''} selected`
-                        : 'Select your brew methods'}
-                    </span>
-                    <ChevronDown 
-                      className="w-4 h-4" 
-                      style={{ 
-                        transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s ease',
-                        color: selectedMethods.length > 0 ? '#111827' : 'rgba(17, 24, 39, 0.5)',
-                      }} 
-                    />
-                  </button>
+                {/* Coffee Methods Multi-Select Pills */}
+                <div className="brew-methods-section" style={{ width: '100%', marginTop: '8px', marginBottom: '8px' }}>
+                  {/* Header */}
+                  <label className="brew-methods-label" style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'left',
+                  }}>
+                    Your brew methods
+                  </label>
                   
-                  {/* Dropdown Content */}
-                  {isDropdownOpen && (
-                    <div 
-                      style={{
-                        position: 'absolute',
-                        top: 'calc(100% + 4px)',
-                        left: 0,
-                        right: 0,
-                        backgroundColor: 'rgb(255, 255, 255)',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                        zIndex: 1000,
-                        maxHeight: '300px',
-                        overflowY: 'auto',
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {/* Predefined Methods + Other */}
-                      <div style={{
-                        padding: '8px',
-                      }}>
-                        {PREDEFINED_METHODS.map((method) => (
-                          <label
-                            key={method}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              cursor: 'pointer',
-                              padding: '8px 12px',
-                              borderRadius: '6px',
-                              backgroundColor: selectedMethods.includes(method) ? '#f3f4f6' : 'transparent',
-                              transition: 'background-color 0.15s ease',
-                              textAlign: 'left',
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!selectedMethods.includes(method)) {
-                                e.currentTarget.style.backgroundColor = '#f9fafb';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!selectedMethods.includes(method)) {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedMethods.includes(method)}
-                              onChange={() => toggleMethod(method)}
-                              disabled={isSubmitting}
-                              style={{
-                                marginRight: '10px',
-                                width: '16px',
-                                height: '16px',
-                                cursor: 'pointer',
-                                accentColor: '#111827',
-                                borderRadius: '4px',
-                              }}
-                            />
-                            <span style={{
-                              fontSize: '1rem',
-                              lineHeight: '1.5',
-                              color: '#111827',
-                              flex: 1,
-                              textAlign: 'left',
-                            }}>
-                              {method}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* All Method Pills */}
+                  <div className="brew-methods-pills-container" style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '6px',
+                  }}>
+                    {PREDEFINED_METHODS.map((method) => {
+                      const isSelected = selectedMethods.includes(method);
+                      return (
+                        <button
+                          key={method}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleMethod(method);
+                          }}
+                          disabled={isSubmitting}
+                          className={`inline-flex items-center gap-1 rounded-full text-sm border transition-colors ${
+                            isSelected
+                              ? 'bg-gray-900 border-gray-900 text-white hover:bg-gray-800'
+                              : 'bg-transparent border-gray-300 text-gray-900 hover:bg-gray-100'
+                          } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                          style={{
+                            paddingLeft: '16px',
+                            paddingRight: '16px',
+                            paddingTop: '4px',
+                            paddingBottom: '4px',
+                          }}
+                        >
+                          <span>{method}</span>
+                          {isSelected && (
+                            <X className="w-3 h-3 flex-shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                   
                   {selectedMethods.length === 0 && hasAttemptedSubmit && (
                     <p style={{
                       fontSize: '0.8125rem',
                       color: '#ef4444',
-                      marginTop: '4px',
+                      marginTop: '8px',
                     }}>
                       Please select at least one coffee method
                     </p>
@@ -548,6 +411,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         button[type="button"] {
           text-align: left !important;
           font-size: 1rem !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"] {
+          padding-left: 16px !important;
+          padding-right: 16px !important;
+          padding-top: 4px !important;
+          padding-bottom: 4px !important;
+          height: auto !important;
+          min-height: auto !important;
         }
         button[type="button"] span {
           text-align: left !important;
@@ -760,21 +631,72 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content form {
             maxWidth: 100% !important;
             width: 100% !important;
+            text-align: left !important;
+            align-items: flex-start !important;
+          }
+          .landing-text-content form > div {
+            text-align: left !important;
+            align-items: flex-start !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .landing-text-content form > div > div {
+            text-align: left !important;
+            align-items: flex-start !important;
+          }
+          .landing-text-content .brew-methods-label,
+          .landing-text-content .brew-methods-section label,
+          .landing-text-content form label.brew-methods-label,
+          .landing-text-content form .brew-methods-section label {
+            text-align: left !important;
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            display: block !important;
+          }
+          .landing-text-content form .brew-methods-section {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+          .landing-text-content form .brew-methods-label,
+          .landing-text-content form .brew-methods-section label {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
           }
           .landing-text-content input[type="email"],
-          .landing-text-content button {
+          .landing-text-content button:not(.brew-methods-pills-container button) {
             width: 100% !important;
           }
           .landing-text-content form > div > div:first-child {
             min-height: 40px !important;
           }
-          .landing-text-content input[type="email"],
-          .landing-text-content button[type="button"] {
+          .landing-text-content input[type="email"] {
             text-align: left !important;
             font-size: 0.875rem !important;
             height: 40px !important;
             min-height: 40px !important;
             padding: 10px 14px !important;
+          }
+          .landing-text-content button[type="button"]:not(.brew-methods-pills-container *) {
+            text-align: left !important;
+            font-size: 0.875rem !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            padding: 10px 14px !important;
+          }
+          .brew-methods-pills-container button[type="button"],
+          .landing-text-content .brew-methods-pills-container button[type="button"] {
+            height: auto !important;
+            min-height: auto !important;
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+            padding-top: 6px !important;
+            padding-bottom: 6px !important;
           }
           .landing-text-content button[type="button"] span {
             text-align: left !important;
@@ -792,6 +714,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content form label {
             padding: 6px 10px !important;
+          }
+          .landing-text-content form label.brew-methods-label,
+          .landing-text-content form .brew-methods-section label {
+            padding: 0 !important;
+            padding-bottom: 8px !important;
           }
           .landing-text-content form > div > div > div > div {
             padding: 4px !important;
@@ -896,6 +823,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         }
         .landing-footer-text a:hover {
           text-decoration: underline !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"] {
+          height: auto !important;
+          min-height: auto !important;
+          padding-left: 16px !important;
+          padding-right: 16px !important;
+          padding-top: 4px !important;
+          padding-bottom: 4px !important;
         }
       `}</style>
 
