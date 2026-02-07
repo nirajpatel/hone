@@ -1026,16 +1026,17 @@ export default function App() {
     );
   }
 
+  if (!currentUser) {
+    // Show LandingPage immediately, don't show loading animation for logged out users
+    return <LandingPage onLoginSuccess={() => checkAuth()} />;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <EspressoLoading />
       </div>
     );
-  }
-
-  if (!currentUser) {
-    return <LandingPage onLoginSuccess={() => checkAuth()} />;
   }
 
   if (currentRoute === '/feed') {
