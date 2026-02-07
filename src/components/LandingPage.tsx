@@ -291,7 +291,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                 </div>
                 
                 {/* Coffee Methods Multi-Select Pills */}
-                <div className="brew-methods-section" style={{ width: '100%', marginTop: '8px', marginBottom: '10px' }}>
+                <div className="brew-methods-section" style={{ width: '100%', marginTop: '8px', marginBottom: '12px' }}>
                   {/* Header */}
                   <label className="brew-methods-label" style={{
                     display: 'block',
@@ -647,6 +647,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 42px !important;
             padding: 10px 16px !important;
           }
+          .landing-text-content form .brew-methods-section {
+            margin-bottom: 12px !important;
+          }
         }
         @media (max-width: 768px) {
           .landing-page-wrapper {
@@ -915,6 +918,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content button[type="submit"] {
             height: 42px !important;
             min-height: 42px !important;
+          }
+          .landing-text-content form .brew-methods-section {
+            margin-bottom: 12px !important;
           }
           .landing-text-content form > div > div:first-child {
             min-height: 36px !important;
