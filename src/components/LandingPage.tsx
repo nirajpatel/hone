@@ -593,7 +593,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: auto !important;
             margin-right: auto !important;
             margin-top: -2px !important;
-            margin-bottom: 24px !important;
+            margin-bottom: 32px !important;
           }
           .landing-text-content form div p.rolling-access-text {
             margin-top: 8px !important;
