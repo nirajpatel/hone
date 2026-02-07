@@ -307,7 +307,7 @@ app.post('/make-server-23508aac/users', async (c) => {
       } else if (!allowedEmail) {
         // Email not found in allowlist - block access
         return c.json({ 
-          error: 'Thanks for your interest! This email isn't approved for beta access yet.' 
+          error: 'Thanks for your interest! This email isn\'t approved for beta access yet.' 
         }, 403);
       }
     }

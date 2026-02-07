@@ -2,7 +2,7 @@ import { Button } from './ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
-import { projectId } from '../utils/supabase/info';
+import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 interface LandingPageProps {
   onLoginSuccess?: () => void;
@@ -39,6 +39,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${publicAnonKey}`,
         },
         body: JSON.stringify({ email }),
       });

@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
         JSON.stringify({
           error: {
             http_code: 403,
-            message: 'Thanks for your interest! This email isn't approved for beta access yet.',
+            message: 'Thanks for your interest! This email isn\'t approved for beta access yet.',
           },
         }),
         {
