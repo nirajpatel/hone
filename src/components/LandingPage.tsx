@@ -524,15 +524,18 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             flex: 0 0 auto !important;
             display: block !important;
             align-items: normal !important;
-            justify-content: normal !important;
+            justify-content: flex-start !important;
+            text-align: left !important;
           }
           .landing-graph-container > div {
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
+            text-align: left !important;
           }
           .static-timeline-card {
             margin-bottom: 0 !important;
             margin-top: 0 !important;
+            text-align: left !important;
           }
           .landing-text-content {
             text-align: left !important;
@@ -605,20 +608,45 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-graph-container {
             margin-bottom: 20px !important;
+            text-align: left !important;
+            display: flex !important;
+            justify-content: flex-start !important;
+            align-items: flex-start !important;
+          }
+          .landing-graph-container > div {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            width: 100% !important;
+          }
+          .static-timeline-card {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+          }
+          .landing-graph-container .static-timeline-card h3 {
+            text-align: left !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 {
+            text-align: left !important;
+          }
+          .landing-graph-container .static-timeline-card p {
+            text-align: left !important;
+            justify-content: flex-start !important;
           }
           .landing-text-content {
-            align-items: center !important;
+            align-items: flex-start !important;
           }
           .landing-text-content h1 {
             margin-bottom: 6px !important;
-            text-align: center !important;
+            text-align: left !important;
             line-height: 1.1 !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 20px !important;
             font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
-            text-align: center !important;
-            margin-left: auto !important;
+            text-align: left !important;
+            margin-left: 0 !important;
             margin-right: auto !important;
           }
           .landing-text-content * {
@@ -626,7 +654,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content h1,
           .landing-text-content .landing-subtitle {
-            text-align: center !important;
+            text-align: left !important;
           }
           .landing-text-content form {
             maxWidth: 100% !important;
@@ -689,12 +717,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 40px !important;
             padding: 10px 14px !important;
           }
-          .brew-methods-pills-container button[type="button"],
           .landing-text-content .brew-methods-pills-container button[type="button"] {
             height: auto !important;
             min-height: auto !important;
             padding-left: 16px !important;
-            padding-right: 16px !important;
+            padding-right: 14px !important;
             padding-top: 6px !important;
             padding-bottom: 6px !important;
           }
