@@ -68,7 +68,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             className="text-gray-900 hover:bg-gray-100 cursor-pointer"
             style={{ fontWeight: 500 }}
           >
-            Log in
+            Sign in
           </Button>
         </div>
       </nav>
@@ -85,7 +85,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
               className="text-gray-900 hover:bg-gray-100 cursor-pointer"
               style={{ fontWeight: 500, padding: '4px 12px' }}
             >
-              Log in
+              Sign in
             </Button>
           </div>
         </div>
