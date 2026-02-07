@@ -669,20 +669,70 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-graph-container {
             display: none !important;
           }
+          .landing-mobile-header > div {
+            display: grid !important;
+            grid-template-columns: 1fr auto 1fr !important;
+            align-items: center !important;
+            position: relative !important;
+          }
+          .landing-mobile-header > div > div:first-child {
+            grid-column: 2 !important;
+            justify-self: center !important;
+          }
+          .landing-mobile-header > div > div:last-child {
+            grid-column: 3 !important;
+            justify-self: end !important;
+          }
           .landing-text-content {
-            align-items: flex-start !important;
+            align-items: center !important;
           }
           .landing-text-content h1 {
             margin-bottom: 6px !important;
-            text-align: left !important;
+            text-align: center !important;
             line-height: 1.1 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 20px !important;
             font-size: clamp(1.125rem, 2.5vw, 1.25rem) !important;
+            text-align: center !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+        }
+        @media (max-width: 512px) {
+          .landing-mobile-header > div {
+            display: flex !important;
+            grid-template-columns: none !important;
+            justify-content: space-between !important;
+          }
+          .landing-mobile-header > div > div:first-child {
+            position: static !important;
+            left: auto !important;
+            transform: none !important;
+            grid-column: auto !important;
+            justify-self: auto !important;
+          }
+          .landing-mobile-header > div > div:last-child {
+            grid-column: auto !important;
+            justify-self: auto !important;
+          }
+          .landing-text-content {
+            align-items: flex-start !important;
+            text-align: left !important;
+          }
+          .landing-text-content h1 {
             text-align: left !important;
             margin-left: 0 !important;
             margin-right: auto !important;
+            width: 100% !important;
+          }
+          .landing-text-content .landing-subtitle {
+            text-align: left !important;
+            margin-left: 0 !important;
+            margin-right: auto !important;
+            width: 100% !important;
           }
           .landing-text-content * {
             text-align: left !important;
