@@ -13,7 +13,7 @@ const getUserFriendlyError = (error: any): string => {
 
   // Handle specific error codes
   if (errorCode === 403 || errorMessage.includes('Access denied') || errorMessage.includes('not authorized')) {
-    return 'Thanks for your interest! This email isn't approved for beta access yet.';
+    return 'Thanks for your interest! This email isn\'t approved for beta access yet.';
   }
   
   if (errorMessage.includes('Invalid login credentials') || errorMessage.includes('Invalid credentials')) {
@@ -33,7 +33,7 @@ const getUserFriendlyError = (error: any): string => {
   }
   
   if (errorCode === 'access_denied' || errorMessage.includes('access_denied')) {
-    return 'Thanks for your interest! This email isn't approved for beta access yet.';
+    return 'Thanks for your interest! This email isn\'t approved for beta access yet.';
   }
   
   if (errorCode === 'invalid_request' || errorMessage.includes('invalid_request')) {
