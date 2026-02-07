@@ -494,7 +494,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                   fontSize: '0.875rem',
                   lineHeight: '1.5',
                   color: '#6b7280',
-                  margin: '8px auto 0 auto',
+                  margin: '4px auto 0 auto',
                   textAlign: 'center',
                   width: '100%'
                 }}>
@@ -710,6 +710,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: auto !important;
             margin-right: auto !important;
           }
+          .landing-text-content form div p.rolling-access-text {
+            margin-top: 8px !important;
+          }
         }
         @media (max-width: 768px) {
           .landing-page-wrapper {
@@ -732,14 +735,27 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-graph-container {
             margin-bottom: 24px !important;
           }
+          .landing-text-content {
+            align-items: center !important;
+          }
           .landing-text-content h1 {
             margin-bottom: 8px !important;
-            text-align: left !important;
+            text-align: center !important;
             line-height: 1.1 !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 24px !important;
             font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
+            text-align: center !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          .landing-text-content * {
+            text-align: left !important;
+          }
+          .landing-text-content h1,
+          .landing-text-content .landing-subtitle {
+            text-align: center !important;
           }
           .landing-text-content form {
             maxWidth: 100% !important;
@@ -749,18 +765,31 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content button {
             width: 100% !important;
           }
+          .landing-text-content form > div > div:first-child {
+            min-height: 40px !important;
+          }
           .landing-text-content input[type="email"],
           .landing-text-content button[type="button"] {
             text-align: left !important;
-            font-size: 1rem !important;
+            font-size: 0.875rem !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            padding: 10px 14px !important;
           }
           .landing-text-content button[type="button"] span {
             text-align: left !important;
-            font-size: 1rem !important;
+            font-size: 0.875rem !important;
             line-height: 1.5 !important;
+          }
+          .landing-text-content button[type="submit"] {
+            font-size: 0.875rem !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            padding: 10px 16px !important;
           }
           .landing-text-content form div p.rolling-access-text {
             text-align: center !important;
+            font-size: 0.75rem !important;
           }
           .landing-footer-text {
             height: 60px !important;
@@ -810,6 +839,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             text-align: left !important;
             margin: 0 auto !important;
             max-width: 1400px !important;
+          }
+          .landing-text-content form div p.rolling-access-text {
+            margin-top: 8px !important;
           }
         }
         .landing-footer-text {

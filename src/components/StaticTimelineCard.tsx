@@ -380,18 +380,18 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
         }
         @media (max-width: 767px) {
           .static-timeline-card .mb-3 {
-            text-align: left !important;
+            text-align: center !important;
             margin-bottom: 0.5rem !important;
           }
           .static-timeline-card h3 {
-            text-align: left !important;
+            text-align: center !important;
             font-size: 12px !important;
             display: block !important;
             margin-bottom: 0 !important;
           }
           .static-timeline-card p {
-            text-align: left !important;
-            justify-content: flex-start !important;
+            text-align: center !important;
+            justify-content: center !important;
             font-size: 12px !important;
             margin-top: 0 !important;
           }
