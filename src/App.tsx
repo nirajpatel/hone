@@ -244,6 +244,14 @@ export default function App() {
     };
   }, []);
 
+  // Redirect from /login to / when user becomes authenticated
+  useEffect(() => {
+    if (currentUser && currentRoute === '/login') {
+      window.history.pushState({}, '', '/');
+      setCurrentRoute('/');
+    }
+  }, [currentUser, currentRoute]);
+
   useEffect(() => {
     checkAuth();
     
@@ -252,6 +260,11 @@ export default function App() {
       if (event === 'SIGNED_IN' && session?.access_token) {
         setAccessToken(session.access_token);
         await createOrGetUser(session.access_token);
+        // Redirect from /login to root after successful sign-in
+        if (window.location.pathname === '/login') {
+          window.history.pushState({}, '', '/');
+          setCurrentRoute('/');
+        }
       } else if (event === 'SIGNED_OUT') {
         setCurrentUser(null);
         setAccessToken(null);
@@ -302,7 +315,13 @@ export default function App() {
       if (session?.access_token) {
         setAccessToken(session.access_token);
         await createOrGetUser(session.access_token);
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // Redirect from /login to root after successful sign-in
+        if (window.location.pathname === '/login') {
+          window.history.pushState({}, '', '/');
+          setCurrentRoute('/');
+        } else {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
         return;
       }
       
@@ -328,6 +347,11 @@ export default function App() {
         setCurrentUser(userData);
         // Fetch brews and coffees after successful auth
         await fetchData(token);
+        // Redirect from /login to root after successful sign-in
+        if (window.location.pathname === '/login') {
+          window.history.pushState({}, '', '/');
+          setCurrentRoute('/');
+        }
       } else {
         const errorData = await res.json().catch(() => ({}));
         
@@ -1011,6 +1035,14 @@ export default function App() {
   }
 
   if (currentRoute === '/login') {
+    // If user is already logged in, show loading briefly while redirect happens
+    if (currentUser) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <EspressoLoading />
+        </div>
+      );
+    }
     return <SignInPage onLoginSuccess={() => checkAuth()} />;
   }
 
