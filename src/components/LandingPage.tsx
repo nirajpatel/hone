@@ -648,32 +648,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             -webkit-overflow-scrolling: touch !important;
           }
           .landing-graph-container {
-            margin-bottom: 20px !important;
-            text-align: left !important;
-            display: flex !important;
-            justify-content: flex-start !important;
-            align-items: flex-start !important;
-          }
-          .landing-graph-container > div {
-            text-align: left !important;
-            margin-left: 0 !important;
-            margin-right: auto !important;
-            width: 100% !important;
-          }
-          .static-timeline-card {
-            text-align: left !important;
-            margin-left: 0 !important;
-            margin-right: auto !important;
-          }
-          .landing-graph-container .static-timeline-card h3 {
-            text-align: left !important;
-          }
-          .landing-graph-container .static-timeline-card .mb-3 {
-            text-align: left !important;
-          }
-          .landing-graph-container .static-timeline-card p {
-            text-align: left !important;
-            justify-content: flex-start !important;
+            display: none !important;
           }
           .landing-text-content {
             align-items: flex-start !important;
@@ -734,6 +709,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             width: 100% !important;
             padding-left: 0 !important;
             padding-right: 0 !important;
+          }
+          .landing-text-content form .brew-methods-section {
+            margin-top: 6px !important;
           }
           .landing-text-content form .brew-methods-label,
           .landing-text-content form .brew-methods-section label,
