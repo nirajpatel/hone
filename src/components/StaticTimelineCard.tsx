@@ -384,12 +384,17 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
           }
           .static-timeline-card h3 {
             text-align: left !important;
-            font-size: 14px !important;
+            font-size: 12px !important;
             display: block !important;
           }
           .static-timeline-card p {
             text-align: left !important;
             justify-content: flex-start !important;
+            font-size: 12px !important;
+          }
+          .static-timeline-card p svg {
+            width: 12px !important;
+            height: 12px !important;
           }
           .static-timeline-card .mobile-gap-container {
             gap: 24px !important;
