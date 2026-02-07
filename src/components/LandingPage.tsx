@@ -200,7 +200,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                 margin: 0,
                 fontWeight: 500
               }}>
-                You're on the list! We'll be in touch.
+                You're on the list! We'll be in touch soon.
               </p>
             </div>
           )}
