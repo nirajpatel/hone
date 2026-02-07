@@ -608,31 +608,31 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-graph-container {
             margin-bottom: 20px !important;
-            text-align: left !important;
+            text-align: center !important;
             display: flex !important;
-            justify-content: flex-start !important;
-            align-items: flex-start !important;
+            justify-content: center !important;
+            align-items: center !important;
           }
           .landing-graph-container > div {
-            text-align: left !important;
-            margin-left: 0 !important;
+            text-align: center !important;
+            margin-left: auto !important;
             margin-right: auto !important;
             width: 100% !important;
           }
           .static-timeline-card {
-            text-align: left !important;
-            margin-left: 0 !important;
+            text-align: center !important;
+            margin-left: auto !important;
             margin-right: auto !important;
           }
           .landing-graph-container .static-timeline-card h3 {
-            text-align: left !important;
+            text-align: center !important;
           }
           .landing-graph-container .static-timeline-card .mb-3 {
-            text-align: left !important;
+            text-align: center !important;
           }
           .landing-graph-container .static-timeline-card p {
-            text-align: left !important;
-            justify-content: flex-start !important;
+            text-align: center !important;
+            justify-content: center !important;
           }
           .landing-text-content {
             align-items: flex-start !important;
