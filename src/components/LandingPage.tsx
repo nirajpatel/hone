@@ -733,7 +733,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             -webkit-overflow-scrolling: touch !important;
           }
           .landing-graph-container {
-            margin-bottom: 24px !important;
+            margin-bottom: 20px !important;
           }
           .landing-text-content {
             align-items: center !important;
