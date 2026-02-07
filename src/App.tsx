@@ -229,7 +229,8 @@ export default function App() {
     updateMetaTag('theme-color', '#000000');
     updateMetaTag('apple-mobile-web-app-title', 'Hone');
     updateMetaTag('application-name', 'Hone');
-    updateMetaTag('apple-mobile-web-app-capable', 'yes');
+    updateMetaTag('mobile-web-app-capable', 'yes');
+    updateMetaTag('apple-mobile-web-app-capable', 'yes'); // Keep for iOS compatibility
     updateMetaTag('apple-mobile-web-app-status-bar-style', 'default');
     
     // SEO meta tags
