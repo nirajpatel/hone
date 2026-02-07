@@ -739,12 +739,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             align-items: center !important;
           }
           .landing-text-content h1 {
-            margin-bottom: 8px !important;
+            margin-bottom: 6px !important;
             text-align: center !important;
             line-height: 1.1 !important;
           }
           .landing-text-content .landing-subtitle {
-            margin-bottom: 24px !important;
+            margin-bottom: 20px !important;
             font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
             text-align: center !important;
             margin-left: auto !important;
