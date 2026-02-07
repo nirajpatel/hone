@@ -414,12 +414,13 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                   {isSubmitting ? 'Requesting...' : 'Request Early Access'}
                   {!isSubmitting && <ArrowRight className="w-4 h-4 ml-2" />}
                 </Button>
-                <p style={{
+                <p className="rolling-access-text" style={{
                   fontSize: '0.875rem',
                   lineHeight: '1.5',
                   color: '#6b7280',
-                  margin: '8px 0 0 0',
-                  textAlign: 'center'
+                  margin: '8px auto 0 auto',
+                  textAlign: 'center',
+                  width: '100%'
                 }}>
                   Rolling access • Built with early users
                 </p>
@@ -589,14 +590,17 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content {
             text-align: left !important;
           }
-          .landing-text-content * {
-            text-align: left !important;
-          }
           .landing-text-content button[type="button"],
           .landing-text-content button[type="button"] span,
           .landing-text-content label,
           .landing-text-content label span {
             text-align: left !important;
+          }
+          .landing-text-content * {
+            text-align: left !important;
+          }
+          .landing-text-content form div p.rolling-access-text {
+            text-align: center !important;
           }
           .landing-text-content form {
             margin-left: auto !important;
@@ -618,6 +622,19 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-right: auto !important;
           }
         }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .landing-text-content {
+            align-items: center !important;
+          }
+          .landing-text-content h1 {
+            text-align: center !important;
+          }
+          .landing-text-content .landing-subtitle {
+            text-align: center !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+        }
         @media (max-width: 768px) {
           .landing-page-wrapper {
             height: 100vh !important;
@@ -628,7 +645,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 100dvh !important;
           }
           .landing-page > div {
-            padding: 12px !important;
+            padding: 16px !important;
             padding-top: 60px !important;
             padding-bottom: 60px !important;
             justify-content: center !important;
@@ -665,6 +682,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             text-align: left !important;
             font-size: 1rem !important;
             line-height: 1.5 !important;
+          }
+          .landing-text-content form div p.rolling-access-text {
+            text-align: center !important;
           }
           .landing-footer-text {
             height: 60px !important;
