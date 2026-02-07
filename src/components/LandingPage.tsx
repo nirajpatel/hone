@@ -141,12 +141,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         </div>
       </nav>
 
-      {/* Mobile/Tablet Header - Centered Top */}
+      {/* Mobile/Tablet Header - Left Aligned */}
       <nav className="landing-mobile-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px' }}>
         <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div style={{ flex: 1 }}></div>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button 
               onClick={handleSignInClick}
               variant="ghost"
@@ -551,7 +550,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            align-items: center !important;
+            align-items: flex-start !important;
             justify-content: flex-start !important;
             margin-top: 0 !important;
             padding-top: 0 !important;
@@ -560,6 +559,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-top: 0 !important;
             margin-bottom: 12px !important;
             font-size: clamp(1.75rem, 4vw, 2.5rem) !important;
+            text-align: left !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 16px !important;
@@ -587,10 +587,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-top: 0 !important;
           }
           .landing-text-content {
-            text-align: center !important;
+            text-align: left !important;
           }
           .landing-text-content * {
-            text-align: center !important;
+            text-align: left !important;
           }
           .landing-text-content button[type="button"],
           .landing-text-content button[type="button"] span,
@@ -609,12 +609,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-right: auto !important;
           }
           .landing-section {
-            text-align: center !important;
+            text-align: left !important;
           }
           .landing-section p,
           .landing-subtitle {
-            text-align: center !important;
-            margin-left: auto !important;
+            text-align: left !important;
+            margin-left: 0 !important;
             margin-right: auto !important;
           }
         }
@@ -642,6 +642,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content h1 {
             margin-bottom: 8px !important;
             font-size: clamp(2rem, 6vw, 2.5rem) !important;
+            text-align: left !important;
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 24px !important;
