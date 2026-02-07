@@ -603,6 +603,25 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
         }
         @media (min-width: 769px) and (max-width: 1024px) {
+          .landing-mobile-header > div {
+            display: grid !important;
+            grid-template-columns: 1fr auto 1fr !important;
+            align-items: center !important;
+          }
+          .landing-mobile-header > div > div:first-child {
+            grid-column: 2 !important;
+            justify-self: center !important;
+          }
+          .landing-mobile-header > div > div:last-child {
+            grid-column: 3 !important;
+            justify-self: end !important;
+          }
+          .landing-page > div {
+            gap: 80px !important;
+          }
+          .landing-graph-container {
+            margin-bottom: 0 !important;
+          }
           .landing-text-content {
             align-items: center !important;
           }
