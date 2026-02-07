@@ -37,6 +37,13 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       setTimeout(() => {
         emailInputRef.current?.focus();
       }, 100);
+    } else {
+      // Auto-focus on desktop (min-width: 1025px)
+      if (window.innerWidth >= 1025) {
+        setTimeout(() => {
+          emailInputRef.current?.focus();
+        }, 100);
+      }
     }
   }, []);
 
@@ -225,7 +232,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           <p 
             className="landing-subtitle"
             style={{ 
-              fontSize: 'clamp(1.125rem, 2vw, 1.25rem)',
+              fontSize: 'clamp(1.25rem, 2vw, 1.375rem)',
               fontWeight: 400,
               lineHeight: '1.6',
               color: '#4b5563',
@@ -249,9 +256,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                     placeholder="Enter your email"
                     required
                     disabled={isSubmitting}
+                    autoFocus={typeof window !== 'undefined' && window.innerWidth >= 1025}
                     style={{
                       width: '100%',
-                      padding: '12px 16px',
+                      padding: '10px 16px',
                       paddingRight: '40px', // Make room for LastPass icon
                       fontSize: '1rem',
                       lineHeight: '1.5',
@@ -263,7 +271,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                       transition: 'border-color 0.15s ease',
                       textAlign: 'left',
                       boxSizing: 'border-box',
-                      height: '48px',
+                      height: '42px',
                       position: 'relative',
                       zIndex: 1,
                     }}
@@ -511,7 +519,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 16px !important;
-            font-size: clamp(1rem, 2vw, 1.125rem) !important;
+            font-size: clamp(1.125rem, 2vw, 1.25rem) !important;
           }
           .landing-graph-container {
             position: relative !important;
@@ -578,14 +586,25 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content h1 {
             text-align: center !important;
+            margin-bottom: 10px !important;
           }
           .landing-text-content .landing-subtitle {
             text-align: center !important;
             margin-left: auto !important;
             margin-right: auto !important;
+            margin-top: -2px !important;
+            margin-bottom: 24px !important;
           }
           .landing-text-content form div p.rolling-access-text {
             margin-top: 8px !important;
+          }
+          .landing-text-content form > div > div:first-child {
+            min-height: 42px !important;
+          }
+          .landing-text-content input[type="email"] {
+            height: 42px !important;
+            min-height: 42px !important;
+            padding: 10px 16px !important;
           }
         }
         @media (max-width: 768px) {
@@ -644,7 +663,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content .landing-subtitle {
             margin-bottom: 20px !important;
-            font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
+            font-size: clamp(1.125rem, 2.5vw, 1.25rem) !important;
             text-align: left !important;
             margin-left: 0 !important;
             margin-right: auto !important;
@@ -805,6 +824,30 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content form div p.rolling-access-text {
             margin-top: 8px !important;
+          }
+          .landing-text-content h1 {
+            margin-bottom: 10px !important;
+          }
+          .landing-text-content .landing-subtitle {
+            margin-top: 0 !important;
+          }
+          .landing-text-content form > div > div:first-child {
+            min-height: 36px !important;
+          }
+          .landing-text-content input[type="email"] {
+            height: 36px !important;
+            min-height: 36px !important;
+            padding: 8px 16px !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .landing-text-content form > div > div:first-child {
+            min-height: 42px !important;
+          }
+          .landing-text-content input[type="email"] {
+            height: 42px !important;
+            min-height: 42px !important;
+            padding: 10px 16px !important;
           }
         }
         .landing-footer-text {
