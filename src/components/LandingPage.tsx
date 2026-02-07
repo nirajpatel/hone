@@ -321,6 +321,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                             e.preventDefault();
                             e.stopPropagation();
                             toggleMethod(method);
+                            // Blur the button to remove focus state on mobile
+                            e.currentTarget.blur();
                           }}
                           disabled={isSubmitting}
                           className={`inline-flex items-center gap-1 rounded-full text-sm border transition-colors ${
@@ -441,6 +443,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):hover {
           color: #111827 !important;
         }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):active,
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):focus {
+          color: #6b7280 !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):active:hover,
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):focus:hover {
+          color: #111827 !important;
+        }
         .landing-text-content .brew-methods-pills-container button[type="button"].bg-gray-900 {
           color: #ffffff !important;
         }
@@ -448,6 +458,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           color: inherit !important;
         }
         .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):hover span {
+          color: inherit !important;
+        }
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):active span,
+        .landing-text-content .brew-methods-pills-container button[type="button"]:not(.bg-gray-900):focus span {
           color: inherit !important;
         }
         button[type="button"] span {
