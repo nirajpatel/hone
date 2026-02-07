@@ -8,6 +8,25 @@ This app uses Resend to send email notifications when someone requests early acc
 2. A verified domain (or use Resend's test domain for development)
 3. Supabase project with access to environment variables
 
+## Database Setup
+
+### Run Migration
+Before using the early access feature, you need to create the database table:
+
+1. Go to your Supabase project dashboard
+2. Navigate to **SQL Editor**
+3. Run the migration file: `supabase/migrations/002_create_early_access_requests.sql`
+
+Or use the Supabase CLI:
+```bash
+supabase db push
+```
+
+This creates the `early_access_requests` table with:
+- Email storage (primary key)
+- Timestamp tracking
+- Status field (pending/approved/rejected)
+
 ## Resend Setup
 
 ### 1. Get Your Resend API Key
@@ -45,13 +64,26 @@ For development/testing, Resend provides a test domain (`onboarding.resend.dev`)
 ### Early Access Request Flow:
 1. User enters email on landing page (`/`)
 2. Frontend calls `/make-server-23508aac/early-access` endpoint
-3. Backend sends email notification to `niraj@hone.coffee`
-4. User sees success message
+3. Backend stores email in `early_access_requests` database table
+4. Backend sends email notification to `niraj@hone.coffee` (only for new requests)
+5. User sees success message
+
+### Database Storage
+All early access requests are stored in the `early_access_requests` table with:
+- `email` (primary key)
+- `created_at` (timestamp)
+- `status` (pending, approved, or rejected)
 
 ### Email Content
 The email includes:
 - User's email address
 - Timestamp of the request
+
+### Admin Endpoints
+You can manage early access requests via these admin endpoints:
+- `GET /make-server-23508aac/admin/early-access-requests` - List all requests
+- `PUT /make-server-23508aac/admin/early-access-requests/:email` - Update status (pending/approved/rejected)
+- `DELETE /make-server-23508aac/admin/early-access-requests/:email` - Delete a request
 
 ## Testing
 

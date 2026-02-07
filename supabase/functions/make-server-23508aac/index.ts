@@ -3423,23 +3423,57 @@ app.post('/make-server-23508aac/early-access', async (c) => {
       return c.json({ error: 'Valid email is required' }, 400);
     }
 
-    // Send email notification to niraj@hone.coffee
-    const emailSubject = 'New Early Access Request';
-    const emailHtml = `
-      <h2>New Early Access Request</h2>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Requested at:</strong> ${new Date().toISOString()}</p>
-    `;
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase().trim();
 
-    const emailSent = await notifications.sendEmail(
-      'niraj@hone.coffee',
-      emailSubject,
-      emailHtml
-    );
+    // Check if this is a new request or a duplicate
+    const { data: existing } = await supabase
+      .from('early_access_requests')
+      .select('email, created_at')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
 
-    if (!emailSent) {
-      console.error('Failed to send early access notification email');
-      // Still return success to user even if email fails
+    const isNewRequest = !existing;
+
+    // Store in database (upsert to handle duplicate requests)
+    const { error: dbError } = await supabase
+      .from('early_access_requests')
+      .upsert(
+        {
+          email: normalizedEmail,
+          created_at: new Date().toISOString(),
+          status: 'pending',
+        },
+        {
+          onConflict: 'email',
+          ignoreDuplicates: false, // Update timestamp if email already exists
+        }
+      );
+
+    if (dbError) {
+      console.error('Error storing early access request:', dbError);
+      // Continue even if DB fails - still try to send email
+    }
+
+    // Only send email notification for new requests
+    if (isNewRequest) {
+      const emailSubject = 'New Early Access Request';
+      const emailHtml = `
+        <h2>New Early Access Request</h2>
+        <p><strong>Email:</strong> ${normalizedEmail}</p>
+        <p><strong>Requested at:</strong> ${new Date().toISOString()}</p>
+      `;
+
+      const emailSent = await notifications.sendEmail(
+        'niraj@hone.coffee',
+        emailSubject,
+        emailHtml
+      );
+
+      if (!emailSent) {
+        console.error('Failed to send early access notification email');
+        // Still return success to user even if email fails
+      }
     }
 
     return c.json({ 
@@ -3449,6 +3483,96 @@ app.post('/make-server-23508aac/early-access', async (c) => {
   } catch (error) {
     console.error('Error processing early access request:', error);
     return c.json({ error: 'Failed to process request' }, 500);
+  }
+});
+
+// Admin endpoints for managing early access requests
+app.get('/make-server-23508aac/admin/early-access-requests', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    const { data, error } = await supabase
+      .from('early_access_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching early access requests:', error);
+      return c.json({ error: 'Failed to fetch early access requests' }, 500);
+    }
+
+    return c.json(data || []);
+  } catch (error) {
+    console.error('Error in GET /admin/early-access-requests:', error);
+    return c.json({ error: 'Failed to fetch early access requests' }, 500);
+  }
+});
+
+app.put('/make-server-23508aac/admin/early-access-requests/:email', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    const email = decodeURIComponent(c.req.param('email'));
+    const { status } = await c.req.json();
+
+    if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+      return c.json({ error: 'Valid status is required (pending, approved, or rejected)' }, 400);
+    }
+
+    const { data, error } = await supabase
+      .from('early_access_requests')
+      .update({ status })
+      .eq('email', email)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating early access request:', error);
+      return c.json({ error: 'Failed to update early access request' }, 500);
+    }
+
+    return c.json(data);
+  } catch (error) {
+    console.error('Error in PUT /admin/early-access-requests/:email:', error);
+    return c.json({ error: 'Failed to update early access request' }, 500);
+  }
+});
+
+app.delete('/make-server-23508aac/admin/early-access-requests/:email', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    const email = decodeURIComponent(c.req.param('email'));
+    
+    const { error } = await supabase
+      .from('early_access_requests')
+      .delete()
+      .eq('email', email);
+
+    if (error) {
+      console.error('Error deleting early access request:', error);
+      return c.json({ error: 'Failed to delete early access request' }, 500);
+    }
+
+    return c.json({ message: 'Early access request deleted' });
+  } catch (error) {
+    console.error('Error in DELETE /admin/early-access-requests/:email:', error);
+    return c.json({ error: 'Failed to delete early access request' }, 500);
   }
 });
 
