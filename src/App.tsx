@@ -173,7 +173,7 @@ export default function App() {
 
   useEffect(() => {
     // Set document title and meta tags
-    document.title = 'Hone';
+    document.title = 'Hone – Designed for Better Coffee';
     
     // Clear favicon and apple-touch-icon
     // Remove existing favicon
@@ -189,33 +189,48 @@ export default function App() {
     }
     
     // Update or create meta tags for social media
-    const updateMetaTag = (property: string, content: string) => {
-      let meta = document.querySelector(`meta[property="${property}"]`) || 
-                 document.querySelector(`meta[name="${property}"]`);
-      if (!meta) {
-        meta = document.createElement('meta');
-        if (property.startsWith('og:') || property.startsWith('twitter:')) {
+    const updateMetaTag = (property: string, content: string, useProperty = false) => {
+      let meta: HTMLMetaElement | null = null;
+      
+      if (useProperty || property.startsWith('og:')) {
+        meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+        if (!meta) {
+          meta = document.createElement('meta');
           meta.setAttribute('property', property);
-        } else {
-          meta.setAttribute('name', property);
+          document.head.appendChild(meta);
         }
-        document.head.appendChild(meta);
+      } else {
+        meta = document.querySelector(`meta[name="${property}"]`) as HTMLMetaElement;
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', property);
+          document.head.appendChild(meta);
+        }
       }
       meta.setAttribute('content', content);
     };
 
-    updateMetaTag('description', '');
-    updateMetaTag('og:title', 'Hone');
-    updateMetaTag('og:description', '');
-    updateMetaTag('og:type', 'website');
-    updateMetaTag('twitter:card', 'summary');
-    updateMetaTag('twitter:title', 'Hone');
-    updateMetaTag('twitter:description', '');
+    // Standard meta tags
+    updateMetaTag('description', 'Track your brews, analyze patterns, and get personalized guidance to brew better coffee – every time.');
     
-    // Add apple-mobile-web-app-capable and title for better iOS home screen experience
+    // Open Graph tags (use property attribute)
+    updateMetaTag('og:type', 'website', true);
+    updateMetaTag('og:title', 'Hone – Designed for Better Coffee', true);
+    updateMetaTag('og:description', 'Track brews. Learn from your data. Get personalized guidance for better coffee.', true);
+    updateMetaTag('og:url', 'https://hone.coffee', true);
+    updateMetaTag('og:site_name', 'Hone', true);
+    
+    // Twitter Card tags (use name attribute)
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:title', 'Hone – Designed for Better Coffee');
+    updateMetaTag('twitter:description', 'Log brews, analyze patterns, and get personalized guidance to brew better coffee.');
+    
+    // Theme and app meta tags (use name attribute)
+    updateMetaTag('theme-color', '#000000');
+    updateMetaTag('apple-mobile-web-app-title', 'Hone');
+    updateMetaTag('application-name', 'Hone');
     updateMetaTag('apple-mobile-web-app-capable', 'yes');
     updateMetaTag('apple-mobile-web-app-status-bar-style', 'default');
-    updateMetaTag('apple-mobile-web-app-title', 'Hone');
   }, []);
 
   useEffect(() => {
