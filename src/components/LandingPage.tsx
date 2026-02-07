@@ -787,6 +787,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 40px !important;
             padding: 10px 16px !important;
           }
+          .landing-text-content label span {
+            font-size: 0.875rem !important;
+          }
+          .landing-text-content form label {
+            padding: 6px 10px !important;
+          }
+          .landing-text-content form > div > div > div > div {
+            padding: 4px !important;
+          }
           .landing-text-content form div p.rolling-access-text {
             text-align: center !important;
             font-size: 0.75rem !important;
