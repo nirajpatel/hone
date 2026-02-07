@@ -281,7 +281,7 @@ export function UserProfileDialog({
                   <Input 
                     value={household.inviteCode} 
                     disabled 
-                    className="font-mono text-lg tracking-wider"
+                    className="font-mono text-base tracking-wider"
                   />
                   <Button
                     type="button"

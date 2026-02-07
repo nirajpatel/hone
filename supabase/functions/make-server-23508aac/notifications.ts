@@ -118,6 +118,54 @@ export async function sendEmail(to: string, subject: string, html: string, from:
   }
 }
 
+// Send email via Resend using a template
+export async function sendEmailWithTemplate(
+  to: string, 
+  templateId: string, 
+  from: string = 'Hone <noreply@hone.coffee>',
+  templateData?: Record<string, any>
+): Promise<boolean> {
+  try {
+    const apiKey = Deno.env.get('RESEND_API_KEY');
+
+    if (!apiKey) {
+      console.error('RESEND_API_KEY is not set');
+      return false;
+    }
+
+    const requestBody: any = {
+      from,
+      to,
+      template_id: templateId,
+    };
+
+    // If template data is provided, add it
+    if (templateData) {
+      requestBody.data = templateData;
+    }
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Resend API error (${response.status}): ${errorText}`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error sending template email to ${to}:`, error);
+    return false;
+  }
+}
+
 // Get all brews for a specific user on a specific date with same coffee and method
 export async function getBrewsForCoffeeAndMethodOnDate(
   userId: string,

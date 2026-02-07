@@ -3515,6 +3515,20 @@ app.post('/make-server-23508aac/early-access', async (c) => {
       } else {
         console.log(`Email sent successfully to niraj@hone.coffee with ${normalizedMethods.length} methods`);
       }
+
+      // Send welcome email to the user using Resend template
+      console.log(`Sending welcome email to ${normalizedEmail} using private-beta-sign-up template`);
+      const welcomeEmailSent = await notifications.sendEmailWithTemplate(
+        normalizedEmail,
+        'private-beta-sign-up'
+      );
+
+      if (!welcomeEmailSent) {
+        console.error(`Failed to send welcome email to ${normalizedEmail}`);
+        // Still return success to user even if welcome email fails
+      } else {
+        console.log(`Welcome email sent successfully to ${normalizedEmail}`);
+      }
     }
     
     // Log methods for debugging (methods are always saved to DB, even for duplicates)
