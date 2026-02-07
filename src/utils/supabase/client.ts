@@ -11,7 +11,7 @@ export const supabase = createClient(
       detectSessionInUrl: true,
       flowType: 'pkce',
       storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'coffee-tracker-auth',
+      storageKey: 'hone-auth',
     },
   }
 );

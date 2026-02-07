@@ -21,6 +21,7 @@ import { A2POptInProof } from './components/A2POptInProof';
 import { CoffeeBagImageFlow } from './components/CoffeeBagImageFlow';
 import { Feed } from './components/Feed';
 import { UserProfileDialog } from './components/UserProfileDialog';
+import { FeedbackDialog } from './components/FeedbackDialog';
 import { BrewEquipmentIcon } from './components/icons/BrewEquipmentIcon';
 import { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar';
 import {
@@ -50,7 +51,7 @@ import coffeeBeansImage from './assets/coffee-beans.webp';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
 import { Coffee as CoffeeIcon, Plus, LogOut } from 'lucide-react';
-import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon, MessageSquare } from 'lucide-react';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { toast, Toaster } from 'sonner@2.0.3';
 import {
@@ -67,6 +68,7 @@ export default function App() {
   const [coffees, setCoffees] = useState<Coffee[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [selectedBrew, setSelectedBrew] = useState<Extraction | null>(null);
   const [scrollToGuidance, setScrollToGuidance] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
@@ -97,6 +99,8 @@ export default function App() {
   const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('table');
   const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('timeline');
   const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isFeedbackHovered, setIsFeedbackHovered] = useState(false);
 
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
 
@@ -297,6 +301,7 @@ export default function App() {
         setCurrentUser(null);
         setAccessToken(null);
         setLoading(false);
+        setAuthChecked(true);
       }
     });
 
@@ -318,6 +323,7 @@ export default function App() {
       if (error && !isLoginRoute) {
         toast.error(`OAuth Error: ${errorDescription || error}`);
         setLoading(false);
+        setAuthChecked(true);
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
       }
@@ -325,6 +331,7 @@ export default function App() {
       // If on login route and there's an error, let SignInPage handle it
       if (error && isLoginRoute) {
         setLoading(false);
+        setAuthChecked(true);
         return;
       }
       
@@ -350,13 +357,16 @@ export default function App() {
         } else {
           window.history.replaceState({}, document.title, window.location.pathname);
         }
+        setAuthChecked(true);
         return;
       }
       
       setLoading(false);
+      setAuthChecked(true);
     } catch (error) {
       console.error('Error checking auth:', error);
       setLoading(false);
+      setAuthChecked(true);
     }
   };
 
@@ -1071,6 +1081,24 @@ export default function App() {
         </div>
       );
     }
+    
+    // Check if this is an OAuth callback (has code or access_token in URL)
+    // If so, show loading instead of login page to prevent flash
+    const urlParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const code = urlParams.get('code');
+    const accessToken = hashParams.get('access_token');
+    const hasOAuthCallback = code || accessToken;
+    
+    if (hasOAuthCallback) {
+      // OAuth callback detected - show loading while processing
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <EspressoLoading />
+        </div>
+      );
+    }
+    
     return <SignInPage onLoginSuccess={() => checkAuth()} />;
   }
 
@@ -1086,17 +1114,44 @@ export default function App() {
     );
   }
 
-  if (!currentUser) {
-    // Show LandingPage immediately, don't show loading animation for logged out users
-    return <LandingPage onLoginSuccess={() => checkAuth()} />;
+  // Public routes that don't require auth
+  const publicRoutes = ['/login', '/landing'];
+  const isPublicRoute = publicRoutes.includes(currentRoute);
+  
+  // Root route (/) shows landing page when logged out
+  const isRootRoute = currentRoute === '/';
+
+  // Check if there's a potential session stored (to prevent flash for logged-in users)
+  // Supabase stores session in localStorage under the storageKey configured in client.ts
+  const hasPotentialSession = typeof window !== 'undefined' && 
+    localStorage.getItem('hone-auth') !== null;
+
+  // Show loading spinner if:
+  // 1. User is logged in and loading their data, OR
+  // 2. We're loading and there's a potential session (might be logged in, checking auth)
+  // Don't show loading if no potential session (definitely logged out)
+  if (loading) {
+    if (currentUser) {
+      // User is logged in, loading their data - show loading
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <EspressoLoading />
+        </div>
+      );
+    } else if (hasPotentialSession && !authChecked) {
+      // Potential session exists, still checking auth - show loading to prevent flash
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <EspressoLoading />
+        </div>
+      );
+    }
+    // No potential session - user is definitely logged out, don't show loading
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <EspressoLoading />
-      </div>
-    );
+  if (!currentUser) {
+    // Show LandingPage - no loading spinner for logged-out users
+    return <LandingPage onLoginSuccess={() => checkAuth()} />;
   }
 
   if (currentRoute === '/feed') {
@@ -1645,6 +1700,60 @@ export default function App() {
             fetchData(); // Refetch brews to get updated equipment names
           }}
         />
+      )}
+
+      {/* Floating Feedback Button - Only show when logged in */}
+      {currentUser && (
+        <>
+          <button
+            type="button"
+            onClick={() => setShowFeedback(true)}
+            onMouseEnter={() => setIsFeedbackHovered(true)}
+            onMouseLeave={() => setIsFeedbackHovered(false)}
+            style={{
+              position: 'fixed',
+              bottom: '24px',
+              right: '24px',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              gap: isFeedbackHovered ? '10px' : '0',
+              backgroundColor: isFeedbackHovered ? '#1f2937' : '#111827',
+              color: '#ffffff',
+              paddingTop: '8px',
+              paddingBottom: '8px',
+              paddingLeft: '12px',
+              paddingRight: '12px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: 500,
+              transition: 'background-color 0.2s, gap 0.2s',
+            }}
+            aria-label="Send feedback"
+          >
+            <MessageSquare className="w-5 h-5" style={{ flexShrink: 0 }} />
+            <span 
+              style={{
+                opacity: isFeedbackHovered ? 1 : 0,
+                maxWidth: isFeedbackHovered ? '200px' : '0',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                transition: 'opacity 0.2s, max-width 0.2s',
+                fontSize: '14px',
+              }}
+            >
+              Feedback
+            </span>
+          </button>
+          <FeedbackDialog
+            open={showFeedback}
+            onOpenChange={setShowFeedback}
+            userEmail={currentUser.email}
+          />
+        </>
       )}
     </div>
   );

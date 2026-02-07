@@ -1,7 +1,7 @@
 
-  # Coffee Extraction Dashboard
+# Hone
 
-  This is a code bundle for Coffee Extraction Dashboard. The original project is available at https://www.figma.com/design/MGLmX8JT6avLElpbH3tXp2/Coffee-Extraction-Dashboard.
+Designed for better coffee.
 
   ## Running the code
 

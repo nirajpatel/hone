@@ -3449,7 +3449,9 @@ app.post('/make-server-23508aac/early-access', async (c) => {
     const isNewRequest = !existing;
 
     // Store in database (upsert to handle duplicate requests)
-    const { error: dbError } = await supabase
+    console.log(`Attempting to save early access request: ${normalizedEmail}, Methods: ${JSON.stringify(normalizedMethods)}`);
+    
+    const { data: savedData, error: dbError } = await supabase
       .from('early_access_requests')
       .upsert(
         {
@@ -3462,16 +3464,31 @@ app.post('/make-server-23508aac/early-access', async (c) => {
           onConflict: 'email',
           ignoreDuplicates: false, // Update timestamp if email already exists
         }
-      );
+      )
+      .select();
 
     if (dbError) {
       console.error('Error storing early access request:', dbError);
-      // Continue even if DB fails - still try to send email
+      console.error('Error details:', JSON.stringify(dbError, null, 2));
+      // Return error instead of continuing silently
+      return c.json({ 
+        error: 'Failed to save request to database',
+        details: dbError.message 
+      }, 500);
+    }
+
+    console.log(`Successfully saved early access request: ${normalizedEmail}`);
+    if (savedData && savedData.length > 0) {
+      console.log(`Saved data:`, JSON.stringify(savedData[0], null, 2));
     }
 
     // Only send email notification for new requests
     if (isNewRequest) {
-      const methodsList = normalizedMethods.map((m: string) => `• ${m}`).join('<br>');
+      // Format methods for email
+      const methodsList = normalizedMethods.length > 0 
+        ? normalizedMethods.map((m: string) => `• ${m}`).join('<br>')
+        : 'None selected';
+      
       const emailSubject = 'New Early Access Request';
       const emailHtml = `
         <h2>New Early Access Request</h2>
@@ -3480,6 +3497,11 @@ app.post('/make-server-23508aac/early-access', async (c) => {
         <p>${methodsList}</p>
         <p><strong>Requested at:</strong> ${new Date().toISOString()}</p>
       `;
+
+      // Log email content for debugging
+      console.log(`Sending email notification for ${normalizedEmail}`);
+      console.log(`Methods being sent: ${normalizedMethods.join(', ')}`);
+      console.log(`Email HTML preview:`, emailHtml);
 
       const emailSent = await notifications.sendEmail(
         'niraj@hone.coffee',
@@ -3490,6 +3512,8 @@ app.post('/make-server-23508aac/early-access', async (c) => {
       if (!emailSent) {
         console.error('Failed to send early access notification email');
         // Still return success to user even if email fails
+      } else {
+        console.log(`Email sent successfully to niraj@hone.coffee with ${normalizedMethods.length} methods`);
       }
     }
     
@@ -3506,6 +3530,53 @@ app.post('/make-server-23508aac/early-access', async (c) => {
   }
 });
 
+// Feedback endpoint
+app.post('/make-server-23508aac/feedback', async (c) => {
+  try {
+    const { feedback, userEmail } = await c.req.json();
+
+    if (!feedback || typeof feedback !== 'string' || feedback.trim().length === 0) {
+      return c.json({ error: 'Feedback is required' }, 400);
+    }
+
+    const trimmedFeedback = feedback.trim();
+    const email = userEmail || 'Unknown';
+
+    // Send email notification
+    const emailSubject = 'Hone Feedback';
+    const emailHtml = `
+      <h2>New Feedback</h2>
+      <p><strong>From:</strong> ${email}</p>
+      <p><strong>Feedback:</strong></p>
+      <p style="white-space: pre-wrap;">${trimmedFeedback}</p>
+      <p><strong>Submitted at:</strong> ${new Date().toISOString()}</p>
+    `;
+
+    console.log(`Sending feedback email from ${email}`);
+
+    const emailSent = await notifications.sendEmail(
+      'niraj@hone.coffee',
+      emailSubject,
+      emailHtml
+    );
+
+    if (!emailSent) {
+      console.error('Failed to send feedback email');
+      return c.json({ error: 'Failed to send feedback' }, 500);
+    }
+
+    console.log(`Feedback sent successfully from ${email}`);
+
+    return c.json({ 
+      success: true,
+      message: 'Feedback received'
+    });
+  } catch (error) {
+    console.error('Error processing feedback:', error);
+    return c.json({ error: 'Failed to process feedback' }, 500);
+  }
+});
+
 // Admin endpoints for managing early access requests
 app.get('/make-server-23508aac/admin/early-access-requests', async (c) => {
   try {
@@ -3518,12 +3589,19 @@ app.get('/make-server-23508aac/admin/early-access-requests', async (c) => {
     // TODO: Add admin check here
     const { data, error } = await supabase
       .from('early_access_requests')
-      .select('*')
+      .select('email, created_at, status, methods')
       .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching early access requests:', error);
       return c.json({ error: 'Failed to fetch early access requests' }, 500);
+    }
+
+    // Log methods for debugging
+    if (data && data.length > 0) {
+      console.log(`Fetched ${data.length} early access requests. Methods included:`, 
+        data.map((r: any) => ({ email: r.email, methods: r.methods }))
+      );
     }
 
     return c.json(data || []);
