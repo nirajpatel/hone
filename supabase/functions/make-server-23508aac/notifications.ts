@@ -122,7 +122,7 @@ export async function sendEmail(to: string, subject: string, html: string, from:
 export async function sendEmailWithTemplate(
   to: string, 
   templateId: string, 
-  from: string = 'Hone <noreply@hone.coffee>',
+  from: string = 'Niraj from Hone <niraj@hone.coffee>',
   templateData?: Record<string, any>
 ): Promise<boolean> {
   try {
@@ -136,12 +136,14 @@ export async function sendEmailWithTemplate(
     const requestBody: any = {
       from,
       to,
-      template_id: templateId,
+      template: {
+        id: templateId,
+      },
     };
 
-    // If template data is provided, add it
+    // If template data is provided, add it to the template object
     if (templateData) {
-      requestBody.data = templateData;
+      requestBody.template.data = templateData;
     }
 
     const response = await fetch('https://api.resend.com/emails', {
