@@ -752,7 +752,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content .email-label,
           .landing-text-content form label.email-label {
             text-align: left !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 4px !important;
             margin-top: -2px !important;
             margin-left: 0 !important;
             margin-right: auto !important;
@@ -778,7 +778,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-right: 0 !important;
             margin-left: 0 !important;
             margin-top: -2px !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 4px !important;
           }
           .landing-text-content input[type="email"],
           .landing-text-content button:not(.brew-methods-pills-container button) {
@@ -928,7 +928,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content .email-label,
           .landing-text-content form label.email-label {
             text-align: left !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 4px !important;
             margin-top: -2px !important;
             margin-left: 0 !important;
             margin-right: auto !important;
@@ -954,7 +954,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-right: 0 !important;
             margin-left: 0 !important;
             margin-top: -2px !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 4px !important;
           }
           .landing-text-content input[type="email"],
           .landing-text-content button:not(.brew-methods-pills-container button) {
@@ -1009,7 +1009,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding: 0 !important;
             padding-bottom: 0 !important;
             margin-top: -2px !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 4px !important;
           }
           .landing-text-content form > div > div > div > div {
             padding: 4px !important;
