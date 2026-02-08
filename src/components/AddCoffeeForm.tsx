@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Coffee, RoastLevel } from '../types';
-import { Plus, Camera, Trash2, Loader2, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { Plus, Camera, Trash2, Loader2, CheckCircle2, AlertCircle, X, CalendarIcon } from 'lucide-react';
 import { StandardDialog } from './ui/standard-dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -15,6 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar } from './ui/calendar';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 interface AddCoffeeFormProps {
@@ -58,6 +60,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [roastLevel, setRoastLevel] = useState<RoastLevel | undefined>();
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   // Track focus state for roaster and name fields
   const [roasterFocused, setRoasterFocused] = useState(false);
@@ -95,12 +98,13 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       // For duplicates, don't copy roast date - leave it empty
       // For edits, keep the roast date
       if (editData) {
-        // Convert date format for iOS (yyyy-mm-dd to mm/dd/yyyy)
-        if (isIOS && dataToUse.roastDate) {
+        // For mobile date picker, keep yyyy-mm-dd format
+        // For iOS desktop text input, convert to mm/dd/yyyy
+        if (isIOS && !isMobile && dataToUse.roastDate) {
           const [year, month, day] = dataToUse.roastDate.split('-');
           setRoastDate(`${month}/${day}/${year}`);
         } else {
-          setRoastDate(dataToUse.roastDate);
+          setRoastDate(dataToUse.roastDate || '');
         }
       } else {
         // Duplicate - clear roast date
@@ -209,9 +213,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
     if (!canSave) return;
     
     // Normalize date to yyyy-mm-dd format
+    // Date picker on mobile already stores in yyyy-mm-dd format
     let normalizedDate = roastDate;
-    if (isIOS && roastDate.includes('/')) {
-      // Convert mm/dd/yyyy to yyyy-mm-dd
+    if (roastDate && roastDate.includes('/')) {
+      // Convert mm/dd/yyyy to yyyy-mm-dd (for iOS text input fallback)
       const [month, day, year] = roastDate.split('/');
       normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
@@ -232,9 +237,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
     if (!canSave || !editData) return;
     
     // Normalize date to yyyy-mm-dd format
+    // Date picker on mobile already stores in yyyy-mm-dd format
     let normalizedDate = roastDate;
-    if (isIOS && roastDate.includes('/')) {
-      // Convert mm/dd/yyyy to yyyy-mm-dd
+    if (roastDate && roastDate.includes('/')) {
+      // Convert mm/dd/yyyy to yyyy-mm-dd (for iOS text input fallback)
       const [month, day, year] = roastDate.split('/');
       normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
@@ -553,8 +559,9 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       if (roasterValue) setRoaster(roasterValue);
       if (nameValue) setName(nameValue);
       if (data.roastDate) {
-        // Convert date format for iOS (yyyy-mm-dd to mm/dd/yyyy)
-        if (isIOS) {
+        // For mobile date picker, keep yyyy-mm-dd format
+        // For iOS desktop text input, convert to mm/dd/yyyy
+        if (isIOS && !isMobile) {
           const [year, month, day] = data.roastDate.split('-');
           setRoastDate(`${month}/${day}/${year}`);
         } else {
@@ -947,15 +954,67 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <Label htmlFor="roastDate">
                 Roast Date <span className="text-muted-foreground">(optional)</span>
               </Label>
-              <Input
-                id="roastDate"
-                type={isIOS ? "text" : "date"}
-                placeholder={isIOS ? "mm/dd/yyyy" : undefined}
-                pattern={isIOS ? "\\d{2}/\\d{2}/\\d{4}" : undefined}
-                value={roastDate}
-                onChange={(e) => setRoastDate(e.target.value)}
-                className="mt-2"
-              />
+              
+              {/* Desktop: Use date input (shows segments) */}
+              {!isMobile && (
+                <Input
+                  id="roastDate"
+                  type="date"
+                  value={roastDate}
+                  onChange={(e) => setRoastDate(e.target.value)}
+                  className="mt-2"
+                />
+              )}
+              
+              {/* Mobile: Use date picker */}
+              {isMobile && (
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2 justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {roastDate ? (
+                        (() => {
+                          // Date picker stores in yyyy-mm-dd format
+                          const [year, month, day] = roastDate.split('-');
+                          if (year && month && day) {
+                            return `${month}/${day}/${year}`;
+                          }
+                          return roastDate;
+                        })()
+                      ) : (
+                        <span className="text-muted-foreground">Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={roastDate ? (() => {
+                        // Handle both yyyy-mm-dd and mm/dd/yyyy formats
+                        if (roastDate.includes('/')) {
+                          const [month, day, year] = roastDate.split('/');
+                          return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                        }
+                        const [year, month, day] = roastDate.split('-');
+                        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                      })() : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          setRoastDate(`${year}-${month}-${day}`);
+                          setDatePickerOpen(false);
+                        }
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             <div>

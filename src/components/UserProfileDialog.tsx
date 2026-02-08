@@ -651,8 +651,9 @@ export function UserProfileDialog({
                 Create a household to share coffee inventory and brews with others, or join an existing household with an invite code.
               </p>
               
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
+              <div className="space-y-3">
+                {/* Desktop layout: Create Household | or | Input | Join */}
+                <div className="hidden md:flex items-center gap-3">
                   <Button
                     type="button"
                     onClick={handleCreateHousehold}
@@ -667,7 +668,7 @@ export function UserProfileDialog({
                   
                   <Input
                     id="inviteCode"
-                    placeholder="Enter code"
+                    placeholder="Enter invite code"
                     value={inviteCode}
                     onChange={(e) => {
                       setInviteCode(e.target.value.toUpperCase());
@@ -686,6 +687,52 @@ export function UserProfileDialog({
                     {joiningHousehold ? 'Joining...' : 'Join'}
                   </Button>
                 </div>
+
+                {/* Mobile layout: Create Household full width, divider with or, Input | Join */}
+                <div className="md:hidden space-y-3">
+                  <Button
+                    type="button"
+                    onClick={handleCreateHousehold}
+                    disabled={creatingHousehold}
+                    variant="outline"
+                    className="w-full cursor-pointer"
+                  >
+                    {creatingHousehold ? 'Creating...' : 'Create Household'}
+                  </Button>
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                      <span className="bg-white px-2 text-gray-500">or</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="inviteCode-mobile"
+                      placeholder="Enter invite code"
+                      value={inviteCode}
+                      onChange={(e) => {
+                        setInviteCode(e.target.value.toUpperCase());
+                        setInviteCodeError(''); // Clear error when typing
+                      }}
+                      className={`font-mono flex-1 ${inviteCodeError ? 'border-red-500' : ''}`}
+                    />
+                    
+                    <Button
+                      type="button"
+                      onClick={handleJoinHousehold}
+                      disabled={!inviteCode.trim() || joiningHousehold}
+                      variant="outline"
+                      className="cursor-pointer whitespace-nowrap flex-shrink-0"
+                    >
+                      {joiningHousehold ? 'Joining...' : 'Join'}
+                    </Button>
+                  </div>
+                </div>
+                
                 {inviteCodeError && (
                   <p className="text-sm text-red-500 mt-1">{inviteCodeError}</p>
                 )}
@@ -702,14 +749,13 @@ export function UserProfileDialog({
             Phone Number <span className="text-muted-foreground">(optional)</span>
           </Label>
           <div className="relative mt-2">
-            <div className="absolute left-3 pointer-events-none select-none text-sm" style={{ top: '8.5px' }}>+1</div>
             <Input
               id="phoneNumber"
               type="tel"
               placeholder="(123) 456-7890"
               value={phoneNumber}
               onChange={handlePhoneChange}
-              className="pl-[30px]"
+              disabled={saving}
             />
           </div>
         </div>
