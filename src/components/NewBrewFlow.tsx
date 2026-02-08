@@ -202,11 +202,20 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const lastSuggestionBrewMethodRef = useRef<string>('');
 
   // Collapsible states for information boxes
-  const [isPrefilledOpen, setIsPrefilledOpen] = useState(true);
-  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+  const [isPrefilledOpen, setIsPrefilledOpen] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true); // Open by default when baselineMode is 'most-recent'
 
   // Baseline brew mode
   const [baselineMode, setBaselineMode] = useState<'most-recent' | 'best' | 'browse-all'>('most-recent');
+
+  // Keep Dial-In Guidance open when baselineMode is 'most-recent', closed otherwise
+  useEffect(() => {
+    if (baselineMode === 'most-recent') {
+      setIsSuggestionsOpen(true);
+    } else {
+      setIsSuggestionsOpen(false);
+    }
+  }, [baselineMode]);
   const [browseAllIndex, setBrowseAllIndex] = useState(0);
   const lastSuggestionBrewIdRef = useRef<string>('');
 
@@ -1387,6 +1396,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
   const handleBaselineModeChange = (mode: 'most-recent' | 'best' | 'browse-all') => {
     setBaselineMode(mode);
+    // useEffect will handle opening/closing dial-in guidance based on mode
     
     if (mode === 'browse-all') {
       setBrowseAllIndex(0);
@@ -2168,7 +2178,12 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                       <div className={`flex items-center gap-2 px-3 py-2.5 ${canExpand ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`} style={{ backgroundColor: '#E8F1FB' }}>
                         <span className="flex-shrink-0 leading-none">📌</span>
                         <p className="text-sm text-gray-900 font-medium flex-1 text-left">
-                          Baseline Extraction
+                          Baseline Brew{' '}
+                          <span className="text-gray-600 font-normal">
+                            {baselineMode === 'most-recent' ? '(Most Recent)' : 
+                             baselineMode === 'best' ? '(Best)' : 
+                             '(Manually Selected)'}
+                          </span>
                         </p>
                         <ChevronDown 
                           className={`w-4 h-4 text-gray-900 transition-transform ${canExpand && isPrefilledOpen ? 'transform rotate-180' : ''}`}
@@ -2696,6 +2711,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             )}
 
             <div>
+              <p className="text-xs text-gray-500 mb-4">
+                You can come back later to provide the details below, but they are critical for accurate dial-in guidance.
+              </p>
               <Label>
                 Extraction Quality <span className="text-muted-foreground">(optional)</span>
               </Label>
