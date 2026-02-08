@@ -75,6 +75,12 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
 
   // Detect if mobile device
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // Detect if tablet (iPad or Android tablet)
+  const isTablet = /iPad|Android/i.test(navigator.userAgent) && window.innerWidth >= 768;
+  
+  // Detect if phone (mobile but not tablet)
+  const isPhone = isMobile && !isTablet;
 
   // Handle Escape key to close
   useEffect(() => {
@@ -365,11 +371,11 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   // Handle camera capture - different behavior for mobile vs desktop
   const handleCameraCapture = () => {
     if (isMobile) {
-      // Mobile: Open native camera with front-facing camera
+      // Mobile: Open native camera with back camera on phones, front camera on tablets
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.capture = 'user'; // Front-facing camera
+      input.capture = isPhone ? 'environment' : 'user'; // Back camera on phones, front camera on tablets
       input.style.display = 'none';
       
       input.onchange = async (e) => {
@@ -410,7 +416,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const startDesktopCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' },
+        video: { facingMode: isTablet ? 'user' : 'user' }, // Front camera on tablet and desktop
         audio: false 
       });
       setCameraStream(stream);
