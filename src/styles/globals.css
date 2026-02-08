@@ -334,6 +334,7 @@ html {
     padding-bottom: 0px !important;
     padding-left: 12px !important;
     padding-right: 0px !important;
+    margin-left: -12px !important;
     line-height: 1.5 !important;
     box-sizing: border-box !important;
   }
