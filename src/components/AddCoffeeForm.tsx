@@ -922,13 +922,13 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <Label htmlFor="roastDate">
                 Roast Date <span className="text-muted-foreground">(optional)</span>
               </Label>
-              <input
+              <Input
                 id="roastDate"
                 type="date"
                 inputMode="numeric"
                 value={roastDate}
                 onChange={(e) => setRoastDate(e.target.value)}
-                className="mt-2 flex h-9 w-full rounded-md border border-input bg-input-background px-3 py-1 text-sm transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-2 w-full"
               />
             </div>
 
