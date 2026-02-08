@@ -1150,13 +1150,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           text-decoration: underline !important;
         }
       `}</style>
-
-      {/* Footer */}
-      <footer className="landing-footer-text" style={{ padding: '0 2rem', fontSize: '0.875rem', color: '#6b7280', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', textAlign: 'left' }}>
-          © 2026 Hone • <a href="/privacy">Privacy</a> • <a href="/terms">Terms</a>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -1847,6 +1847,13 @@ export default function App() {
           />
         </>
       )}
+      
+      {/* Footer */}
+      <footer className="px-3 md:px-6 pt-4 pb-6" style={{ fontSize: '0.875rem', color: '#6b7280', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', textAlign: 'left' }}>
+        <div className="w-full" style={{ textAlign: 'left' }}>
+          © 2026 Hone • <a href="/privacy" style={{ color: '#6b7280', textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'} onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}>Privacy</a> • <a href="/terms" style={{ color: '#6b7280', textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'} onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}>Terms</a>
+        </div>
+      </footer>
     </div>
   );
 }
