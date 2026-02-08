@@ -16,6 +16,7 @@ import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { toast } from 'sonner@2.0.3';
 import { projectId } from '../utils/supabase/info';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { sanitizeErrorMessage } from '../utils/errorHandling';
 
 interface EquipmentDialogProps {
   open: boolean;
@@ -145,7 +146,7 @@ export function EquipmentDialog({
       }
     } catch (error) {
       console.error('Error saving equipment:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to save equipment');
+      toast.error(sanitizeErrorMessage(error, 'Failed to save equipment'));
       // Reload on error to revert optimistic update
       loadEquipment();
     } finally {

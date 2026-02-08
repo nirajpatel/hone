@@ -3282,10 +3282,13 @@ app.post('/make-server-23508aac/admin/allowed-emails', async (c) => {
       return c.json({ error: 'Email is required' }, 400);
     }
 
+    // Normalize email to lowercase and trim whitespace for consistent storage
+    const normalizedEmail = email.toLowerCase().trim();
+
     const { data, error } = await supabase
       .from('allowed_emails')
       .insert({
-        email,
+        email: normalizedEmail,
         created_by: created_by || user.email || 'admin',
       })
       .select()
@@ -3387,8 +3390,9 @@ app.post('/make-server-23508aac/admin/migrate-existing-users', async (c) => {
     const allEmails = [...new Set([...kvEmails, ...authEmails])];
 
     // Insert into allowed_emails (skip duplicates)
+    // Normalize emails to lowercase and trim whitespace for consistent storage
     const insertData = allEmails.map((email) => ({
-      email,
+      email: email.toLowerCase().trim(),
       created_by: 'migration',
     }));
 
@@ -3755,6 +3759,84 @@ app.delete('/make-server-23508aac/admin/early-access-requests/:email', async (c)
   } catch (error) {
     console.error('Error in DELETE /admin/early-access-requests/:email:', error);
     return c.json({ error: 'Failed to delete early access request' }, 500);
+  }
+});
+
+// Approve waitlist requests - add to allowed_emails and send welcome email
+app.post('/make-server-23508aac/admin/approve-waitlist', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    // TODO: Add admin check here
+    const { emails } = await c.req.json();
+    
+    if (!emails || !Array.isArray(emails) || emails.length === 0) {
+      return c.json({ error: 'Emails array is required' }, 400);
+    }
+
+    const approved: string[] = [];
+    const failed: Array<{ email: string; error: string }> = [];
+
+    for (const email of emails) {
+      try {
+        const normalizedEmail = email.toLowerCase().trim();
+        
+        // Add to allowed_emails
+        const { error: insertError } = await supabase
+          .from('allowed_emails')
+          .insert({
+            email: normalizedEmail,
+            created_by: user.email || 'admin',
+          })
+          .select()
+          .single();
+
+        if (insertError && insertError.code !== '23505') {
+          // 23505 is unique constraint violation (email already exists) - that's okay
+          throw new Error(`Failed to add to allowlist: ${insertError.message}`);
+        }
+
+        // Update early access request status to approved
+        const { error: updateError } = await supabase
+          .from('early_access_requests')
+          .update({ status: 'approved' })
+          .eq('email', normalizedEmail);
+
+        if (updateError) {
+          console.error(`Error updating early access request status for ${normalizedEmail}:`, updateError);
+          // Continue even if status update fails
+        }
+
+        // Send welcome email using Resend template
+        const welcomeEmailSent = await notifications.sendEmailWithTemplate(
+          normalizedEmail,
+          'welcome'
+        );
+
+        if (!welcomeEmailSent) {
+          console.error(`Failed to send welcome email to ${normalizedEmail}`);
+          // Continue even if email fails - they're still approved
+        }
+
+        approved.push(normalizedEmail);
+      } catch (error: any) {
+        console.error(`Error processing ${email}:`, error);
+        failed.push({ email, error: error.message || 'Unknown error' });
+      }
+    }
+
+    return c.json({
+      approved,
+      failed,
+      message: `Approved ${approved.length} request(s)${failed.length > 0 ? `, ${failed.length} failed` : ''}`,
+    });
+  } catch (error) {
+    console.error('Error in POST /admin/approve-waitlist:', error);
+    return c.json({ error: 'Failed to approve waitlist requests' }, 500);
   }
 });
 

@@ -22,6 +22,7 @@ import { CoffeeBagImageFlow } from './components/CoffeeBagImageFlow';
 import { Feed } from './components/Feed';
 import { UserProfileDialog } from './components/UserProfileDialog';
 import { FeedbackDialog } from './components/FeedbackDialog';
+import { WaitlistDialog } from './components/WaitlistDialog';
 import { BrewEquipmentIcon } from './components/icons/BrewEquipmentIcon';
 import { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar';
 import {
@@ -51,7 +52,7 @@ import coffeeBeansImage from './assets/coffee-beans.webp';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
 import { Coffee as CoffeeIcon, Plus, LogOut } from 'lucide-react';
-import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon, MessageSquare } from 'lucide-react';
+import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon, MessageSquare, Users } from 'lucide-react';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { toast, Toaster } from 'sonner@2.0.3';
 import {
@@ -62,6 +63,7 @@ import {
 } from './components/ui/tooltip';
 import { SimpleTooltip } from './components/ui/simple-tooltip';
 import { supabase } from './utils/supabase/client';
+import { sanitizeErrorMessage } from './utils/errorHandling';
 
 export default function App() {
   const [brews, setBrews] = useState<Brew[]>([]);
@@ -98,6 +100,7 @@ export default function App() {
   const [serverVersion, setServerVersion] = useState<string | null>(null);
   const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('table');
   const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('timeline');
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isFeedbackHovered, setIsFeedbackHovered] = useState(false);
@@ -328,7 +331,8 @@ export default function App() {
       const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
       
       if (error && !isLoginRoute && !isAuthConfirmRoute) {
-        toast.error(`OAuth Error: ${errorDescription || error}`);
+        const sanitizedError = sanitizeErrorMessage({ message: errorDescription || error, code: error }, 'Sign in failed. Please try again.');
+        toast.error(sanitizedError);
         setLoading(false);
         setAuthChecked(true);
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -356,7 +360,7 @@ export default function App() {
           
           if (verifyError) {
             console.error('Magic link verification error:', verifyError);
-            toast.error(`Failed to verify magic link: ${verifyError.message}`);
+            toast.error(sanitizeErrorMessage(verifyError, 'Failed to verify magic link. Please try again.'));
             // Clear URL params and redirect to login
             window.history.replaceState({}, '', '/login');
             setCurrentRoute('/login');
@@ -484,7 +488,7 @@ export default function App() {
           // Other errors - show toast only if not on login page
           const isLoginRoute = window.location.pathname === '/login';
           if (!isLoginRoute) {
-            toast.error(errorData.error || 'Failed to set up user');
+            toast.error(sanitizeErrorMessage(errorData, 'Failed to set up user'));
           }
         }
       }
@@ -587,11 +591,11 @@ export default function App() {
       } else {
         const error = await res.json();
         console.error('Failed to create brew:', error);
-        toast.error(error.error || 'Failed to log brew');
+        toast.error(sanitizeErrorMessage(error, 'Failed to log brew'));
       }
     } catch (error) {
       console.error('Error creating brew:', error);
-      toast.error('Error logging brew');
+      toast.error(sanitizeErrorMessage(error, 'Something went wrong'));
     }
   };
 
@@ -622,11 +626,11 @@ export default function App() {
       } else {
         const error = await res.json();
         console.error('Failed to update brew:', error);
-        toast.error(error.error || 'Failed to update quality');
+        toast.error(sanitizeErrorMessage(error, 'Failed to update quality'));
       }
     } catch (error) {
       console.error('Error updating brew:', error);
-      toast.error('Error updating quality');
+      toast.error(sanitizeErrorMessage(error, 'Something went wrong'));
     }
   };
 
@@ -656,11 +660,11 @@ export default function App() {
       } else {
         const error = await res.json();
         console.error('Failed to update notes:', error);
-        toast.error(error.error || 'Failed to update notes');
+        toast.error(sanitizeErrorMessage(error, 'Failed to update notes'));
       }
     } catch (error) {
       console.error('Error updating notes:', error);
-      toast.error('Error updating notes');
+      toast.error(sanitizeErrorMessage(error, 'Something went wrong'));
     }
   };
 
@@ -740,11 +744,11 @@ export default function App() {
       } else {
         const error = await res.json();
         console.error('Failed to delete brew:', error);
-        toast.error(error.error || 'Failed to delete brew');
+        toast.error(sanitizeErrorMessage(error, 'Failed to delete brew'));
       }
     } catch (error) {
       console.error('Error deleting brew:', error);
-      toast.error('Error deleting brew');
+      toast.error(sanitizeErrorMessage(error, 'Something went wrong'));
     }
   };
 
@@ -904,11 +908,11 @@ export default function App() {
       } else {
         const error = await res.json();
         console.error('Failed to update brew:', error);
-        toast.error(error.error || 'Failed to update brew');
+        toast.error(sanitizeErrorMessage(error, 'Failed to update brew'));
       }
     } catch (error) {
       console.error('Error updating brew:', error);
-      toast.error('Error updating brew');
+      toast.error(sanitizeErrorMessage(error, 'Something went wrong'));
     }
   };
 
@@ -1312,7 +1316,7 @@ export default function App() {
   }
 
   return (
-    <div className="bg-gray-50" style={{ minHeight: '100dvh' }}>
+    <div className="bg-gray-50" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       <Toaster 
         position="top-center" 
         richColors 
@@ -1395,6 +1399,12 @@ export default function App() {
                         <BrewEquipmentIcon className="w-4 h-4" />
                         Equipment
                       </DropdownMenuItem>
+                      {currentUser?.email === 'niraj.patel.09@gmail.com' && (
+                        <DropdownMenuItem onClick={() => setShowWaitlist(true)}>
+                          <Users className="w-4 h-4" />
+                          Waitlist
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
                         <LogOut className="w-4 h-4" />
                         Sign Out
@@ -1445,7 +1455,7 @@ export default function App() {
       )}
 
       {/* Main Content */}
-      <div className="px-3 py-4 md:px-6 md:py-6">
+      <div className="px-3 py-4 md:px-6 md:py-6" style={{ flex: 1 }}>
         {activeView === 'brews' ? (
           brewsView === 'table' ? (
             <BrewsTableView
@@ -1791,6 +1801,14 @@ export default function App() {
             setEquipmentChangeCounter(prev => prev + 1);
             fetchData(); // Refetch brews to get updated equipment names
           }}
+        />
+      )}
+
+      {showWaitlist && accessToken && (
+        <WaitlistDialog
+          open={showWaitlist}
+          onOpenChange={setShowWaitlist}
+          accessToken={accessToken}
         />
       )}
 

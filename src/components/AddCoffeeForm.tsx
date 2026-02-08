@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from './ui/select';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { sanitizeErrorMessage } from '../utils/errorHandling';
 
 interface AddCoffeeFormProps {
   onClose: () => void;
@@ -580,7 +581,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
     } catch (error) {
       console.error('Error extracting details:', error);
       setExtractionStatus('error');
-      setExtractionMessage(`Failed to extract details: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setExtractionMessage(sanitizeErrorMessage(error, 'Failed to extract details'));
     } finally {
       setIsExtracting(false);
     }
@@ -628,7 +629,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       }
     } catch (error) {
       console.error('Error looking up roast level:', error);
-      toast.error(`Failed to lookup roast level: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(sanitizeErrorMessage(error, 'Failed to lookup roast level'));
     } finally {
       setRoastLevelLoading(false);
     }
@@ -678,7 +679,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       }
     } catch (error) {
       console.error('Error looking up region:', error);
-      toast.error(`Failed to lookup region: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(sanitizeErrorMessage(error, 'Failed to lookup region'));
     } finally {
       setRegionLoading(false);
     }
@@ -728,7 +729,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       }
     } catch (error) {
       console.error('Error looking up tasting notes:', error);
-      toast.error(`Failed to lookup tasting notes: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(sanitizeErrorMessage(error, 'Failed to lookup tasting notes'));
     } finally {
       setNotesLoading(false);
     }

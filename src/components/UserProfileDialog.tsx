@@ -9,6 +9,7 @@ import { projectId } from '../utils/supabase/info';
 import { User } from '../types';
 import { Copy, Check, Users, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../utils/supabase/client';
+import { sanitizeErrorMessage } from '../utils/errorHandling';
 
 interface UserProfileDialogProps {
   open: boolean;
@@ -381,7 +382,7 @@ export function UserProfileDialog({
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to update profile');
+      toast.error(sanitizeErrorMessage(error, 'Failed to update profile'));
     } finally {
       setSaving(false);
     }

@@ -2,52 +2,11 @@ import { Button } from './ui/button';
 import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase/client';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { sanitizeErrorMessage } from '../utils/errorHandling';
 
 interface SignInPageProps {
   onLoginSuccess?: () => void;
 }
-
-// Map technical error messages to user-friendly ones
-const getUserFriendlyError = (error: any): string => {
-  const errorMessage = error?.message || String(error);
-  const errorCode = error?.code || error?.status;
-
-  // Handle specific error codes
-  if (errorCode === 403 || errorMessage.includes('Access denied') || errorMessage.includes('not authorized')) {
-    return 'Thanks for your interest! This email isn\'t approved for beta access yet.';
-  }
-  
-  if (errorMessage.includes('Invalid login credentials') || errorMessage.includes('Invalid credentials')) {
-    return 'Incorrect email or password. Please try again.';
-  }
-  
-  if (errorMessage.includes('Email not confirmed') || errorMessage.includes('email_not_confirmed')) {
-    return 'Please verify your email before signing in.';
-  }
-  
-  if (errorMessage.includes('Too many requests') || errorMessage.includes('rate_limit')) {
-    return 'Too many sign-in attempts. Please wait a moment.';
-  }
-  
-  if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('connection')) {
-    return 'Connection error. Please check your internet and try again.';
-  }
-  
-  if (errorCode === 'access_denied' || errorMessage.includes('access_denied')) {
-    return 'Thanks for your interest! This email isn\'t approved for beta access yet.';
-  }
-  
-  if (errorCode === 'invalid_request' || errorMessage.includes('invalid_request')) {
-    return 'Sign in failed. Please try again.';
-  }
-
-  if (errorMessage.includes('magic link') || errorMessage.includes('email link')) {
-    return 'Failed to send magic link. Please try again.';
-  }
-
-  // Return the original message if we can't map it
-  return errorMessage || 'Sign in failed. Please try again.';
-};
 
 export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   const [email, setEmail] = useState('');
@@ -69,10 +28,10 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
     const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
     
     if (error) {
-      const friendlyError = getUserFriendlyError({ 
+      const friendlyError = sanitizeErrorMessage({ 
         message: errorDescription || error,
         code: error 
-      });
+      }, 'Sign in failed. Please try again.');
       setError(friendlyError);
       
       // Clear error params from URL
@@ -101,13 +60,13 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
 
       if (error) {
         console.error('OAuth error:', error);
-        setError(getUserFriendlyError(error));
+        setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
         setIsGoogleSubmitting(false);
       }
       // Note: If successful, user will be redirected, so we don't reset state
     } catch (error) {
       console.error('Login error:', error);
-      setError(getUserFriendlyError(error));
+      setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
       setIsGoogleSubmitting(false);
     }
   };
@@ -163,7 +122,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       });
 
       if (error) {
-        setError(getUserFriendlyError(error));
+        setError(sanitizeErrorMessage(error, 'Failed to send magic link. Please try again.'));
         setIsSubmitting(false);
       } else {
         setMagicLinkSent(true);
@@ -172,7 +131,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       }
     } catch (error) {
       console.error('Magic link error:', error);
-      setError(getUserFriendlyError(error));
+      setError(sanitizeErrorMessage(error, 'Something went wrong'));
       setIsSubmitting(false);
     }
   };
@@ -191,7 +150,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       });
 
       if (error) {
-        setError(getUserFriendlyError(error));
+        setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
         setIsSubmitting(false);
       } else {
         // Success - onAuthStateChange will handle the rest
@@ -201,7 +160,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError(getUserFriendlyError(error));
+      setError(sanitizeErrorMessage(error, 'Something went wrong'));
       setIsSubmitting(false);
     }
   };
