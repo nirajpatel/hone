@@ -324,6 +324,18 @@ html {
     font-size: 0.875rem !important;
   }
   
+  /* Ensure date inputs match height of other inputs on mobile */
+  input[type="date"] {
+    height: 2.25rem !important;
+    line-height: 1.5 !important;
+  }
+  
+  input[type="date"]::-webkit-date-and-time-value {
+    min-height: 0 !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+  }
+  
   /* View picker should maintain fixed size on mobile */
   .flex.items-center.gap-0\\.5.border.border-gray-200.rounded-md.p-0\\.5.shrink-0 {
     min-width: fit-content !important;
