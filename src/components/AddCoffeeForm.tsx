@@ -934,6 +934,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   minHeight: '2.25rem',
                   maxHeight: '2.25rem',
                   lineHeight: '1.5',
+                  display: 'block',
                 }}
               />
             </div>
