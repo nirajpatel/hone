@@ -263,7 +263,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
+                      placeholder="name@domain.com"
                       required
                       disabled={isSubmitting}
                       style={{
