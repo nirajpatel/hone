@@ -255,27 +255,30 @@ html {
   display: none;
 }
 
-/* Mobile-specific viewport fix for iOS and iPad */
-@media (max-width: 767px) {
+/* Global viewport fix - use 100dvh to prevent overflow on mobile browsers */
+html, body {
+  height: 100dvh;
+  overflow: auto;
+  position: relative;
+  width: 100%;
+}
+
+#root {
+  height: 100dvh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fallback for browsers that don't support dvh */
+@supports not (height: 100dvh) {
   html, body {
     height: 100%;
-    overflow: auto;
-    position: relative;
-    width: 100%;
   }
-
+  
   #root {
     height: 100%;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
   }
-
-  /* Support for browsers that support dvh (dynamic viewport height) */
-  @supports (height: 100dvh) {
-    html, body {
-      height: 100dvh;
-    }
-  }
+}
   
   /* Login and Loading pages - no scroll, centered content */
   #root:has(.min-h-screen.flex.items-center.justify-center) {
