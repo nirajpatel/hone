@@ -324,11 +324,27 @@ html {
     font-size: 0.875rem !important;
   }
   
-  /* Ensure roast date input matches height of other inputs on mobile */
-  /* Override index.css webkit date styles that set min-height: 1lh */
+  /* Constrain roast date input height on mobile to match other inputs */
   @media (max-width: 768px) {
+    #roastDate {
+      height: 2.25rem !important;
+      min-height: 2.25rem !important;
+      max-height: 2.25rem !important;
+    }
+    
     #roastDate::-webkit-date-and-time-value {
       min-height: 0 !important;
+      height: auto !important;
+      line-height: 1.5 !important;
+    }
+    
+    #roastDate::-webkit-datetime-edit {
+      height: auto !important;
+      line-height: 1.5 !important;
+    }
+    
+    #roastDate::-webkit-datetime-edit-fields-wrapper {
+      height: auto !important;
       line-height: 1.5 !important;
     }
   }
