@@ -936,7 +936,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   value={roastDate}
                   onChange={(e) => setRoastDate(e.target.value)}
                   style={{
-                    height: '36px',
+                    height: '34px',
                     lineHeight: '1.5',
                     paddingTop: '0px',
                     paddingBottom: '0px',

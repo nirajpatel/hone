@@ -329,7 +329,7 @@ html {
   #roastDate[data-slot="input"],
   input[type="date"]#roastDate,
   input[type="date"][id="roastDate"] {
-    height: 36px !important;
+    height: 34px !important;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
     padding-left: 12px !important;
