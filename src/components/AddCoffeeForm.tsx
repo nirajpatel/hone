@@ -75,12 +75,6 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
 
   // Detect if mobile device
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  
-  // Detect if tablet (iPad or Android tablet)
-  const isTablet = /iPad|Android/i.test(navigator.userAgent) && window.innerWidth >= 768;
-  
-  // Detect if phone (mobile but not tablet)
-  const isPhone = isMobile && !isTablet;
 
   // Handle Escape key to close
   useEffect(() => {
@@ -101,7 +95,13 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       // For duplicates, don't copy roast date - leave it empty
       // For edits, keep the roast date
       if (editData) {
-        setRoastDate(dataToUse.roastDate || '');
+        // Convert date format for iOS (yyyy-mm-dd to mm/dd/yyyy)
+        if (isIOS && dataToUse.roastDate) {
+          const [year, month, day] = dataToUse.roastDate.split('-');
+          setRoastDate(`${month}/${day}/${year}`);
+        } else {
+          setRoastDate(dataToUse.roastDate);
+        }
       } else {
         // Duplicate - clear roast date
         setRoastDate('');
@@ -208,11 +208,18 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const handleSave = () => {
     if (!canSave) return;
     
-    // Date input already provides yyyy-mm-dd format
+    // Normalize date to yyyy-mm-dd format
+    let normalizedDate = roastDate;
+    if (isIOS && roastDate.includes('/')) {
+      // Convert mm/dd/yyyy to yyyy-mm-dd
+      const [month, day, year] = roastDate.split('/');
+      normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    
     onSave({
       roaster,
       name,
-      roastDate: roastDate,
+      roastDate: normalizedDate,
       region: regionPills.join(', '),
       notes: notesPills.join(', '),
       imageData: images.length > 0 ? images : undefined, // Send all images
@@ -224,12 +231,18 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const handleUpdate = () => {
     if (!canSave || !editData) return;
     
-    // Date input already provides yyyy-mm-dd format
+    // Normalize date to yyyy-mm-dd format
+    let normalizedDate = roastDate;
+    if (isIOS && roastDate.includes('/')) {
+      // Convert mm/dd/yyyy to yyyy-mm-dd
+      const [month, day, year] = roastDate.split('/');
+      normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
     
     onUpdate!(editData.id, {
       roaster,
       name,
-      roastDate: roastDate,
+      roastDate: normalizedDate,
       region: regionPills.join(', '),
       notes: notesPills.join(', '),
       imageData: images.length > 0 ? images : undefined, // Send all images
@@ -371,11 +384,11 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   // Handle camera capture - different behavior for mobile vs desktop
   const handleCameraCapture = () => {
     if (isMobile) {
-      // Mobile: Open native camera with back camera on phones, front camera on tablets
+      // Mobile: Open native camera with front-facing camera
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
-      input.capture = isPhone ? 'environment' : 'user'; // Back camera on phones, front camera on tablets
+      input.capture = 'user'; // Front-facing camera
       input.style.display = 'none';
       
       input.onchange = async (e) => {
@@ -416,7 +429,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const startDesktopCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: isTablet ? 'user' : 'user' }, // Front camera on tablet and desktop
+        video: { facingMode: 'user' },
         audio: false 
       });
       setCameraStream(stream);
@@ -540,7 +553,13 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       if (roasterValue) setRoaster(roasterValue);
       if (nameValue) setName(nameValue);
       if (data.roastDate) {
-        setRoastDate(data.roastDate);
+        // Convert date format for iOS (yyyy-mm-dd to mm/dd/yyyy)
+        if (isIOS) {
+          const [year, month, day] = data.roastDate.split('-');
+          setRoastDate(`${month}/${day}/${year}`);
+        } else {
+          setRoastDate(data.roastDate);
+        }
       }
       if (data.region) {
         // Parse region into pills (split by commas)
@@ -928,25 +947,15 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <Label htmlFor="roastDate">
                 Roast Date <span className="text-muted-foreground">(optional)</span>
               </Label>
-              <div className="mt-2" style={{ paddingLeft: '12px' }}>
-                <Input
-                  id="roastDate"
-                  type="date"
-                  inputMode="numeric"
-                  value={roastDate}
-                  onChange={(e) => setRoastDate(e.target.value)}
-                  style={{
-                    height: '34px',
-                    lineHeight: '1.5',
-                    paddingTop: '0px',
-                    paddingBottom: '0px',
-                    paddingLeft: '12px',
-                    paddingRight: '0px',
-                    marginLeft: '-14px',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
+              <Input
+                id="roastDate"
+                type={isIOS ? "text" : "date"}
+                placeholder={isIOS ? "mm/dd/yyyy" : undefined}
+                pattern={isIOS ? "\\d{2}/\\d{2}/\\d{4}" : undefined}
+                value={roastDate}
+                onChange={(e) => setRoastDate(e.target.value)}
+                className="mt-2"
+              />
             </div>
 
             <div>

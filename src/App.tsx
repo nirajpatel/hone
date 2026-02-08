@@ -1154,7 +1154,7 @@ export default function App() {
   // Show loading for /auth/confirm route (magic link verification)
   if (currentRoute === '/auth/confirm') {
     return (
-      <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <EspressoLoading />
       </div>
     );
@@ -1192,11 +1192,7 @@ export default function App() {
 
   if (currentRoute === '/coffee-bag') {
     if (loading) {
-      return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
-      );
+      return <EspressoLoading />;
     }
     return (
       <CoffeeBagImageFlow

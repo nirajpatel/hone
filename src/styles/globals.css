@@ -324,21 +324,6 @@ html {
     font-size: 0.875rem !important;
   }
   
-  /* Date input height and padding fixes */
-  #roastDate,
-  #roastDate[data-slot="input"],
-  input[type="date"]#roastDate,
-  input[type="date"][id="roastDate"] {
-    height: 34px !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-    padding-left: 12px !important;
-    padding-right: 0px !important;
-    margin-left: -14px !important;
-    line-height: 1.5 !important;
-    box-sizing: border-box !important;
-  }
-  
   /* View picker should maintain fixed size on mobile */
   .flex.items-center.gap-0\\.5.border.border-gray-200.rounded-md.p-0\\.5.shrink-0 {
     min-width: fit-content !important;
