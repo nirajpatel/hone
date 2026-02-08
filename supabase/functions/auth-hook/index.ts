@@ -32,9 +32,6 @@ Deno.serve(async (req) => {
   try {
     const payload = await req.json();
     
-    // Log full payload for debugging (especially for OAuth flows)
-    console.error('Auth hook payload:', JSON.stringify(payload, null, 2));
-    
     // Extract email from various possible locations in the payload
     // For magic links: payload.user.email or payload.record.email
     // For OAuth: payload.user.email, payload.record.email, or payload.user.user_metadata.email
@@ -47,8 +44,6 @@ Deno.serve(async (req) => {
                   payload.record?.raw_user_meta_data?.email;
     
     if (!email) {
-      // Log payload structure for debugging
-      console.error('No email found in payload. Payload structure:', JSON.stringify(payload, null, 2));
       // If no email, allow the request (shouldn't happen, but be safe)
       return new Response(JSON.stringify({}), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -58,10 +53,6 @@ Deno.serve(async (req) => {
     // Normalize email to lowercase and trim whitespace for consistent comparison
     // All emails in allowed_emails table should be stored in normalized format
     const normalizedEmail = email.toLowerCase().trim();
-    
-    console.error('Auth hook checking email:', normalizedEmail);
-    console.error('Normalized email length:', normalizedEmail.length);
-    console.error('Normalized email bytes:', JSON.stringify(Array.from(normalizedEmail).map(c => c.charCodeAt(0))));
 
     // Check if email exists in allowed_emails table using exact match
     // Since emails are normalized when inserted, exact match should work
@@ -70,9 +61,6 @@ Deno.serve(async (req) => {
       .select('email')
       .eq('email', normalizedEmail)
       .maybeSingle();
-
-    console.error('Query result - data:', data);
-    console.error('Query result - error:', error);
 
     if (error) {
       console.error('Error checking allowed_emails:', error);
@@ -84,27 +72,6 @@ Deno.serve(async (req) => {
 
     if (!data) {
       // Email not found in allowlist - block signup
-      console.error('Email not in allowlist:', normalizedEmail);
-      
-      // Debug: Fetch all emails and check manually
-      const { data: allEmails, error: fetchError } = await supabase
-        .from('allowed_emails')
-        .select('email');
-      
-      console.error('All emails in allowed_emails table:', allEmails);
-      if (!fetchError && allEmails) {
-        const matchingEmail = allEmails.find(e => {
-          const storedEmail = e.email?.toLowerCase().trim();
-          const matches = storedEmail === normalizedEmail;
-          console.error(`Comparing: "${storedEmail}" === "${normalizedEmail}" = ${matches}`);
-          if (storedEmail && storedEmail.length !== normalizedEmail.length) {
-            console.error(`Length mismatch: stored=${storedEmail.length}, normalized=${normalizedEmail.length}`);
-          }
-          return matches;
-        });
-        console.error('Manual comparison found match:', matchingEmail);
-      }
-      
       // Use 400 status code as per Supabase docs for before-user-created hook
       return new Response(
         JSON.stringify({
@@ -121,7 +88,6 @@ Deno.serve(async (req) => {
     }
 
     // Email found in allowlist - allow signup
-    console.error('Email found in allowlist, allowing signup:', normalizedEmail);
     return new Response(JSON.stringify({}), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
