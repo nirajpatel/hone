@@ -928,22 +928,23 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <Label htmlFor="roastDate">
                 Roast Date <span className="text-muted-foreground">(optional)</span>
               </Label>
-              <Input
-                id="roastDate"
-                type="date"
-                inputMode="numeric"
-                value={roastDate}
-                onChange={(e) => setRoastDate(e.target.value)}
-                className="mt-2"
-                style={{
-                  height: '36px',
-                  lineHeight: '1.5',
-                  paddingTop: '0px',
-                  paddingBottom: '0px',
-                  paddingLeft: '0.75rem',
-                  paddingRight: '0.75rem',
-                }}
-              />
+              <div className="mt-2" style={{ paddingLeft: '12px' }}>
+                <Input
+                  id="roastDate"
+                  type="date"
+                  inputMode="numeric"
+                  value={roastDate}
+                  onChange={(e) => setRoastDate(e.target.value)}
+                  style={{
+                    height: '36px',
+                    lineHeight: '1.5',
+                    paddingTop: '0px',
+                    paddingBottom: '0px',
+                    paddingLeft: '0px',
+                    paddingRight: '0px',
+                  }}
+                />
+              </div>
             </div>
 
             <div>
