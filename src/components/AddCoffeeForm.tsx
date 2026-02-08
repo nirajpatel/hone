@@ -942,7 +942,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                     paddingBottom: '0px',
                     paddingLeft: '12px',
                     paddingRight: '0px',
-                    marginLeft: '-12px',
+                    marginLeft: '-14px',
                     boxSizing: 'border-box',
                   }}
                 />
