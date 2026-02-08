@@ -58,7 +58,13 @@ export function UserProfileDialog({
     : '';
   const [phoneNumber, setPhoneNumber] = useState(initialPhone);
   const [smsConsent, setSmsConsent] = useState(user.smsConsent || false);
+  const [name, setName] = useState(user.name || '');
   const [saving, setSaving] = useState(false);
+  
+  // Update name when user prop changes
+  useEffect(() => {
+    setName(user.name || '');
+  }, [user.name]);
   
   // Household state
   const [household, setHousehold] = useState<any>(null);
@@ -357,6 +363,7 @@ export function UserProfileDialog({
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
+          name: name.trim() || undefined,
           phoneNumber: finalPhoneNumber,
           smsConsent: finalSmsConsent,
         }),
@@ -404,7 +411,13 @@ export function UserProfileDialog({
           <h3 className="text-base font-semibold text-gray-900">Account Info</h3>
           <div>
             <Label htmlFor="name">Name</Label>
-            <Input id="name" value={user.name || ''} disabled className="mt-2" />
+            <Input 
+              id="name" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              className="mt-2" 
+            />
           </div>
           <div>
             <Label htmlFor="email">Email</Label>
