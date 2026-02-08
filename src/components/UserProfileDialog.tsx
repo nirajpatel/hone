@@ -7,7 +7,8 @@ import { toast } from 'sonner@2.0.3';
 import { StandardDialog } from './ui/standard-dialog';
 import { projectId } from '../utils/supabase/info';
 import { User } from '../types';
-import { Copy, Check, Users } from 'lucide-react';
+import { Copy, Check, Users, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../utils/supabase/client';
 
 interface UserProfileDialogProps {
   open: boolean;
@@ -68,6 +69,48 @@ export function UserProfileDialog({
   const [creatingHousehold, setCreatingHousehold] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [inviteCodeError, setInviteCodeError] = useState('');
+
+  // Password management state
+  const [authProvider, setAuthProvider] = useState<string | null>(null);
+  const [hasPassword, setHasPassword] = useState<boolean>(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+
+  // Check auth provider when dialog opens
+  useEffect(() => {
+    if (open) {
+      checkAuthProvider();
+    }
+  }, [open]);
+
+  const checkAuthProvider = async () => {
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        // Check provider from identities array (most reliable)
+        const provider = authUser.identities?.[0]?.provider || authUser.app_metadata?.provider || 'email';
+        setAuthProvider(provider);
+        
+        // For email provider, check if password exists
+        // Supabase doesn't directly expose this, but we can infer:
+        // - If provider is 'email' and user was created via email/password or magic link, they might have a password
+        // - We'll show "Set Password" initially and let them try to set it
+        if (provider === 'email') {
+          // Assume no password initially - user can set one
+          setHasPassword(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking auth provider:', error);
+    }
+  };
 
   // Update state when user prop changes or dialog opens
   useEffect(() => {
@@ -188,6 +231,110 @@ export function UserProfileDialog({
     setPhoneNumber(formatted);
   };
 
+  const handleSetPassword = async () => {
+    setUpdatingPassword(true);
+    setPasswordError('');
+
+    // Validation
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      setUpdatingPassword(false);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      setUpdatingPassword(false);
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        setPasswordError(error.message || 'Failed to set password');
+        setUpdatingPassword(false);
+        return;
+      }
+
+      toast.success('Password set successfully');
+      setHasPassword(true);
+      setShowPasswordForm(false);
+      setNewPassword('');
+      setConfirmPassword('');
+      setCurrentPassword('');
+      setPasswordError('');
+    } catch (error) {
+      console.error('Error setting password:', error);
+      setPasswordError('Failed to set password');
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setUpdatingPassword(true);
+    setPasswordError('');
+
+    // Validation
+    if (!currentPassword) {
+      setPasswordError('Please enter your current password');
+      setUpdatingPassword(false);
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      setUpdatingPassword(false);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      setUpdatingPassword(false);
+      return;
+    }
+
+    try {
+      // First verify current password by attempting sign-in
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+
+      if (verifyError) {
+        setPasswordError('Current password is incorrect');
+        setUpdatingPassword(false);
+        return;
+      }
+
+      // Current password is correct, update to new password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) {
+        setPasswordError(updateError.message || 'Failed to update password');
+        setUpdatingPassword(false);
+        return;
+      }
+
+      toast.success('Password updated successfully');
+      setShowPasswordForm(false);
+      setNewPassword('');
+      setConfirmPassword('');
+      setCurrentPassword('');
+      setPasswordError('');
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setPasswordError('Failed to change password');
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -264,6 +411,132 @@ export function UserProfileDialog({
             <Input id="email" value={user.email} disabled className="mt-2" />
           </div>
         </div>
+
+        {/* Security Section - Only show for email-based users */}
+        {authProvider === 'email' && (
+          <div className="space-y-4 pt-4 border-t">
+            <h3 className="text-base font-semibold text-gray-900">Security</h3>
+            
+            {!showPasswordForm ? (
+              <div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowPasswordForm(true);
+                    setPasswordError('');
+                    setNewPassword('');
+                    setConfirmPassword('');
+                    setCurrentPassword('');
+                  }}
+                  variant="outline"
+                  className="cursor-pointer"
+                >
+                  {hasPassword ? 'Change Password' : 'Set Password'}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {hasPassword && (
+                  <div>
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <div className="relative mt-2">
+                      <Input
+                        id="currentPassword"
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Enter current password"
+                        disabled={updatingPassword}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <div className="relative mt-2">
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
+                      disabled={updatingPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="relative mt-2">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      disabled={updatingPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {passwordError && (
+                  <p className="text-sm text-red-500">{passwordError}</p>
+                )}
+
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={hasPassword ? handleChangePassword : handleSetPassword}
+                    disabled={updatingPassword || !newPassword || !confirmPassword || (hasPassword && !currentPassword)}
+                    className="cursor-pointer"
+                  >
+                    {updatingPassword ? 'Saving...' : hasPassword ? 'Update Password' : 'Set Password'}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordForm(false);
+                      setPasswordError('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                      setCurrentPassword('');
+                    }}
+                    variant="outline"
+                    disabled={updatingPassword}
+                    className="cursor-pointer"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Household Section */}
         <div className="space-y-4 pt-4 border-t">

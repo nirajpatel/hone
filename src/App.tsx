@@ -289,6 +289,12 @@ export default function App() {
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Skip auth state change handling if we're processing /auth/confirm
+      // The checkAuth function handles it directly
+      if (window.location.pathname === '/auth/confirm') {
+        return;
+      }
+      
       if (event === 'SIGNED_IN' && session?.access_token) {
         setAccessToken(session.access_token);
         await createOrGetUser(session.access_token);
@@ -312,6 +318,7 @@ export default function App() {
     try {
       // Skip error handling if we're on /login route (let SignInPage handle it)
       const isLoginRoute = window.location.pathname === '/login';
+      const isAuthConfirmRoute = window.location.pathname === '/auth/confirm';
       
       // Check for OAuth errors in URL
       const urlParams = new URLSearchParams(window.location.search);
@@ -320,7 +327,7 @@ export default function App() {
       const error = urlParams.get('error') || hashParams.get('error');
       const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
       
-      if (error && !isLoginRoute) {
+      if (error && !isLoginRoute && !isAuthConfirmRoute) {
         toast.error(`OAuth Error: ${errorDescription || error}`);
         setLoading(false);
         setAuthChecked(true);
@@ -333,6 +340,79 @@ export default function App() {
         setLoading(false);
         setAuthChecked(true);
         return;
+      }
+      
+      // Handle /auth/confirm route for PKCE magic link verification
+      if (isAuthConfirmRoute) {
+        const tokenHash = urlParams.get('token_hash');
+        const type = urlParams.get('type');
+        const redirectTo = urlParams.get('redirect_to');
+        
+        if (tokenHash && type === 'email') {
+          console.log('Verifying magic link with token_hash:', tokenHash.substring(0, 20) + '...');
+          const { data, error: verifyError } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'email',
+          });
+          
+          if (verifyError) {
+            console.error('Magic link verification error:', verifyError);
+            toast.error(`Failed to verify magic link: ${verifyError.message}`);
+            // Clear URL params and redirect to login
+            window.history.replaceState({}, '', '/login');
+            setCurrentRoute('/login');
+            setLoading(false);
+            setAuthChecked(true);
+            return;
+          }
+          
+          // Wait for session to be established
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Verify session was created
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          if (session?.access_token) {
+            // Session established - set auth state first
+            setAccessToken(session.access_token);
+            await createOrGetUser(session.access_token);
+            
+            // Extract target path from redirect_to, default to root
+            let targetPath = '/';
+            if (redirectTo) {
+              try {
+                const redirectUrl = new URL(redirectTo);
+                targetPath = redirectUrl.pathname || '/';
+              } catch (e) {
+                // If redirectTo is not a full URL, treat it as a path
+                targetPath = redirectTo.startsWith('/') ? redirectTo : '/';
+              }
+            }
+            
+            // Clear URL params and navigate to target path
+            window.history.replaceState({}, '', targetPath);
+            setCurrentRoute(targetPath);
+            setAuthChecked(true);
+            setLoading(false);
+            return;
+          } else {
+            // Session not established - redirect to login
+            console.error('Session not established after verification');
+            window.history.replaceState({}, '', '/login');
+            setCurrentRoute('/login');
+            setLoading(false);
+            setAuthChecked(true);
+            return;
+          }
+        } else {
+          console.error('Missing token_hash or invalid type in /auth/confirm');
+          toast.error('Invalid magic link');
+          window.history.replaceState({}, '', '/login');
+          setCurrentRoute('/login');
+          setLoading(false);
+          setAuthChecked(true);
+          return;
+        }
       }
       
       // Check if we have an auth code or tokens in the URL
@@ -1070,6 +1150,15 @@ export default function App() {
 
   if (currentRoute === '/landing') {
     return <LandingPage onLoginSuccess={() => checkAuth()} />;
+  }
+
+  // Show loading for /auth/confirm route (magic link verification)
+  if (currentRoute === '/auth/confirm') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <EspressoLoading />
+      </div>
+    );
   }
 
   if (currentRoute === '/login') {

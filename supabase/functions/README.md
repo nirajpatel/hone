@@ -6,21 +6,42 @@ This directory contains the server-side functions that run on Supabase Edge Func
 
 ```
 supabase/functions/
-└── make-server-23508aac/
-    ├── index.ts                      # Main API server (Hono)
-    ├── kv_store.ts                   # Key-value store operations
-    ├── brewMethods.ts                # Brew method configurations
-    ├── lamarzocco.ts                 # La Marzocco integration
-    ├── notifications.ts              # SMS notification handlers
-    └── migrate-extraction-to-brew.ts # Database migration script
+├── make-server-23508aac/
+│   ├── index.ts                      # Main API server (Hono)
+│   ├── kv_store.ts                   # Key-value store operations
+│   ├── brewMethods.ts                # Brew method configurations
+│   ├── lamarzocco.ts                 # La Marzocco integration
+│   ├── notifications.ts              # SMS notification handlers
+│   └── migrate-extraction-to-brew.ts # Database migration script
+├── auth-hook/
+│   └── index.ts                      # Before User Created hook
+└── send-email-hook/
+    └── index.ts                      # Custom email hook for magic links
 ```
 
 ## Deployment
 
-Deploy all functions:
+Deploy main API server:
 ```bash
 npx supabase functions deploy make-server-23508aac --project-ref YOUR_PROJECT_REF
 ```
+
+Deploy auth hook:
+```bash
+npx supabase functions deploy auth-hook --project-ref YOUR_PROJECT_REF
+```
+
+Deploy send email hook:
+```bash
+npx supabase functions deploy send-email-hook --project-ref YOUR_PROJECT_REF
+```
+
+Or use the deployment script:
+```bash
+./deploy-send-email-hook.sh
+```
+
+**Note:** See `SEND_EMAIL_HOOK_DEPLOYMENT.md` for complete setup instructions for the send-email-hook function.
 
 ## Development
 

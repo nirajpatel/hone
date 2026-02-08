@@ -3414,6 +3414,80 @@ app.post('/make-server-23508aac/admin/migrate-existing-users', async (c) => {
   }
 });
 
+// Validate email eligibility for magic link sign-in
+app.post('/make-server-23508aac/validate-magic-link-email', async (c) => {
+  try {
+    const { email } = await c.req.json();
+
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return c.json({ error: 'Valid email is required' }, 400);
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    console.log(`Validating email: ${normalizedEmail}`);
+
+    // Check if email is in allowed_emails table
+    const { data: allowedEmail, error: allowedEmailError } = await supabase
+      .from('allowed_emails')
+      .select('email')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    if (allowedEmailError) {
+      console.error('Error checking allowed_emails:', allowedEmailError);
+      // Continue to check auth.users even if allowed_emails check fails
+    } else if (allowedEmail) {
+      console.log(`Email ${normalizedEmail} found in allowed_emails`);
+      return c.json({ eligible: true, reason: 'allowed_email' });
+    }
+
+    // Check if user already exists in auth.users using listUsers
+    // Note: listUsers doesn't support filtering by email, so we'll list and check
+    // For better performance, we could use a Postgres function, but this works for now
+    try {
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        console.error('Error checking existing user:', authError);
+        // On error checking auth, fail closed for security but provide helpful error
+        return c.json({ 
+          error: 'Unable to verify email eligibility. Please try again or contact support.',
+          eligible: false, 
+          reason: 'error_checking' 
+        }, 500);
+      }
+
+      // Check if any user has the matching email
+      const existingUser = authUsers?.users?.find((u: any) => 
+        u.email?.toLowerCase().trim() === normalizedEmail
+      );
+
+      if (existingUser) {
+        console.log(`User ${normalizedEmail} found in auth.users`);
+        return c.json({ eligible: true, reason: 'existing_user' });
+      }
+    } catch (error) {
+      console.error('Error checking existing user:', error);
+      // On error checking auth, fail closed for security but provide helpful error
+      return c.json({ 
+        error: 'Unable to verify email eligibility. Please try again or contact support.',
+        eligible: false, 
+        reason: 'error_checking' 
+      }, 500);
+    }
+
+    // Email is not eligible
+    console.log(`Email ${normalizedEmail} is not eligible`);
+    return c.json({ eligible: false, reason: 'not_approved' });
+  } catch (error) {
+    console.error('Error validating magic link email:', error);
+    return c.json({ 
+      error: 'Failed to validate email. Please try again.',
+      eligible: false 
+    }, 500);
+  }
+});
+
 // Early access request endpoint
 app.post('/make-server-23508aac/early-access', async (c) => {
   try {
