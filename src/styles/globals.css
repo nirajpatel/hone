@@ -324,28 +324,27 @@ html {
     font-size: 0.875rem !important;
   }
   
-  /* Constrain roast date input height on mobile to match other inputs */
-  @media (max-width: 768px) {
-    #roastDate {
-      height: 2.25rem !important;
-      min-height: 2.25rem !important;
-      max-height: 2.25rem !important;
+  /* Date input webkit styling to match other inputs on mobile and tablet */
+  @media (max-width: 1024px) {
+    input[type="date"]::-webkit-datetime-edit,
+    input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+    input[type="date"]::-webkit-datetime-edit-text,
+    input[type="date"]::-webkit-datetime-edit-minute-field,
+    input[type="date"]::-webkit-datetime-edit-hour-field,
+    input[type="date"]::-webkit-datetime-edit-day-field,
+    input[type="date"]::-webkit-datetime-edit-month-field,
+    input[type="date"]::-webkit-datetime-edit-year-field {
+      padding: 0;
     }
-    
-    #roastDate::-webkit-date-and-time-value {
-      min-height: 0 !important;
-      height: auto !important;
-      line-height: 1.5 !important;
+
+    input[type="date"]::-webkit-date-and-time-value {
+      height: 1.5em;
+      padding: 0;
     }
-    
-    #roastDate::-webkit-datetime-edit {
-      height: auto !important;
-      line-height: 1.5 !important;
-    }
-    
-    #roastDate::-webkit-datetime-edit-fields-wrapper {
-      height: auto !important;
-      line-height: 1.5 !important;
+
+    /* Optional: remove the inner spin button */
+    input[type="date"]::-webkit-inner-spin-button {
+      display: none;
     }
   }
   
