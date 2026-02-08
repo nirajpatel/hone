@@ -24,7 +24,7 @@ export function StandardDialog({
   titleClassName,
   subtitle,
   children,
-  maxHeight = '90vh',
+  maxHeight = '90dvh',
   maxWidth = '40rem',
   hideCloseButton = false,
   footerContent,

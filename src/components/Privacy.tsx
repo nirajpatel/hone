@@ -6,7 +6,7 @@ interface PrivacyProps {
 
 export function Privacy({ onBack }: PrivacyProps) {
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="bg-gray-50 py-8 px-4" style={{ minHeight: '100dvh' }}>
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-8">
         <Button onClick={onBack} variant="outline" className="mb-6 cursor-pointer">
           ← Back to App

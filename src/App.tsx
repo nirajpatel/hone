@@ -1248,7 +1248,7 @@ export default function App() {
 
   if (currentRoute === '/feed') {
   return (
-    <div className="bg-gray-50" style={{ minHeight: '100dvh', maxHeight: '100dvh', overflow: 'auto' }}>
+    <div className="bg-gray-50" style={{ minHeight: '100dvh' }}>
         <div className="bg-white shadow-sm mb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">

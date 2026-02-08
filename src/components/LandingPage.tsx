@@ -491,11 +491,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page-wrapper {
             position: relative !important;
-            height: 100vh !important;
             height: 100dvh !important;
-            max-height: 100vh !important;
             max-height: 100dvh !important;
-            min-height: 100vh !important;
             min-height: 100dvh !important;
             overflow: hidden !important;
           }
@@ -675,11 +672,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         }
         @media (max-width: 768px) {
           .landing-page-wrapper {
-            height: 100vh !important;
             height: 100dvh !important;
-            max-height: 100vh !important;
             max-height: 100dvh !important;
-            min-height: 100vh !important;
             min-height: 100dvh !important;
           }
           .landing-page > div {
@@ -1033,7 +1027,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         @media (min-width: 1025px) {
           .landing-page-wrapper {
             height: auto !important;
-            min-height: 100vh !important;
             min-height: 100dvh !important;
             overflow: visible !important;
           }

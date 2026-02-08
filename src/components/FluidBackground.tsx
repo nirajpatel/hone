@@ -569,7 +569,7 @@ export function FluidBackground() {
       style={{ 
         display: 'block', 
         width: '100vw',
-        height: '100vh',
+        height: '100dvh',
         position: 'fixed',
         top: '0px',
         left: '0px',

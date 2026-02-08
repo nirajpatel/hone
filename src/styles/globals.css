@@ -281,28 +281,15 @@ html, body {
 }
   
   /* Login and Loading pages - no scroll, centered content */
-  #root:has(.min-h-screen.flex.items-center.justify-center) {
+  #root:has([style*="height: 100dvh"].flex.items-center.justify-center) {
     overflow: hidden;
-    height: 100vh;
+    height: 100dvh;
   }
   
-  @supports (height: 100dvh) {
-    #root:has(.min-h-screen.flex.items-center.justify-center) {
-      height: 100dvh;
-    }
-  }
-  
-  /* Login/Loading pages should fill viewport without scroll */
-  .min-h-screen.flex.items-center.justify-center {
-    min-height: 100vh;
-    height: 100vh;
-    overflow: hidden;
-  }
-  
-  @supports (height: 100dvh) {
-    .min-h-screen.flex.items-center.justify-center {
-      min-height: 100dvh;
-      height: 100dvh;
+  /* Fallback for browsers that don't support dvh */
+  @supports not (height: 100dvh) {
+    #root:has([style*="height: 100dvh"].flex.items-center.justify-center) {
+      height: 100vh;
     }
   }
   
@@ -640,14 +627,14 @@ html, body {
   [data-slot="dialog-content"],
   [data-slot="sheet-content"],
   [data-slot="popover-content"] {
-    max-height: 90vh !important;
+    max-height: 90dvh !important;
     overflow-y: auto !important;
   }
   
   /* Add vertical spacing and centering for dialogs */
   [data-slot="dialog-content"] {
     max-width: calc(100vw - 2rem) !important;
-    max-height: calc(100vh - 2rem) !important;
+    max-height: calc(100dvh - 2rem) !important;
     margin: 1rem !important;
     padding: 1rem !important;
     overflow-y: auto !important;
@@ -660,7 +647,7 @@ html, body {
   
   /* Ensure dialog children are scrollable */
   [data-slot="dialog-content"] > div {
-    max-height: calc(90vh - 6rem);
+    max-height: calc(90dvh - 6rem);
     overflow-y: auto;
   }
   
@@ -677,11 +664,11 @@ html, body {
   
   /* Adjust max-height for cards inside fixed modals */
   .fixed.inset-0 .max-h-\[90vh\] {
-    max-height: calc(90vh - 2rem) !important;
+    max-height: calc(90dvh - 2rem) !important;
   }
   
   .fixed.inset-0 .max-h-\[80vh\] {
-    max-height: calc(80vh - 2rem) !important;
+    max-height: calc(80dvh - 2rem) !important;
   }
   
   /* Ensure card content has proper padding */
