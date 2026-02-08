@@ -332,9 +332,10 @@ html {
     height: 36px !important;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
-    padding-left: 0px !important;
+    padding-left: 12px !important;
     padding-right: 0px !important;
     line-height: 1.5 !important;
+    box-sizing: border-box !important;
   }
   
   /* View picker should maintain fixed size on mobile */
