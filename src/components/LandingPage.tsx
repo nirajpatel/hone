@@ -109,6 +109,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
     };
   }, []);
 
+  // Autofocus email input on desktop only
+  useEffect(() => {
+    // Only autofocus on desktop (width > 768px)
+    if (window.innerWidth > 768 && emailInputRef.current) {
+      emailInputRef.current.focus();
+    }
+  }, []);
+
   const toggleMethod = (method: string) => {
     setSelectedMethods(prev => 
       prev.includes(method) 
