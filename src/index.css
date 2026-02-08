@@ -314,7 +314,7 @@
   }
 
   ::-webkit-date-and-time-value {
-    min-height: 1lh;
+    min-height: 0;
     text-align: inherit;
   }
 

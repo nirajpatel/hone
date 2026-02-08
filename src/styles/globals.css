@@ -324,80 +324,11 @@ html {
     font-size: 0.875rem !important;
   }
   
-  /* Ensure date inputs match height of other inputs on mobile */
+  /* Ensure date inputs match height of other inputs */
   /* Override index.css webkit date styles that set min-height: 1lh */
-  /* Use very specific selectors and aggressive overrides */
-  @media (max-width: 768px) {
-    input[type="date"],
-    input[type="date"][data-slot="input"],
-    #roastDate,
-    #roastDate[data-slot="input"] {
-      height: 2.25rem !important;
-      min-height: 2.25rem !important;
-      max-height: 2.25rem !important;
-      line-height: 1 !important;
-      padding-top: 0.5rem !important;
-      padding-bottom: 0.5rem !important;
-      box-sizing: border-box !important;
-      display: block !important;
-      overflow: hidden !important;
-    }
-    
-    input[type="date"]::-webkit-date-and-time-value,
-    input[type="date"][data-slot="input"]::-webkit-date-and-time-value,
-    #roastDate::-webkit-date-and-time-value {
-      min-height: 0 !important;
-      height: 1rem !important;
-      max-height: 1rem !important;
-      line-height: 1 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      display: block !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit,
-    input[type="date"][data-slot="input"]::-webkit-datetime-edit,
-    #roastDate::-webkit-datetime-edit {
-      padding: 0 !important;
-      margin: 0 !important;
-      line-height: 1 !important;
-      height: 1rem !important;
-      max-height: 1rem !important;
-      display: flex !important;
-      align-items: center !important;
-      vertical-align: middle !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-fields-wrapper,
-    input[type="date"][data-slot="input"]::-webkit-datetime-edit-fields-wrapper,
-    #roastDate::-webkit-datetime-edit-fields-wrapper {
-      padding: 0 !important;
-      margin: 0 !important;
-      line-height: 1 !important;
-      height: 1rem !important;
-      max-height: 1rem !important;
-      display: flex !important;
-      align-items: center !important;
-    }
-    
-    input[type="date"]::-webkit-datetime-edit-year-field,
-    input[type="date"]::-webkit-datetime-edit-month-field,
-    input[type="date"]::-webkit-datetime-edit-day-field,
-    input[type="date"][data-slot="input"]::-webkit-datetime-edit-year-field,
-    input[type="date"][data-slot="input"]::-webkit-datetime-edit-month-field,
-    input[type="date"][data-slot="input"]::-webkit-datetime-edit-day-field,
-    #roastDate::-webkit-datetime-edit-year-field,
-    #roastDate::-webkit-datetime-edit-month-field,
-    #roastDate::-webkit-datetime-edit-day-field {
-      padding: 0 !important;
-      margin: 0 !important;
-      padding-block: 0 !important;
-      line-height: 1 !important;
-      height: 1rem !important;
-      max-height: 1rem !important;
-      display: inline-block !important;
-      vertical-align: middle !important;
-    }
+  input[type="date"]::-webkit-date-and-time-value {
+    min-height: 0 !important;
+    line-height: 1.5 !important;
   }
   
   /* View picker should maintain fixed size on mobile */
