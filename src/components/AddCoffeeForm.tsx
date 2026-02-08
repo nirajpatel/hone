@@ -938,6 +938,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                 style={{
                   height: '36px',
                   lineHeight: '1.5',
+                  paddingTop: '0px',
+                  paddingBottom: '0px',
+                  paddingLeft: '0.75rem',
+                  paddingRight: '0.75rem',
                 }}
               />
             </div>
