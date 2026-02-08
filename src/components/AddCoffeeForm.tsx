@@ -780,10 +780,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <div className="flex items-center gap-3 mt-3">
                 <div className="flex-1">
                   <p className="text-sm text-gray-600">
-                    Auto-fill coffee details from your bag
+                    • Auto-fill coffee details from your bag
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    Saved with your coffee
+                    • Saved with your coffee
                   </p>
                 </div>
                 <Button
@@ -959,6 +959,9 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
             </div>
 
             <div>
+              <p className="text-xs text-gray-500 mb-4">
+                The following fields are optional, but sharing more will help improve your dial-in guidance.
+              </p>
               <Label htmlFor="roastLevel">
                 Roast Level <span className="text-muted-foreground">(optional)</span>
               </Label>
