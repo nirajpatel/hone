@@ -324,11 +324,13 @@ html {
     font-size: 0.875rem !important;
   }
   
-  /* Ensure date inputs match height of other inputs */
+  /* Ensure roast date input matches height of other inputs on mobile */
   /* Override index.css webkit date styles that set min-height: 1lh */
-  input[type="date"]::-webkit-date-and-time-value {
-    min-height: 0 !important;
-    line-height: 1.5 !important;
+  @media (max-width: 768px) {
+    #roastDate::-webkit-date-and-time-value {
+      min-height: 0 !important;
+      line-height: 1.5 !important;
+    }
   }
   
   /* View picker should maintain fixed size on mobile */
