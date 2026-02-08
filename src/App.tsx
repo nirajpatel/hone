@@ -349,7 +349,6 @@ export default function App() {
         const redirectTo = urlParams.get('redirect_to');
         
         if (tokenHash && type === 'email') {
-          console.log('Verifying magic link with token_hash:', tokenHash.substring(0, 20) + '...');
           const { data, error: verifyError } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
             type: 'email',

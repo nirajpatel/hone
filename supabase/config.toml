@@ -1,2 +1,5 @@
 [functions.send-email-hook]
 verify_jwt = false
+
+[functions.auth-hook]
+verify_jwt = false

@@ -236,8 +236,8 @@ export function UserProfileDialog({
     setPasswordError('');
 
     // Validation
-    if (!newPassword || newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+    if (!newPassword || newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
       setUpdatingPassword(false);
       return;
     }
@@ -285,8 +285,8 @@ export function UserProfileDialog({
       return;
     }
 
-    if (!newPassword || newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+    if (!newPassword || newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
       setUpdatingPassword(false);
       return;
     }
@@ -447,12 +447,25 @@ export function UserProfileDialog({
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="Enter current password"
                         disabled={updatingPassword}
+                        style={{ paddingRight: '2.5rem' }}
                       />
                       <button
                         type="button"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          color: '#6b7280',
+                          zIndex: 10,
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#374151'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
                       >
                         {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -470,12 +483,25 @@ export function UserProfileDialog({
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter new password"
                       disabled={updatingPassword}
+                      style={{ paddingRight: '2.5rem' }}
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        color: '#6b7280',
+                        zIndex: 10,
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#374151'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
                     >
                       {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -492,12 +518,25 @@ export function UserProfileDialog({
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm new password"
                       disabled={updatingPassword}
+                      style={{ paddingRight: '2.5rem' }}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        color: '#6b7280',
+                        zIndex: 10,
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#374151'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#6b7280'}
                     >
                       {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -596,54 +635,47 @@ export function UserProfileDialog({
           ) : (
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
-                Create a household to share coffee inventory and extractions with others, or join an existing household with an invite code.
+                Create a household to share coffee inventory and brews with others, or join an existing household with an invite code.
               </p>
               
-              <div className="space-y-3">
-                <Button
-                  type="button"
-                  onClick={handleCreateHousehold}
-                  disabled={creatingHousehold}
-                  className="w-full cursor-pointer"
-                >
-                  {creatingHousehold ? 'Creating...' : 'Create Household'}
-                </Button>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-200"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-white px-2 text-gray-500">or</span>
-                  </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="button"
+                    onClick={handleCreateHousehold}
+                    disabled={creatingHousehold}
+                    variant="outline"
+                    className="cursor-pointer whitespace-nowrap"
+                  >
+                    {creatingHousehold ? 'Creating...' : 'Create Household'}
+                  </Button>
+                  
+                  <span className="text-sm text-gray-500 whitespace-nowrap">or</span>
+                  
+                  <Input
+                    id="inviteCode"
+                    placeholder="Enter code"
+                    value={inviteCode}
+                    onChange={(e) => {
+                      setInviteCode(e.target.value.toUpperCase());
+                      setInviteCodeError(''); // Clear error when typing
+                    }}
+                    className={`font-mono flex-1 ${inviteCodeError ? 'border-red-500' : ''}`}
+                  />
+                  
+                  <Button
+                    type="button"
+                    onClick={handleJoinHousehold}
+                    disabled={!inviteCode.trim() || joiningHousehold}
+                    variant="outline"
+                    className="cursor-pointer whitespace-nowrap"
+                  >
+                    {joiningHousehold ? 'Joining...' : 'Join'}
+                  </Button>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="inviteCode">Join with Invite Code</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="inviteCode"
-                      placeholder="Enter code"
-                      value={inviteCode}
-                      onChange={(e) => {
-                        setInviteCode(e.target.value.toUpperCase());
-                        setInviteCodeError(''); // Clear error when typing
-                      }}
-                      className={`font-mono ${inviteCodeError ? 'border-red-500' : ''}`}
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleJoinHousehold}
-                      disabled={!inviteCode.trim() || joiningHousehold}
-                      className="cursor-pointer flex-shrink-0"
-                    >
-                      {joiningHousehold ? 'Joining...' : 'Join'}
-                    </Button>
-                  </div>
-                  {inviteCodeError && (
-                    <p className="text-sm text-red-500 mt-1">{inviteCodeError}</p>
-                  )}
-                </div>
+                {inviteCodeError && (
+                  <p className="text-sm text-red-500 mt-1">{inviteCodeError}</p>
+                )}
               </div>
             </div>
           )}

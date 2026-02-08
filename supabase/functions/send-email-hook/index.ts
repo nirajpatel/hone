@@ -10,10 +10,6 @@ const projectRef = Deno.env.get('SUPABASE_PROJECT_REF') || 'YOUR_PROJECT_REF';
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || `https://${projectRef}.supabase.co`;
 
 Deno.serve(async (req) => {
-  console.log('=== Send Email Hook Called ===');
-  console.log('Method:', req.method);
-  console.log('URL:', req.url);
-  
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { 
@@ -26,9 +22,6 @@ Deno.serve(async (req) => {
 
   // Handle GET requests (health check / validation from Dashboard)
   if (req.method === 'GET') {
-    console.log('GET request - health check');
-    console.log('RESEND_API_KEY configured:', !!Deno.env.get('RESEND_API_KEY'));
-    console.log('SEND_EMAIL_HOOK_SECRET configured:', !!Deno.env.get('SEND_EMAIL_HOOK_SECRET'));
     return new Response(JSON.stringify({ status: 'ok', message: 'Send Email Hook is active' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -41,15 +34,6 @@ Deno.serve(async (req) => {
 
   const payload = await req.text();
   const headers = Object.fromEntries(req.headers);
-  
-  console.log('Request headers:', JSON.stringify(headers, null, 2));
-  console.log('Payload length:', payload.length);
-  console.log('SEND_EMAIL_HOOK_SECRET present:', !!Deno.env.get('SEND_EMAIL_HOOK_SECRET'));
-  console.log('hookSecret extracted:', !!hookSecret);
-  if (hookSecret) {
-    console.log('hookSecret length:', hookSecret.length);
-    console.log('hookSecret starts with:', hookSecret.substring(0, 10) + '...');
-  }
 
   // Verify webhook signature if secret is configured
   let verifiedData: {
@@ -67,12 +51,8 @@ Deno.serve(async (req) => {
 
   if (hookSecret) {
     try {
-      console.log('Attempting webhook signature verification...');
       const wh = new Webhook(hookSecret);
       verifiedData = wh.verify(payload, headers) as typeof verifiedData;
-      console.log('Webhook signature verification SUCCESS');
-      console.log('Verified user email:', verifiedData.user?.email);
-      console.log('Verified email_action_type:', verifiedData.email_data?.email_action_type);
     } catch (error: any) {
       console.error('=== Webhook signature verification FAILED ===');
       console.error('Error type:', error?.constructor?.name);
@@ -98,26 +78,18 @@ Deno.serve(async (req) => {
   } else {
     // If no secret configured, parse payload directly (for development/testing)
     console.warn('No webhook secret configured, skipping signature verification');
-    console.log('Parsing payload without verification...');
     verifiedData = JSON.parse(payload);
-    console.log('Parsed payload - user email:', verifiedData.user?.email);
-    console.log('Parsed payload - email_action_type:', verifiedData.email_data?.email_action_type);
   }
 
   const { user, email_data } = verifiedData;
 
-  console.log('=== Processing Email ===');
-  console.log('User email:', user?.email);
-  console.log('Email action type:', email_data?.email_action_type);
-  console.log('Token present:', !!email_data?.token);
-  console.log('Token hash present:', !!email_data?.token_hash);
-  console.log('Redirect to:', email_data?.redirect_to);
-  console.log('Site URL:', email_data?.site_url);
-  console.log('Full email_data:', JSON.stringify(email_data, null, 2));
-
-  // Only handle magic link emails
-  if (email_data.email_action_type !== 'magic_link' && email_data.email_action_type !== 'magiclink') {
-    console.log(`Skipping email type: ${email_data.email_action_type}`);
+  // Handle magic link emails and signup emails (new users signing up via magic link)
+  // Supabase sends 'signup' email_action_type for new user signups via magic link
+  const isMagicLinkEmail = email_data.email_action_type === 'magic_link' || 
+                          email_data.email_action_type === 'magiclink' ||
+                          email_data.email_action_type === 'signup';
+  
+  if (!isMagicLinkEmail) {
     // Return empty JSON to let Supabase handle other email types
     return new Response(JSON.stringify({}), {
       status: 200,
@@ -160,18 +132,8 @@ Deno.serve(async (req) => {
   
   // Construct magic link URL: app_url/auth/confirm?token_hash=...&type=email
   const magicLinkUrl = `${appUrl}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=email&redirect_to=${encodeURIComponent(redirectTo)}`;
-  console.log('Magic link URL constructed:', magicLinkUrl);
-  console.log('App URL (extracted from redirect_to):', appUrl);
-  console.log('Redirect to:', redirectTo);
-  console.log('Token hash (first 50 chars):', tokenHash?.substring(0, 50) + '...');
 
   try {
-    console.log('=== Sending Email via Resend ===');
-    console.log('Resend API Key present:', !!Deno.env.get('RESEND_API_KEY'));
-    console.log('Template ID: magic-link-email');
-    console.log('To:', user.email);
-    console.log('From: Hone <noreply@hone.coffee>');
-    
     // Send email via Resend using template
     const { error, data } = await resend.emails.send({
       from: 'Hone <noreply@hone.coffee>',
@@ -195,10 +157,6 @@ Deno.serve(async (req) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-
-    console.log('=== Email Sent Successfully ===');
-    console.log('Resend response data:', JSON.stringify(data, null, 2));
-    console.log(`Magic link email sent successfully to ${user.email}`);
   } catch (error: any) {
     console.error('=== Exception Sending Email ===');
     console.error('Error type:', error?.constructor?.name);

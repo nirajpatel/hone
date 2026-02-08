@@ -3424,7 +3424,6 @@ app.post('/make-server-23508aac/validate-magic-link-email', async (c) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    console.log(`Validating email: ${normalizedEmail}`);
 
     // Check if email is in allowed_emails table
     const { data: allowedEmail, error: allowedEmailError } = await supabase
@@ -3437,7 +3436,6 @@ app.post('/make-server-23508aac/validate-magic-link-email', async (c) => {
       console.error('Error checking allowed_emails:', allowedEmailError);
       // Continue to check auth.users even if allowed_emails check fails
     } else if (allowedEmail) {
-      console.log(`Email ${normalizedEmail} found in allowed_emails`);
       return c.json({ eligible: true, reason: 'allowed_email' });
     }
 
@@ -3463,7 +3461,6 @@ app.post('/make-server-23508aac/validate-magic-link-email', async (c) => {
       );
 
       if (existingUser) {
-        console.log(`User ${normalizedEmail} found in auth.users`);
         return c.json({ eligible: true, reason: 'existing_user' });
       }
     } catch (error) {
@@ -3477,7 +3474,6 @@ app.post('/make-server-23508aac/validate-magic-link-email', async (c) => {
     }
 
     // Email is not eligible
-    console.log(`Email ${normalizedEmail} is not eligible`);
     return c.json({ eligible: false, reason: 'not_approved' });
   } catch (error) {
     console.error('Error validating magic link email:', error);
