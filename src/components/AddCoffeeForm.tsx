@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Coffee, RoastLevel } from '../types';
-import { Plus, Camera, Trash2, Loader2, CheckCircle2, AlertCircle, X, CalendarIcon } from 'lucide-react';
+import { Plus, Camera, Trash2, Loader2, CheckCircle2, AlertCircle, X } from 'lucide-react';
 import { StandardDialog } from './ui/standard-dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -15,8 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { Calendar } from './ui/calendar';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
 interface AddCoffeeFormProps {
@@ -60,7 +58,6 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const [roastLevel, setRoastLevel] = useState<RoastLevel | undefined>();
   const [isLookingUp, setIsLookingUp] = useState(false);
-  const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   // Track focus state for roaster and name fields
   const [roasterFocused, setRoasterFocused] = useState(false);
@@ -98,14 +95,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       // For duplicates, don't copy roast date - leave it empty
       // For edits, keep the roast date
       if (editData) {
-        // For mobile date picker, keep yyyy-mm-dd format
-        // For iOS desktop text input, convert to mm/dd/yyyy
-        if (isIOS && !isMobile && dataToUse.roastDate) {
-          const [year, month, day] = dataToUse.roastDate.split('-');
-          setRoastDate(`${month}/${day}/${year}`);
-        } else {
-          setRoastDate(dataToUse.roastDate || '');
-        }
+        setRoastDate(dataToUse.roastDate || '');
       } else {
         // Duplicate - clear roast date
         setRoastDate('');
@@ -212,19 +202,11 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const handleSave = () => {
     if (!canSave) return;
     
-    // Normalize date to yyyy-mm-dd format
-    // Date picker on mobile already stores in yyyy-mm-dd format
-    let normalizedDate = roastDate;
-    if (roastDate && roastDate.includes('/')) {
-      // Convert mm/dd/yyyy to yyyy-mm-dd (for iOS text input fallback)
-      const [month, day, year] = roastDate.split('/');
-      normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    }
-    
+    // Date input already provides yyyy-mm-dd format
     onSave({
       roaster,
       name,
-      roastDate: normalizedDate,
+      roastDate: roastDate,
       region: regionPills.join(', '),
       notes: notesPills.join(', '),
       imageData: images.length > 0 ? images : undefined, // Send all images
@@ -236,19 +218,12 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const handleUpdate = () => {
     if (!canSave || !editData) return;
     
-    // Normalize date to yyyy-mm-dd format
-    // Date picker on mobile already stores in yyyy-mm-dd format
-    let normalizedDate = roastDate;
-    if (roastDate && roastDate.includes('/')) {
-      // Convert mm/dd/yyyy to yyyy-mm-dd (for iOS text input fallback)
-      const [month, day, year] = roastDate.split('/');
-      normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    }
+    // Date input already provides yyyy-mm-dd format
     
     onUpdate!(editData.id, {
       roaster,
       name,
-      roastDate: normalizedDate,
+      roastDate: roastDate,
       region: regionPills.join(', '),
       notes: notesPills.join(', '),
       imageData: images.length > 0 ? images : undefined, // Send all images
@@ -559,14 +534,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       if (roasterValue) setRoaster(roasterValue);
       if (nameValue) setName(nameValue);
       if (data.roastDate) {
-        // For mobile date picker, keep yyyy-mm-dd format
-        // For iOS desktop text input, convert to mm/dd/yyyy
-        if (isIOS && !isMobile) {
-          const [year, month, day] = data.roastDate.split('-');
-          setRoastDate(`${month}/${day}/${year}`);
-        } else {
-          setRoastDate(data.roastDate);
-        }
+        setRoastDate(data.roastDate);
       }
       if (data.region) {
         // Parse region into pills (split by commas)
@@ -954,67 +922,14 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <Label htmlFor="roastDate">
                 Roast Date <span className="text-muted-foreground">(optional)</span>
               </Label>
-              
-              {/* Desktop: Use date input (shows segments) */}
-              {!isMobile && (
-                <Input
-                  id="roastDate"
-                  type="date"
-                  value={roastDate}
-                  onChange={(e) => setRoastDate(e.target.value)}
-                  className="mt-2"
-                />
-              )}
-              
-              {/* Mobile: Use date picker */}
-              {isMobile && (
-                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2 justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {roastDate ? (
-                        (() => {
-                          // Date picker stores in yyyy-mm-dd format
-                          const [year, month, day] = roastDate.split('-');
-                          if (year && month && day) {
-                            return `${month}/${day}/${year}`;
-                          }
-                          return roastDate;
-                        })()
-                      ) : (
-                        <span className="text-muted-foreground">Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={roastDate ? (() => {
-                        // Handle both yyyy-mm-dd and mm/dd/yyyy formats
-                        if (roastDate.includes('/')) {
-                          const [month, day, year] = roastDate.split('/');
-                          return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                        }
-                        const [year, month, day] = roastDate.split('-');
-                        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-                      })() : undefined}
-                      onSelect={(date) => {
-                        if (date) {
-                          const year = date.getFullYear();
-                          const month = String(date.getMonth() + 1).padStart(2, '0');
-                          const day = String(date.getDate()).padStart(2, '0');
-                          setRoastDate(`${year}-${month}-${day}`);
-                          setDatePickerOpen(false);
-                        }
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              )}
+              <input
+                id="roastDate"
+                type="date"
+                inputMode="numeric"
+                value={roastDate}
+                onChange={(e) => setRoastDate(e.target.value)}
+                className="mt-2 flex h-9 w-full rounded-md border border-input bg-input-background px-3 py-1 text-sm transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+              />
             </div>
 
             <div>
