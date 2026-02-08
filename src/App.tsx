@@ -1164,7 +1164,7 @@ export default function App() {
     // If user is already logged in, show loading briefly while redirect happens
     if (currentUser) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
           <EspressoLoading />
         </div>
       );
@@ -1181,7 +1181,7 @@ export default function App() {
     if (hasOAuthCallback) {
       // OAuth callback detected - show loading while processing
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
           <EspressoLoading />
         </div>
       );
@@ -1226,14 +1226,14 @@ export default function App() {
     if (currentUser) {
       // User is logged in, loading their data - show loading
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
           <EspressoLoading />
         </div>
       );
     } else if (hasPotentialSession && !authChecked) {
       // Potential session exists, still checking auth - show loading to prevent flash
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
           <EspressoLoading />
         </div>
       );
