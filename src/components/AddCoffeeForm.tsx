@@ -784,7 +784,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                     • Auto-fill coffee details from your bag
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    • Saved with your coffee
+                    • Photos are saved with your coffee
                   </p>
                 </div>
                 <Button
@@ -795,7 +795,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   className="cursor-pointer whitespace-nowrap flex-shrink-0 self-center h-9 font-normal"
                 >
                   <Camera className="w-4 h-4" />
-                  Add Photo
+                  {images.length > 0 ? 'Add Another Photo' : 'Add Photo'}
                 </Button>
               </div>
 
@@ -830,10 +830,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                         {isExtracting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Extracting Details
+                            Auto-Filling From Photos
                           </>
                         ) : (
-                          'Extract Details'
+                          'Auto-Fill From Photos'
                         )}
                       </Button>
                       
