@@ -795,7 +795,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   className="cursor-pointer whitespace-nowrap flex-shrink-0 self-center h-9 font-normal"
                 >
                   <Camera className="w-4 h-4" />
-                  {images.length > 0 ? 'Add Another Photo' : 'Add Photo'}
+                  {images.length > 0 ? 'Add Another' : 'Add Photo'}
                 </Button>
               </div>
 
