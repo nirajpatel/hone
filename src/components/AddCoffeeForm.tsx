@@ -779,11 +779,8 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               <Label>Bag Photos</Label>
               
               <div className="mt-2">
-                <p className="text-sm text-gray-600">
-                  • Auto-fill coffee details from your bag
-                </p>
-                <p className="text-sm text-gray-600">
-                  • Photos are saved with your coffee
+                <p className="text-sm text-gray-500">
+                  Auto-fill coffee details from your bag. Photos are saved with your coffee.
                 </p>
               </div>
 
@@ -807,10 +804,10 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                 <button
                   type="button"
                   onClick={handleCameraCapture}
-                  className="w-20 h-20 border border-dashed border-gray-300 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                  className="w-20 h-20 border border-dashed border-gray-400 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-gray-400 mb-1" />
-                  <span className="text-xs text-gray-400 text-center leading-tight">Add Photo</span>
+                  <Plus className="w-5 h-5 text-gray-500 mb-1" />
+                  <span className="text-xs text-gray-500 text-center leading-tight">Add Photo</span>
                 </button>
               </div>
 
