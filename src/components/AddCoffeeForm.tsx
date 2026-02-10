@@ -778,47 +778,44 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
             <div className="border-b border-gray-200 pb-4 mb-4">
               <Label>Bag Photos</Label>
               
-              <div className="flex items-center gap-3 mt-3">
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600">
-                    • Auto-fill coffee details from your bag
-                  </p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    • Photos are saved with your coffee
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
+              <div className="mt-2">
+                <p className="text-sm text-gray-600">
+                  • Auto-fill coffee details from your bag
+                </p>
+                <p className="text-sm text-gray-600">
+                  • Photos are saved with your coffee
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 mt-3">
+                {images.map((img, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={img}
+                      alt={`Coffee bag ${index + 1}`}
+                      className="w-20 h-20 object-cover rounded border"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button
                   type="button"
                   onClick={handleCameraCapture}
-                  className="cursor-pointer whitespace-nowrap flex-shrink-0 self-center h-9 font-normal"
+                  className="w-20 h-20 border border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
                 >
-                  <Camera className="w-4 h-4" />
-                  {images.length > 0 ? 'Add Another' : 'Add Photo'}
-                </Button>
+                  <Plus className="w-5 h-5 text-gray-400 mb-1" />
+                  <span className="text-xs text-gray-400 text-center leading-tight">Add Photo</span>
+                </button>
               </div>
 
               {images.length > 0 && (
                 <div className="space-y-3 mt-3">
-                  <div className="flex flex-wrap gap-2">
-                    {images.map((img, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={img}
-                          alt={`Coffee bag ${index + 1}`}
-                          className="w-20 h-20 object-cover rounded border"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
                   {!editData && (
                     <>
                       <Button
