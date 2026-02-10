@@ -2712,7 +2712,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
             <div>
               <p className="text-xs text-gray-500 mb-4">
-                You can come back later to provide the details below, but they are critical for accurate dial-in guidance.
+                You can come back later to provide the details below, but they are critical for accurate Dial-In Guidance.
               </p>
               <Label>
                 Extraction Quality <span className="text-muted-foreground">(optional)</span>

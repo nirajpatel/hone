@@ -955,7 +955,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
 
             <div>
               <p className="text-xs text-gray-500 mb-4">
-                The following fields are optional, but sharing more will help improve your dial-in guidance.
+                The following fields are optional, but sharing more will help improve your Dial-In Guidance.
               </p>
               <Label htmlFor="roastLevel">
                 Roast Level <span className="text-muted-foreground">(optional)</span>
