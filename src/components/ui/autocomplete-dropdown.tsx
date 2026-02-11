@@ -5,6 +5,7 @@ interface AutocompleteOption {
   value: string;
   line1: string;
   line2?: string;
+  isSectionHeader?: boolean;
 }
 
 interface AutocompleteDropdownProps {
@@ -36,6 +37,8 @@ export function AutocompleteDropdown({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const isScrollingRef = useRef(false);
 
   // Get the selected option
   const selectedOption = options.find(opt => opt.value === value);
@@ -137,31 +140,99 @@ export function AutocompleteDropdown({
     setHighlightedIndex(-1);
   };
 
-  // Handle option pointer down (for better mobile responsiveness)
-  const handleOptionPointerDown = (e: React.PointerEvent, optionValue: string) => {
-    e.preventDefault(); // Prevent blur from firing
-    handleSelect(optionValue);
+  // Handle option touch start - track initial position
+  const handleOptionTouchStart = (e: React.TouchEvent, optionValue: string) => {
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+    };
+    isScrollingRef.current = false;
   };
 
-  // Handle keyboard navigation
+  // Handle option touch move - detect scrolling
+  const handleOptionTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    
+    // If moved more than 10px, consider it scrolling
+    if (deltaX > 10 || deltaY > 10) {
+      isScrollingRef.current = true;
+    }
+  };
+
+  // Handle option touch end - only select if not scrolling
+  const handleOptionTouchEnd = (e: React.TouchEvent, optionValue: string) => {
+    if (!touchStartRef.current) return;
+    
+    const touch = e.changedTouches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // Only select if:
+    // 1. Not scrolling (movement < 10px)
+    // 2. Touch duration < 500ms (quick tap, not long press)
+    if (!isScrollingRef.current && deltaX < 10 && deltaY < 10 && deltaTime < 500) {
+      e.preventDefault();
+      handleSelect(optionValue);
+    }
+    
+    touchStartRef.current = null;
+    isScrollingRef.current = false;
+  };
+
+  // Handle option pointer down (for better mobile responsiveness)
+  const handleOptionPointerDown = (e: React.PointerEvent, optionValue: string) => {
+    // Only prevent default and select for mouse events, not touch
+    if (e.pointerType === 'mouse') {
+      e.preventDefault();
+      handleSelect(optionValue);
+    }
+  };
+
+  // Handle keyboard navigation - skip section headers
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showDropdown || filteredOptions.length === 0) return;
+
+    // Get selectable options (excluding section headers)
+    const selectableOptions = filteredOptions.filter(opt => !opt.isSectionHeader);
+    if (selectableOptions.length === 0) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev =>
-          prev < filteredOptions.length - 1 ? prev + 1 : prev
-        );
+        setHighlightedIndex(prev => {
+          // Find next selectable option
+          let nextIndex = prev + 1;
+          while (nextIndex < filteredOptions.length && filteredOptions[nextIndex].isSectionHeader) {
+            nextIndex++;
+          }
+          return nextIndex < filteredOptions.length ? nextIndex : prev;
+        });
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1));
+        setHighlightedIndex(prev => {
+          // Find previous selectable option
+          let prevIndex = prev - 1;
+          while (prevIndex >= 0 && filteredOptions[prevIndex].isSectionHeader) {
+            prevIndex--;
+          }
+          return prevIndex >= 0 ? prevIndex : -1;
+        });
         break;
       case 'Enter':
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
-          handleSelect(filteredOptions[highlightedIndex].value);
+          const option = filteredOptions[highlightedIndex];
+          if (!option.isSectionHeader) {
+            handleSelect(option.value);
+          }
         }
         break;
       case 'Escape':
@@ -174,15 +245,15 @@ export function AutocompleteDropdown({
     }
   };
 
-  // Scroll highlighted option into view
+  // Scroll highlighted option into view (skip section headers)
   useEffect(() => {
     if (highlightedIndex >= 0 && dropdownRef.current) {
       const highlightedElement = dropdownRef.current.children[highlightedIndex] as HTMLElement;
-      if (highlightedElement) {
+      if (highlightedElement && !filteredOptions[highlightedIndex]?.isSectionHeader) {
         highlightedElement.scrollIntoView({ block: 'nearest' });
       }
     }
-  }, [highlightedIndex]);
+  }, [highlightedIndex, filteredOptions]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -235,27 +306,52 @@ export function AutocompleteDropdown({
             </div>
           )}
           <div ref={dropdownRef}>
-            {filteredOptions.map((option, index) => (
-              <div
-                key={option.value}
-                className={`px-3 py-2 cursor-pointer border-b last:border-b-0 ${
-                  index === highlightedIndex ? 'bg-gray-100' : 'hover:bg-gray-50'
-                }`}
-                onClick={() => handleSelect(option.value)}
-                onPointerDown={(e) => handleOptionPointerDown(e, option.value)}
-              >
-                <div className="flex flex-col items-start">
-                  <div className="text-sm">
-                    {highlightMatch(option.line1, searchQuery)}
+            {filteredOptions.map((option, index) => {
+              if (option.isSectionHeader) {
+                // Divider (empty line1)
+                if (!option.line1) {
+                  return (
+                    <div
+                      key={`divider-${index}`}
+                      className="h-px bg-gray-200"
+                    />
+                  );
+                }
+                // Section header
+                return (
+                  <div
+                    key={`header-${option.value}`}
+                    className="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50 border-t border-b border-gray-200"
+                  >
+                    {option.line1}
                   </div>
-                  {option.line2 && (
-                    <div className="text-sm text-gray-500">
-                      {option.line2}
+                );
+              }
+              return (
+                <div
+                  key={option.value}
+                  className={`px-3 py-2 cursor-pointer border-b last:border-b-0 ${
+                    index === highlightedIndex ? 'bg-gray-100' : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => handleSelect(option.value)}
+                  onPointerDown={(e) => handleOptionPointerDown(e, option.value)}
+                  onTouchStart={(e) => handleOptionTouchStart(e, option.value)}
+                  onTouchMove={handleOptionTouchMove}
+                  onTouchEnd={(e) => handleOptionTouchEnd(e, option.value)}
+                >
+                  <div className="flex flex-col items-start">
+                    <div className="text-sm">
+                      {highlightMatch(option.line1, searchQuery)}
                     </div>
-                  )}
+                    {option.line2 && (
+                      <div className="text-sm text-gray-500">
+                        {option.line2}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
