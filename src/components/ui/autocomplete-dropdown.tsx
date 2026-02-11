@@ -35,6 +35,7 @@ export function AutocompleteDropdown({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Get the selected option
   const selectedOption = options.find(opt => opt.value === value);
@@ -106,12 +107,25 @@ export function AutocompleteDropdown({
     }
   };
 
-  // Handle input blur
-  const handleBlur = () => {
+  // Handle input blur - only close if focus isn't moving to dropdown
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Check if the related target (where focus is moving) is within our container
+    const relatedTarget = e.relatedTarget as Node | null;
+    if (relatedTarget && containerRef.current?.contains(relatedTarget)) {
+      // Focus is moving to dropdown, don't close
+      return;
+    }
+    
+    // Use a timeout to allow click events to fire first
     setTimeout(() => {
-      setShowDropdown(false);
-      setSearchQuery('');
-      setHighlightedIndex(-1);
+      // Double-check that dropdown is still open and focus is truly outside
+      if (showDropdown && containerRef.current && document.activeElement) {
+        if (!containerRef.current.contains(document.activeElement)) {
+          setShowDropdown(false);
+          setSearchQuery('');
+          setHighlightedIndex(-1);
+        }
+      }
     }, 200);
   };
 
@@ -170,8 +184,31 @@ export function AutocompleteDropdown({
     }
   }, [highlightedIndex]);
 
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    if (!showDropdown) return;
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (containerRef.current && target && !containerRef.current.contains(target)) {
+        setShowDropdown(false);
+        setSearchQuery('');
+        setHighlightedIndex(-1);
+      }
+    };
+
+    // Use both mousedown and touchstart to catch all interactions
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showDropdown]);
+
   return (
-    <div className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`}>
       <Input
         ref={inputRef}
         value={displayValue}
@@ -187,6 +224,10 @@ export function AutocompleteDropdown({
       {showDropdown && filteredOptions.length > 0 && (
         <div
           className="absolute z-10 mt-1 left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden"
+          onPointerDown={(e) => {
+            // Prevent blur when interacting with dropdown (scrolling, tapping)
+            e.preventDefault();
+          }}
         >
           {getDropdownLabel && (
             <div className="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50 border-b">
