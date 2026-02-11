@@ -37,8 +37,6 @@ export function AutocompleteDropdown({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const isScrollingRef = useRef(false);
 
   // Get the selected option
   const selectedOption = options.find(opt => opt.value === value);
@@ -140,55 +138,9 @@ export function AutocompleteDropdown({
     setHighlightedIndex(-1);
   };
 
-  // Handle option touch start - track initial position
-  const handleOptionTouchStart = (e: React.TouchEvent, optionValue: string) => {
-    const touch = e.touches[0];
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now(),
-    };
-    isScrollingRef.current = false;
-  };
-
-  // Handle option touch move - detect scrolling
-  const handleOptionTouchMove = (e: React.TouchEvent) => {
-    if (!touchStartRef.current) return;
-    
-    const touch = e.touches[0];
-    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
-    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
-    
-    // If moved more than 10px, consider it scrolling
-    if (deltaX > 10 || deltaY > 10) {
-      isScrollingRef.current = true;
-    }
-  };
-
-  // Handle option touch end - only select if not scrolling
-  const handleOptionTouchEnd = (e: React.TouchEvent, optionValue: string) => {
-    if (!touchStartRef.current) return;
-    
-    const touch = e.changedTouches[0];
-    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
-    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
-    const deltaTime = Date.now() - touchStartRef.current.time;
-    
-    // Only select if:
-    // 1. Not scrolling (movement < 10px)
-    // 2. Touch duration < 500ms (quick tap, not long press)
-    if (!isScrollingRef.current && deltaX < 10 && deltaY < 10 && deltaTime < 500) {
-      e.preventDefault();
-      handleSelect(optionValue);
-    }
-    
-    touchStartRef.current = null;
-    isScrollingRef.current = false;
-  };
-
-  // Handle option pointer down (for better mobile responsiveness)
+  // Handle option pointer down (mouse only - touch uses onClick which doesn't fire during scroll)
   const handleOptionPointerDown = (e: React.PointerEvent, optionValue: string) => {
-    // Only prevent default and select for mouse events, not touch
+    // Only handle mouse events - touch events use onClick which naturally doesn't fire during scroll
     if (e.pointerType === 'mouse') {
       e.preventDefault();
       handleSelect(optionValue);
@@ -294,10 +246,13 @@ export function AutocompleteDropdown({
       />
       {showDropdown && filteredOptions.length > 0 && (
         <div
-          className="absolute z-10 mt-1 left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden"
+          className="absolute z-10 mt-1 left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg overflow-y-auto max-h-[300px]"
+          style={{ touchAction: 'pan-y' }}
           onPointerDown={(e) => {
-            // Prevent blur when interacting with dropdown (scrolling, tapping)
-            e.preventDefault();
+            // Only prevent blur for mouse events - allow touch scrolling
+            if (e.pointerType === 'mouse') {
+              e.preventDefault();
+            }
           }}
         >
           {getDropdownLabel && (
@@ -335,9 +290,6 @@ export function AutocompleteDropdown({
                   }`}
                   onClick={() => handleSelect(option.value)}
                   onPointerDown={(e) => handleOptionPointerDown(e, option.value)}
-                  onTouchStart={(e) => handleOptionTouchStart(e, option.value)}
-                  onTouchMove={handleOptionTouchMove}
-                  onTouchEnd={(e) => handleOptionTouchEnd(e, option.value)}
                 >
                   <div className="flex flex-col items-start">
                     <div className="text-sm">
