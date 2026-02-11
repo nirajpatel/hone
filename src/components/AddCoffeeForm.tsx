@@ -69,6 +69,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   const [regionLoading, setRegionLoading] = useState(false);
   const [notesLoading, setNotesLoading] = useState(false);
   const [personalNotes, setPersonalNotes] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Detect iOS devices
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
@@ -206,50 +207,66 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
     }
   }, [roaster, name, roasterFocused, nameFocused, existingCoffees, editData]);
 
-  const handleSave = () => {
-    if (!canSave) return;
+  const handleSave = async () => {
+    if (!canSave || isSaving) return;
     
-    // Normalize date to yyyy-mm-dd format
-    let normalizedDate = roastDate;
-    if (isIOS && roastDate.includes('/')) {
-      // Convert mm/dd/yyyy to yyyy-mm-dd
-      const [month, day, year] = roastDate.split('/');
-      normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    setIsSaving(true);
+    
+    try {
+      // Normalize date to yyyy-mm-dd format
+      let normalizedDate = roastDate;
+      if (isIOS && roastDate.includes('/')) {
+        // Convert mm/dd/yyyy to yyyy-mm-dd
+        const [month, day, year] = roastDate.split('/');
+        normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      
+      await onSave({
+        roaster,
+        name,
+        roastDate: normalizedDate,
+        region: regionPills.join(', '),
+        notes: notesPills.join(', '),
+        imageData: images.length > 0 ? images : undefined, // Send all images
+        roastLevel,
+        personalNotes: personalNotes.trim() || undefined,
+      } as any);
+    } catch (error) {
+      console.error('Error saving coffee:', error);
+    } finally {
+      setIsSaving(false);
     }
-    
-    onSave({
-      roaster,
-      name,
-      roastDate: normalizedDate,
-      region: regionPills.join(', '),
-      notes: notesPills.join(', '),
-      imageData: images.length > 0 ? images : undefined, // Send all images
-      roastLevel,
-      personalNotes: personalNotes.trim() || undefined,
-    } as any);
   };
 
-  const handleUpdate = () => {
-    if (!canSave || !editData) return;
+  const handleUpdate = async () => {
+    if (!canSave || !editData || isSaving) return;
     
-    // Normalize date to yyyy-mm-dd format
-    let normalizedDate = roastDate;
-    if (isIOS && roastDate.includes('/')) {
-      // Convert mm/dd/yyyy to yyyy-mm-dd
-      const [month, day, year] = roastDate.split('/');
-      normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    setIsSaving(true);
+    
+    try {
+      // Normalize date to yyyy-mm-dd format
+      let normalizedDate = roastDate;
+      if (isIOS && roastDate.includes('/')) {
+        // Convert mm/dd/yyyy to yyyy-mm-dd
+        const [month, day, year] = roastDate.split('/');
+        normalizedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      
+      await onUpdate!(editData.id, {
+        roaster,
+        name,
+        roastDate: normalizedDate,
+        region: regionPills.join(', '),
+        notes: notesPills.join(', '),
+        imageData: images.length > 0 ? images : undefined, // Send all images
+        roastLevel,
+        personalNotes: personalNotes.trim() || undefined,
+      } as any);
+    } catch (error) {
+      console.error('Error updating coffee:', error);
+    } finally {
+      setIsSaving(false);
     }
-    
-    onUpdate!(editData.id, {
-      roaster,
-      name,
-      roastDate: normalizedDate,
-      region: regionPills.join(', '),
-      notes: notesPills.join(', '),
-      imageData: images.length > 0 ? images : undefined, // Send all images
-      roastLevel,
-      personalNotes: personalNotes.trim() || undefined,
-    } as any);
   };
 
   // Add region pill
@@ -764,11 +781,18 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
         titleAlign="center"
         footerContent={
           <div className="flex gap-3">
-            <Button variant="outline" onClick={onClose} className="cursor-pointer">
+            <Button variant="outline" onClick={onClose} className="cursor-pointer" disabled={isSaving}>
               Cancel
             </Button>
-            <Button onClick={editData ? handleUpdate : handleSave} disabled={!canSave} className="flex-1 cursor-pointer">
-              {editData ? 'Save Changes' : 'Add Coffee'}
+            <Button onClick={editData ? handleUpdate : handleSave} disabled={!canSave || isSaving} className="flex-1 cursor-pointer">
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  {editData ? 'Saving...' : 'Adding...'}
+                </>
+              ) : (
+                editData ? 'Save Changes' : 'Add Coffee'
+              )}
             </Button>
           </div>
         }

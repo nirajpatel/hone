@@ -136,43 +136,37 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
                 <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Roast Date</p>
-                  <p className="text-sm text-gray-900">{formatRoastDate(coffee.roastDate)}</p>
+                  <p className="text-sm text-gray-900">{coffee.roastDate ? formatRoastDate(coffee.roastDate) : '–'}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Calendar className="w-5 h-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Age</p>
-                  <p className="text-sm text-gray-900">{getDaysOld(coffee.roastDate)}</p>
+                  <p className="text-sm text-gray-900">{coffee.roastDate ? getDaysOld(coffee.roastDate) : '–'}</p>
                 </div>
               </div>
-              {coffee.roastLevel && (
-                <div className="flex items-start gap-3">
-                  <Flame className="w-5 h-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Roast Level</p>
-                    <p className="text-sm text-gray-900">{coffee.roastLevel}</p>
-                  </div>
+              <div className="flex items-start gap-3">
+                <Flame className="w-5 h-5 text-gray-500 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Roast Level</p>
+                  <p className="text-sm text-gray-900">{coffee.roastLevel || '–'}</p>
                 </div>
-              )}
-              {coffee.region && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Region</p>
-                    <p className="text-sm text-gray-900">{coffee.region}</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Region</p>
+                  <p className="text-sm text-gray-900">{coffee.region || '–'}</p>
                 </div>
-              )}
-              {coffee.notes && (
-                <div className="flex items-start gap-3 col-span-2">
-                  <FileText className="w-5 h-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Tasting Notes</p>
-                    <p className="text-sm text-gray-900">{coffee.notes}</p>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3 col-span-2">
+                <FileText className="w-5 h-5 text-gray-500 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Tasting Notes</p>
+                  <p className="text-sm text-gray-900">{coffee.notes || '–'}</p>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Extraction Quality */}

@@ -1725,11 +1725,14 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   options={(() => {
                     // All coffees for searching
                     return coffees.map(coffee => {
-                      const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
-                      const date = new Date(year, monthNum - 1, day);
-                      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                      const month = months[date.getMonth()];
-                      const formattedDate = `${month} ${date.getDate()}, ${date.getFullYear()}`;
+                      let formattedDate = 'Unknown';
+                      if (coffee.roastDate) {
+                        const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
+                        const date = new Date(year, monthNum - 1, day);
+                        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        const month = months[date.getMonth()];
+                        formattedDate = `${month} ${date.getDate()}, ${date.getFullYear()}`;
+                      }
                       
                       return {
                         value: coffee.id,
@@ -1742,11 +1745,14 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     // Limited set for default display (recently extracted, top 8)
                     const { coffees: dropdownCoffees } = getCoffeesForDropdown();
                     return dropdownCoffees.map(coffee => {
-                      const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
-                      const date = new Date(year, monthNum - 1, day);
-                      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                      const month = months[date.getMonth()];
-                      const formattedDate = `${month} ${date.getDate()}, ${date.getFullYear()}`;
+                      let formattedDate = 'Unknown';
+                      if (coffee.roastDate) {
+                        const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
+                        const date = new Date(year, monthNum - 1, day);
+                        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                        const month = months[date.getMonth()];
+                        formattedDate = `${month} ${date.getDate()}, ${date.getFullYear()}`;
+                      }
                       
                       return {
                         value: coffee.id,
