@@ -223,7 +223,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
               margin: '0 0 16px 0'
             }}
           >
-            Dial in any bean, perfectly
+            Dial in any bean, perfectly.
           </h1>
           
           <p 
