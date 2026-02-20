@@ -188,15 +188,15 @@ export default function App() {
     if (existingFavicon) existingFavicon.remove();
     const favicon = document.createElement('link');
     favicon.setAttribute('rel', 'icon');
-    favicon.setAttribute('href', '/favicon.svg?v=2');
-    favicon.setAttribute('type', 'image/svg+xml');
+    favicon.setAttribute('href', '/favicon.png?v=2');
+    favicon.setAttribute('type', 'image/png');
     document.head.appendChild(favicon);
 
     const existingAppleIcon = document.querySelector("link[rel='apple-touch-icon']");
     if (existingAppleIcon) existingAppleIcon.remove();
     const appleIcon = document.createElement('link');
     appleIcon.setAttribute('rel', 'apple-touch-icon');
-    appleIcon.setAttribute('href', '/favicon.svg?v=2');
+    appleIcon.setAttribute('href', '/favicon.png?v=2');
     document.head.appendChild(appleIcon);
 
     // Update or create meta tags for social media
@@ -1339,8 +1339,8 @@ export default function App() {
       <nav className="bg-white border-b border-gray-200">
         <div className="px-3 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <img src={honeLogo} alt="" style={{ height: '22px', width: 'auto', display: 'block' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <img src={honeLogo} alt="" style={{ height: '24px', width: 'auto', display: 'block' }} />
               <span className="hidden md:inline text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
             </div>
             <div className="flex items-center gap-4">
