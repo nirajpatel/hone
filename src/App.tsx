@@ -183,19 +183,22 @@ export default function App() {
     // Set document title and meta tags
     document.title = 'Hone – Designed for Better Coffee';
     
-    // Clear favicon and apple-touch-icon
-    // Remove existing favicon
+    // Set favicon and apple-touch-icon to Hone logo
     const existingFavicon = document.querySelector("link[rel='icon']");
-    if (existingFavicon) {
-      existingFavicon.remove();
-    }
-    
-    // Remove existing apple-touch-icon
+    if (existingFavicon) existingFavicon.remove();
+    const favicon = document.createElement('link');
+    favicon.setAttribute('rel', 'icon');
+    favicon.setAttribute('href', '/favicon.svg');
+    favicon.setAttribute('type', 'image/svg+xml');
+    document.head.appendChild(favicon);
+
     const existingAppleIcon = document.querySelector("link[rel='apple-touch-icon']");
-    if (existingAppleIcon) {
-      existingAppleIcon.remove();
-    }
-    
+    if (existingAppleIcon) existingAppleIcon.remove();
+    const appleIcon = document.createElement('link');
+    appleIcon.setAttribute('rel', 'apple-touch-icon');
+    appleIcon.setAttribute('href', '/favicon.svg');
+    document.head.appendChild(appleIcon);
+
     // Update or create meta tags for social media
     const updateMetaTag = (property: string, content: string, useProperty = false) => {
       let meta: HTMLMetaElement | null = null;
@@ -227,12 +230,14 @@ export default function App() {
     updateMetaTag('og:description', 'Track brews. Learn from your data. Get personalized guidance for better coffee.', true);
     updateMetaTag('og:url', 'https://hone.coffee', true);
     updateMetaTag('og:site_name', 'Hone', true);
-    
+    updateMetaTag('og:image', `${typeof window !== 'undefined' ? window.location.origin : 'https://hone.coffee'}/favicon.svg`, true);
+
     // Twitter Card tags (use name attribute)
     updateMetaTag('twitter:card', 'summary_large_image');
     updateMetaTag('twitter:title', 'Hone – Designed for Better Coffee');
     updateMetaTag('twitter:description', 'Log brews, analyze patterns, and get personalized guidance to brew better coffee.');
-    
+    updateMetaTag('twitter:image', `${typeof window !== 'undefined' ? window.location.origin : 'https://hone.coffee'}/favicon.svg`);
+
     // Theme and app meta tags (use name attribute)
     updateMetaTag('theme-color', '#000000');
     updateMetaTag('apple-mobile-web-app-title', 'Hone');
@@ -1334,9 +1339,9 @@ export default function App() {
       <nav className="bg-white border-b border-gray-200">
         <div className="px-3 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <img src={honeLogo} alt="" style={{ height: '26px', width: 'auto', display: 'block' }} />
-              <span className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <img src={honeLogo} alt="" style={{ height: '24px', width: 'auto', display: 'block' }} />
+              <span className="hidden md:inline text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
             </div>
             <div className="flex items-center gap-4">
               {/* Desktop Navigation */}
