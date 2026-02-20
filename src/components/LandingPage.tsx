@@ -178,7 +178,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       {/* Desktop Header - Top Left */}
       <nav className="landing-desktop-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px', padding: '0 2rem' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className="landing-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="landing-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <img src={honeLogo} alt="" style={{ height: '26px', width: 'auto', display: 'block' }} />
             <span className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
           </div>
@@ -196,7 +196,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       {/* Mobile/Tablet Header - Left Aligned */}
       <nav className="landing-mobile-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px' }}>
         <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div className="landing-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="landing-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <img src={honeLogo} alt="" style={{ height: '26px', width: 'auto', display: 'block' }} />
             <span className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
           </div>
@@ -431,7 +431,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           display: block;
         }
         .landing-header-brand {
-          gap: 6px !important;
+          gap: 4px !important;
         }
         .landing-header-brand img {
           height: 26px !important;
