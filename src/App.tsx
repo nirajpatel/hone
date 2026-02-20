@@ -49,6 +49,7 @@ import {
   SheetTrigger,
 } from './components/ui/sheet';
 import coffeeBeansImage from './assets/coffee-beans.webp';
+import honeLogo from './assets/hone-logo.svg';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
 import { Coffee as CoffeeIcon, Plus, LogOut } from 'lucide-react';
@@ -1333,7 +1334,10 @@ export default function App() {
       <nav className="bg-white border-b border-gray-200">
         <div className="px-3 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-lg)' }}>Hone</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <img src={honeLogo} alt="" style={{ height: '26px', width: 'auto', display: 'block' }} />
+              <span className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
+            </div>
             <div className="flex items-center gap-4">
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center gap-2">

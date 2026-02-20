@@ -179,7 +179,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Hone Branding */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-xl)', marginBottom: '0.5rem' }}>Hone</div>
+          <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-xl)', marginBottom: '0.5rem', color: '#111827' }}>Hone</div>
         </div>
 
         {/* Sign In Form */}

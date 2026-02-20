@@ -54,7 +54,7 @@ export function Login({ onLoginSuccess }: LoginProps) {
           <div className="w-full max-w-md">
             <div className="flex flex-col items-center gap-6">
               <div className="flex flex-col items-center gap-2">
-                <h1 className="text-gray-900" style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-weight-bold)' }}>Hone</h1>
+                <h1 className="text-gray-900" style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-weight-bold)', color: '#111827' }}>Hone</h1>
                 <p className="text-gray-600 text-lg" style={{ fontWeight: 500 }}>Designed for better coffee</p>
               </div>
 
