@@ -1,11 +1,14 @@
 import { Button } from './ui/button';
 import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase/client';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { sanitizeErrorMessage } from '../utils/errorHandling';
 
 interface SignInPageProps {
   onLoginSuccess?: () => void;
+}
+
+function getIsSignUpModeFromUrl(): boolean {
+  return new URLSearchParams(window.location.search).get('signup') === 'true';
 }
 
 export function SignInPage({ onLoginSuccess }: SignInPageProps) {
@@ -17,20 +20,28 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
-  const [usePasswordMode, setUsePasswordMode] = useState(false); // false = magic link mode (default)
+  const [isSignUpMode, setIsSignUpMode] = useState(getIsSignUpModeFromUrl);
+  const [usePasswordMode, setUsePasswordMode] = useState(false);
+
+  // Sync sign-up mode from URL when route changes (e.g. back/forward)
+  useEffect(() => {
+    const handler = () => setIsSignUpMode(getIsSignUpModeFromUrl());
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, []);
 
   // Check for OAuth errors in URL params on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     
-    const error = urlParams.get('error') || hashParams.get('error');
+    const errorParam = urlParams.get('error') || hashParams.get('error');
     const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
     
-    if (error) {
+    if (errorParam) {
       const friendlyError = sanitizeErrorMessage({ 
-        message: errorDescription || error,
-        code: error 
+        message: errorDescription || errorParam,
+        code: errorParam 
       }, 'Sign in failed. Please try again.');
       setError(friendlyError);
       
@@ -75,47 +86,21 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
     e.preventDefault();
     if (!email || isSubmitting) return;
 
+    const trimmedEmail = email.toLowerCase().trim();
+    if (!trimmedEmail.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // First validate email eligibility
-      const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
-      const validationResponse = await fetch(`${apiUrl}/validate-magic-link-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${publicAnonKey}`,
-        },
-        body: JSON.stringify({ email: email.toLowerCase().trim() }),
-      });
-
-      let validationData;
-      try {
-        validationData = await validationResponse.json();
-      } catch (parseError) {
-        console.error('Failed to parse validation response:', parseError);
-        throw new Error('Failed to validate email. Please try again.');
-      }
-
-      if (!validationResponse.ok) {
-        // If we got an error response, check if it has a specific error message
-        const errorMessage = validationData?.error || 'Failed to validate email. Please try again.';
-        throw new Error(errorMessage);
-      }
-
-      if (!validationData.eligible) {
-        setError('Thanks for your interest! This email isn\'t approved for beta access yet.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Email is eligible, send magic link
       const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
 
       const { error } = await supabase.auth.signInWithOtp({
-        email: email.toLowerCase().trim(),
+        email: trimmedEmail,
         options: {
           emailRedirectTo: redirectUrl,
         },
@@ -126,12 +111,12 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
         setIsSubmitting(false);
       } else {
         setMagicLinkSent(true);
-        setMagicLinkEmail(email.toLowerCase().trim());
+        setMagicLinkEmail(trimmedEmail);
         setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error('Magic link error:', error);
-      setError(sanitizeErrorMessage(error, 'Something went wrong'));
+    } catch (err) {
+      console.error('Magic link error:', err);
+      setError(sanitizeErrorMessage(err, 'Something went wrong'));
       setIsSubmitting(false);
     }
   };
@@ -153,24 +138,23 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
         setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
         setIsSubmitting(false);
       } else {
-        // Success - onAuthStateChange will handle the rest
         if (onLoginSuccess) {
           onLoginSuccess();
         }
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      setError(sanitizeErrorMessage(error, 'Something went wrong'));
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(sanitizeErrorMessage(err, 'Something went wrong'));
       setIsSubmitting(false);
     }
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (usePasswordMode) {
-      await handleEmailPasswordLogin(e);
+      handleEmailPasswordLogin(e);
     } else {
-      await handleMagicLinkSignIn(e);
+      handleMagicLinkSignIn(e);
     }
   };
 
@@ -221,34 +205,31 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                 marginBottom: '20px',
                 lineHeight: '1.5'
               }}>
-                We sent a sign-in link to<br />
+                We sent a {isSignUpMode ? 'sign-up' : 'sign-in'} link to<br />
                 <strong style={{ color: '#166534' }}>{magicLinkEmail}</strong>
               </p>
-              <div style={{ 
-                display: 'flex', 
-                gap: '8px', 
-                justifyContent: 'center',
-                flexWrap: 'wrap' 
-              }}>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setMagicLinkSent(false);
-                    setMagicLinkEmail('');
-                    setError(null);
-                    setUsePasswordMode(true);
-                  }}
-                  variant="outline"
-                  className="cursor-pointer"
-                  style={{ 
-                    fontSize: '0.875rem', 
-                    padding: '8px 16px',
-                    borderColor: '#86efac',
-                    color: '#166534'
-                  }}
-                >
-                  Use password instead
-                </Button>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {!isSignUpMode && (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setMagicLinkSent(false);
+                      setMagicLinkEmail('');
+                      setError(null);
+                      setUsePasswordMode(true);
+                    }}
+                    variant="outline"
+                    className="cursor-pointer"
+                    style={{ 
+                      fontSize: '0.875rem', 
+                      padding: '8px 16px',
+                      borderColor: '#86efac',
+                      color: '#166534'
+                    }}
+                  >
+                    Use password instead
+                  </Button>
+                )}
                 <Button
                   type="button"
                   onClick={(e) => {
@@ -271,7 +252,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
             </div>
           ) : (
             <>
-              {/* Google Sign In */}
+              {/* Google Sign In / Sign Up */}
               <Button 
                 type="button"
                 onClick={handleGoogleLogin}
@@ -308,7 +289,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Sign in with Google
+                {isSignUpMode ? 'Sign up with Google' : 'Sign in with Google'}
               </Button>
 
               {/* Divider */}
@@ -318,7 +299,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                 <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
               </div>
 
-              {/* Single Form - Toggles between Magic Link and Password */}
+              {/* Email + optional password form */}
               <form onSubmit={handleFormSubmit}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div>
@@ -346,7 +327,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                     />
                   </div>
 
-                  {usePasswordMode && (
+                  {!isSignUpMode && usePasswordMode && (
                     <div style={{ position: 'relative' }}>
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -394,7 +375,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
 
                   <Button 
                     type="submit"
-                    disabled={isSubmitting || !email || (usePasswordMode && !password)}
+                    disabled={isSubmitting || !email || (!isSignUpMode && usePasswordMode && !password)}
                     variant="default"
                     className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-0 focus-visible:outline-none"
                     style={{
@@ -405,59 +386,63 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                     }}
                   >
                     {isSubmitting 
-                      ? (usePasswordMode ? 'Signing in...' : 'Sending...') 
-                      : (usePasswordMode ? 'Sign in' : 'Sign in with magic link')
+                      ? (!isSignUpMode && usePasswordMode ? 'Signing in...' : 'Sending...') 
+                      : (!isSignUpMode && usePasswordMode ? 'Sign in' : (isSignUpMode ? 'Sign up with magic link' : 'Sign in with magic link'))
                     }
                   </Button>
 
-                  {/* Toggle Link */}
-                  <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUsePasswordMode(!usePasswordMode);
-                        setPassword('');
-                        setError(null);
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#6b7280',
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        padding: 0,
-                      }}
-                    >
-                      {usePasswordMode ? 'Use magic link instead' : 'Sign in with password instead'}
-                    </button>
-                  </div>
+                  {/* Sign in with password instead / Use magic link instead - only in sign-in flow */}
+                  {!isSignUpMode && (
+                    <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUsePasswordMode(!usePasswordMode);
+                          setPassword('');
+                          setError(null);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#6b7280',
+                          fontSize: '0.875rem',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          padding: 0,
+                        }}
+                      >
+                        {usePasswordMode ? 'Use magic link instead' : 'Sign in with password instead'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </form>
 
-              {/* Request Access Link */}
-              <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>New here? </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.history.pushState({}, '', '/?requestAccess=true');
-                    window.dispatchEvent(new PopStateEvent('popstate'));
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#111827',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    padding: 0,
-                  }}
-                >
-                  Request access
-                </button>
-              </div>
+              {/* New here? Sign up - only show in sign-in flow; hide in sign-up flow */}
+              {!isSignUpMode && (
+                <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                  <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>New here? </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUpMode(true);
+                      window.history.replaceState({}, '', '/login?signup=true');
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#111827',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: 0,
+                    }}
+                  >
+                    Sign up
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>

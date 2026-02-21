@@ -22,7 +22,6 @@ import { CoffeeBagImageFlow } from './components/CoffeeBagImageFlow';
 import { Feed } from './components/Feed';
 import { UserProfileDialog } from './components/UserProfileDialog';
 import { FeedbackDialog } from './components/FeedbackDialog';
-import { WaitlistDialog } from './components/WaitlistDialog';
 import { BrewEquipmentIcon } from './components/icons/BrewEquipmentIcon';
 import { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar';
 import {
@@ -53,7 +52,7 @@ import honeLogo from './assets/hone-logo.svg';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
 import { Coffee as CoffeeIcon, Plus, LogOut } from 'lucide-react';
-import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon, MessageSquare, Users } from 'lucide-react';
+import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon, MessageSquare } from 'lucide-react';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { toast, Toaster } from 'sonner@2.0.3';
 import {
@@ -101,7 +100,6 @@ export default function App() {
   const [serverVersion, setServerVersion] = useState<string | null>(null);
   const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('table');
   const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('timeline');
-  const [showWaitlist, setShowWaitlist] = useState(false);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isFeedbackHovered, setIsFeedbackHovered] = useState(false);
@@ -1408,12 +1406,6 @@ export default function App() {
                         <BrewEquipmentIcon className="w-4 h-4" />
                         Equipment
                       </DropdownMenuItem>
-                      {currentUser?.email === 'niraj.patel.09@gmail.com' && (
-                        <DropdownMenuItem onClick={() => setShowWaitlist(true)}>
-                          <Users className="w-4 h-4" />
-                          Waitlist
-                        </DropdownMenuItem>
-                      )}
                       <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
                         <LogOut className="w-4 h-4" />
                         Sign Out
@@ -1810,14 +1802,6 @@ export default function App() {
             setEquipmentChangeCounter(prev => prev + 1);
             fetchData(); // Refetch brews to get updated equipment names
           }}
-        />
-      )}
-
-      {showWaitlist && accessToken && (
-        <WaitlistDialog
-          open={showWaitlist}
-          onOpenChange={setShowWaitlist}
-          accessToken={accessToken}
         />
       )}
 

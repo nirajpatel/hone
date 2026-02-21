@@ -1,42 +1,17 @@
 import { Button } from './ui/button';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { StaticTimelineScreenshot } from './StaticTimelineScreenshot';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
 import honeLogo from '../assets/hone-logo.svg';
 
 interface LandingPageProps {
   onLoginSuccess?: () => void;
 }
 
-const PREDEFINED_METHODS = [
-  'Espresso',
-  'Pour Over',
-  'AeroPress',
-  'French Press',
-  'Other',
-];
-
 export function LandingPage({ onLoginSuccess }: LandingPageProps) {
-  const [email, setEmail] = useState('');
-  const [selectedMethods, setSelectedMethods] = useState<string[]>([]);
-  const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [headlineFontSize, setHeadlineFontSize] = useState<number | null>(null);
-  const emailInputRef = useRef<HTMLInputElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const headlineContainerRef = useRef<HTMLDivElement>(null);
-
-  // Clear requestAccess query parameter if present
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('requestAccess') === 'true') {
-      // Clear the query parameter
-      window.history.replaceState({}, '', '/');
-    }
-  }, []);
-
 
   // Dynamic font sizing for headline on mobile
   useEffect(() => {
@@ -110,66 +85,13 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
     };
   }, []);
 
-  // Autofocus email input on desktop only
-  useEffect(() => {
-    // Only autofocus on desktop (width > 768px)
-    if (window.innerWidth > 768 && emailInputRef.current) {
-      emailInputRef.current.focus();
-    }
-  }, []);
-
-  const toggleMethod = (method: string) => {
-    setSelectedMethods(prev => 
-      prev.includes(method) 
-        ? prev.filter(m => m !== method)
-        : [...prev, method]
-    );
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setHasAttemptedSubmit(true);
-    
-    if (!email || selectedMethods.length === 0 || isSubmitting) return;
-
-    setIsSubmitting(true);
-    
-    try {
-      const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
-      const response = await fetch(`${apiUrl}/early-access`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${publicAnonKey}`,
-        },
-        body: JSON.stringify({ 
-          email,
-          methods: selectedMethods,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit request');
-      }
-
-      setSubmitted(true);
-      setIsSubmitting(false);
-      setEmail('');
-      setSelectedMethods([]);
-      setHasAttemptedSubmit(false);
-    } catch (error) {
-      console.error('Error submitting early access request:', error);
-      setIsSubmitting(false);
-      // Still show success to user even if email fails (graceful degradation)
-      setSubmitted(true);
-      setEmail('');
-      setSelectedMethods([]);
-      setHasAttemptedSubmit(false);
-    }
-  };
-
   const handleSignInClick = () => {
     window.history.pushState({}, '', '/login');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
+  const handleGetStartedClick = () => {
+    window.history.pushState({}, '', '/login?signup=true');
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
@@ -248,171 +170,20 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             Brew smarter with personalized guidance
           </p>
 
-          {!submitted ? (
-            <form onSubmit={handleSubmit} style={{ maxWidth: '480px', margin: '0', position: 'relative' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'stretch', position: 'relative' }}>
-                {/* Email Section */}
-                <div className="email-section" style={{ width: '100%' }}>
-                  <label className="email-label" style={{
-                    display: 'block',
-                    fontSize: '0.875rem',
-                    fontWeight: 400,
-                    color: '#6b7280',
-                    marginBottom: '6px',
-                    marginTop: '-2px',
-                    textAlign: 'left',
-                  }}>
-                    Email
-                  </label>
-                  <div style={{ position: 'relative', width: '100%', minHeight: '42px', isolation: 'isolate' }}>
-                    <input
-                      ref={emailInputRef}
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@domain.com"
-                      required
-                      disabled={isSubmitting}
-                      style={{
-                        width: '100%',
-                        padding: '10px 16px',
-                        paddingRight: '40px', // Make room for LastPass icon
-                        fontSize: '1rem',
-                        lineHeight: '1.5',
-                        color: '#111827',
-                        backgroundColor: 'rgb(255, 255, 255)',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '8px',
-                        outline: 'none',
-                        transition: 'border-color 0.15s ease',
-                        textAlign: 'left',
-                        boxSizing: 'border-box',
-                        height: '42px',
-                        position: 'relative',
-                        zIndex: 1,
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = '#111827';
-                        // Prevent any scroll behavior
-                        e.currentTarget.scrollIntoView({ behavior: 'instant', block: 'nearest' });
-                      }}
-                      onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                    />
-                  </div>
-                </div>
-                
-                {/* Coffee Methods Multi-Select Pills */}
-                <div className="brew-methods-section" style={{ width: '100%', marginTop: '8px', marginBottom: '12px' }}>
-                  {/* Header */}
-                  <label className="brew-methods-label" style={{
-                    display: 'block',
-                    fontSize: '0.875rem',
-                    fontWeight: 400,
-                    color: '#6b7280',
-                    marginBottom: '6px',
-                    marginTop: '-2px',
-                    textAlign: 'left',
-                  }}>
-                    Brew methods
-                  </label>
-                  
-                  {/* All Method Pills */}
-                  <div className="brew-methods-pills-container" style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '6px',
-                  }}>
-                    {PREDEFINED_METHODS.map((method) => {
-                      const isSelected = selectedMethods.includes(method);
-                      return (
-                        <button
-                          key={method}
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleMethod(method);
-                            // Blur the button to remove focus state on mobile
-                            e.currentTarget.blur();
-                          }}
-                          disabled={isSubmitting}
-                          className={`inline-flex items-center gap-1 rounded-full text-sm border transition-colors ${
-                            isSelected
-                              ? 'bg-gray-900 border-gray-900 text-white hover:bg-gray-800'
-                              : 'bg-transparent border-gray-300 text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                          } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                          style={{
-                            paddingLeft: '16px',
-                            paddingRight: '16px',
-                            paddingTop: '4px',
-                            paddingBottom: '4px',
-                          }}
-                        >
-                          <span>{method}</span>
-                          {isSelected && (
-                            <X className="w-3 h-3 flex-shrink-0" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  
-                  {selectedMethods.length === 0 && hasAttemptedSubmit && (
-                    <p style={{
-                      fontSize: '0.8125rem',
-                      color: '#ef4444',
-                      marginTop: '8px',
-                    }}>
-                      Please select at least one coffee method
-                    </p>
-                  )}
-                </div>
-                
-                <Button 
-                  type="submit"
-                  size="lg"
-                  disabled={isSubmitting || !email || selectedMethods.length === 0}
-                  className="bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer px-8 py-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    fontWeight: 500,
-                    width: '100%',
-                  }}
-                >
-                  {isSubmitting ? 'Requesting...' : 'Request Early Access'}
-                  {!isSubmitting && <ArrowRight className="w-4 h-4 ml-2" />}
-                </Button>
-                <p className="rolling-access-text" style={{
-                  fontSize: '0.875rem',
-                  lineHeight: '1.5',
-                  color: '#6b7280',
-                  margin: '4px auto 0 auto',
-                  textAlign: 'center',
-                  width: '100%'
-                }}>
-                  Rolling access • Built with early users
-                </p>
-              </div>
-            </form>
-          ) : (
-            <div style={{ 
-              padding: '16px 24px',
-              backgroundColor: '#f0fdf4',
-              border: '1px solid #86efac',
-              borderRadius: '8px',
+          <Button 
+            type="button"
+            onClick={handleGetStartedClick}
+            size="lg"
+            className="bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer px-8 py-3 text-base"
+            style={{
+              fontWeight: 500,
               maxWidth: '480px',
-              margin: '0'
-            }}>
-              <p style={{ 
-                fontSize: '1rem',
-                lineHeight: '1.5',
-                color: '#166534',
-                margin: 0,
-                fontWeight: 500
-              }}>
-                You're on the list! We'll be in touch soon.
-              </p>
-            </div>
-          )}
+              width: '100%',
+            }}
+          >
+            Get Started
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
         </div>
       </section>
 
@@ -587,8 +358,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-bottom: 56px !important;
             padding-bottom: 0 !important;
             flex: 0 0 auto !important;
-            display: block !important;
-            align-items: normal !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
             justify-content: flex-start !important;
             text-align: left !important;
           }
@@ -596,11 +368,16 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
             text-align: left !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
           }
           .static-timeline-card {
             margin-bottom: 0 !important;
             margin-top: 0 !important;
             text-align: left !important;
+            align-self: flex-start !important;
           }
           .landing-text-content {
             text-align: left !important;
@@ -671,6 +448,16 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-top: -2px !important;
             margin-bottom: 32px !important;
           }
+          .landing-graph-container .static-timeline-card .mb-3 {
+            text-align: center !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 h3,
+          .landing-graph-container .static-timeline-card .mb-3 p {
+            text-align: center !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 p {
+            justify-content: center !important;
+          }
           .landing-text-content form div p.rolling-access-text {
             margin-top: 8px !important;
           }
@@ -706,7 +493,27 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             -webkit-overflow-scrolling: touch !important;
           }
           .landing-graph-container {
-            display: none !important;
+            order: 1 !important;
+            margin-bottom: 40px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            width: 100% !important;
+          }
+          .landing-graph-container > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          .landing-graph-container .static-timeline-card {
+            align-self: flex-start !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 {
+            text-align: left !important;
+          }
+          .landing-section {
+            order: 2 !important;
           }
           .landing-mobile-header > div {
             display: flex !important;
@@ -883,6 +690,16 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: auto !important;
             margin-right: auto !important;
           }
+          .landing-graph-container .static-timeline-card .mb-3 {
+            text-align: center !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 h3,
+          .landing-graph-container .static-timeline-card .mb-3 p {
+            text-align: center !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 p {
+            justify-content: center !important;
+          }
         }
         @media (max-width: 512px) {
           .landing-mobile-header > div {
@@ -924,6 +741,31 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content h1,
           .landing-text-content .landing-subtitle {
             text-align: left !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 {
+            text-align: left !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 h3,
+          .landing-graph-container .static-timeline-card .mb-3 p {
+            text-align: left !important;
+          }
+          .landing-graph-container .static-timeline-card .mb-3 p {
+            justify-content: flex-start !important;
+          }
+          .landing-graph-container {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            width: 100% !important;
+          }
+          .landing-graph-container > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          .landing-graph-container .static-timeline-card {
+            align-self: flex-start !important;
           }
           .landing-text-content form {
             maxWidth: 100% !important;
