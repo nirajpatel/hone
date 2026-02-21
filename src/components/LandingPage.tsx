@@ -587,7 +587,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: 0 !important;
             margin-right: auto !important;
             width: 100% !important;
-            font-size: 16px !important;
+            font-size: 18px !important;
           }
           .landing-text-content * {
             text-align: left !important;
