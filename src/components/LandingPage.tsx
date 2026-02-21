@@ -231,7 +231,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
-          line-height: 1.25 !important;
+          line-height: 1 !important;
         }
         .landing-cta-button svg {
           display: block !important;
@@ -725,6 +725,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             height: 48px !important;
             padding-top: 12px !important;
             padding-bottom: 12px !important;
+            line-height: 1 !important;
           }
           .landing-cta-button svg {
             display: block !important;
@@ -967,6 +968,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             height: 48px !important;
             padding-top: 12px !important;
             padding-bottom: 12px !important;
+            line-height: 1 !important;
           }
           .landing-cta-button svg {
             display: block !important;
