@@ -48,7 +48,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
       // Mobile: 10 nodes
       // Right to left (newest to oldest): green, green, green, yellow, yellow, red, yellow, yellow, red, red
       // Array is oldest to newest, so: [1, 1, 2, 2, 1, 2, 2, 3, 3, 3]
-      qualities = [1, 1, 2, 2, 1, 2, 2, 3, 3, 3];
+      qualities = [1, 1, 2, 1, 2, 1, 2, 2, 3, 3];
     } else if (windowWidth <= 1024) {
       // Tablet: 8 nodes
       // Right to left (newest to oldest): green, green, green, yellow, yellow, red, yellow, red
