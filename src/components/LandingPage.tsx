@@ -358,7 +358,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 24px !important;
+            gap: 20px !important;
             padding: 16px !important;
             position: relative !important;
             flex: 0 0 auto !important;
@@ -572,7 +572,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page > div,
           .landing-main {
-            gap: 24px !important;
+            gap: 20px !important;
           }
           .landing-page > div {
             padding: 16px !important;
