@@ -582,7 +582,7 @@ export function EquipmentDialog({
       {loading ? (
         <div className="text-center py-8 text-gray-500">Loading equipment...</div>
       ) : (
-        <div className="space-y-8 mt-0">
+        <div className="space-y-8 mt-0 pb-4">
           {renderEquipmentSection('brewer', brewers, 'Brewers')}
           {renderEquipmentSection('grinder', grinders, 'Grinders')}
         </div>

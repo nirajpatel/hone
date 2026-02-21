@@ -152,30 +152,18 @@ export default function App() {
     return () => clearInterval(interval);
   }, [apiUrl]);
 
-  // SMS reminder checker - runs every minute when user is logged in
-  useEffect(() => {
-    if (!currentUser) return;
-
-    const checkReminders = async () => {
-      try {
-        await fetch(`${apiUrl}/check-reminders`, {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        });
-      } catch (error) {
-        // Silently fail - reminder checks are background tasks
-      }
-    };
-
-    // Check immediately
-    checkReminders();
-    
-    // Then check every minute
-    const interval = setInterval(checkReminders, 60000);
-    
-    return () => clearInterval(interval);
-  }, [apiUrl, currentUser]);
+  // SMS reminder checker - disabled (notification checks turned off)
+  // useEffect(() => {
+  //   if (!currentUser) return;
+  //   const checkReminders = async () => {
+  //     try {
+  //       await fetch(`${apiUrl}/check-reminders`, { headers: { 'Authorization': `Bearer ${publicAnonKey}` } });
+  //     } catch (error) { /* Silently fail */ }
+  //   };
+  //   checkReminders();
+  //   const interval = setInterval(checkReminders, 60000);
+  //   return () => clearInterval(interval);
+  // }, [apiUrl, currentUser]);
 
   useEffect(() => {
     // Set document title and meta tags

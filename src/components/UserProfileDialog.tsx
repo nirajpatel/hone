@@ -406,7 +406,7 @@ export function UserProfileDialog({
         </div>
       }
     >
-      <div className="space-y-6">
+      <div className="space-y-6 pb-6">
         {/* Account Info Section */}
         <div className="space-y-4">
           <h3 className="text-base font-semibold text-gray-900">Account Info</h3>
@@ -742,7 +742,8 @@ export function UserProfileDialog({
           )}
         </div>
 
-        {/* SMS Notifications Section */}
+        {/* SMS Notifications Section - hidden */}
+        {false && (
         <div className="space-y-4 pt-4 border-t">
           <h3 className="text-base font-semibold text-gray-900">SMS Notifications</h3>
         <div>
@@ -784,6 +785,7 @@ export function UserProfileDialog({
           </div>
         </div>
         </div>
+        )}
       </div>
     </StandardDialog>
   );

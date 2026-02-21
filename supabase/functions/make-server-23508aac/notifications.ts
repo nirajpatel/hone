@@ -571,37 +571,27 @@ export function buildNotesRequestMessage(rating: number): string {
   return `Any notes? Reply with comma-separated notes or SKIP to skip.${suggestionText}`;
 }
 
-// Check all active notifications and send messages if needed
+// Check all active notifications and send messages if needed - DISABLED (notification checks turned off)
 // Timeline: 5 min (initial), 15 min (reminder) - max 2 messages for rating. Notes request sent after rating, no reminders.
-// Also clears all notification states from previous day(s) at day boundary.
 export async function checkReminders(): Promise<void> {
-  try {
-    // First, clear all notifications from previous day(s)
-    await clearPreviousDayNotifications();
-    
-    const activeNotifications = await kv.getByPrefix('notification_active:');
-    
-    for (const state of activeNotifications) {
-      const elapsed = Date.now() - new Date(state.startTime).getTime();
-      const fiveMinutes = 5 * 60 * 1000;
-      const fifteenMinutes = 15 * 60 * 1000;
-      
-      // Determine which message should be sent based on elapsed time
-      let expectedMessages = 0;
-      if (elapsed >= fifteenMinutes) {
-        expectedMessages = 2; // Initial + 1 reminder
-      } else if (elapsed >= fiveMinutes) {
-        expectedMessages = 1; // Initial message
-      }
-      
-      // Send message if we haven't sent it yet
-      if (expectedMessages > state.messagesSent && state.messagesSent < 2) {
-        await processReminder(state.userId, state);
-      }
-    }
-  } catch (error) {
-    console.error('Error checking reminders:', error);
-  }
+  return; // Disabled - no-op
+  // try {
+  //   await clearPreviousDayNotifications();
+  //   const activeNotifications = await kv.getByPrefix('notification_active:');
+  //   for (const state of activeNotifications) {
+  //     const elapsed = Date.now() - new Date(state.startTime).getTime();
+  //     const fiveMinutes = 5 * 60 * 1000;
+  //     const fifteenMinutes = 15 * 60 * 1000;
+  //     let expectedMessages = 0;
+  //     if (elapsed >= fifteenMinutes) expectedMessages = 2;
+  //     else if (elapsed >= fiveMinutes) expectedMessages = 1;
+  //     if (expectedMessages > state.messagesSent && state.messagesSent < 2) {
+  //       await processReminder(state.userId, state);
+  //     }
+  //   }
+  // } catch (error) {
+  //   console.error('Error checking reminders:', error);
+  // }
 }
 
 // Clear all notification states from previous day(s)

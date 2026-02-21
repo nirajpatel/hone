@@ -1762,20 +1762,18 @@ app.post('/make-server-23508aac/sms-webhook', async (c) => {
   }
 });
 
-// Cron endpoint to check for reminders (call this every minute or use Deno.cron)
+// Cron endpoint to check for reminders - disabled (notification checks turned off)
 app.get('/make-server-23508aac/check-reminders', async (c) => {
-  try {
-    // Don't await - run in background to avoid timeout
-    notifications.checkReminders().catch((error) => {
-      console.error('Background error checking reminders:', error);
-    });
-    
-    // Return immediately
-    return c.json({ success: true, message: 'Reminder check initiated' });
-  } catch (error) {
-    console.error('Error initiating reminder check:', error);
-    return c.json({ error: 'Failed to initiate reminder check', details: String(error) }, 500);
-  }
+  return c.json({ success: true, message: 'Reminder check disabled' });
+  // try {
+  //   notifications.checkReminders().catch((error) => {
+  //     console.error('Background error checking reminders:', error);
+  //   });
+  //   return c.json({ success: true, message: 'Reminder check initiated' });
+  // } catch (error) {
+  //   console.error('Error initiating reminder check:', error);
+  //   return c.json({ error: 'Failed to initiate reminder check', details: String(error) }, 500);
+  // }
 });
 
 // DEBUG: Clear all active notifications and queues
