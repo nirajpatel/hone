@@ -3605,6 +3605,9 @@ html {
 
 .animate-radiate {
   position: relative;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .animate-radiate:before {
@@ -3614,6 +3617,9 @@ html {
   animation: 2s cubic-bezier(.4, 0, .6, 1) infinite radiate;
   position: absolute;
   inset: -2px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .scrollbar-hide {

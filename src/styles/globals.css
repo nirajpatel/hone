@@ -229,6 +229,9 @@ html {
 
 .animate-radiate {
   position: relative;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 .animate-radiate::before {
@@ -238,6 +241,9 @@ html {
   border-radius: 50%;
   animation: radiate 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   pointer-events: none;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
 }
 
 /* Hide scrollbar for horizontal scroll containers */
