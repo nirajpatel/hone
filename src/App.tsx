@@ -489,19 +489,11 @@ export default function App() {
           window.dispatchEvent(new PopStateEvent('popstate'));
           // Don't show toast - SignInPage will handle the error display
         } else {
-          // Other errors - show toast only if not on login page
-          const isLoginRoute = window.location.pathname === '/login';
-          if (!isLoginRoute) {
-            toast.error(sanitizeErrorMessage(errorData, 'Failed to set up user'));
-          }
+          // Other errors - don't show toast
         }
       }
     } catch (error) {
       console.error('Error creating/getting user:', error);
-      const isLoginRoute = window.location.pathname === '/login';
-      if (!isLoginRoute) {
-        toast.error('Error setting up user');
-      }
     } finally {
       setLoading(false);
     }
