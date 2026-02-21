@@ -804,7 +804,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
-                  Auto-fill coffee details from your bag. Photos are saved with your coffee.
+                  Auto-fill details from your bag. Photos are saved with your coffee.
                 </p>
               </div>
 
