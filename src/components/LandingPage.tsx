@@ -423,7 +423,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             text-align: left !important;
           }
           .landing-text-content .landing-subtitle {
-            margin-bottom: 16px !important;
+            margin-bottom: 0 !important;
             font-size: clamp(1.125rem, 2vw, 1.25rem) !important;
           }
           .landing-graph-container {
@@ -432,7 +432,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             z-index: 0 !important;
             order: 1 !important;
             min-width: auto !important;
-            margin-bottom: 56px !important;
+            margin-bottom: 0 !important;
             padding-bottom: 0 !important;
             flex: 0 0 auto !important;
             display: flex !important;
@@ -572,7 +572,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page > div,
           .landing-main {
-            gap: 12px !important;
+            gap: 0 !important;
           }
           .landing-page > div {
             padding: 16px !important;
@@ -583,7 +583,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-graph-container {
             order: 2 !important;
-            margin-bottom: 40px !important;
+            margin-bottom: 0 !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: flex-start !important;
