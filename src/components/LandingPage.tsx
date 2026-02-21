@@ -238,6 +238,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           vertical-align: middle !important;
           margin: 0 !important;
         }
+        .landing-graph-container .static-timeline-card .mb-3 h3,
+        .landing-graph-container .static-timeline-card .mb-3 p {
+          margin-bottom: 1px !important;
+        }
         .landing-footer {
           justify-content: flex-start !important;
           align-items: center !important;
