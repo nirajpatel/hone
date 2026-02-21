@@ -630,6 +630,19 @@ html, body {
     max-height: 90dvh !important;
     overflow-y: auto !important;
   }
+
+  /* Hide scrollbar on popovers, dialogs, and sheets */
+  [data-slot="popover-content"],
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"] {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  [data-slot="popover-content"]::-webkit-scrollbar,
+  [data-slot="dialog-content"]::-webkit-scrollbar,
+  [data-slot="sheet-content"]::-webkit-scrollbar {
+    display: none !important;
+  }
   
   /* Add vertical spacing and centering for dialogs */
   [data-slot="dialog-content"] {
@@ -649,6 +662,11 @@ html, body {
   [data-slot="dialog-content"] > div {
     max-height: calc(90dvh - 6rem);
     overflow-y: auto;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  [data-slot="dialog-content"] > div::-webkit-scrollbar {
+    display: none !important;
   }
   
   /* Add padding to dialog/sheet containers */
@@ -688,7 +706,29 @@ html, body {
   .fixed.inset-0 > .max-w-2xl {
     max-height: calc(90vh - 2rem) !important;
     overflow-y: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
+  .fixed.inset-0 > .max-w-lg::-webkit-scrollbar,
+  .fixed.inset-0 > .max-w-xl::-webkit-scrollbar,
+  .fixed.inset-0 > .max-w-2xl::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
+/* Hide scrollbars in all dialog/sheet/popover and their scrollable descendants */
+[data-slot="dialog-content"] *,
+[data-slot="sheet-content"] *,
+[role="dialog"] *,
+[role="alertdialog"] * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+[data-slot="dialog-content"] *::-webkit-scrollbar,
+[data-slot="sheet-content"] *::-webkit-scrollbar,
+[role="dialog"] *::-webkit-scrollbar,
+[role="alertdialog"] *::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Overlap arrow with popover border to hide the connection line */

@@ -194,6 +194,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       </div>
       </div>
 
+      <footer className="landing-footer" style={{ height: '60px', flex: '0 0 auto', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', fontSize: '0.875rem', color: '#6b7280', textAlign: 'left', backgroundColor: 'rgb(255, 255, 255)', boxSizing: 'border-box' }}>
+        <div className="landing-footer-inner" style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: 0, boxSizing: 'border-box' }}>
+          <div style={{ textAlign: 'left' }}>
+            © 2026 Hone • <a href="/privacy" style={{ color: '#6b7280', textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }} onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}>Privacy</a> • <a href="/terms" style={{ color: '#6b7280', textDecoration: 'none', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }} onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}>Terms</a>
+          </div>
+        </div>
+      </footer>
+
       <style>{`
         .landing-page * {
           box-sizing: border-box;
@@ -218,6 +226,21 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         .landing-cta-block {
           grid-column: 1 !important;
           grid-row: 2 !important;
+        }
+        .landing-footer {
+          justify-content: flex-start !important;
+          align-items: center !important;
+          text-align: left !important;
+        }
+        .landing-footer-inner {
+          justify-content: flex-start !important;
+          align-items: center !important;
+          text-align: left !important;
+        }
+        .landing-footer-inner > div {
+          text-align: left !important;
+          width: auto !important;
+          max-width: none !important;
         }
         .landing-header-brand {
           gap: 5px !important;
@@ -361,6 +384,20 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             grid-column: auto !important;
             grid-row: auto !important;
           }
+          .landing-footer,
+          .landing-footer-inner {
+            justify-content: flex-start !important;
+            text-align: left !important;
+          }
+          .landing-footer {
+            padding: 0 16px !important;
+          }
+          .landing-footer-inner {
+            padding: 0 !important;
+          }
+          .landing-footer-inner > div {
+            text-align: left !important;
+          }
           .landing-text-content {
             width: 100% !important;
             display: flex !important;
@@ -490,6 +527,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-graph-container .static-timeline-card .mb-3 p {
             justify-content: center !important;
+          }
+          .landing-footer,
+          .landing-footer-inner {
+            justify-content: center !important;
+            text-align: center !important;
+          }
+          .landing-footer-inner > div {
+            text-align: center !important;
           }
           .landing-text-content form div p.rolling-access-text {
             margin-top: 8px !important;
@@ -741,6 +786,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-graph-container .static-timeline-card .mb-3 p {
             justify-content: center !important;
           }
+          .landing-footer,
+          .landing-footer-inner {
+            justify-content: center !important;
+            text-align: center !important;
+          }
+          .landing-footer-inner > div {
+            text-align: center !important;
+          }
         }
         @media (max-width: 512px) {
           .landing-mobile-header > div {
@@ -807,6 +860,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-graph-container .static-timeline-card {
             align-self: flex-start !important;
+          }
+          .landing-footer,
+          .landing-footer-inner {
+            justify-content: flex-start !important;
+            text-align: left !important;
+          }
+          .landing-footer-inner > div {
+            text-align: left !important;
           }
           .landing-text-content form {
             maxWidth: 100% !important;
@@ -953,6 +1014,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-mobile-header {
             display: none !important;
           }
+          .landing-footer {
+            padding: 0 2rem !important;
+          }
+          .landing-footer-inner {
+            padding: 0 !important;
+          }
           .landing-footer-text {
             height: 60px !important;
             justify-content: flex-start !important;
@@ -963,6 +1030,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin: 0 auto !important;
             max-width: 1400px !important;
           }
+        }
+        @media (min-width: 1025px) {
           .landing-text-content form div p.rolling-access-text {
             margin-top: 8px !important;
           }

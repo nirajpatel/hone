@@ -3950,6 +3950,18 @@ html {
     overflow-y: auto !important;
   }
 
+  [data-slot="popover-content"],
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"] {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  [data-slot="popover-content"]::-webkit-scrollbar,
+  [data-slot="dialog-content"]::-webkit-scrollbar,
+  [data-slot="sheet-content"]::-webkit-scrollbar {
+    display: none !important;
+  }
+
   [data-slot="dialog-content"] {
     max-width: calc(100vw - 2rem) !important;
     max-height: calc(100vh - 2rem) !important;
@@ -3965,6 +3977,11 @@ html {
   [data-slot="dialog-content"] > div {
     max-height: calc(90vh - 6rem);
     overflow-y: auto;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  [data-slot="dialog-content"] > div::-webkit-scrollbar {
+    display: none !important;
   }
 
   [role="dialog"], [role="alertdialog"] {
@@ -3990,7 +4007,28 @@ html {
   .fixed.inset-0 > .max-w-lg, .fixed.inset-0 > .max-w-xl, .fixed.inset-0 > .max-w-2xl {
     max-height: calc(90vh - 2rem) !important;
     overflow-y: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
+  .fixed.inset-0 > .max-w-lg::-webkit-scrollbar,
+  .fixed.inset-0 > .max-w-xl::-webkit-scrollbar,
+  .fixed.inset-0 > .max-w-2xl::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
+[data-slot="dialog-content"] *,
+[data-slot="sheet-content"] *,
+[role="dialog"] *,
+[role="alertdialog"] * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+[data-slot="dialog-content"] *::-webkit-scrollbar,
+[data-slot="sheet-content"] *::-webkit-scrollbar,
+[role="dialog"] *::-webkit-scrollbar,
+[role="alertdialog"] *::-webkit-scrollbar {
+  display: none !important;
 }
 
 @media (width >= 768px) {
