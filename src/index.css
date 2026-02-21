@@ -4395,6 +4395,6 @@ html {
 /* Logged-in nav: larger logo on mobile only */
 @media (max-width: 767px) {
   .app-nav-logo {
-    height: 26px !important;
+    height: 28px !important;
   }
 }
