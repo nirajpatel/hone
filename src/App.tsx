@@ -230,13 +230,13 @@ export default function App() {
     updateMetaTag('og:description', 'Track brews. Learn from your data. Get personalized guidance for better coffee.', true);
     updateMetaTag('og:url', 'https://hone.coffee', true);
     updateMetaTag('og:site_name', 'Hone', true);
-    updateMetaTag('og:image', `${typeof window !== 'undefined' ? window.location.origin : 'https://hone.coffee'}/web-app-manifest-512x512.png`, true);
+    updateMetaTag('og:image', `${typeof window !== 'undefined' ? window.location.origin : 'https://hone.coffee'}/og-image.png`, true);
 
     // Twitter Card tags (use name attribute)
     updateMetaTag('twitter:card', 'summary_large_image');
     updateMetaTag('twitter:title', 'Hone – Designed for Better Coffee');
     updateMetaTag('twitter:description', 'Log brews, analyze patterns, and get personalized guidance to brew better coffee.');
-    updateMetaTag('twitter:image', `${typeof window !== 'undefined' ? window.location.origin : 'https://hone.coffee'}/web-app-manifest-512x512.png`);
+    updateMetaTag('twitter:image', `${typeof window !== 'undefined' ? window.location.origin : 'https://hone.coffee'}/og-image.png`);
 
     // Theme and app meta tags (use name attribute)
     updateMetaTag('theme-color', '#000000');
