@@ -231,10 +231,12 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
+          line-height: 1.25 !important;
         }
         .landing-cta-button svg {
           display: block !important;
           vertical-align: middle !important;
+          margin: 0 !important;
         }
         .landing-footer {
           justify-content: flex-start !important;
@@ -341,30 +343,30 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             height: 100% !important;
             min-height: 0 !important;
             max-height: 100% !important;
-            overflow: hidden !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
             padding: 0 !important;
             flex: 1 1 0 !important;
             display: flex !important;
             flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
           }
           .landing-page > div,
           .landing-main {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            min-height: 0 !important;
             gap: 0 !important;
             padding: 16px !important;
             position: relative !important;
-            flex: 1 1 0 !important;
+            flex: 0 0 auto !important;
             width: 100% !important;
             max-width: 1400px !important;
             margin: 0 auto !important;
             display: flex !important;
             box-sizing: border-box !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            -webkit-overflow-scrolling: touch !important;
           }
           .landing-main {
             grid-template-columns: none !important;
@@ -575,9 +577,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-page > div {
             padding: 16px !important;
             justify-content: center !important;
-            min-height: 0 !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch !important;
           }
           .landing-headline-block {
             order: 1 !important;
@@ -722,10 +721,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
+            min-height: 48px !important;
+            height: 48px !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
           }
           .landing-cta-button svg {
             display: block !important;
             vertical-align: middle !important;
+            margin: 0 !important;
           }
           .landing-text-content .brew-methods-pills-container button[type="button"] {
             height: auto !important;
@@ -959,10 +963,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
+            min-height: 48px !important;
+            height: 48px !important;
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
           }
           .landing-cta-button svg {
             display: block !important;
             vertical-align: middle !important;
+            margin: 0 !important;
           }
           .landing-text-content .brew-methods-pills-container button[type="button"] {
             height: auto !important;
