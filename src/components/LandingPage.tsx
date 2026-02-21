@@ -358,7 +358,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 16px !important;
+            gap: 24px !important;
             padding: 16px !important;
             position: relative !important;
             flex: 0 0 auto !important;
@@ -546,7 +546,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             text-align: center !important;
           }
           .landing-text-content form div p.rolling-access-text {
-            margin-top: 10px !important;
+            margin-top: 8px !important;
           }
           .landing-text-content form > div > div:first-child {
             min-height: 42px !important;
@@ -572,7 +572,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page > div,
           .landing-main {
-            gap: 16px !important;
+            gap: 24px !important;
           }
           .landing-page > div {
             padding: 16px !important;
@@ -726,7 +726,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-top: 12px !important;
             padding-bottom: 12px !important;
             line-height: 1 !important;
-            margin-top: 10px !important;
+            margin-top: 8px !important;
           }
           .landing-cta-button svg {
             display: block !important;
@@ -970,7 +970,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             padding-top: 12px !important;
             padding-bottom: 12px !important;
             line-height: 1 !important;
-            margin-top: 10px !important;
+            margin-top: 8px !important;
           }
           .landing-cta-button svg {
             display: block !important;
@@ -1069,7 +1069,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         }
         @media (min-width: 1025px) {
           .landing-text-content form div p.rolling-access-text {
-            margin-top: 10px !important;
+            margin-top: 8px !important;
           }
           .landing-text-content h1 {
             margin-bottom: 10px !important;
