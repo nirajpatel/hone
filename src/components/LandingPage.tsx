@@ -116,7 +116,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       </nav>
 
       {/* Mobile/Tablet Header - Left Aligned */}
-      <nav className="landing-mobile-header bg-white" style={{ display: 'none', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, height: '60px' }}>
+      <nav className="landing-mobile-header bg-white" style={{ display: 'none', flexShrink: 0, height: '60px' }}>
         <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
           <div className="landing-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <img src={honeLogo} alt="" style={{ height: '24px', width: 'auto', display: 'block' }} />
@@ -346,8 +346,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 0 !important;
             gap: 0 !important;
             padding: 16px !important;
-            padding-top: 60px !important;
-            padding-bottom: 60px !important;
             position: relative !important;
             flex: 1 1 0 !important;
             width: 100% !important;
@@ -567,8 +565,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page > div {
             padding: 16px !important;
-            padding-top: 60px !important;
-            padding-bottom: 60px !important;
             justify-content: center !important;
             min-height: 0 !important;
             overflow-y: auto !important;
