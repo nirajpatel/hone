@@ -136,10 +136,9 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
       </nav>
 
       <div className="landing-page" style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 2rem', overflow: 'auto' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', alignItems: 'center', gap: '64px', flexWrap: 'wrap' }}>
-        {/* Hero Section - Left */}
-        <section className="landing-section" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', order: 2 }}>
-        <div ref={headlineContainerRef} className="landing-text-content" style={{ textAlign: 'left', width: '100%' }}>
+        <div className="landing-main" style={{ maxWidth: '1400px', margin: '0 auto', width: '100%', display: 'flex', alignItems: 'center', gap: '64px', flexWrap: 'wrap' }}>
+        {/* Headline block - order 1 on mobile */}
+        <div ref={headlineContainerRef} className="landing-headline-block landing-text-content" style={{ flex: '1', minWidth: '400px', textAlign: 'left', width: '100%' }}>
           <h1 
             ref={headlineRef}
             style={{ 
@@ -154,7 +153,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           >
             Dial in any bean, perfectly.
           </h1>
-          
           <p 
             className="landing-subtitle"
             style={{ 
@@ -169,7 +167,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           >
             Brew smarter with personalized guidance
           </p>
+        </div>
 
+        {/* Graph - order 2 on mobile */}
+        <div className="landing-graph-container" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <StaticTimelineScreenshot />
+        </div>
+
+        {/* CTA block - order 3 on mobile */}
+        <div className="landing-cta-block landing-text-content" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
           <Button 
             type="button"
             onClick={handleGetStartedClick}
@@ -185,12 +191,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
-      </section>
-
-      {/* Static Timeline Screenshot - Right */}
-      <div className="landing-graph-container" style={{ flex: '1', minWidth: '400px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', order: 1 }}>
-        <StaticTimelineScreenshot />
-      </div>
       </div>
       </div>
 
@@ -198,8 +198,26 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         .landing-page * {
           box-sizing: border-box;
         }
-        .landing-section {
-          display: block;
+        .landing-main {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          grid-template-rows: auto auto !important;
+          column-gap: 64px !important;
+          row-gap: 0 !important;
+          align-items: start !important;
+        }
+        .landing-headline-block {
+          grid-column: 1 !important;
+          grid-row: 1 !important;
+        }
+        .landing-graph-container {
+          grid-column: 2 !important;
+          grid-row: 1 / -1 !important;
+          align-self: center !important;
+        }
+        .landing-cta-block {
+          grid-column: 1 !important;
+          grid-row: 2 !important;
         }
         .landing-header-brand {
           gap: 5px !important;
@@ -297,7 +315,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             display: flex !important;
             flex-direction: column !important;
           }
-          .landing-page > div {
+          .landing-page > div,
+          .landing-main {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
@@ -317,18 +336,30 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             overflow-x: hidden !important;
             -webkit-overflow-scrolling: touch !important;
           }
-          .landing-section {
-            order: 2 !important;
+          .landing-main {
+            grid-template-columns: none !important;
+            grid-template-rows: none !important;
+          }
+          .landing-headline-block {
+            order: 1 !important;
             width: 100% !important;
             min-width: auto !important;
             flex: 0 0 auto !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 1 !important;
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-            margin-bottom: 16px !important;
+            grid-column: auto !important;
+            grid-row: auto !important;
+          }
+          .landing-graph-container {
+            order: 2 !important;
+            grid-column: auto !important;
+            grid-row: auto !important;
+          }
+          .landing-cta-block {
+            order: 3 !important;
+            width: 100% !important;
+            min-width: auto !important;
+            flex: 0 0 auto !important;
+            grid-column: auto !important;
+            grid-row: auto !important;
           }
           .landing-text-content {
             width: 100% !important;
@@ -404,10 +435,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: auto !important;
             margin-right: auto !important;
           }
-          .landing-section {
+          .landing-headline-block,
+          .landing-cta-block {
             text-align: left !important;
           }
-          .landing-section p,
           .landing-subtitle {
             text-align: left !important;
             margin-left: 0 !important;
@@ -429,7 +460,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             justify-self: end !important;
           }
           .landing-page > div {
-            gap: 80px !important;
+            gap: 64px !important;
           }
           .landing-graph-container {
             margin-bottom: 0 !important;
@@ -440,13 +471,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content h1 {
             text-align: center !important;
             margin-bottom: 10px !important;
+            font-size: 40px !important;
           }
           .landing-text-content .landing-subtitle {
             text-align: center !important;
             margin-left: auto !important;
             margin-right: auto !important;
             margin-top: -2px !important;
-            margin-bottom: 32px !important;
+            margin-bottom: 0 !important;
+            font-size: 20px !important;
           }
           .landing-graph-container .static-timeline-card .mb-3 {
             text-align: center !important;
@@ -483,6 +516,10 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             max-height: 100dvh !important;
             min-height: 100dvh !important;
           }
+          .landing-page > div,
+          .landing-main {
+            gap: 12px !important;
+          }
           .landing-page > div {
             padding: 16px !important;
             padding-top: 60px !important;
@@ -492,8 +529,11 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch !important;
           }
-          .landing-graph-container {
+          .landing-headline-block {
             order: 1 !important;
+          }
+          .landing-graph-container {
+            order: 2 !important;
             margin-bottom: 40px !important;
             display: flex !important;
             flex-direction: column !important;
@@ -512,8 +552,8 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-graph-container .static-timeline-card .mb-3 {
             text-align: left !important;
           }
-          .landing-section {
-            order: 2 !important;
+          .landing-cta-block {
+            order: 3 !important;
           }
           .landing-mobile-header > div {
             display: flex !important;
@@ -547,6 +587,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: 0 !important;
             margin-right: auto !important;
             width: 100% !important;
+            font-size: 16px !important;
           }
           .landing-text-content * {
             text-align: left !important;
@@ -895,12 +936,6 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-page {
             overflow: visible !important;
             padding: 64px 2rem !important;
-          }
-          .landing-section {
-            order: 1 !important;
-          }
-          .landing-page > div > div:last-child {
-            order: 2 !important;
           }
           .landing-desktop-header {
             display: block !important;
