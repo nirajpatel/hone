@@ -180,7 +180,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             type="button"
             onClick={handleGetStartedClick}
             size="lg"
-            className="bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer px-8 py-3 text-base"
+            className="landing-cta-button bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer px-8 py-3 text-base inline-flex items-center justify-center gap-2"
             style={{
               fontWeight: 500,
               maxWidth: '480px',
@@ -188,7 +188,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             }}
           >
             Get Started
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="w-4 h-4 shrink-0" />
           </Button>
         </div>
       </div>
@@ -226,6 +226,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
         .landing-cta-block {
           grid-column: 1 !important;
           grid-row: 2 !important;
+        }
+        .landing-cta-button {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        .landing-cta-button svg {
+          display: block !important;
+          vertical-align: middle !important;
         }
         .landing-footer {
           justify-content: flex-start !important;
@@ -709,6 +718,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             min-height: 40px !important;
             padding: 10px 14px !important;
           }
+          .landing-cta-button {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .landing-cta-button svg {
+            display: block !important;
+            vertical-align: middle !important;
+          }
           .landing-text-content .brew-methods-pills-container button[type="button"] {
             height: auto !important;
             min-height: auto !important;
@@ -936,6 +954,15 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             height: 40px !important;
             min-height: 40px !important;
             padding: 10px 14px !important;
+          }
+          .landing-cta-button {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .landing-cta-button svg {
+            display: block !important;
+            vertical-align: middle !important;
           }
           .landing-text-content .brew-methods-pills-container button[type="button"] {
             height: auto !important;
