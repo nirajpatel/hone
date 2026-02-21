@@ -1330,7 +1330,7 @@ export default function App() {
         <div className="px-3 md:px-6 py-4">
           <div className="flex items-center justify-between">
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <img src={honeLogo} alt="" style={{ height: '24px', width: 'auto', display: 'block' }} />
+              <img src={honeLogo} alt="" className="app-nav-logo" style={{ height: '24px', width: 'auto', display: 'block' }} />
               <span className="hidden md:inline text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
             </div>
             <div className="flex items-center gap-4">

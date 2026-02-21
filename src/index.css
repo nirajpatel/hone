@@ -4391,3 +4391,10 @@ html {
 .h-2\.5 {
   height: calc(var(--spacing) * 2.5) !important;
 }
+
+/* Logged-in nav: larger logo on mobile only */
+@media (max-width: 767px) {
+  .app-nav-logo {
+    height: 26px !important;
+  }
+}
