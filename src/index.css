@@ -4397,6 +4397,9 @@ html {
   .app-nav-logo {
     height: 28px !important;
   }
+  .timeline-cards-mobile-mt {
+    margin-top: 0.75em !important;
+  }
 }
 
 /* Empty state card: no background/border on tablet+ (loads after Tailwind so it wins) */
