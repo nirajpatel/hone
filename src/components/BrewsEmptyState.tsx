@@ -37,7 +37,7 @@ export function BrewsEmptyState({
   const step3Done = hasBrews;
 
   // First step (in order 1→2→3) that isn't done yet — people may complete steps out of order
-  const firstIncomplete =
+  const firstIncomplete = 
     !step1Done ? 1 : !step2Done ? 2 : !step3Done ? 3 : null;
 
   const nextAction =
