@@ -57,11 +57,11 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          skipBrowserRedirect: true,
+          skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -73,15 +73,8 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
         console.error('OAuth error:', error);
         setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
         setIsGoogleSubmitting(false);
-        return;
       }
-
-      if (data?.url) {
-        // Use replace() to force same-tab navigation—mobile Chrome can open
-        // assign() in a new tab, leaving the original tab stuck with the spinner
-        window.location.replace(data.url);
-      }
-      // Note: If we redirect, we won't reach here; otherwise reset on error above
+      // Note: If successful, user will be redirected, so we don't reset state
     } catch (error) {
       console.error('Login error:', error);
       setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
