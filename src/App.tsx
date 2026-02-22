@@ -335,6 +335,7 @@ export default function App() {
       if (error && isLoginRoute) {
         setLoading(false);
         setAuthChecked(true);
+        if (urlParams.get('mode') === 'popup') window.close();
         return;
       }
       
@@ -443,6 +444,12 @@ export default function App() {
       if (session?.access_token) {
         setAccessToken(session.access_token);
         await createOrGetUser(session.access_token);
+        // If we're in OAuth popup, close it so parent can detect and refresh
+        const isOAuthPopup = urlParams.get('mode') === 'popup';
+        if (isOAuthPopup) {
+          window.close();
+          return;
+        }
         // Redirect from /login to root after successful sign-in
         if (window.location.pathname === '/login') {
           window.history.pushState({}, '', '/');
@@ -456,10 +463,12 @@ export default function App() {
       
       setLoading(false);
       setAuthChecked(true);
+      if (urlParams.get('mode') === 'popup') window.close();
     } catch (error) {
       console.error('Error checking auth:', error);
       setLoading(false);
       setAuthChecked(true);
+      if (urlParams.get('mode') === 'popup') window.close();
     }
   };
 
