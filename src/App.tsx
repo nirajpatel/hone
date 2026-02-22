@@ -335,7 +335,6 @@ export default function App() {
       if (error && isLoginRoute) {
         setLoading(false);
         setAuthChecked(true);
-        if (typeof window !== 'undefined' && window.opener) window.close();
         return;
       }
       
@@ -426,11 +425,6 @@ export default function App() {
       if (session?.access_token) {
         setAccessToken(session.access_token);
         await createOrGetUser(session.access_token);
-        // If we're in an OAuth popup (iOS Chrome workaround), close after session is set
-        if (typeof window !== 'undefined' && window.opener) {
-          window.close();
-          return;
-        }
         // Redirect from /login to root after successful sign-in
         if (window.location.pathname === '/login') {
           window.history.pushState({}, '', '/');
@@ -444,17 +438,10 @@ export default function App() {
       
       setLoading(false);
       setAuthChecked(true);
-      // If we're in an OAuth popup (iOS Chrome) and auth failed, close so user can retry in opener
-      if (typeof window !== 'undefined' && window.opener) {
-        window.close();
-      }
     } catch (error) {
       console.error('Error checking auth:', error);
       setLoading(false);
       setAuthChecked(true);
-      if (typeof window !== 'undefined' && window.opener) {
-        window.close();
-      }
     }
   };
 
