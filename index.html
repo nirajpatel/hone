@@ -33,7 +33,19 @@
       <meta name="twitter:description" content="Log brews, analyze patterns, and get personalized guidance to brew better coffee." />
       
       <!-- Theme and App -->
-      <link rel="manifest" href="/manifest.json" />
+      <!-- On iOS, skip manifest to prevent standalone PWA - OAuth redirects fail (user never returns from Google).
+           See: https://github.com/GoogleChromeLabs/pwacompat/issues/15 -->
+      <script>
+        (function() {
+          var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          if (!isIOS) {
+            var link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = '/manifest.json';
+            document.head.appendChild(link);
+          }
+        })();
+      </script>
       <meta name="theme-color" content="#000000" />
       <meta name="apple-mobile-web-app-title" content="Hone" />
       <meta name="application-name" content="Hone" />
