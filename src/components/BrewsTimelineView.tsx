@@ -724,31 +724,38 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
       };
     });
 
-    if (allExtractions.length === 0) return '';
+    if (allExtractions.length === 0) return { solidPath: '', dashedPath: '' };
 
-    // Build points array - include button if it exists
-    const points: [number, number][] = allExtractions.map(item => [item.x, item.y]);
+    // Build points array - solid line is brews only; dashed segment is last brew to button
+    const solidPoints: [number, number][] = allExtractions.map(item => [item.x, item.y]);
     
-    // If button exists, add intermediate point at 90% then button
-    if (coffeeId && brewMethod && onAddExtraction) {
-      const lastExtractionX = allExtractions[allExtractions.length - 1].x;
-      const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
-      const buttonY = isMobile ? 45 : 60; // Responsive center position
-      
-      // Add intermediate point at 90% of the distance, at vertical center
-      const intermediateX = lastExtractionX + 0.9 * (buttonCenterX - lastExtractionX);
-      points.push([intermediateX, buttonY]);
-      
-      // Then add the button point
-      points.push([buttonCenterX, buttonY]);
-    }
-
     const lineGenerator = line<[number, number]>()
       .x(d => d[0])
       .y(d => d[1])
       .curve(curveMonotoneX);
 
-    return lineGenerator(points) || '';
+    let dashedPath = '';
+    if (coffeeId && brewMethod && onAddExtraction) {
+      const lastExtractionX = allExtractions[allExtractions.length - 1].x;
+      const lastExtractionY = allExtractions[allExtractions.length - 1].y;
+      const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
+      const lastQuality = brews[brews.length - 1]?.quality ?? lastRatedQuality;
+      const buttonY = lastQuality === 1
+        ? (isMobile ? 45 : 60)
+        : lastExtractionY;
+      const intermediateX = lastExtractionX + 0.9 * (buttonCenterX - lastExtractionX);
+      const dashedPoints: [number, number][] = [
+        [lastExtractionX, lastExtractionY],
+        [intermediateX, buttonY],
+        [buttonCenterX, buttonY],
+      ];
+      dashedPath = lineGenerator(dashedPoints) || '';
+    }
+
+    return {
+      solidPath: lineGenerator(solidPoints) || '',
+      dashedPath,
+    };
   };
 
   // Calculate gradient mask stops for highlight effect (desktop only)
@@ -797,8 +804,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     };
   };
 
-  const mobileGraphPath = calculateGraphPath(true);
-  const desktopGraphPath = calculateGraphPath(false);
+  const mobileGraphPaths = calculateGraphPath(true);
+  const desktopGraphPaths = calculateGraphPath(false);
 
   // Calculate gradient stops for highlight effect (desktop only)
   const desktopGradientStops = hoveredNodeIndex !== null && hoveredNodeIndex < brews.length
@@ -836,14 +843,16 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     // If button exists, add intermediate point at 90% then button (match the line path)
     if (coffeeId && brewMethod && onAddExtraction) {
       const lastExtractionX = allExtractions[allExtractions.length - 1].x;
+      const lastExtractionY = allExtractions[allExtractions.length - 1].y;
       const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
-      const buttonY = isMobile ? 45 : 60; // Responsive center position
+      const lastQuality = brews[brews.length - 1]?.quality ?? lastRatedQuality;
+      const buttonY = lastQuality === 1
+        ? (isMobile ? 45 : 60)
+        : lastExtractionY;
       
-      // Add intermediate point at 90% of the distance, at vertical center
       const intermediateX = lastExtractionX + 0.9 * (buttonCenterX - lastExtractionX);
       points.push([intermediateX, buttonY]);
       
-      // Then add the button point
       points.push([buttonCenterX, buttonY]);
     }
 
@@ -1045,7 +1054,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   opacity="1"
                 />
                 <path
-                  d={mobileGraphPath}
+                  d={mobileGraphPaths.solidPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
@@ -1053,6 +1062,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinejoin="round"
                   opacity="1"
                 />
+                {mobileGraphPaths.dashedPath && (
+                  <path
+                    d={mobileGraphPaths.dashedPath}
+                    fill="none"
+                    stroke="#d1d5db"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray="4 4"
+                    opacity="1"
+                  />
+                )}
               </svg>
 
               {/* SVG Graph - Desktop */}
@@ -1260,7 +1281,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 {/* Base line - always rendered, opacity controlled for instant transitions */}
                 {/* Line at 60% opacity - mask controls visibility to 60% */}
                 <path
-                  d={desktopGraphPath}
+                  d={desktopGraphPaths.solidPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
@@ -1271,7 +1292,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 />
                 {/* Line at 80% opacity - mask controls visibility to 80% */}
                 <path
-                  d={desktopGraphPath}
+                  d={desktopGraphPaths.solidPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
@@ -1282,7 +1303,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 />
                 {/* Line at 100% opacity - mask controls visibility to 100% */}
                 <path
-                  d={desktopGraphPath}
+                  d={desktopGraphPaths.solidPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
@@ -1293,7 +1314,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 />
                 {/* Base line at full opacity when not hovering */}
                 <path
-                  d={desktopGraphPath}
+                  d={desktopGraphPaths.solidPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
@@ -1301,6 +1322,19 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinejoin="round"
                   opacity={desktopGradientStops ? "0" : "1"}
                 />
+                {/* Dashed line to new brew node */}
+                {desktopGraphPaths.dashedPath && (
+                  <path
+                    d={desktopGraphPaths.dashedPath}
+                    fill="none"
+                    stroke="#d1d5db"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray="4 4"
+                    opacity="1"
+                  />
+                )}
               </svg>
 
               {/* Nodes */}
@@ -1371,7 +1405,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 {/* Add Extraction Button */}
                 {coffeeId && brewMethod && onAddExtraction && (() => {
                   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-                  const buttonMarginTop = isMobile ? 33 : 48; // Mobile: 45-12=33, Desktop: 60-12=48
+                  // Match last brew level; if last was bad, use decent level
+                  let lastRatedQuality: number | null = null;
+                  for (let i = brews.length - 1; i >= 0; i--) {
+                    if (brews[i].quality) {
+                      lastRatedQuality = brews[i].quality;
+                      break;
+                    }
+                  }
+                  const lastQuality = brews[brews.length - 1]?.quality ?? lastRatedQuality;
+                  const lastBrewY = getYPosition(brews[brews.length - 1]?.quality ?? null, lastRatedQuality, isMobile);
+                  const buttonY = lastQuality === 1 ? (isMobile ? 45 : 60) : lastBrewY;
+                  const buttonMarginTop = buttonY - 12; // Center 24px button at buttonY
                   
                   const isOtherNodeHovered = hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length;
                   

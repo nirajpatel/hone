@@ -419,6 +419,24 @@ export default function App() {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
       
+      // PKCE fallback: if we have a code but no session, try explicit exchange
+      // (helps when automatic detection fails, e.g. mobile OAuth context issues)
+      if (code) {
+        const { data: { session: codeSession }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (!exchangeError && codeSession?.access_token) {
+          setAccessToken(codeSession.access_token);
+          await createOrGetUser(codeSession.access_token);
+          if (window.location.pathname === '/login') {
+            window.history.pushState({}, '', '/');
+            setCurrentRoute('/');
+          } else {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+          setAuthChecked(true);
+          return;
+        }
+      }
+      
       // Check for session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
