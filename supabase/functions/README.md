@@ -13,8 +13,6 @@ supabase/functions/
 │   ├── lamarzocco.ts                 # La Marzocco integration
 │   ├── notifications.ts              # SMS notification handlers
 │   └── migrate-extraction-to-brew.ts # Database migration script
-├── auth-hook/
-│   └── index.ts                      # Before User Created hook
 └── send-email-hook/
     └── index.ts                      # Custom email hook for magic links
 ```
@@ -24,11 +22,6 @@ supabase/functions/
 Deploy main API server:
 ```bash
 npx supabase functions deploy make-server-23508aac --project-ref YOUR_PROJECT_REF
-```
-
-Deploy auth hook:
-```bash
-npx supabase functions deploy auth-hook --project-ref YOUR_PROJECT_REF
 ```
 
 Deploy send email hook:

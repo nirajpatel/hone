@@ -16,31 +16,14 @@ This document describes how to set up the email allowlist feature to restrict si
    - This migrates all existing users from `auth.users` to the allowlist
    - Verify the migration worked by checking the `allowed_emails` table
 
-## Step 2: Deploy Auth Hook Edge Function
-
-1. Deploy the auth-hook Edge Function:
-   ```bash
-   npx supabase functions deploy auth-hook --project-ref YOUR_PROJECT_REF
-   ```
-
-2. Verify the function is deployed in Supabase Dashboard → Edge Functions
-
-## Step 3: Configure Before User Created Hook
-
-1. Go to Supabase Dashboard → Authentication → Hooks
-2. Click "Add Hook" → Select "Before User Created"
-3. Set the hook URL to: `https://YOUR_PROJECT_REF.supabase.co/functions/v1/auth-hook`
-4. **IMPORTANT**: Do NOT enable the hook yet - wait until after migration is complete
-5. After verifying migration completed successfully, enable the hook
-
-## Step 4: Deploy Updated Backend Function
+## Step 2: Deploy Updated Backend Function
 
 1. Deploy the updated `make-server-23508aac` function:
    ```bash
    npx supabase functions deploy make-server-23508aac --project-ref YOUR_PROJECT_REF
    ```
 
-## Step 5: Test the Implementation
+## Step 3: Test the Implementation
 
 1. Try signing in with an email NOT in the allowlist - should be blocked
 2. Try signing in with an email IN the allowlist - should work
@@ -97,11 +80,6 @@ This will:
 
 ## Troubleshooting
 
-### Hook not blocking sign-ups
-- Verify the hook is enabled in Supabase Dashboard
-- Check Edge Function logs for errors
-- Verify the `allowed_emails` table exists and has data
-
 ### Existing users can't sign in
 - Run the migration script again to ensure all users are in allowlist
 - Check backend logs for 403 errors
@@ -115,6 +93,6 @@ This will:
 ## Security Notes
 
 - The allowlist check runs server-side and cannot be bypassed
-- Both the hook and backend check use service role key (not exposed to client)
+- The backend check uses service role key (not exposed to client)
 - Admin endpoints should be protected with proper authorization (TODO: add admin check)
 - Error messages don't reveal sensitive information

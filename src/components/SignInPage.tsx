@@ -22,6 +22,32 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
   const [isSignUpMode, setIsSignUpMode] = useState(getIsSignUpModeFromUrl);
   const [usePasswordMode, setUsePasswordMode] = useState(false);
+  const [googleOAuthUrl, setGoogleOAuthUrl] = useState<string | null>(null);
+
+  // Pre-fetch Google OAuth URL on mount. On iOS Safari/Chrome, redirects after async
+  // operations can be blocked (no longer tied to user gesture). Having the URL ready
+  // allows an immediate synchronous redirect on click, which works reliably on iOS.
+  useEffect(() => {
+    const fetchGoogleOAuthUrl = async () => {
+      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      if (!error && data?.url) {
+        setGoogleOAuthUrl(data.url);
+      }
+    };
+    fetchGoogleOAuthUrl();
+  }, []);
 
   // Sync sign-up mode from URL when route changes (e.g. back/forward)
   useEffect(() => {
@@ -51,13 +77,22 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   }, []);
 
   const handleGoogleLogin = async () => {
+    setError(null);
+
+    // If we have a pre-fetched OAuth URL, redirect immediately (synchronous).
+    // This is critical for iOS Safari/Chrome where async redirects can be blocked.
+    if (googleOAuthUrl) {
+      window.location.href = googleOAuthUrl;
+      return;
+    }
+
+    // Fallback: fetch and redirect (may fail on iOS due to async redirect blocking)
     try {
       setIsGoogleSubmitting(true);
-      setError(null);
       const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
       
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
@@ -73,8 +108,9 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
         console.error('OAuth error:', error);
         setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
         setIsGoogleSubmitting(false);
+      } else if (data?.url) {
+        window.location.href = data.url;
       }
-      // Note: If successful, user will be redirected, so we don't reset state
     } catch (error) {
       console.error('Login error:', error);
       setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
