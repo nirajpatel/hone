@@ -4398,3 +4398,13 @@ html {
     height: 28px !important;
   }
 }
+
+/* Empty state card: no background/border on tablet+ (loads after Tailwind so it wins) */
+@media (min-width: 768px) {
+  .empty-state-card-md {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}

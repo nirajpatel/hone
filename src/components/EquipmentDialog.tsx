@@ -472,11 +472,7 @@ export function EquipmentDialog({
         {renderAddForm(type)}
 
         <div className="space-y-4">
-          {items.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-6">
-              No {type}s added yet
-            </p>
-          ) : (
+          {items.length === 0 ? null : (
             <>
               {itemsByMethod.map(({ method, items: methodItems }) => {
                 const sortedItems = [...methodItems].sort(sortEquipment);
@@ -576,7 +572,7 @@ export function EquipmentDialog({
     <StandardDialog 
       open={open} 
       onOpenChange={onOpenChange}
-      title="Equipment Management"
+      title="Equipment"
       maxHeight="85vh"
     >
       {loading ? (

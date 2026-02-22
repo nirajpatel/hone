@@ -6,6 +6,7 @@ import { MoreVertical, Pencil, Trash2, Copy, Check, Plus, TrendingUp, TrendingDo
 import { getRatingEmoji, capitalizeBrewMethod } from '../utils/formatters';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsToolbar } from './BrewsToolbar';
+import { BrewsEmptyState } from './BrewsEmptyState';
 import { line, area, curveMonotoneX } from 'd3-shape';
 
 interface BrewsTimelineViewProps {
@@ -262,74 +263,37 @@ export function BrewsTimelineView({
 
   return (
     <>
-      {/* Toolbar */}
-      <BrewsToolbar
-        filterMethod={filterMethod}
-        onFilterMethodChange={onFilterMethodChange}
-        onNewBrew={onNewBrew}
-        view={view || 'timeline'}
-        onViewChange={onViewChange!}
-        equipment={equipment}
-        coffees={coffees}
-      />
+      {/* Toolbar - hidden during empty state */}
+      {sortedGroups.length > 0 && (
+        <BrewsToolbar
+          filterMethod={filterMethod}
+          onFilterMethodChange={onFilterMethodChange}
+          onNewBrew={onNewBrew}
+          view={view || 'timeline'}
+          onViewChange={onViewChange!}
+          equipment={equipment}
+          coffees={coffees}
+        />
+      )}
 
       {/* Timeline Cards */}
-      <div className="space-y-2 md:space-y-4 md:mt-0 mt-4">
-        {sortedGroups.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
-            <div className="max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {filterMethod !== 'all' ? 'No Brews Found' : 'No Brews Yet'}
-              </h3>
-              <p className="text-sm text-gray-600 mb-6">
-                {filterMethod !== 'all' ? (
-                  'Try changing the filter or create a new brew'
-                ) : (
-                  'Get started by adding equipment and coffee, then log your first brew'
-                )}
-              </p>
-              {filterMethod === 'all' && (
-                <div className="flex gap-3 justify-center">
-                  {!hasCompleteEquipment() ? (
-                    <Button 
-                      onClick={onOpenEquipment}
-                      variant="outline"
-                      className="cursor-pointer"
-                    >
-                      Add Equipment
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outline"
-                      className="bg-green-50 border-green-300 text-green-700 hover:bg-green-50 hover:text-green-700 hover:border-green-300 cursor-default"
-                    >
-                      <Check className="w-4 h-4 mr-1" />
-                      Equipment Added
-                    </Button>
-                  )}
-                  {coffees.length === 0 ? (
-                    <Button 
-                      onClick={onOpenAddCoffee}
-                      variant="outline"
-                      className="cursor-pointer"
-                    >
-                      Add Coffee
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outline"
-                      className="bg-green-50 border-green-300 text-green-700 hover:bg-green-50 hover:text-green-700 hover:border-green-300 cursor-default"
-                    >
-                      <Check className="w-4 h-4 mr-1" />
-                      Coffee Added
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+      {sortedGroups.length === 0 ? (
+        <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
+          <div className="flex flex-1 items-center justify-center min-h-0">
+            <BrewsEmptyState
+              filterMethod={filterMethod}
+              hasEquipment={hasCompleteEquipment()}
+              hasCoffees={coffees.length > 0}
+              hasBrews={brews.length > 0}
+              onOpenEquipment={onOpenEquipment ?? (() => {})}
+              onOpenAddCoffee={onOpenAddCoffee ?? (() => {})}
+              onNewBrew={onNewBrew}
+            />
           </div>
-        ) : (
-          sortedGroups.map(([key, group]) => {
+        </div>
+      ) : (
+        <div className="space-y-2 md:space-y-4">
+          {sortedGroups.map(([key, group]) => {
             // Sort brews by date ascending for timeline (oldest to newest left to right)
             const sortedExtractions = [...group.brews].sort((a, b) => 
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -571,9 +535,9 @@ export function BrewsTimelineView({
                 />
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
     </>
   );
 }

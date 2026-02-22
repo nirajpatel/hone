@@ -8,6 +8,7 @@ import { MoreVertical, Pencil, Trash2, RotateCcw, Check, ChevronDown, X, Plus } 
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
 import { BrewsToolbar } from './BrewsToolbar';
+import { BrewsEmptyState } from './BrewsEmptyState';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsMobileListView } from './BrewsMobileListView';
 import { getTastingNoteSuggestions } from '../utils/tastingNotes';
@@ -243,71 +244,34 @@ export function BrewsTableView({
 
   return (
     <>
-      {/* Toolbar */}
-      <BrewsToolbar
-        filterMethod={filterMethod}
-        groupBy={groupBy}
-        onFilterMethodChange={onFilterMethodChange}
-        onGroupByChange={onGroupByChange}
-        onNewBrew={onNewBrew}
-        view={view}
-        onViewChange={onViewChange!}
-        equipment={equipment}
-        coffees={coffees}
-      />
+      {/* Toolbar - hidden during empty state */}
+      {filteredBrews.length > 0 && (
+        <BrewsToolbar
+          filterMethod={filterMethod}
+          groupBy={groupBy}
+          onFilterMethodChange={onFilterMethodChange}
+          onGroupByChange={onGroupByChange}
+          onNewBrew={onNewBrew}
+          view={view}
+          onViewChange={onViewChange!}
+          equipment={equipment}
+          coffees={coffees}
+        />
+      )}
 
       {/* Table */}
       {filteredBrews.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {filterMethod !== 'all' ? 'No Brews Found' : 'No Brews Yet'}
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {filterMethod !== 'all' ? (
-                'Try changing the filter or create a new brew'
-              ) : (
-                'Get started by adding equipment and coffee, then log your first brew'
-              )}
-            </p>
-            {filterMethod === 'all' && (
-              <div className="flex gap-3 justify-center">
-                {!hasCompleteEquipment() ? (
-                  <Button 
-                    onClick={onOpenEquipment}
-                    variant="outline"
-                    className="cursor-pointer"
-                  >
-                    Add Equipment
-                  </Button>
-                ) : (
-                  <Button 
-                    variant="outline"
-                    className="bg-green-50 border-green-300 text-green-700 hover:bg-green-50 hover:text-green-700 hover:border-green-300 cursor-default"
-                  >
-                    <Check className="w-4 h-4 mr-1" />
-                    Equipment Added
-                  </Button>
-                )}
-                {coffees.length === 0 ? (
-                  <Button 
-                    onClick={onOpenAddCoffee}
-                    variant="outline"
-                    className="cursor-pointer"
-                  >
-                    Add Coffee
-                  </Button>
-                ) : (
-                  <Button 
-                    variant="outline"
-                    className="bg-green-50 border-green-300 text-green-700 hover:bg-green-50 hover:text-green-700 hover:border-green-300 cursor-default"
-                  >
-                    <Check className="w-4 h-4 mr-1" />
-                    Coffee Added
-                  </Button>
-                )}
-              </div>
-            )}
+        <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
+          <div className="flex flex-1 items-center justify-center min-h-0">
+            <BrewsEmptyState
+            filterMethod={filterMethod}
+            hasEquipment={hasCompleteEquipment()}
+            hasCoffees={coffees.length > 0}
+            hasBrews={brews.length > 0}
+            onOpenEquipment={onOpenEquipment ?? (() => {})}
+            onOpenAddCoffee={onOpenAddCoffee ?? (() => {})}
+            onNewBrew={onNewBrew}
+            />
           </div>
         </div>
       ) : (

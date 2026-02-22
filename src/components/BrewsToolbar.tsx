@@ -16,6 +16,8 @@ interface BrewsToolbarProps {
   onNewBrew: () => void;
   equipment: Equipment[];
   coffees: Coffee[];
+  /** When true, hide view selector and filter/groupBy dropdowns (e.g. during empty state) */
+  isEmpty?: boolean;
 }
 
 export function BrewsToolbar({
@@ -28,6 +30,7 @@ export function BrewsToolbar({
   onNewBrew,
   equipment,
   coffees,
+  isEmpty = false,
 }: BrewsToolbarProps) {
   const brewMethodConfigs = getAllBrewMethodConfigs();
 
@@ -63,87 +66,91 @@ export function BrewsToolbar({
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2 desktop-filters">
-        {/* View Toggle Buttons */}
-        <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
-          <div className="hidden md:block">
-            <DelayedHelpTooltip content="Timeline">
-              <Button
-                variant={view === 'timeline' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewChange('timeline')}
-                className="cursor-pointer h-8 px-2"
-              >
-                <Activity className="w-4 h-4" />
-              </Button>
-            </DelayedHelpTooltip>
-          </div>
-          <div className="md:hidden">
-            <Button
-              variant={view === 'timeline' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onViewChange('timeline')}
-              className="cursor-pointer h-8 px-2"
-            >
-              <Activity className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="hidden md:block">
-            <DelayedHelpTooltip content="Table">
-              <Button
-                variant={view === 'table' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => onViewChange('table')}
-                className="cursor-pointer h-8 px-2"
-              >
-                <TableIcon className="w-4 h-4" />
-              </Button>
-            </DelayedHelpTooltip>
-          </div>
-          <div className="md:hidden">
-            <Button
-              variant={view === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => onViewChange('table')}
-              className="cursor-pointer h-8 px-2"
-            >
-              <TableIcon className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-        
-        <Select value={filterMethod} onValueChange={(v) => onFilterMethodChange(v as BrewMethod | 'all')}>
-          <SelectTrigger className="w-[180px] cursor-default text-sm">
-            <SelectValue placeholder="All Methods" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Methods</SelectItem>
-            {brewMethodConfigs.map(config => (
-              <SelectItem key={config.id} value={config.id}>{config.displayName || config.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
-        {groupBy && onGroupByChange && (
-          <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
-            <SelectTrigger className="w-[180px] cursor-default text-sm">
-              <span>
-                {groupBy === 'month' && (
-                  <>
+        {!isEmpty && (
+          <>
+            {/* View Toggle Buttons */}
+            <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
+              <div className="hidden md:block">
+                <DelayedHelpTooltip content="Timeline">
+                  <Button
+                    variant={view === 'timeline' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onViewChange('timeline')}
+                    className="cursor-pointer h-8 px-2"
+                  >
+                    <Activity className="w-4 h-4" />
+                  </Button>
+                </DelayedHelpTooltip>
+              </div>
+              <div className="md:hidden">
+                <Button
+                  variant={view === 'timeline' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewChange('timeline')}
+                  className="cursor-pointer h-8 px-2"
+                >
+                  <Activity className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="hidden md:block">
+                <DelayedHelpTooltip content="Table">
+                  <Button
+                    variant={view === 'table' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onViewChange('table')}
+                    className="cursor-pointer h-8 px-2"
+                  >
+                    <TableIcon className="w-4 h-4" />
+                  </Button>
+                </DelayedHelpTooltip>
+              </div>
+              <div className="md:hidden">
+                <Button
+                  variant={view === 'table' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => onViewChange('table')}
+                  className="cursor-pointer h-8 px-2"
+                >
+                  <TableIcon className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <Select value={filterMethod} onValueChange={(v) => onFilterMethodChange(v as BrewMethod | 'all')}>
+              <SelectTrigger className="w-[180px] cursor-default text-sm">
+                <SelectValue placeholder="All Methods" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Methods</SelectItem>
+                {brewMethodConfigs.map(config => (
+                  <SelectItem key={config.id} value={config.id}>{config.displayName || config.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {groupBy && onGroupByChange && (
+              <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
+                <SelectTrigger className="w-[180px] cursor-default text-sm">
+                  <span>
+                    {groupBy === 'month' && (
+                      <>
+                        <span className="hidden md:inline">By Month</span>
+                        <span className="md:hidden">By Date</span>
+                      </>
+                    )}
+                    {groupBy === 'coffee' && 'By Coffee'}
+                  </span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="month">
                     <span className="hidden md:inline">By Month</span>
                     <span className="md:hidden">By Date</span>
-                  </>
-                )}
-                {groupBy === 'coffee' && 'By Coffee'}
-              </span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="month">
-                <span className="hidden md:inline">By Month</span>
-                <span className="md:hidden">By Date</span>
-              </SelectItem>
-              <SelectItem value="coffee">By Coffee</SelectItem>
-            </SelectContent>
-          </Select>
+                  </SelectItem>
+                  <SelectItem value="coffee">By Coffee</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </>
         )}
       </div>
       

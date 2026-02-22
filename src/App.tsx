@@ -1300,7 +1300,7 @@ export default function App() {
   }
 
   return (
-    <div className="bg-gray-50" style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+    <div className="bg-gray-50 flex flex-col min-h-0" style={{ height: '100dvh', minHeight: '100dvh' }}>
       <Toaster 
         position="top-center" 
         richColors 
@@ -1436,7 +1436,7 @@ export default function App() {
       )}
 
       {/* Main Content */}
-      <div className="px-3 py-4 md:px-6 md:py-6" style={{ flex: 1 }}>
+      <div className="px-3 py-4 md:px-6 md:py-6 flex flex-col min-h-0 flex-1 overflow-auto" style={{ flex: '1 1 0' }}>
         {activeView === 'brews' ? (
           brewsView === 'table' ? (
             <BrewsTableView

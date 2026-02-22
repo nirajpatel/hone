@@ -463,74 +463,82 @@ export function CoffeesShelvesView({
 
   return (
     <div className="space-y-6">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 desktop-filters">
-          {/* View Toggle Buttons */}
-          {onViewChange && (
-            <div className="flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
-              <DelayedHelpTooltip content="Table">
-                <Button
-                  variant={view === 'table' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => onViewChange('table')}
-                  className="cursor-pointer h-8 px-2"
-                >
-                  <TableIcon className="w-4 h-4" />
-                </Button>
-              </DelayedHelpTooltip>
-              <DelayedHelpTooltip content="Shelf">
-                <Button
-                  variant={view === 'shelf' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => onViewChange('shelf')}
-                  className="cursor-pointer h-8 px-2"
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </Button>
-              </DelayedHelpTooltip>
-            </div>
-          )}
+      {/* Toolbar - hidden during empty state */}
+      {sortedGroups.length > 0 && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 desktop-filters">
+            {onViewChange && (
+              <div className="flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
+                <DelayedHelpTooltip content="Table">
+                  <Button
+                    variant={view === 'table' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onViewChange('table')}
+                    className="cursor-pointer h-8 px-2"
+                  >
+                    <TableIcon className="w-4 h-4" />
+                  </Button>
+                </DelayedHelpTooltip>
+                <DelayedHelpTooltip content="Shelf">
+                  <Button
+                    variant={view === 'shelf' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => onViewChange('shelf')}
+                    className="cursor-pointer h-8 px-2"
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                </DelayedHelpTooltip>
+              </div>
+            )}
+            
+            <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
+              <SelectTrigger className="w-[180px] cursor-default text-sm">
+                <SelectValue placeholder="By Roast Month" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="month">By Roast Month</SelectItem>
+                <SelectItem value="coffee">By Roaster</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           
-          <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
-            <SelectTrigger className="w-[180px] cursor-default text-sm">
-              <SelectValue placeholder="By Roast Month" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="month">By Roast Month</SelectItem>
-              <SelectItem value="coffee">By Roaster</SelectItem>
-            </SelectContent>
-          </Select>
+          <h2 className="mobile-section-header">
+            Previous Coffees
+          </h2>
+          
+          <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
+            <Plus className="w-4 h-4" />
+            Add Coffee
+          </Button>
         </div>
-        
-        {/* Mobile Header */}
-        <h2 className="mobile-section-header">
-          Previous Coffees
-        </h2>
-        
-        <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
-          <Plus className="w-4 h-4" />
-          Add Coffee
-        </Button>
-      </div>
+      )}
 
       {/* Shelves */}
-      <div className="space-y-8">
-        {sortedGroups.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
-            <div className="max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Coffees Yet</h3>
-              <p className="text-sm text-gray-600">
-                Get started by adding your first coffee
-              </p>
+      {sortedGroups.length === 0 ? (
+        <div className="flex flex-1 flex-col min-h-0">
+          <div className="flex flex-1 items-center justify-center min-h-0">
+            <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-8 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+              <div className="max-w-lg mx-auto">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No coffees yet</h3>
+                <p className="text-base text-gray-600 mb-6">
+                  Add your coffee to start logging brews and getting personalized guidance.
+                </p>
+                <Button onClick={onNewCoffee} className="cursor-pointer">
+                  <Plus className="w-4 h-4" />
+                  Add Coffee
+                </Button>
+              </div>
             </div>
           </div>
-        ) : (
-          sortedGroups.map(([groupName, coffeesInGroup]) => (
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {sortedGroups.map(([groupName, coffeesInGroup]) => (
             <ScrollableShelf key={groupName} groupName={groupName} coffeesInGroup={coffeesInGroup} />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

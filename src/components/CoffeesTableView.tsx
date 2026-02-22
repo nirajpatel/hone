@@ -237,56 +237,65 @@ export function CoffeesTableView({
 
   return (
     <>
-      {/* Toolbar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 desktop-filters">
-          <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
-            <SelectTrigger className="w-[180px] cursor-default text-sm">
-              <span>
-                {groupBy === 'month' && (
-                  <>
-                    <span className="hidden md:inline">By Roast Month</span>
-                    <span className="md:hidden">By Roast Date</span>
-                  </>
-                )}
-                {groupBy === 'coffee' && 'By Roaster'}
-              </span>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="month">
-                <span className="hidden md:inline">By Roast Month</span>
-                <span className="md:hidden">By Roast Date</span>
-              </SelectItem>
-              <SelectItem value="coffee">By Roaster</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Toolbar - hidden during empty state */}
+      {filteredCoffees.length > 0 && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 desktop-filters">
+            <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
+              <SelectTrigger className="w-[180px] cursor-default text-sm">
+                <span>
+                  {groupBy === 'month' && (
+                    <>
+                      <span className="hidden md:inline">By Roast Month</span>
+                      <span className="md:hidden">By Roast Date</span>
+                    </>
+                  )}
+                  {groupBy === 'coffee' && 'By Roaster'}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="month">
+                  <span className="hidden md:inline">By Roast Month</span>
+                  <span className="md:hidden">By Roast Date</span>
+                </SelectItem>
+                <SelectItem value="coffee">By Roaster</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <h2 className="mobile-section-header">
+            Previous Coffees
+          </h2>
+          
+          <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
+            <Plus className="w-4 h-4" />
+            Add Coffee
+          </Button>
         </div>
-        
-        {/* Mobile Header */}
-        <h2 className="mobile-section-header">
-          Previous Coffees
-        </h2>
-        
-        <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
-          <Plus className="w-4 h-4" />
-          Add Coffee
-        </Button>
-      </div>
+      )}
 
       {/* Table */}
       {filteredCoffees.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-16 text-center">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {filterMethod !== 'all' ? 'No Coffees Found' : 'No Coffees Yet'}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {filterMethod !== 'all' ? (
-                'Try changing the filter or add a new coffee'
-              ) : (
-                'Get started by adding your first coffee'
-              )}
-            </p>
+        <div className="flex flex-1 flex-col min-h-0">
+          <div className="flex flex-1 items-center justify-center min-h-0">
+            <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-8 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+            <div className="max-w-lg mx-auto">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {filterMethod !== 'all' ? 'No Coffees Found' : 'No coffees yet'}
+              </h3>
+              <p className="text-base text-gray-600 mb-6">
+                {filterMethod !== 'all' ? (
+                  'Try changing the filter or add a new coffee'
+                ) : (
+                  'Add your coffee to start logging brews and getting personalized guidance.'
+                )}
+              </p>
+              <Button onClick={onNewCoffee} className="cursor-pointer">
+                <Plus className="w-4 h-4" />
+                Add Coffee
+              </Button>
+            </div>
+          </div>
           </div>
         </div>
       ) : (
