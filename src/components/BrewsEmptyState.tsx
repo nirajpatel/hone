@@ -23,7 +23,7 @@ export function BrewsEmptyState({
 }: BrewsEmptyStateProps) {
   if (filterMethod !== 'all') {
     return (
-      <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-8 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+      <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
         <div className="max-w-lg mx-auto">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Brews Found</h3>
           <p className="text-sm text-gray-600">Try changing the filter or create a new brew</p>
@@ -48,7 +48,7 @@ export function BrewsEmptyState({
         : { label: 'New Brew', onClick: onNewBrew };
 
   return (
-    <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-8 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+    <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
       <div className="max-w-lg mx-auto">
         <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Let's dial in your first coffee</h3>
         <p className="text-base text-gray-600 mb-8 text-center">
@@ -57,18 +57,18 @@ export function BrewsEmptyState({
           then log your brews to get personalized guidance and improve every cup.
         </p>
 
-        {/* Horizontal stepper — only the first incomplete step (in order) is unmuted */}
-        <div className="flex flex-wrap items-center justify-center gap-y-1 text-sm mb-6" style={{ gap: '0 0.25rem' }}>
+        {/* Stepper — vertical on mobile, horizontal on tablet+ */}
+        <div className="flex flex-col md:flex-row md:flex-wrap items-center justify-center gap-2 md:gap-y-1 md:gap-x-1 text-sm mb-6">
           <span className={step1Done ? 'text-gray-500' : firstIncomplete === 1 ? 'text-gray-900 font-medium' : 'text-gray-400'}>
             {step1Done ? <Check className="w-4 h-4 inline-block align-middle mr-1" /> : '①'}
             {' '}Add Coffee
           </span>
-          <span className="shrink-0 text-gray-300" style={{ marginLeft: '0.125rem', marginRight: '0.125rem' }}>——</span>
+          <span className="hidden md:inline shrink-0 text-gray-300" style={{ marginLeft: '0.125rem', marginRight: '0.125rem' }}>——</span>
           <span className={step2Done ? 'text-gray-500' : firstIncomplete === 2 ? 'text-gray-900 font-medium' : 'text-gray-400'}>
             {step2Done ? <Check className="w-4 h-4 inline-block align-middle mr-1" /> : '②'}
             {' '}Add Equipment
           </span>
-          <span className="shrink-0 text-gray-300" style={{ marginLeft: '0.125rem', marginRight: '0.125rem' }}>——</span>
+          <span className="hidden md:inline shrink-0 text-gray-300" style={{ marginLeft: '0.125rem', marginRight: '0.125rem' }}>——</span>
           <span className={step3Done ? 'text-gray-500' : firstIncomplete === 3 ? 'text-gray-900 font-medium' : 'text-gray-400'}>
             {step3Done ? <Check className="w-4 h-4 inline-block align-middle mr-1" /> : '③'}
             {' '}Log First Brew

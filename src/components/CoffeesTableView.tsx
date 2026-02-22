@@ -278,7 +278,7 @@ export function CoffeesTableView({
       {filteredCoffees.length === 0 ? (
         <div className="flex flex-1 flex-col min-h-0">
           <div className="flex flex-1 items-center justify-center min-h-0">
-            <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-8 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+            <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
             <div className="max-w-lg mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {filterMethod !== 'all' ? 'No Coffees Found' : 'No coffees yet'}
