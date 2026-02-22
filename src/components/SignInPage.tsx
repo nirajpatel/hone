@@ -55,17 +55,15 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       setIsGoogleSubmitting(true);
       setError(null);
       const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const baseRedirect = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
-
-      // Chrome M115+ blocks cross-origin redirects; use popup on mobile to avoid hang
-      const usePopup = /Android|iPhone|iPad|iPod|webOS|Mobile/i.test(navigator.userAgent);
-      const redirectUrl = usePopup ? `${baseRedirect}?mode=popup` : baseRedirect;
-
+      const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: true,
+          // Avoid prompt: 'consent' on mobile—it can cause the account picker to hang
+          // after selection. Default flow shows consent only when needed.
           queryParams: {
             access_type: 'offline',
           },
@@ -80,27 +78,11 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       }
 
       if (data?.url) {
-        if (usePopup) {
-          // Open popup immediately (must be from user gesture to avoid blocker)
-          const popup = window.open('', 'hone-oauth', 'width=500,height=600,scrollbars=yes');
-          if (!popup) {
-            // Popup blocked—fall back to redirect
-            window.location.replace(data.url);
-            return;
-          }
-          popup.location.href = data.url;
-
-          const poll = setInterval(() => {
-            if (popup.closed) {
-              clearInterval(poll);
-              onLoginSuccess?.();
-              setIsGoogleSubmitting(false);
-            }
-          }, 200);
-        } else {
-          window.location.replace(data.url);
-        }
+        // Use replace() to force same-tab navigation—mobile Chrome can open
+        // assign() in a new tab, leaving the original tab stuck with the spinner
+        window.location.replace(data.url);
       }
+      // Note: If we redirect, we won't reach here; otherwise reset on error above
     } catch (error) {
       console.error('Login error:', error);
       setError(sanitizeErrorMessage(error, 'Sign in failed. Please try again.'));
