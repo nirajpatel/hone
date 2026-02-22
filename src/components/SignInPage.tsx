@@ -62,10 +62,9 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: true,
-          // Avoid prompt: 'consent' on mobile—it can cause the account picker to hang
-          // after selection. Default flow shows consent only when needed.
           queryParams: {
             access_type: 'offline',
+            prompt: 'consent',
           },
         },
       });
