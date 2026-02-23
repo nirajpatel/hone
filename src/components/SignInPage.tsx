@@ -39,11 +39,10 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
     const errorDescription = urlParams.get('error_description') || hashParams.get('error_description');
     
     if (errorParam) {
-      const msg = (errorDescription || errorParam).toLowerCase();
-      const isWorkspaceBlock = errorParam === 'access_denied' || msg.includes('blocked') || msg.includes('organization') || msg.includes('admin');
-      const friendlyError = isWorkspaceBlock
-        ? 'Google sign-in was blocked. This often happens with work or school accounts. Please sign in with your email below instead.'
-        : sanitizeErrorMessage({ message: errorDescription || errorParam, code: errorParam }, 'Sign in failed. Please try again.');
+      const friendlyError = sanitizeErrorMessage({ 
+        message: errorDescription || errorParam,
+        code: errorParam 
+      }, 'Sign in failed. Please try again.');
       setError(friendlyError);
       
       // Clear error params from URL
@@ -292,9 +291,6 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                 </svg>
                 {isSignUpMode ? 'Sign up with Google' : 'Sign in with Google'}
               </Button>
-              <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '-0.5rem', marginBottom: 0 }}>
-                Using a work or school Google account? Your organization may block sign-in. Use email below instead.
-              </p>
 
               {/* Divider */}
               <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
