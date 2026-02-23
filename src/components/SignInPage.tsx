@@ -27,41 +27,6 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
   const [isSignUpMode, setIsSignUpMode] = useState(getIsSignUpModeFromUrl);
   const [usePasswordMode, setUsePasswordMode] = useState(false);
-  const [googleOAuthUrl, setGoogleOAuthUrl] = useState<string | null>(null);
-  const [showReturnMessage, setShowReturnMessage] = useState(false);
-
-  // iOS Chrome: pre-fetch OAuth URL, open in new tab (redirect may work in new tab)
-  useEffect(() => {
-    if (!isIOSChrome()) return;
-    const fetchUrl = async () => {
-      const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
-      const { data, err } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          skipBrowserRedirect: true,
-          queryParams: { access_type: 'offline', prompt: 'consent' },
-        },
-      });
-      if (!err && data?.url) setGoogleOAuthUrl(data.url);
-    };
-    fetchUrl();
-  }, []);
-
-  // iOS Chrome: poll for session when OAuth opened in new tab (localStorage shared across tabs)
-  useEffect(() => {
-    if (!isIOSChrome() || !showReturnMessage) return;
-    const poll = setInterval(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        clearInterval(poll);
-        setShowReturnMessage(false);
-        onLoginSuccess?.();
-      }
-    }, 1000);
-    return () => clearInterval(poll);
-  }, [showReturnMessage, onLoginSuccess]);
 
   // Sync sign-up mode from URL when route changes (e.g. back/forward)
   useEffect(() => {
@@ -91,62 +56,22 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   }, []);
 
   const handleGoogleLogin = async () => {
-    setError(null);
-
-    // iOS Chrome: open in new tab - redirect may complete there; we poll for session
-    if (isIOSChrome() && googleOAuthUrl) {
-      const newTab = window.open(googleOAuthUrl, '_blank', 'noopener,noreferrer');
-      if (newTab) {
-        setShowReturnMessage(true);
-        setIsGoogleSubmitting(true);
-        setTimeout(() => setIsGoogleSubmitting(false), 2000);
-      } else {
-        setError('Please allow popups, or try opening in Safari.');
-      }
-      return;
-    }
-
-    if (isIOSChrome()) {
-      try {
-        setIsGoogleSubmitting(true);
-        const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: redirectUrl,
-            skipBrowserRedirect: true,
-            queryParams: { access_type: 'offline', prompt: 'consent' },
-          },
-        });
-        if (error) throw error;
-        if (data?.url) {
-          const newTab = window.open(data.url, '_blank', 'noopener,noreferrer');
-          if (newTab) setShowReturnMessage(true);
-          else setError('Please allow popups, or try opening in Safari.');
-        }
-      } catch (err) {
-        setError(sanitizeErrorMessage(err, 'Sign in failed. Please try again.'));
-      }
-      setIsGoogleSubmitting(false);
-      return;
-    }
-
-    // Standard redirect flow for Safari, desktop
     try {
       setIsGoogleSubmitting(true);
+      setError(null);
       const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
+      // iOS Chrome: redirect to root (/) - some browsers handle root redirects differently
+      const redirectPath = isIOSChrome() ? '/' : '/login';
+      const redirectUrl = isDev ? `http://localhost:3000${redirectPath}` : `${window.location.origin}${redirectPath}`;
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: false,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
+          queryParams: isIOSChrome()
+            ? {} // Simpler params for iOS Chrome - no prompt=consent
+            : { access_type: 'offline', prompt: 'consent' },
         },
       });
 
@@ -332,17 +257,11 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
             </div>
           ) : (
             <>
-              {/* iOS Chrome: show message when OAuth opened in new tab */}
-              {showReturnMessage && (
-                <div className="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm">
-                  Complete sign-in in the new tab, then return here. We&apos;ll detect it automatically.
-                </div>
-              )}
               {/* Google Sign In / Sign Up */}
               <Button 
                 type="button"
                 onClick={handleGoogleLogin}
-                disabled={isGoogleSubmitting || (isIOSChrome() && !googleOAuthUrl)}
+                disabled={isGoogleSubmitting}
                 variant="default"
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer mb-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-0 focus-visible:outline-none"
                 style={{
@@ -375,7 +294,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {isIOSChrome() && !googleOAuthUrl ? 'Loading...' : (isSignUpMode ? 'Sign up with Google' : 'Sign in with Google')}
+                {isSignUpMode ? 'Sign up with Google' : 'Sign in with Google'}
               </Button>
 
               {/* Divider */}
