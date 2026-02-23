@@ -11,11 +11,6 @@ function getIsSignUpModeFromUrl(): boolean {
   return new URLSearchParams(window.location.search).get('signup') === 'true';
 }
 
-function isIOSChrome(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return /CriOS/i.test(navigator.userAgent);
-}
-
 export function SignInPage({ onLoginSuccess }: SignInPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,18 +55,18 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
       setIsGoogleSubmitting(true);
       setError(null);
       const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      // iOS Chrome: redirect to root (/) - some browsers handle root redirects differently
-      const redirectPath = isIOSChrome() ? '/' : '/login';
-      const redirectUrl = isDev ? `http://localhost:3000${redirectPath}` : `${window.location.origin}${redirectPath}`;
+      const redirectUrl = isDev ? 'http://localhost:3000/login' : `${window.location.origin}/login`;
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: false,
-          queryParams: isIOSChrome()
-            ? {} // Simpler params for iOS Chrome - no prompt=consent
-            : { access_type: 'offline', prompt: 'consent' },
+          scopes: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid', // Explicit scopes - required for some Google Workspace; ensures user creation
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
