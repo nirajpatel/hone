@@ -165,7 +165,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
               margin: '0 0 24px 0'
             }}
           >
-            Brew smarter with personalized guidance
+            Brew confidently with personalized guidance
           </p>
         </div>
 
