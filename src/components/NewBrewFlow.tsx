@@ -235,6 +235,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   
   const selectedCoffee = coffees.find(c => c.id === coffeeId);
   const isEspresso = brewMethod === 'espresso';
+  const isImmersion = brewMethod === 'immersion';
 
   // Check if La Marzocco status should be shown
   const shouldShowLaMarzoccoStatus = () => {
@@ -1228,11 +1229,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     prevStagesLengthRef.current = stages.length;
   }, [stages.length]);
 
-  // For espresso, require brewTime and finalWeight
+  // For espresso and immersion, require brewTime and finalWeight
   // For pour over, require all stages except the last one to have endTime and endWeight
   // The last stage is optional (allows for an empty stage to be ready for input)
   const canSave = coffeeId && brewMethod && userId && grindSetting && dosage && coffeeTemperature && (
-    isEspresso 
+    (isEspresso || isImmersion)
       ? (brewTime && finalWeight)
       : stages.slice(0, -1).every(stage => stage.endTime && stage.endWeight) && 
         (stages.length === 1 ? (stages[0].endTime && stages[0].endWeight) : true)
@@ -2359,8 +2360,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                 <div className="flex items-start gap-2">
                                   <Clock className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
                                   <div className="min-w-0">
-                                    <p className="text-xs text-gray-500 mb-0.5">Extraction Time</p>
-                                    <p className="text-xs text-gray-900">{preFilledBrew.brewTime ? `${preFilledBrew.brewTime}s` : 'N/A'}</p>
+                                    <p className="text-xs text-gray-500 mb-0.5">{isImmersion ? 'Steep Time' : 'Extraction Time'}</p>
+                                    <p className="text-xs text-gray-900">{preFilledBrew.brewTime ? formatTime(parseFloat(preFilledBrew.brewTime)) : 'N/A'}</p>
                                   </div>
                                 </div>
 
@@ -2559,6 +2560,36 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                 className="mt-2"
               />
             </div>
+
+            {/* Immersion: Steep time and final weight */}
+            {isImmersion && (
+              <>
+                <div>
+                  <Label>Steep Time</Label>
+                  <div className="mt-2">
+                    <TimeInput
+                      value={brewTime}
+                      onChange={(value) => setExtractionTime(value)}
+                      placeholder="4m 00s"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="finalWeight">Final Weight (g)</Label>
+                  <Input
+                    id="finalWeight"
+                    type="text"
+                    inputMode="decimal"
+                    step="0.1"
+                    value={finalWeight}
+                    onChange={(e) => setFinalWeight(validateNumericInput(e.target.value))}
+                    placeholder="350"
+                    className="mt-2"
+                  />
+                </div>
+              </>
+            )}
 
             {/* Espresso: Single brew time and final weight */}
             {isEspresso && (

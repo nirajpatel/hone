@@ -48,8 +48,11 @@ export function formatBrewForPrompt(brew: any, method: BrewMethod): string {
   if (config.supportsStages && brew.stages) {
     // Pour over: show stages
     details += `\n- Stages: ${brew.stages.map((s: any, i: number) => `Stage ${i + 1}: ${s.endTime}s / ${s.endWeight}g`).join(', ')}`;
+  } else if (method === 'immersion') {
+    // Immersion: steep time and final weight
+    details += `\n- Steep Time: ${brew.brewTime}s\n- Final Weight: ${brew.finalWeight}g`;
   } else {
-    // Espresso and other single-stage methods: show extraction time and final weight
+    // Espresso: extraction time and final weight
     details += `\n- Extraction Time: ${brew.brewTime}s\n- Final Weight: ${brew.finalWeight}g`;
   }
   

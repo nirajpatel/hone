@@ -2401,6 +2401,18 @@ app.post('/make-server-23508aac/brew-suggestions', async (c) => {
       // First-time coffee prompt: suggest starting parameters
       systemMessage = 'You are an expert barista helping set up initial brew parameters for a new coffee. Provide specific, actionable starting parameters based on coffee characteristics. Respond with valid JSON only.';
       
+      const isImmersionMethod = brewMethod === 'immersion';
+      const timeParamName = isImmersionMethod ? 'Steep Time' : 'Brew Time';
+      const timeParamRec = isImmersionMethod
+        ? "Target steep time (e.g., '4:00')"
+        : "Target total brew time from start to finish (e.g., '2:45-3:00')";
+      const timeParamExp = isImmersionMethod
+        ? 'One sentence explaining why this steep duration extracts well for this roast and grind'
+        : 'One sentence explaining why this timing supports balance';
+      const finalWeightRec = isImmersionMethod
+        ? "Target total water weight and ratio (e.g., '350g water (1:15 ratio)')"
+        : "Target final output weight and ratio (e.g., '300g output (1:15 ratio)')";
+
       // Build the parameters array based on brew method
       const baseParameters = `    {
       "name": "Grind Setting",
@@ -2418,13 +2430,13 @@ app.post('/make-server-23508aac/brew-suggestions', async (c) => {
       "explanation": "One sentence explaining why this temperature suits the roast level"
     },
     {
-      "name": "Brew Time",
-      "recommendation": "Target total brew time from start to finish (e.g., '2:45-3:00')",
-      "explanation": "One sentence explaining why this timing supports balance"
+      "name": "${timeParamName}",
+      "recommendation": "${timeParamRec}",
+      "explanation": "${timeParamExp}"
     },
     {
       "name": "Final Weight/Ratio",
-      "recommendation": "Target final output weight and ratio (e.g., '300g output (1:15 ratio)')",
+      "recommendation": "${finalWeightRec}",
       "explanation": "One sentence explaining why this ratio fits the flavor profile and method"
     }`;
       
@@ -2438,7 +2450,7 @@ app.post('/make-server-23508aac/brew-suggestions', async (c) => {
       const parametersSection = supportsStages(brewMethod as any) 
         ? baseParameters + pourStructureParameter 
         : baseParameters;
-      
+
       prompt = `You are helping a barista brew a coffee for the first time. Based on the coffee's characteristics, suggest optimal starting parameters for an excellent brew.
 
 COFFEE:
@@ -2465,32 +2477,7 @@ You must respond with valid JSON only. No markdown, no code blocks, just raw JSO
 {
   "introduction": "Brief introduction (1-2 sentences) acknowledging this is the first time brewing this coffee and what makes it distinctive (origin, roast level, or flavor profile)",
   "parameters": [
-    {
-      "name": "Grind Setting",
-      "recommendation": "Specific setting on the grinder (e.g., 'Start at 6.5 on the Fellow Ode Gen 2')",
-      "explanation": "One sentence explaining why this setting works for this coffee and equipment"
-    },
-    {
-      "name": "Dosage",
-      "recommendation": "Specific dose (e.g., '20g')",
-      "explanation": "One sentence explaining why this dose suits the brew method and coffee"
-    },
-    {
-      "name": "Water Temperature",
-      "recommendation": "Specific temperature (e.g., '200°F')",
-      "explanation": "One sentence explaining why this temperature suits the roast level"
-    },
-    {
-      "name": "Brew Time",
-      "recommendation": "Target total brew time from start to finish (e.g., '2:45-3:00')",
-      "explanation": "One sentence explaining why this timing supports balance"
-    },
-    {
-      "name": "Final Weight/Ratio",
-      "recommendation": "Target final output weight and ratio (e.g., '300g output (1:15 ratio)')",
-      "explanation": "One sentence explaining why this ratio fits the flavor profile and method"
-    }
-\${parametersSection}
+${parametersSection}
   ],
   "note": "These are based on common best practices for this brew method and equipment. Adjust grind first, then ratio or time, based on taste and flow."
 }`;
@@ -2589,11 +2576,12 @@ IMPORTANT CONSIDERATIONS:
 
 ADDITIONAL RULES TO FOLLOW:
 A) Decision hierarchy and change magnitude (use this order unless history strongly suggests otherwise, prefer minimal changes):
-   - Grind / flow behavior
-   - Final weight / ratio
+   - Grind setting${brewMethod === 'espresso' ? `
+   - Flow behavior / puck preparation (if flow issues indicate channeling, address distribution, tamping, or pre-infusion before changing core parameters)` : ''}
+   - Final weight / ratio${brewMethod === 'immersion' ? `
+   - Steep time` : ''}
    - Water temperature
    - Dose
-   - If flow issues indicate puck preparation or channeling, address distribution, tamping, or pre-infusion before changing core parameters.
    - Prefer the smallest reasonable change that could plausibly fix the issue. Avoid large jumps unless history clearly shows they are necessary.
 
 B) Require directional reasoning (no vague advice):

@@ -345,6 +345,31 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
                       </div>
                     </div>
                   </>
+                ) : brew.brewMethod === 'immersion' ? (
+                  /* Immersion */
+                  <>
+                    <div className="flex items-start gap-3">
+                      <Clock className="w-5 h-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Steep Time</p>
+                        <p className="text-sm text-gray-900">{formatExtractionTime(parseFloat(brew.brewTime))}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Droplet className="w-5 h-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Final Weight</p>
+                        <p className="text-sm text-gray-900">{brew.finalWeight} grams</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Scale className="w-5 h-5 text-gray-500 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Brew Ratio</p>
+                        <p className="text-sm text-gray-900">{calculateBrewRatio()}</p>
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   /* Espresso or Pour Over without stages */
                   <>
