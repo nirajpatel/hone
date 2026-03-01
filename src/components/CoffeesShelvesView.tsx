@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Plus, ChevronLeft, ChevronRight, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
+import { toTitleCase } from '../utils/tastingNotes';
 import { useState, useEffect, useRef } from 'react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import VanillaTilt from 'vanilla-tilt';
@@ -339,7 +340,7 @@ export function CoffeesShelvesView({
 
             {coffee.notes && (
               <p className="text-sm text-gray-600 line-clamp-2">
-                <span className="font-medium">Notes:</span> {coffee.notes}
+                <span className="font-medium">Notes:</span> {toTitleCase(coffee.notes)}
               </p>
             )}
 

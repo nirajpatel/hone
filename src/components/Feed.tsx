@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Heart, MessageCircle, Star } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { capitalizeBrewMethod } from '../utils/formatters';
+import { capitalize } from '../utils/tastingNotes';
 import { Extraction, Coffee } from '../types';
 
 interface FeedProps {
@@ -152,7 +153,7 @@ const FeedCard = ({ brew, coffeeImages }: FeedCardProps) => {
                     key={idx}
                     className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 border border-gray-200 text-gray-700"
                   >
-                    {note.trim()}
+                    {capitalize(note.trim())}
                   </span>
                 ))}
               </div>

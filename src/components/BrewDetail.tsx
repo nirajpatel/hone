@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { BrewEquipmentIcon } from './icons/BrewEquipmentIcon';
 import { GrinderIcon } from './icons/GrinderIcon';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
+import { capitalize } from '../utils/tastingNotes';
 import { supportsStages } from '../utils/brewMethods';
 import { FormattedAISuggestions } from './DialInGuidance';
 
@@ -434,7 +435,7 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
                         key={index}
                         className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm"
                       >
-                        {note}
+                        {capitalize(note)}
                       </span>
                     ))}
                   </div>

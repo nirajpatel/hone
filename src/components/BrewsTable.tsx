@@ -16,6 +16,7 @@ import {
 import { InteractiveStarRating } from './InteractiveStarRating';
 import { MoreVertical, Pencil, Trash2, Copy } from 'lucide-react';
 import { capitalizeBrewMethod } from '../utils/formatters';
+import { capitalize } from '../utils/tastingNotes';
 
 interface BrewsTableProps {
   brews: Brew[];
@@ -115,7 +116,7 @@ export function BrewsTable({
                     </div>
                   </TableCell>
                   <TableCell className="px-6 text-sm text-gray-600">
-                    {brew.tastingNotes || brew.notes || '-'}
+                    {brew.tastingNotes ? capitalize(brew.tastingNotes) : brew.notes ? capitalize(brew.notes) : '-'}
                   </TableCell>
                   <TableCell className="px-6">
                     <DropdownMenu>

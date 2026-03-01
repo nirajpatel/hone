@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { X, Upload, RefreshCw, Check } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { toTitleCase } from '../utils/tastingNotes';
 
 interface CoffeeBagImageFlowProps {
   coffees: Coffee[];
@@ -274,7 +275,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
                 <p className="text-sm text-gray-600">Roast: {currentCoffee.roastLevel}</p>
               )}
               {currentCoffee.notes && (
-                <p className="text-sm text-gray-600">Notes: {currentCoffee.notes}</p>
+                <p className="text-sm text-gray-600">Notes: {toTitleCase(currentCoffee.notes)}</p>
               )}
             </div>
             {hasExistingImage && (

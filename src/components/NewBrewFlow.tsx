@@ -26,7 +26,7 @@ import { AutocompleteDropdown } from './ui/autocomplete-dropdown';
 import { getRatingEmoji, getRatingText, formatEquipmentName, capitalizeBrewMethod } from '../utils/formatters';
 import { BrewEquipmentIcon } from './icons/BrewEquipmentIcon';
 import { GrinderIcon } from './icons/GrinderIcon';
-import { getTastingNoteSuggestions } from '../utils/tastingNotes';
+import { getTastingNoteSuggestions, capitalize } from '../utils/tastingNotes';
 import { getAllBrewMethodConfigs, supportsStages } from '../utils/brewMethods';
 import { FormattedAISuggestions, type AISuggestionsData, type FirstTimeSuggestionsData } from './DialInGuidance';
 
@@ -2443,7 +2443,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                       key={idx}
                                       className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 border border-gray-300"
                                     >
-                                      {note.trim()}
+                                      {capitalize(note.trim())}
                                     </span>
                                   ))
                                 ) : (
@@ -2985,7 +2985,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                                           key={index}
                                           className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm whitespace-nowrap"
                                         >
-                                          {note}
+                                          {capitalize(note)}
                                         </span>
                                       ))}
                                       {hiddenCount > 0 && (

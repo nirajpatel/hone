@@ -11,7 +11,7 @@ import { BrewsToolbar } from './BrewsToolbar';
 import { BrewsEmptyState } from './BrewsEmptyState';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsMobileListView } from './BrewsMobileListView';
-import { getTastingNoteSuggestions } from '../utils/tastingNotes';
+import { getTastingNoteSuggestions, capitalize } from '../utils/tastingNotes';
 
 interface BrewsTableViewProps {
   brews: Brew[];
@@ -512,14 +512,14 @@ export function BrewsTableView({
                                               key={index}
                                               className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm whitespace-nowrap"
                                             >
-                                              {note}
+                                              {capitalize(note)}
                                             </span>
                                           ))}
                                         </div>
                                         {hiddenCount > 0 && (
                                           <div onClick={(e) => e.stopPropagation()}>
                                             <SimpleTooltip 
-                                              content={hiddenNotes.join(', ')}
+                                              content={hiddenNotes.map(capitalize).join(', ')}
                                               asChild={false}
                                             >
                                               <span className="text-gray-500 text-sm whitespace-nowrap ml-1 cursor-pointer">
@@ -661,13 +661,13 @@ export function BrewsTableView({
                                           key={index}
                                           className="inline-flex items-center bg-gray-100 border border-gray-300 px-2 py-0.5 rounded-full text-sm whitespace-nowrap"
                                         >
-                                          {note}
+                                          {capitalize(note)}
                                         </span>
                                       ))}
                                       {hiddenCount > 0 && (
                                         <div onClick={(e) => e.stopPropagation()}>
                                           <SimpleTooltip 
-                                            content={hiddenNotes.join(', ')}
+                                            content={hiddenNotes.map(capitalize).join(', ')}
                                             asChild={false}
                                           >
                                             <span className="text-gray-500 text-sm whitespace-nowrap ml-1 cursor-pointer">

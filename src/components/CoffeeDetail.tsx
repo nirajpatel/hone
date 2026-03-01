@@ -6,6 +6,7 @@ import { StandardDialog } from './ui/standard-dialog';
 import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
+import { toTitleCase } from '../utils/tastingNotes';
 
 interface CoffeeDetailProps {
   coffee: Coffee;
@@ -164,7 +165,7 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
                 <FileText className="w-5 h-5 text-gray-500 mt-0.5" />
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Tasting Notes</p>
-                  <p className="text-sm text-gray-900">{coffee.notes || '–'}</p>
+                  <p className="text-sm text-gray-900">{coffee.notes ? toTitleCase(coffee.notes) : '–'}</p>
                 </div>
               </div>
             </div>

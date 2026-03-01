@@ -279,6 +279,16 @@ export default function App() {
     }
   }, [currentUser, currentRoute]);
 
+  // URL shortcut: /coffees/shelf → open coffees tab in shelf view
+  useEffect(() => {
+    if (currentRoute === '/coffees/shelf' && currentUser) {
+      setActiveView('coffees');
+      setCoffeesView('shelf');
+      window.history.replaceState({}, '', '/');
+      setCurrentRoute('/');
+    }
+  }, [currentRoute, currentUser]);
+
   useEffect(() => {
     checkAuth();
     

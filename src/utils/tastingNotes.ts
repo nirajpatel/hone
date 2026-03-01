@@ -1,3 +1,15 @@
+export function toTitleCase(str: string): string {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+export function capitalize(str: string): string {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 /**
  * Get tasting note suggestions based on quality rating
  * @param qualityRating 1 = Bad, 2 = Decent, 3 = Exceptional
