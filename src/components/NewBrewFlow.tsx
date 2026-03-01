@@ -1013,6 +1013,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
   // Fetch AI suggestions when suggestions dialog is opened
   useEffect(() => {
+    const abortController = new AbortController();
+
     const fetchSuggestions = async () => {
       // Only fetch when dialog is opened
       if (!isSuggestionsOpen) {
@@ -1182,30 +1184,44 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               brewerName,
               grinderName,
             }),
+            signal: abortController.signal,
           }
         );
+
+        if (abortController.signal.aborted) return;
 
         if (response.ok) {
           // Handle regular JSON response
           const data = await response.json();
-          setSuggestions(data);
-          setThinkingText(''); // Clear thinking text when done
+          if (!abortController.signal.aborted) {
+            setSuggestions(data);
+            setThinkingText(''); // Clear thinking text when done
+          }
         } else {
           const errorData = await response.json().catch(() => ({}));
           console.error('Failed to fetch suggestions:', response.status, errorData);
-          setSuggestions(null);
-          setThinkingText('');
+          if (!abortController.signal.aborted) {
+            setSuggestions(null);
+            setThinkingText('');
+          }
         }
       } catch (error) {
+        if (abortController.signal.aborted) return;
         console.error('Error fetching suggestions:', error);
         setSuggestions(null);
         setThinkingText('');
       } finally {
-        setLoadingSuggestions(false);
+        if (!abortController.signal.aborted) {
+          setLoadingSuggestions(false);
+        }
       }
     };
 
     fetchSuggestions();
+
+    return () => {
+      abortController.abort();
+    };
   }, [isSuggestionsOpen, coffeeId, duplicateData, editingBrew, brewerId, grinderId, brewMethod]);
 
   // Auto-focus on next stage's time input when a new stage is added
