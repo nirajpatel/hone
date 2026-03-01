@@ -321,7 +321,7 @@ export function BrewsTimelineView({
               <div key={key} className="bg-white rounded-lg border border-gray-200 p-3 md:p-4 mobile-timeline-card">
                 {/* Header with Coffee and Method */}
                 <div className="mb-3">
-                  <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
+                  <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
                   <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     <span className="hidden md:inline">•</span>
@@ -359,7 +359,8 @@ export function BrewsTimelineView({
                         <button
                           type="button"
                           onClick={() => onSelectBrew(newestBrew, true)}
-                          className="text-sm text-gray-500 text-left hover:underline cursor-pointer"
+                          className="text-sm text-gray-500 text-left cursor-pointer"
+                          style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
                         >
                           {(() => {
                             if (!firstSuggestion) return '';
@@ -445,7 +446,8 @@ export function BrewsTimelineView({
                         <button
                           type="button"
                           onClick={() => onSelectBrew(newestBrew, true)}
-                          className="text-sm text-gray-500 text-left hover:underline cursor-pointer"
+                          className="text-sm text-gray-500 text-left cursor-pointer"
+                          style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
                         >
                           {(() => {
                             if (!firstSuggestion) return '';
