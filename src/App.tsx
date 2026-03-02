@@ -68,6 +68,9 @@ import { sanitizeErrorMessage } from './utils/errorHandling';
 export default function App() {
   const [brews, setBrews] = useState<Brew[]>([]);
   const [coffees, setCoffees] = useState<Coffee[]>([]);
+  const [allCoffees, setAllCoffees] = useState<Coffee[]>([]);
+  const [allCoffeesLoading, setAllCoffeesLoading] = useState(false);
+  const [selectedCoffeeSiblings, setSelectedCoffeeSiblings] = useState<Coffee[] | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
@@ -288,6 +291,31 @@ export default function App() {
       setCurrentRoute('/');
     }
   }, [currentRoute, currentUser]);
+
+  const ADMIN_EMAIL = 'niraj.patel.09@gmail.com';
+
+  // Admin: fetch all coffees when on /coffee-bag
+  useEffect(() => {
+    if (currentRoute !== '/coffee-bag' || !currentUser || !accessToken) return;
+    if (currentUser.email !== ADMIN_EMAIL) return;
+
+    const fetchAllCoffees = async () => {
+      setAllCoffeesLoading(true);
+      try {
+        const token = await getAccessToken();
+        const res = await fetch(`${apiUrl}/coffees/all`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) setAllCoffees(await res.json());
+      } catch (e) {
+        console.error('Failed to fetch all coffees', e);
+      } finally {
+        setAllCoffeesLoading(false);
+      }
+    };
+
+    fetchAllCoffees();
+  }, [currentRoute, currentUser, accessToken]);
 
   useEffect(() => {
     checkAuth();
@@ -1189,7 +1217,21 @@ export default function App() {
   }
 
   if (currentRoute === '/coffee-bag') {
-    if (loading) {
+    if (loading || !authChecked) {
+      return (
+        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
+          <EspressoLoading />
+        </div>
+      );
+    }
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
+      return (
+        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
+          <p className="text-gray-400 text-sm">Access denied.</p>
+        </div>
+      );
+    }
+    if (allCoffeesLoading) {
       return (
         <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
           <EspressoLoading />
@@ -1198,7 +1240,7 @@ export default function App() {
     }
     return (
       <CoffeeBagImageFlow
-        coffees={coffees}
+        coffees={allCoffees.length > 0 ? allCoffees : coffees}
         onClose={handleNavigateBack}
       />
     );
@@ -1531,6 +1573,10 @@ export default function App() {
             groupBy={groupBy}
             onGroupByChange={setGroupBy}
             onNewCoffee={() => setShowAddCoffee(true)}
+            onSelectCoffee={(coffee, siblings) => {
+              setSelectedCoffee(coffee);
+              setSelectedCoffeeSiblings(siblings ?? null);
+            }}
             view={coffeesView}
             onViewChange={setCoffeesView}
           />
@@ -1585,37 +1631,42 @@ export default function App() {
       })()}
 
       {selectedCoffee && (() => {
-        // Get flat list of filtered coffees in table order
-        const flatCoffees: Coffee[] = [];
-        Object.entries(groupedCoffees).forEach(([_, groupCoffees]) => {
-          flatCoffees.push(...groupCoffees);
-        });
-        
-        const currentIndex = flatCoffees.findIndex(c => c.id === selectedCoffee.id);
+        // If opened from the shelf "by roaster" view, navigate within sibling bags
+        const navList: Coffee[] = selectedCoffeeSiblings ?? (() => {
+          const flat: Coffee[] = [];
+          Object.entries(groupedCoffees).forEach(([_, gc]) => flat.push(...gc));
+          return flat;
+        })();
+
+        const currentIndex = navList.findIndex(c => c.id === selectedCoffee.id);
         const hasPrev = currentIndex > 0;
-        const hasNext = currentIndex < flatCoffees.length - 1;
-        
+        const hasNext = currentIndex < navList.length - 1;
+
         return (
           <CoffeeDetail
             coffee={selectedCoffee}
             brews={brews}
-            onClose={() => setSelectedCoffee(null)}
+            onClose={() => { setSelectedCoffee(null); setSelectedCoffeeSiblings(null); }}
             onEdit={(coffee) => {
               setSelectedCoffee(null);
+              setSelectedCoffeeSiblings(null);
               handleEditCoffee(coffee);
             }}
             onDuplicateCoffee={(coffee) => {
               setSelectedCoffee(null);
+              setSelectedCoffeeSiblings(null);
               handleDuplicateCoffee(coffee);
             }}
             onDeleteCoffee={(id) => {
               setSelectedCoffee(null);
+              setSelectedCoffeeSiblings(null);
               setDeletingCoffeeId(id);
             }}
-            onNavigatePrev={hasPrev ? () => setSelectedCoffee(flatCoffees[currentIndex - 1]) : undefined}
-            onNavigateNext={hasNext ? () => setSelectedCoffee(flatCoffees[currentIndex + 1]) : undefined}
+            onNavigatePrev={hasPrev ? () => setSelectedCoffee(navList[currentIndex - 1]) : undefined}
+            onNavigateNext={hasNext ? () => setSelectedCoffee(navList[currentIndex + 1]) : undefined}
             hasPrev={hasPrev}
             hasNext={hasNext}
+            showNavArrows={selectedCoffeeSiblings !== null}
           />
         );
       })()}

@@ -15,6 +15,8 @@ interface StandardDialogProps {
   footerContent?: React.ReactNode;
   titleAlign?: 'start' | 'center';
   headerActions?: React.ReactNode;
+  sideNavLeft?: React.ReactNode;
+  sideNavRight?: React.ReactNode;
 }
 
 export function StandardDialog({
@@ -30,6 +32,8 @@ export function StandardDialog({
   footerContent,
   titleAlign = 'start',
   headerActions,
+  sideNavLeft,
+  sideNavRight,
 }: StandardDialogProps) {
   const handleClose = () => onOpenChange(false);
 
@@ -40,6 +44,8 @@ export function StandardDialog({
         style={{ maxHeight, maxWidth }}
         hideCloseButton
         onOpenAutoFocus={(e) => e.preventDefault()}
+        sideNavLeft={sideNavLeft}
+        sideNavRight={sideNavRight}
       >
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-1 min-h-0">
           <DialogHeader

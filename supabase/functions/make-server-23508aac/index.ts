@@ -538,6 +538,38 @@ app.get('/make-server-23508aac/coffees', async (c) => {
   }
 });
 
+// Admin: fetch all coffees across every user
+app.get('/make-server-23508aac/coffees/all', async (c) => {
+  try {
+    const authHeader = c.req.header('Authorization');
+    const accessToken = authHeader?.split(' ')[1];
+    const user = await getUser(accessToken);
+
+    if (!user) return c.json({ error: 'Unauthorized' }, 401);
+    if (user.email !== 'niraj.patel.09@gmail.com') return c.json({ error: 'Forbidden' }, 403);
+
+    const allCoffees = await kv.getByPrefix('coffee:');
+    const allUsers = await kv.getByPrefix('user:');
+
+    // Build userId → display name map
+    const userMap = new Map<string, string>();
+    for (const u of allUsers) {
+      if (u.id) {
+        userMap.set(u.id, u.name || u.email || u.id);
+      }
+    }
+
+    const enriched = allCoffees.map((coffee: any) => ({
+      ...coffee,
+      ownerName: coffee.createdByUserId ? (userMap.get(coffee.createdByUserId) ?? 'Unknown') : 'Unknown',
+    }));
+
+    return c.json(enriched);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch all coffees', details: error?.message }, 500);
+  }
+});
+
 app.post('/make-server-23508aac/coffees', async (c) => {
   try {
     const authHeader = c.req.header('Authorization');
@@ -1871,14 +1903,10 @@ app.post('/make-server-23508aac/users/clear-sms-queue', async (c) => {
 // Generate coffee bag representative image using Gemini
 app.post('/make-server-23508aac/generate-coffee-bag-image', async (c) => {
   try {
-    const { roaster, coffeeName, region, notes, roastLevel, referenceImage, customPrompt } = await c.req.json();
+    const { roaster, coffeeName, region, notes, roastLevel, referenceImage, customPrompt, mode } = await c.req.json();
     
     if (!roaster || !coffeeName) {
       return c.json({ error: 'Roaster and coffee name required' }, 400);
-    }
-
-    if (!referenceImage) {
-      return c.json({ error: 'Reference image required' }, 400);
     }
 
     const googleApiKey = Deno.env.get('GOOGLE_API_KEY');
@@ -1886,8 +1914,16 @@ app.post('/make-server-23508aac/generate-coffee-bag-image', async (c) => {
       return c.json({ error: 'Google API key not configured' }, 500);
     }
 
-    // Build detailed description for image generation with white background
-    let prompt = `Create a clean modern 3D studio product render of the coffee bag shown in the reference image. Preserve the exact layout, logo placement, typography hierarchy, and major artwork shapes from the reference, but simplify fine textures and micro-details. Text policy: The reference image may have incomplete, partially visible, or misspelled text for the roaster/brand name and coffee name. Use the provided names as strong hints: Roaster is "${roaster}" and Coffee name is "${coffeeName}". Keep only text that matches or closely resembles these names, even if partially visible or slightly misspelled on the bag. Use your judgment to identify which text on the bag corresponds to the roaster name and which to the coffee name based on these hints. Remove all other text including region, origin, tasting notes, weight, dates, brewing instructions, and any other descriptive text. Keep the preserved text placement, alignment, and spatial relationships identical to the reference. Rendering style: high-quality 3D product render with subtle material depth, soft natural studio lighting, crisp edges, smooth surfaces, minimal wrinkles, no grain, no noise, no dirt, no scratches, no photoreal texture. The coffee bag should look fresh, brand new, and pristine - not used or wrinkled. The bag should appear as if it just came from the factory with perfect condition and no wear. The coffee bag colors must look natural and normal. Shadow: Add a soft, realistic contact shadow directly beneath the base of the bag. Crucially, this shadow must be perfectly centered and symmetrical, extending equally on both the left and right sides of the bag to create a balanced, professional product showcase aesthetic on the white background. Scale + framing: The bag must fit within a virtual container of 920x920 pixels (centered within a 1024x1024 canvas). Scale the bag proportionally until it touches either the width OR height boundary of this container, whichever comes first. Then center it perfectly on the white 1024x1024 canvas. Camera must be fixed and consistent: front-facing, centered, no tilt, no rotation, symmetrical, presented like a premium ecommerce product hero shot. Use #FFFFFF hex code for the background.`;
+    // Build prompt based on mode / reference image availability
+    let prompt: string;
+    if (mode === 'text-overlay' && referenceImage) {
+      // Take the default bag as-is and add roaster + coffee name as elegant typography
+      prompt = `Take the coffee bag shown in the reference image as the exact base. Keep the bag's shape, color, material finish, and all visual elements precisely as shown — do not alter the bag design in any way. The bag has no text on it. Add exactly two lines of text directly onto the front face of the bag, centered horizontally, following these precise rules: Line 1 — Roaster name: "${roaster}". Position: centered horizontally, vertically placed at 38% from the top of the bag face. Font: all-caps, clean geometric sans-serif (e.g. Futura, Montserrat, or equivalent). Font size: occupies approximately 18–22% of the bag's visible width. Letter-spacing: wide (tracking ~0.15em). Weight: bold. Line 2 — Coffee name: "${coffeeName}". Position: centered horizontally, vertically placed at 50% from the top of the bag face, directly below Line 1 with a gap equal to roughly 1.5× the Line 1 cap height. Font: same typeface family as Line 1. Font size: exactly 60% of the Line 1 font size. Letter-spacing: same wide tracking as Line 1. Weight: regular (not bold). Both lines must be perfectly horizontally centered relative to each other and to the bag. Text color: choose a single color (white, cream, off-white, or near-black) that provides strong contrast against the bag surface and reads clearly. The text must appear to sit on the bag surface with correct perspective foreshortening and subtle lighting integration — not pasted on top. No other text, logos, or decorative elements. Maintain the same rendering quality: high-quality 3D product render, soft natural studio lighting, crisp edges, white #FFFFFF background, 1024x1024 canvas, bag centered within 920x920 pixel area, front-facing camera, perfectly symmetrical composition, soft centered contact shadow beneath the bag.`;
+    } else if (referenceImage) {
+      prompt = `Create a clean modern 3D studio product render of the coffee bag shown in the reference image. Preserve the exact layout, logo placement, typography hierarchy, and major artwork shapes from the reference, but simplify fine textures and micro-details. Text policy: The reference image may have incomplete, partially visible, or misspelled text for the roaster/brand name and coffee name. Use the provided names as strong hints: Roaster is "${roaster}" and Coffee name is "${coffeeName}". Keep only text that matches or closely resembles these names, even if partially visible or slightly misspelled on the bag. Use your judgment to identify which text on the bag corresponds to the roaster name and which to the coffee name based on these hints. Remove all other text including region, origin, tasting notes, weight, dates, brewing instructions, and any other descriptive text. Keep the preserved text placement, alignment, and spatial relationships identical to the reference. Rendering style: high-quality 3D product render with subtle material depth, soft natural studio lighting, crisp edges, smooth surfaces, minimal wrinkles, no grain, no noise, no dirt, no scratches, no photoreal texture. The coffee bag should look fresh, brand new, and pristine - not used or wrinkled. The bag should appear as if it just came from the factory with perfect condition and no wear. The coffee bag colors must look natural and normal. Shadow: Add a soft, realistic contact shadow directly beneath the base of the bag. Crucially, this shadow must be perfectly centered and symmetrical, extending equally on both the left and right sides of the bag to create a balanced, professional product showcase aesthetic on the white background. Scale + framing: The bag must fit within a virtual container of 920x920 pixels (centered within a 1024x1024 canvas). Scale the bag proportionally until it touches either the width OR height boundary of this container, whichever comes first. Then center it perfectly on the white 1024x1024 canvas. Camera must be fixed and consistent: front-facing, centered, no tilt, no rotation, symmetrical, presented like a premium ecommerce product hero shot. Use #FFFFFF hex code for the background.`;
+    } else {
+      prompt = `Create a clean modern 3D studio product render of a generic specialty coffee bag. The bag should be a tall, upright kraft paper or matte-finish bag with a simple, elegant design. No text, no logos, no labels — completely plain. Rendering style: high-quality 3D product render with subtle material depth, soft natural studio lighting, crisp edges, smooth surfaces, minimal wrinkles, no grain, no noise, no dirt, no scratches, no photoreal texture. The coffee bag should look fresh, brand new, and pristine. Shadow: Add a soft, realistic contact shadow directly beneath the base of the bag, perfectly centered and symmetrical. Scale + framing: The bag must fit within a virtual container of 920x920 pixels (centered within a 1024x1024 canvas). Scale the bag proportionally until it touches either the width OR height boundary of this container, then center it on the white 1024x1024 canvas. Camera: front-facing, centered, no tilt, no rotation, symmetrical, premium ecommerce product hero shot. Use #FFFFFF hex code for the background.`;
+    }
 
     // Append custom prompt if provided
     if (customPrompt && customPrompt.trim()) {
@@ -1896,8 +1932,12 @@ app.post('/make-server-23508aac/generate-coffee-bag-image', async (c) => {
 
     console.log('Generating coffee bag image with white background');
 
-    // Convert base64 reference image data
-    const base64Data = referenceImage.replace(/^data:image\/[a-z]+;base64,/, '');
+    // Build request parts — only include the image part when a reference was supplied
+    const parts: object[] = [{ text: prompt }];
+    if (referenceImage) {
+      const base64Data = referenceImage.replace(/^data:image\/[a-z]+;base64,/, '');
+      parts.push({ inlineData: { mimeType: 'image/png', data: base64Data } });
+    }
 
     // Generate image
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${googleApiKey}`, {
@@ -1906,21 +1946,7 @@ app.post('/make-server-23508aac/generate-coffee-bag-image', async (c) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt,
-              },
-              {
-                inlineData: {
-                  mimeType: 'image/png',
-                  data: base64Data,
-                },
-              },
-            ],
-          },
-        ],
+        contents: [{ parts }],
       }),
     });
 

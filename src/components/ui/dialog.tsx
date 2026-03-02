@@ -51,12 +51,25 @@ function DialogContent({
   children,
   hideCloseButton,
   footerContent,
+  sideNavLeft,
+  sideNavRight,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & { hideCloseButton?: boolean; footerContent?: React.ReactNode }) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> & { hideCloseButton?: boolean; footerContent?: React.ReactNode; sideNavLeft?: React.ReactNode; sideNavRight?: React.ReactNode }) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <div className="fixed inset-4 sm:top-[50%] sm:left-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:inset-auto z-50 flex flex-col items-center gap-4 w-auto sm:w-full sm:max-w-[40rem] pointer-events-none">
+        {/* Side arrows — tablet and desktop */}
+        {sideNavLeft && (
+          <div className="hidden md:block absolute top-1/2 -translate-y-1/2 pointer-events-auto z-10" style={{ left: '-20px' }}>
+            {sideNavLeft}
+          </div>
+        )}
+        {sideNavRight && (
+          <div className="hidden md:block absolute top-1/2 -translate-y-1/2 pointer-events-auto z-10" style={{ right: '-20px' }}>
+            {sideNavRight}
+          </div>
+        )}
         <DialogPrimitive.Content
           data-slot="dialog-content"
           className={cn(
@@ -75,6 +88,13 @@ function DialogContent({
             </DialogPrimitive.Close>
           )}
         </DialogPrimitive.Content>
+        {/* Bottom arrows — mobile only */}
+        {(sideNavLeft || sideNavRight) && (
+          <div className="flex md:hidden items-center justify-center gap-2 pointer-events-auto">
+            {sideNavLeft}
+            {sideNavRight}
+          </div>
+        )}
         {footerContent && (
           <div className="flex items-center justify-center pointer-events-auto">
             {footerContent}

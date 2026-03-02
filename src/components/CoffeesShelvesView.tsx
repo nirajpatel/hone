@@ -17,6 +17,7 @@ interface CoffeesShelvesViewProps {
   groupBy: 'month' | 'coffee';
   onGroupByChange: (groupBy: 'month' | 'coffee') => void;
   onNewCoffee: () => void;
+  onSelectCoffee?: (coffee: Coffee, siblings?: Coffee[]) => void;
   view?: 'shelf' | 'table';
   onViewChange?: (view: 'shelf' | 'table') => void;
 }
@@ -27,6 +28,7 @@ export function CoffeesShelvesView({
   groupBy,
   onGroupByChange,
   onNewCoffee,
+  onSelectCoffee,
   view,
   onViewChange,
 }: CoffeesShelvesViewProps) {
@@ -35,6 +37,7 @@ export function CoffeesShelvesView({
   // State for representative images
   const [representativeImages, setRepresentativeImages] = useState<Map<string, string>>(new Map());
   const [loadingImages, setLoadingImages] = useState(true);
+  const [defaultImage, setDefaultImage] = useState<string | null>(null);
   
   // State for window width to calculate card sizes
   const [isDesktop, setIsDesktop] = useState(false);
@@ -112,6 +115,22 @@ export function CoffeesShelvesView({
         await Promise.all(promises);
       }
 
+      // Fetch the default fallback image
+      try {
+        const defaultRes = await fetch(
+          `${apiUrl}/coffee-representative-image?roaster=__default__&coffeeName=__default__`,
+          { headers: { Authorization: `Bearer ${publicAnonKey}` } }
+        );
+        if (defaultRes.ok) {
+          const data = await defaultRes.json();
+          if (data.imageUrl && !abortController.signal.aborted) {
+            setDefaultImage(data.imageUrl);
+          }
+        }
+      } catch {
+        // Non-fatal — leave defaultImage as null
+      }
+
       if (!abortController.signal.aborted) {
         setRepresentativeImages(imageMap);
         setLoadingImages(false);
@@ -127,7 +146,7 @@ export function CoffeesShelvesView({
     };
   }, [coffees, apiUrl]);
 
-  // Get the best image for a coffee (representative > uploaded > null)
+  // Get the best image for a coffee (representative > uploaded > default > null)
   const getCoffeeImage = (coffee: Coffee): string | null => {
     const key = `${coffee.roaster}|${coffee.name}`;
     const representativeImage = representativeImages.get(key);
@@ -140,7 +159,7 @@ export function CoffeesShelvesView({
       return coffee.imageUrls[0];
     }
     
-    return null;
+    return defaultImage;
   };
 
   // Get coffee average rating for a specific coffee bag (by coffeeId)
@@ -181,7 +200,8 @@ export function CoffeesShelvesView({
     const date = new Date(year, monthNum - 1, day);
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
-    return `${month} ${day}, ${year}`;
+    const currentYear = new Date().getFullYear();
+    return year === currentYear ? `${month} ${day}` : `${month} ${day}, ${year}`;
   };
 
   // Calculate coffee age
@@ -221,7 +241,7 @@ export function CoffeesShelvesView({
     coffees.forEach(coffee => {
       const [year, monthNum] = coffee.roastDate.split('-').map(Number);
       const date = new Date(year, monthNum - 1);
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       const month = months[date.getMonth()];
       const monthYear = `${month} ${date.getFullYear()}`;
       if (!groupedCoffees[monthYear]) {
@@ -267,7 +287,7 @@ export function CoffeesShelvesView({
   });
 
   // Component for individual coffee card with tilt effect
-  const CoffeeCard = ({ coffee, rating }: { coffee: Coffee; rating: number }) => {
+  const CoffeeCard = ({ coffee, rating, onClick, roastLabel = 'Roasted:' }: { coffee: Coffee; rating: number; onClick?: () => void; roastLabel?: string }) => {
     const tiltRef = useRef<HTMLImageElement>(null);
 
     useEffect(() => {
@@ -290,7 +310,8 @@ export function CoffeesShelvesView({
 
     return (
       <div
-        className="flex-shrink-0 flex flex-col md:flex-row rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+        onClick={onClick}
+        className={`flex-shrink-0 flex flex-col md:flex-row rounded-lg overflow-hidden hover:shadow-md transition-shadow${onClick ? ' cursor-pointer' : ''}`}
         style={{ 
           // All cards have consistent width on desktop for uniform appearance
           // Width allows exactly 3.5 cards to be visible in the viewport
@@ -303,9 +324,10 @@ export function CoffeesShelvesView({
       >
         {/* Coffee Image Container with Background */}
         <div
-          className="aspect-[2/3] md:aspect-auto md:w-56 md:h-64 md:flex-shrink-0 overflow-hidden flex items-center justify-center"
+          className="w-full h-64 flex-shrink-0 md:w-56 md:h-64 overflow-hidden flex items-center justify-center"
           style={{ 
-            backgroundColor: '#FFFFFF'
+            backgroundColor: '#FFFFFF',
+            paddingTop: isDesktop ? undefined : '1em',
           }}
         >
           {/* Tiltable Coffee Bag Image - only render if image exists */}
@@ -349,7 +371,7 @@ export function CoffeesShelvesView({
                 <span className="text-gray-400">—</span>
               ) : (
                 <>
-                  <span className="font-medium">Roasted:</span> {formatRoastDate(coffee.roastDate)} • {getCoffeeAge(coffee.roastDate)}
+                  <span className="font-medium">{roastLabel}</span> {formatRoastDate(coffee.roastDate)} • {getCoffeeAge(coffee.roastDate)}
                 </>
               )}
             </p>
@@ -409,9 +431,9 @@ export function CoffeesShelvesView({
     };
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {/* Shelf Header */}
-        <h3 className="text-lg font-semibold text-gray-900 sticky left-0">
+        <h3 className="text-sm text-gray-900 sticky left-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>
           {groupName}
         </h3>
 
@@ -447,12 +469,32 @@ export function CoffeesShelvesView({
           >
             <div className="flex flex-row gap-4 pb-2" style={{ minWidth: 'min-content' }}>
               {coffeesInGroup.map((coffee) => {
-                const rating = groupBy === 'month' 
+                const rating = groupBy === 'month'
                   ? getCoffeeBagRating(coffee.id)
                   : getAggregatedCoffeeRating(coffee.roaster, coffee.name);
 
+                const handleClick = onSelectCoffee
+                  ? () => {
+                      if (groupBy === 'coffee') {
+                        // Siblings = all bags of the same roaster+name, newest first
+                        const siblings = coffees
+                          .filter(c => c.roaster === coffee.roaster && c.name === coffee.name)
+                          .sort((a, b) => b.roastDate.localeCompare(a.roastDate));
+                        onSelectCoffee(coffee, siblings);
+                      } else {
+                        onSelectCoffee(coffee);
+                      }
+                    }
+                  : undefined;
+
                 return (
-                  <CoffeeCard key={coffee.id} coffee={coffee} rating={rating} />
+                  <CoffeeCard
+                    key={coffee.id}
+                    coffee={coffee}
+                    rating={rating}
+                    onClick={handleClick}
+                    roastLabel={groupBy === 'coffee' ? 'Latest Roast:' : 'Roasted:'}
+                  />
                 );
               })}
             </div>
@@ -534,7 +576,7 @@ export function CoffeesShelvesView({
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-4">
           {sortedGroups.map(([groupName, coffeesInGroup]) => (
             <ScrollableShelf key={groupName} groupName={groupName} coffeesInGroup={coffeesInGroup} />
           ))}

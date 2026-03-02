@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Coffee, Brew } from '../types';
-import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2 } from 'lucide-react';
+import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
 import { Badge } from './ui/badge';
@@ -19,9 +19,10 @@ interface CoffeeDetailProps {
   onNavigateNext?: () => void;
   hasPrev?: boolean;
   hasNext?: boolean;
+  showNavArrows?: boolean;
 }
 
-export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext }: CoffeeDetailProps) {
+export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext, showNavArrows }: CoffeeDetailProps) {
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
@@ -112,10 +113,28 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
     </DropdownMenu>
   );
 
+  const arrowBase = 'w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-200 shadow-md transition-opacity duration-150';
+
+  const makeArrow = (active: boolean, onClick: (() => void) | undefined, label: string, Icon: typeof ChevronLeft) => (
+    <button
+      onClick={onClick}
+      disabled={!active}
+      className={`${arrowBase} ${active ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+      aria-label={label}
+    >
+      <Icon className={`w-5 h-5 ${active ? 'text-gray-700' : 'text-gray-300'}`} />
+    </button>
+  );
+
+  const leftArrow  = showNavArrows ? makeArrow(!!hasPrev, hasPrev ? onNavigatePrev : undefined, 'Previous bag', ChevronLeft)  : undefined;
+  const rightArrow = showNavArrows ? makeArrow(!!hasNext, hasNext ? onNavigateNext : undefined, 'Next bag',      ChevronRight) : undefined;
+
   return (
     <StandardDialog
       open={true}
       onOpenChange={(open) => !open && onClose()}
+      sideNavLeft={leftArrow}
+      sideNavRight={rightArrow}
       title={coffee.name}
       subtitle={coffee.roaster}
       headerActions={headerActions}
