@@ -354,12 +354,24 @@ export function CoffeesShelvesView({
   }
 
   // Sort groups
+  const monthNameToIndex: Record<string, number> = {
+    January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
+    July: 6, August: 7, September: 8, October: 9, November: 10, December: 11,
+  };
   const sortedGroups = Object.entries(groupedCoffees).sort((a, b) => {
     if (groupBy === 'month') {
-      // Sort by date descending (most recent first)
-      const dateA = new Date(a[0]);
-      const dateB = new Date(b[0]);
-      return dateB.getTime() - dateA.getTime();
+      // Sort by (year, month) descending (most recent first). Parse "Month YYYY" explicitly for reliable cross-browser sort.
+      const parseMonthYear = (s: string) => {
+        const parts = s.split(' ');
+        const year = parseInt(parts[parts.length - 1], 10);
+        const monthName = parts.slice(0, -1).join(' ');
+        const month = monthName in monthNameToIndex ? monthNameToIndex[monthName] : 0;
+        return { year, month };
+      };
+      const pa = parseMonthYear(a[0]);
+      const pb = parseMonthYear(b[0]);
+      if (pb.year !== pa.year) return pb.year - pa.year;
+      return pb.month - pa.month;
     } else {
       // Sort by roaster name alphabetically
       return a[0].localeCompare(b[0]);
@@ -393,7 +405,7 @@ export function CoffeesShelvesView({
         onClick={onClick}
         className={`flex-shrink-0 flex flex-col rounded-lg overflow-hidden hover:shadow-md transition-shadow${onClick ? ' cursor-pointer' : ''}`}
         style={{
-          width: isDesktop ? '26em' : '14em',
+          width: isDesktop ? '26em' : '15em',
           backgroundColor: '#ffffff',
           border: '1px solid #e5e7eb',
           borderRadius: '0.5rem',
