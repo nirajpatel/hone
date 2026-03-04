@@ -405,7 +405,7 @@ export function CoffeesShelvesView({
         onClick={onClick}
         className={`flex-shrink-0 flex flex-col rounded-lg overflow-hidden hover:shadow-md transition-shadow${onClick ? ' cursor-pointer' : ''}`}
         style={{
-          width: isDesktop ? '26em' : '15em',
+          width: isDesktop ? '26em' : '14em',
           backgroundColor: '#ffffff',
           border: '1px solid #e5e7eb',
           borderRadius: '0.5rem',
