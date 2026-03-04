@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Coffee, Brew } from '../types';
 import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
@@ -7,6 +7,7 @@ import { Badge } from './ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
 import { toTitleCase } from '../utils/tastingNotes';
+import { projectId } from '../utils/supabase/info';
 
 interface CoffeeDetailProps {
   coffee: Coffee;
@@ -23,6 +24,19 @@ interface CoffeeDetailProps {
 }
 
 export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext, showNavArrows }: CoffeeDetailProps) {
+  const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
+  const [representativeImageUrl, setRepresentativeImageUrl] = useState<string | null>(null);
+
+  // Fetch global representative image for this roaster+name combination
+  useEffect(() => {
+    if (!coffee.roaster || !coffee.name) return;
+    setRepresentativeImageUrl(null);
+    fetch(`${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(coffee.roaster)}&coffeeName=${encodeURIComponent(coffee.name)}`)
+      .then(r => r.json())
+      .then(data => { if (data.imageUrl) setRepresentativeImageUrl(data.imageUrl); })
+      .catch(() => {});
+  }, [coffee.roaster, coffee.name]);
+
   // Handle Escape key to close and arrow keys for navigation
   useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
@@ -76,13 +90,18 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
 
   const { rating, count } = getCoffeeAverageRating(coffee.id);
 
-  // Collect all images (both old imageUrl and new imageUrls)
+  // Collect all images — representative image (global) takes priority
   const allImages: string[] = [];
-  if (coffee.imageUrl) {
+  if (representativeImageUrl) {
+    allImages.push(representativeImageUrl);
+  }
+  if (coffee.imageUrl && coffee.imageUrl !== representativeImageUrl) {
     allImages.push(coffee.imageUrl);
   }
   if (coffee.imageUrls && coffee.imageUrls.length > 0) {
-    allImages.push(...coffee.imageUrls);
+    coffee.imageUrls.forEach(url => {
+      if (url !== representativeImageUrl) allImages.push(url);
+    });
   }
 
   const headerActions = (

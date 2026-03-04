@@ -378,7 +378,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
 
       const ROASTER_TRACKING = 3;
       const COFFEE_TRACKING  = 4;
-      const maxW = 400; // safe flat-face width of the bag
+      const maxW = 360; // safe flat-face width of the bag
       const cx   = 512;
 
       const roasterText = currentCoffee.roaster.toUpperCase();
