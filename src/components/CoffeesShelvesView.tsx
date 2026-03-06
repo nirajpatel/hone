@@ -445,10 +445,12 @@ export function CoffeesShelvesView({
     const abortController = new AbortController();
 
     const fetchRepresentativeImages = async () => {
+      const norm = (s: string) => s.trim().toLowerCase();
+
       // Get unique coffee combinations that are NOT yet cached
       const uniqueCoffees = new Map<string, Coffee>();
       coffees.forEach(coffee => {
-        const key = `${coffee.roaster}|${coffee.name}`;
+        const key = `${norm(coffee.roaster)}|${norm(coffee.name)}`;
         if (!uniqueCoffees.has(key) && !_repImageCache.has(key)) {
           uniqueCoffees.set(key, coffee);
         }
@@ -475,8 +477,10 @@ export function CoffeesShelvesView({
             const requestAbortController = new AbortController();
             const timeoutId = setTimeout(() => requestAbortController.abort(), 5000);
 
+            const normRoaster = coffee.roaster.trim().toLowerCase();
+            const normName = coffee.name.trim().toLowerCase();
             const res = await fetch(
-              `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(coffee.roaster)}&coffeeName=${encodeURIComponent(coffee.name)}`,
+              `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(normRoaster)}&coffeeName=${encodeURIComponent(normName)}`,
               {
                 headers: { Authorization: `Bearer ${publicAnonKey}` },
                 signal: requestAbortController.signal,
@@ -485,7 +489,7 @@ export function CoffeesShelvesView({
 
             clearTimeout(timeoutId);
 
-            const key = `${coffee.roaster}|${coffee.name}`;
+            const key = `${normRoaster}|${normName}`;
             if (res.ok) {
               const data = await res.json();
               // Store url if found, empty string as "confirmed missing" sentinel
@@ -550,7 +554,7 @@ export function CoffeesShelvesView({
   // Get the best image for a coffee.
   // Returns null when still loading (caller should show shimmer instead of fallback).
   const getCoffeeImage = (coffee: Coffee): string | null => {
-    const key = `${coffee.roaster}|${coffee.name}`;
+    const key = `${coffee.roaster.trim().toLowerCase()}|${coffee.name.trim().toLowerCase()}`;
     const representativeImage = representativeImages.get(key);
 
     // Non-empty string = confirmed URL

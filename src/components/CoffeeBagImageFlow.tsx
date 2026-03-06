@@ -12,8 +12,10 @@ interface CoffeeBagImageFlowProps {
 }
 
 interface UniqueCoffee {
-  roaster: string;
-  name: string;
+  roaster: string;        // normalized (lowercase) — used for cache keys and API calls
+  name: string;           // normalized (lowercase) — used for cache keys and API calls
+  displayRoaster: string; // original-case — used for display and text overlays
+  displayName: string;    // original-case — used for display and text overlays
   region?: string;
   notes?: string;
   roastLevel?: string;
@@ -44,10 +46,13 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
 
   useEffect(() => {
-    // Already have cached data — skip fetch entirely
-    if (_cachedUniqueCoffees !== null) return;
-    // Another instance is already fetching — skip
-    if (_fetchInProgress) return;
+    // Always clear caches on mount so stale pre-normalization data is never reused
+    _cachedUniqueCoffees = null;
+    _cachedExistingImages = null;
+    _cachedDefaultImage = null;
+    _fetchInProgress = false;
+    setExistingImages(new Map());
+    setDefaultExistingImage(null);
     loadCoffeesNeedingImages();
   }, []);
 
@@ -69,11 +74,31 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
         }
       } catch { /* non-fatal — proceed without aliases */ }
 
+      const norm = (s: string) => s.trim().toLowerCase();
+
       const resolveCanonical = (roaster: string, name: string) => {
-        const canonicalRoaster = roasterAliases[roaster] ?? roaster;
-        const coffeeKey = `${canonicalRoaster}|${name}`;
-        const canonicalName = coffeeNameAliases[coffeeKey]?.split('|')[1] ?? name;
-        return { roaster: canonicalRoaster, name: canonicalName };
+        const normR = norm(roaster);
+        // Case-insensitive roaster alias lookup
+        let canonicalRoaster = roaster; // original case for display
+        for (const [variant, canonical] of Object.entries(roasterAliases)) {
+          if (norm(variant) === normR) { canonicalRoaster = canonical; break; }
+        }
+        // Case-insensitive coffee-name alias lookup
+        const normCoffeeKey = `${norm(canonicalRoaster)}|${norm(name)}`;
+        let canonicalName = name; // original case for display
+        for (const [variantKey, canonicalValue] of Object.entries(coffeeNameAliases)) {
+          const [kr, kn] = variantKey.split('|');
+          if (`${norm(kr)}|${norm(kn)}` === normCoffeeKey) {
+            canonicalName = canonicalValue.split('|')[1] ?? name;
+            break;
+          }
+        }
+        return {
+          roaster: norm(canonicalRoaster),    // normalized for keys/API
+          name: norm(canonicalName),          // normalized for keys/API
+          displayRoaster: canonicalRoaster,   // original case for display
+          displayName: canonicalName,         // original case for display
+        };
       };
 
       // Build unique coffees list immediately and show UI
@@ -86,6 +111,8 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
           uniqueMap.set(key, {
             roaster: canonical.roaster,
             name: canonical.name,
+            displayRoaster: canonical.displayRoaster,
+            displayName: canonical.displayName,
             region: coffee.region,
             notes: coffee.notes,
             roastLevel: coffee.roastLevel,
@@ -126,6 +153,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
           const batch = allUniqueCoffees.slice(i, i + batchSize);
           const results = await Promise.all(
             batch.map(async (coffee) => {
+              // Use normalized names — these already are normalized from resolveCanonical
               const key = `${coffee.roaster}|${coffee.name}`;
               try {
                 const res = await fetch(
@@ -347,8 +375,8 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
         return lines;
       };
       const ROASTER_TRACKING = 3; const COFFEE_TRACKING = 4; const maxW = 360; const cx = 512;
-      const roasterText = currentCoffee.roaster.toUpperCase();
-      const coffeeText  = currentCoffee.name.toUpperCase();
+      const roasterText = (currentCoffee.displayRoaster || currentCoffee.roaster).toUpperCase();
+      const coffeeText  = (currentCoffee.displayName || currentCoffee.name).toUpperCase();
       const shrinkToFit = (baseSize: number, text: string, weight: string, family: string, tracking: number): number => {
         let size = baseSize;
         const longestWord = text.split(' ').reduce((a, b) => (a.length >= b.length ? a : b), '');
@@ -460,7 +488,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
   const bottomImage = generatedImage;
 
   const coffeePhotos = currentCoffee
-    ? [...new Set(coffees.filter(c => c.roaster === currentCoffee.roaster && c.name === currentCoffee.name).flatMap(c => c.imageUrls ?? []))]
+    ? [...new Set(coffees.filter(c => c.roaster.trim().toLowerCase() === currentCoffee.roaster && c.name.trim().toLowerCase() === currentCoffee.name).flatMap(c => c.imageUrls ?? []))]
     : [];
 
   return (
@@ -527,7 +555,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
                     {img ? (
                       <img
                         src={img}
-                        alt={`${coffee.roaster} ${coffee.name}`}
+                        alt={`${coffee.displayRoaster || coffee.roaster} ${coffee.displayName || coffee.name}`}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
@@ -543,8 +571,8 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
                   </div>
                   {/* Label */}
                   <div className="px-2 py-1.5">
-                    <p className="text-[11px] font-medium text-gray-700 leading-tight truncate">{coffee.roaster}</p>
-                    <p className="text-[11px] text-gray-400 leading-tight truncate">{coffee.name}</p>
+                    <p className="text-[11px] font-medium text-gray-700 leading-tight truncate">{coffee.displayRoaster || coffee.roaster}</p>
+                    <p className="text-[11px] text-gray-400 leading-tight truncate">{coffee.displayName || coffee.name}</p>
                   </div>
                 </button>
               );
