@@ -201,6 +201,18 @@ html {
   font-size: var(--font-size);
 }
 
+/* Shimmer animation for image loading skeletons */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #ebebeb 25%, #d6d6d6 50%, #ebebeb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
 /* Custom animation for faster brewing pulse */
 @keyframes brewing-pulse {
   0%, 100% {

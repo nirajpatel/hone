@@ -12,6 +12,7 @@ import { BrewsTableView } from './components/BrewsTableView';
 import { BrewsTimelineView } from './components/BrewsTimelineView';
 import { CoffeesShelvesView } from './components/CoffeesShelvesView';
 import { CoffeesTableView } from './components/CoffeesTableView';
+import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { Profile } from './components/Profile';
 import { EquipmentDialog } from './components/EquipmentDialog';
 import { EspressoLoading } from './components/EspressoLoading';
@@ -19,6 +20,7 @@ import { Terms } from './components/Terms';
 import { Privacy } from './components/Privacy';
 import { A2POptInProof } from './components/A2POptInProof';
 import { CoffeeBagImageFlow } from './components/CoffeeBagImageFlow';
+import { AliasesManager } from './components/AliasesManager';
 import { Feed } from './components/Feed';
 import { UserProfileDialog } from './components/UserProfileDialog';
 import { FeedbackDialog } from './components/FeedbackDialog';
@@ -51,7 +53,7 @@ import coffeeBeansImage from './assets/coffee-beans.webp';
 import honeLogo from './assets/hone-logo.svg';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
-import { Coffee as CoffeeIcon, Plus, LogOut } from 'lucide-react';
+import { Coffee as CoffeeIcon, Plus, LogOut, Link2, ImageIcon } from 'lucide-react';
 import { MoreVertical, User as UserIcon, QrCode, Pencil, Trash2, Menu, Coffee, List, Settings, X, LayoutGrid, Table as TableIcon, MessageSquare } from 'lucide-react';
 import { projectId, publicAnonKey } from './utils/supabase/info';
 import { toast, Toaster } from 'sonner@2.0.3';
@@ -96,12 +98,14 @@ export default function App() {
   const [groupBy, setGroupBy] = useState<'month' | 'coffee'>('month');
   const [showProfile, setShowProfile] = useState(false);
   const [showEquipment, setShowEquipment] = useState(false);
+  const [showAliases, setShowAliases] = useState(false);
+  const [showBagImages, setShowBagImages] = useState(false);
   const [hoveredBrewRating, setHoveredBrewRating] = useState<{ id: string, rating: number } | null>(null);
   const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
   const [equipmentChangeCounter, setEquipmentChangeCounter] = useState(0);
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [serverVersion, setServerVersion] = useState<string | null>(null);
-  const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('table');
+  const [coffeesView, setCoffeesView] = useState<'shelf' | 'table'>('shelf');
   const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('timeline');
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -282,22 +286,13 @@ export default function App() {
     }
   }, [currentUser, currentRoute]);
 
-  // URL shortcut: /coffees/shelf → open coffees tab in shelf view
-  useEffect(() => {
-    if (currentRoute === '/coffees/shelf' && currentUser) {
-      setActiveView('coffees');
-      setCoffeesView('shelf');
-      window.history.replaceState({}, '', '/');
-      setCurrentRoute('/');
-    }
-  }, [currentRoute, currentUser]);
-
   const ADMIN_EMAIL = 'niraj.patel.09@gmail.com';
 
-  // Admin: fetch all coffees when on /coffee-bag
+  // Admin: fetch all coffees when Bag Images is opened
   useEffect(() => {
-    if (currentRoute !== '/coffee-bag' || !currentUser || !accessToken) return;
+    if (!showBagImages || !currentUser || !accessToken) return;
     if (currentUser.email !== ADMIN_EMAIL) return;
+    if (allCoffees.length > 0) return;
 
     const fetchAllCoffees = async () => {
       setAllCoffeesLoading(true);
@@ -315,7 +310,7 @@ export default function App() {
     };
 
     fetchAllCoffees();
-  }, [currentRoute, currentUser, accessToken]);
+  }, [showBagImages, currentUser, accessToken]);
 
   useEffect(() => {
     checkAuth();
@@ -1216,35 +1211,6 @@ export default function App() {
     return <SignInPage onLoginSuccess={() => checkAuth()} />;
   }
 
-  if (currentRoute === '/coffee-bag') {
-    if (loading || !authChecked) {
-      return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
-      );
-    }
-    if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
-      return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <p className="text-gray-400 text-sm">Access denied.</p>
-        </div>
-      );
-    }
-    if (allCoffeesLoading) {
-      return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
-      );
-    }
-    return (
-      <CoffeeBagImageFlow
-        coffees={allCoffees.length > 0 ? allCoffees : coffees}
-        onClose={handleNavigateBack}
-      />
-    );
-  }
 
   // Public routes that don't require auth
   const publicRoutes = ['/login', '/landing'];
@@ -1438,6 +1404,18 @@ export default function App() {
                         <BrewEquipmentIcon className="w-4 h-4" />
                         Equipment
                       </DropdownMenuItem>
+                      {currentUser?.email === ADMIN_EMAIL && (
+                        <>
+                          <DropdownMenuItem onClick={() => setShowBagImages(true)}>
+                            <ImageIcon className="w-4 h-4" />
+                            Bag Images
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setShowAliases(true)}>
+                            <Link2 className="w-4 h-4" />
+                            Manage Aliases
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
                         <LogOut className="w-4 h-4" />
                         Sign Out
@@ -1551,35 +1529,44 @@ export default function App() {
               onOpenAddCoffee={() => setShowAddCoffee(true)}
             />
           )
-        ) : coffeesView === 'table' ? (
-          <CoffeesTableView
-            coffees={coffees}
-            brews={brews}
-            filterMethod={filterMethod}
-            groupBy={groupBy}
-            onFilterMethodChange={setFilterMethod}
-            onGroupByChange={setGroupBy}
-            onNewCoffee={() => setShowAddCoffee(true)}
-            onSelectCoffee={setSelectedCoffee}
-            onEditCoffee={handleEditCoffee}
-            onDuplicateCoffee={handleDuplicateCoffee}
-            onDeleteCoffee={(id) => setDeletingCoffeeId(id)}
-            onPrintQR={setQrCodeCoffee}
-          />
         ) : (
-          <CoffeesShelvesView
-            coffees={coffees}
-            brews={brews}
-            groupBy={groupBy}
-            onGroupByChange={setGroupBy}
-            onNewCoffee={() => setShowAddCoffee(true)}
-            onSelectCoffee={(coffee, siblings) => {
-              setSelectedCoffee(coffee);
-              setSelectedCoffeeSiblings(siblings ?? null);
-            }}
-            view={coffeesView}
-            onViewChange={setCoffeesView}
-          />
+          <>
+            <CoffeesToolbar
+              view={coffeesView}
+              groupBy={groupBy}
+              onViewChange={setCoffeesView}
+              onGroupByChange={setGroupBy}
+              onNewCoffee={() => setShowAddCoffee(true)}
+              isEmpty={coffees.length === 0}
+            />
+            {coffeesView === 'table' ? (
+              <CoffeesTableView
+                coffees={coffees}
+                brews={brews}
+                filterMethod={filterMethod}
+                groupBy={groupBy}
+                onNewCoffee={() => setShowAddCoffee(true)}
+                onSelectCoffee={setSelectedCoffee}
+                onEditCoffee={handleEditCoffee}
+                onDuplicateCoffee={handleDuplicateCoffee}
+                onDeleteCoffee={(id) => setDeletingCoffeeId(id)}
+                onPrintQR={setQrCodeCoffee}
+              />
+            ) : (
+              <div className="shelf-content-top-margin">
+                <CoffeesShelvesView
+                  coffees={coffees}
+                  brews={brews}
+                  groupBy={groupBy}
+                  onNewCoffee={() => setShowAddCoffee(true)}
+                  onSelectCoffee={(coffee, siblings) => {
+                    setSelectedCoffee(coffee);
+                    setSelectedCoffeeSiblings(siblings ?? null);
+                  }}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -1656,6 +1643,11 @@ export default function App() {
               setSelectedCoffee(null);
               setSelectedCoffeeSiblings(null);
               handleDuplicateCoffee(coffee);
+            }}
+            onPrintQR={(coffee) => {
+              setSelectedCoffee(null);
+              setSelectedCoffeeSiblings(null);
+              setQrCodeCoffee(coffee);
             }}
             onDeleteCoffee={(id) => {
               setSelectedCoffee(null);
@@ -1844,6 +1836,29 @@ export default function App() {
             fetchData(); // Refetch brews to get updated equipment names
           }}
         />
+      )}
+
+      {showAliases && accessToken && currentUser?.email === ADMIN_EMAIL && (
+        <AliasesManager
+          open={showAliases}
+          onOpenChange={setShowAliases}
+          accessToken={accessToken}
+        />
+      )}
+
+      {showBagImages && currentUser?.email === ADMIN_EMAIL && (
+        allCoffeesLoading ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">
+            <EspressoLoading />
+          </div>
+        ) : (
+          <div className="fixed inset-0 z-50">
+            <CoffeeBagImageFlow
+              coffees={allCoffees.length > 0 ? allCoffees : coffees}
+              onClose={() => setShowBagImages(false)}
+            />
+          </div>
+        )
       )}
 
       {/* Floating Feedback Button - Only show when logged in */}

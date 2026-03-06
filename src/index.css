@@ -3577,6 +3577,17 @@ html {
   font-size: var(--font-size);
 }
 
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 0%, #f0f0f0 40%, #e0e0e0 50%, #f0f0f0 60%, #f0f0f0 100%);
+  background-size: 400% 100%;
+  animation: shimmer 3.5s linear infinite;
+}
+
 @keyframes brewing-pulse {
   0%, 100% {
     opacity: 1;
@@ -4393,12 +4404,31 @@ html {
 }
 
 /* Logged-in nav: larger logo on mobile only */
+.shelf-scroll-bleed {
+  margin-inline: -0.75rem;
+}
+.shelf-scroll-inner {
+  padding-inline: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .shelf-scroll-bleed {
+    margin-inline: -1.5rem;
+  }
+  .shelf-scroll-inner {
+    padding-inline: 1.5rem;
+  }
+}
+
 @media (max-width: 767px) {
   .app-nav-logo {
     height: 28px !important;
   }
   .timeline-cards-mobile-mt {
     margin-top: 0.75em !important;
+  }
+  .shelf-content-top-margin {
+    margin-top: 0.5rem !important;
   }
 }
 

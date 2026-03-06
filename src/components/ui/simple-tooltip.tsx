@@ -5,6 +5,19 @@ import {
   TooltipTrigger,
 } from './tooltip';
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = React.useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true
+  );
+  React.useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isDesktop;
+}
+
 interface SimpleTooltipProps {
   content: React.ReactNode;
   children: React.ReactNode;
@@ -12,6 +25,7 @@ interface SimpleTooltipProps {
 }
 
 export function SimpleTooltip({ content, children, asChild = true }: SimpleTooltipProps) {
+  const isDesktop = useIsDesktop();
   const [open, setOpen] = React.useState(false);
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const manuallyOpenedRef = React.useRef(false);
@@ -64,6 +78,10 @@ export function SimpleTooltip({ content, children, asChild = true }: SimpleToolt
     
     setOpen(newOpen);
   };
+
+  if (!isDesktop) {
+    return <>{children}</>;
+  }
 
   return (
     <Tooltip open={open} onOpenChange={handleOpenChange}>

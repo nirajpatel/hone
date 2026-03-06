@@ -1,6 +1,5 @@
-import { Extraction, Coffee, BrewMethod } from '../types';
+import { Coffee, BrewMethod } from '../types';
 import { Button } from './ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Plus, MoreVertical, Pencil, Trash2, QrCode } from 'lucide-react';
@@ -15,8 +14,6 @@ interface CoffeesTableViewProps {
   brews: Brew[];
   filterMethod: BrewMethod | 'all';
   groupBy: 'month' | 'coffee';
-  onFilterMethodChange: (method: BrewMethod | 'all') => void;
-  onGroupByChange: (groupBy: 'month' | 'coffee') => void;
   onNewCoffee: () => void;
   onSelectCoffee: (coffee: Coffee) => void;
   onEditCoffee: (coffee: Coffee) => void;
@@ -30,8 +27,6 @@ export function CoffeesTableView({
   brews,
   filterMethod,
   groupBy,
-  onFilterMethodChange,
-  onGroupByChange,
   onNewCoffee,
   onSelectCoffee,
   onEditCoffee,
@@ -237,43 +232,6 @@ export function CoffeesTableView({
 
   return (
     <>
-      {/* Toolbar - hidden during empty state */}
-      {filteredCoffees.length > 0 && (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 desktop-filters">
-            <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
-              <SelectTrigger className="w-[180px] cursor-default text-sm">
-                <span>
-                  {groupBy === 'month' && (
-                    <>
-                      <span className="hidden md:inline">By Roast Month</span>
-                      <span className="md:hidden">By Roast Date</span>
-                    </>
-                  )}
-                  {groupBy === 'coffee' && 'By Roaster'}
-                </span>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="month">
-                  <span className="hidden md:inline">By Roast Month</span>
-                  <span className="md:hidden">By Roast Date</span>
-                </SelectItem>
-                <SelectItem value="coffee">By Roaster</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <h2 className="mobile-section-header">
-            Previous Coffees
-          </h2>
-          
-          <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
-            <Plus className="w-4 h-4" />
-            Add Coffee
-          </Button>
-        </div>
-      )}
-
       {/* Table */}
       {filteredCoffees.length === 0 ? (
         <div className="flex flex-1 flex-col min-h-0">

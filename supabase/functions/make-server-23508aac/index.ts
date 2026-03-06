@@ -1982,6 +1982,65 @@ app.post('/make-server-23508aac/generate-coffee-bag-image', async (c) => {
 });
 
 // Get representative coffee image
+// Helper: load alias maps from KV (non-throwing)
+async function loadAliases(): Promise<{ roasterAliases: Record<string, string>; coffeeNameAliases: Record<string, string> }> {
+  try {
+    const [ra, cna] = await Promise.all([
+      kv.get('roaster-aliases'),
+      kv.get('coffee-name-aliases'),
+    ]);
+    return {
+      roasterAliases: (ra && typeof ra === 'object') ? ra as Record<string, string> : {},
+      coffeeNameAliases: (cna && typeof cna === 'object') ? cna as Record<string, string> : {},
+    };
+  } catch {
+    return { roasterAliases: {}, coffeeNameAliases: {} };
+  }
+}
+
+// Normalize a name for matching: trim whitespace and lowercase
+function normalizeName(s: string): string {
+  return s.trim().toLowerCase();
+}
+
+// Build a normalized KV key for representative images
+function repImageKey(roaster: string, coffeeName: string): string {
+  return `representative-image:${normalizeName(roaster)}|${normalizeName(coffeeName)}`;
+}
+
+// Helper: resolve a (roaster, coffeeName) pair to canonical values.
+// Alias lookups are case- and whitespace-insensitive.
+function resolveAliases(
+  roaster: string,
+  coffeeName: string,
+  roasterAliases: Record<string, string>,
+  coffeeNameAliases: Record<string, string>
+): { roaster: string; coffeeName: string } {
+  const normR = normalizeName(roaster);
+
+  // Case-insensitive roaster alias lookup; return stored canonical (original case)
+  let canonicalRoaster = roaster;
+  for (const [variant, canonical] of Object.entries(roasterAliases)) {
+    if (normalizeName(variant) === normR) {
+      canonicalRoaster = canonical;
+      break;
+    }
+  }
+
+  // Case-insensitive coffee-name alias lookup
+  const normCoffeeKey = `${normalizeName(canonicalRoaster)}|${normalizeName(coffeeName)}`;
+  let canonicalCoffeeName = coffeeName;
+  for (const [variantKey, canonicalValue] of Object.entries(coffeeNameAliases)) {
+    const [kr, kn] = variantKey.split('|');
+    if (`${normalizeName(kr)}|${normalizeName(kn)}` === normCoffeeKey) {
+      canonicalCoffeeName = canonicalValue.split('|')[1] ?? coffeeName;
+      break;
+    }
+  }
+
+  return { roaster: canonicalRoaster, coffeeName: canonicalCoffeeName };
+}
+
 app.get('/make-server-23508aac/coffee-representative-image', async (c) => {
   try {
     const roaster = c.req.query('roaster');
@@ -1991,25 +2050,33 @@ app.get('/make-server-23508aac/coffee-representative-image', async (c) => {
       return c.json({ imageUrl: null });
     }
 
-    const key = `representative-image:${roaster}|${coffeeName}`;
-    
-    // Add timeout to KV store operation with proper cleanup
+    // Skip alias resolution for the special default key
+    const isDefault = roaster === '__default__' && coffeeName === '__default__';
+
+    let effectiveRoaster = roaster;
+    let effectiveCoffeeName = coffeeName;
+
+    if (!isDefault) {
+      const { roasterAliases, coffeeNameAliases } = await loadAliases();
+      const resolved = resolveAliases(roaster, coffeeName, roasterAliases, coffeeNameAliases);
+      effectiveRoaster = resolved.roaster;
+      effectiveCoffeeName = resolved.coffeeName;
+    }
+
+    const key = repImageKey(effectiveRoaster, effectiveCoffeeName);
+
     let timeoutId: number;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutId = setTimeout(() => reject(new Error('KV timeout')), 3000);
     });
-    
+
     let imageUrl = null;
     try {
-      imageUrl = await Promise.race([
-        kv.get(key),
-        timeoutPromise
-      ]);
+      imageUrl = await Promise.race([kv.get(key), timeoutPromise]);
       clearTimeout(timeoutId!);
     } catch (kvError) {
       clearTimeout(timeoutId!);
       console.error('KV store error fetching representative image:', kvError);
-      // Return null if KV store fails - don't throw
       imageUrl = null;
     }
     
@@ -2029,8 +2096,21 @@ app.post('/make-server-23508aac/coffee-representative-image', async (c) => {
       return c.json({ error: 'Roaster, coffee name, and image URL required' }, 400);
     }
 
-    const key = `representative-image:${roaster}|${coffeeName}`;
-    
+    // Always save under the canonical key
+    const isDefault = roaster === '__default__' && coffeeName === '__default__';
+    let effectiveRoaster = roaster;
+    let effectiveCoffeeName = coffeeName;
+    if (!isDefault) {
+      const { roasterAliases, coffeeNameAliases } = await loadAliases();
+      const resolved = resolveAliases(roaster, coffeeName, roasterAliases, coffeeNameAliases);
+      effectiveRoaster = resolved.roaster;
+      effectiveCoffeeName = resolved.coffeeName;
+    }
+
+    const key = isDefault
+      ? `representative-image:${effectiveRoaster}|${effectiveCoffeeName}`
+      : repImageKey(effectiveRoaster, effectiveCoffeeName);
+
     try {
       await kv.set(key, imageUrl);
     } catch (kvError) {
@@ -2042,6 +2122,104 @@ app.post('/make-server-23508aac/coffee-representative-image', async (c) => {
   } catch (error) {
     console.error('Error saving representative image:', error);
     return c.json({ error: 'Failed to save representative image' }, 500);
+  }
+});
+
+// ─── Alias management endpoints (admin only) ─────────────────────────────────
+
+const ALIASES_ADMIN_EMAIL = 'niraj.patel.09@gmail.com';
+
+async function requireAliasAdmin(c: any): Promise<{ user: any } | Response> {
+  const authHeader = c.req.header('Authorization');
+  const accessToken = authHeader?.split(' ')[1];
+  const user = await getUser(accessToken);
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
+  if (user.email !== ALIASES_ADMIN_EMAIL) return c.json({ error: 'Forbidden' }, 403);
+  return { user };
+}
+
+// GET /aliases - return both alias maps (public read, no auth required)
+app.get('/make-server-23508aac/aliases', async (c) => {
+  try {
+    const aliases = await loadAliases();
+    return c.json(aliases);
+  } catch (error) {
+    console.error('Error fetching aliases:', error);
+    return c.json({ error: 'Failed to fetch aliases' }, 500);
+  }
+});
+
+// POST /roaster-aliases - upsert a roaster alias
+app.post('/make-server-23508aac/roaster-aliases', async (c) => {
+  try {
+    const auth = await requireAliasAdmin(c);
+    if (auth instanceof Response) return auth;
+    const { variant, canonical } = await c.req.json();
+    if (!variant || !canonical) return c.json({ error: 'variant and canonical required' }, 400);
+    if (variant === canonical) return c.json({ error: 'variant and canonical must differ' }, 400);
+    const existing = (await kv.get('roaster-aliases') ?? {}) as Record<string, string>;
+    existing[variant] = canonical;
+    await kv.set('roaster-aliases', existing);
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error saving roaster alias:', error);
+    return c.json({ error: 'Failed to save roaster alias' }, 500);
+  }
+});
+
+// DELETE /roaster-aliases - remove a roaster alias
+app.delete('/make-server-23508aac/roaster-aliases', async (c) => {
+  try {
+    const auth = await requireAliasAdmin(c);
+    if (auth instanceof Response) return auth;
+    const { variant } = await c.req.json();
+    if (!variant) return c.json({ error: 'variant required' }, 400);
+    const existing = (await kv.get('roaster-aliases') ?? {}) as Record<string, string>;
+    delete existing[variant];
+    await kv.set('roaster-aliases', existing);
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting roaster alias:', error);
+    return c.json({ error: 'Failed to delete roaster alias' }, 500);
+  }
+});
+
+// POST /coffee-name-aliases - upsert a coffee-name alias
+app.post('/make-server-23508aac/coffee-name-aliases', async (c) => {
+  try {
+    const auth = await requireAliasAdmin(c);
+    if (auth instanceof Response) return auth;
+    const { canonicalRoaster, variantCoffeeName, canonicalCoffeeName } = await c.req.json();
+    if (!canonicalRoaster || !variantCoffeeName || !canonicalCoffeeName) {
+      return c.json({ error: 'canonicalRoaster, variantCoffeeName, and canonicalCoffeeName required' }, 400);
+    }
+    if (variantCoffeeName === canonicalCoffeeName) return c.json({ error: 'variant and canonical coffee names must differ' }, 400);
+    const key = `${canonicalRoaster}|${variantCoffeeName}`;
+    const existing = (await kv.get('coffee-name-aliases') ?? {}) as Record<string, string>;
+    existing[key] = `${canonicalRoaster}|${canonicalCoffeeName}`;
+    await kv.set('coffee-name-aliases', existing);
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error saving coffee-name alias:', error);
+    return c.json({ error: 'Failed to save coffee-name alias' }, 500);
+  }
+});
+
+// DELETE /coffee-name-aliases - remove a coffee-name alias
+app.delete('/make-server-23508aac/coffee-name-aliases', async (c) => {
+  try {
+    const auth = await requireAliasAdmin(c);
+    if (auth instanceof Response) return auth;
+    const { canonicalRoaster, variantCoffeeName } = await c.req.json();
+    if (!canonicalRoaster || !variantCoffeeName) return c.json({ error: 'canonicalRoaster and variantCoffeeName required' }, 400);
+    const key = `${canonicalRoaster}|${variantCoffeeName}`;
+    const existing = (await kv.get('coffee-name-aliases') ?? {}) as Record<string, string>;
+    delete existing[key];
+    await kv.set('coffee-name-aliases', existing);
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting coffee-name alias:', error);
+    return c.json({ error: 'Failed to delete coffee-name alias' }, 500);
   }
 });
 
@@ -3469,13 +3647,29 @@ app.get('/make-server-23508aac/version', (c) => {
   return c.json({ version: '2026-01-31-cascade-delete' });
 });
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 // Wrap the app.fetch with timeout handling (but exclude streaming endpoints)
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight before anything else
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
+
   try {
     const url = new URL(req.url);
     
-    // Don't apply timeout to streaming endpoints or long-running admin scripts
-    if (url.pathname.includes('/stream') || url.pathname.includes('/lamarzocco') || url.pathname.includes('/generate-guidance-for-all')) {
+    // Don't apply timeout to streaming endpoints, long-running admin scripts, or image generation
+    if (
+      url.pathname.includes('/stream') ||
+      url.pathname.includes('/lamarzocco') ||
+      url.pathname.includes('/generate-guidance-for-all') ||
+      url.pathname.includes('/generate-coffee-bag-image')
+    ) {
       return await app.fetch(req);
     }
     
@@ -3496,7 +3690,7 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ error: 'Request failed', details: String(error) }), 
       { 
         status: 500, 
-        headers: { 'Content-Type': 'application/json' } 
+        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } 
       }
     );
   }

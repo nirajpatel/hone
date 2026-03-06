@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Coffee, Brew } from '../types';
-import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, QrCode, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
 import { Badge } from './ui/badge';
@@ -15,6 +15,7 @@ interface CoffeeDetailProps {
   onClose: () => void;
   onEdit: (coffee: Coffee) => void;
   onDuplicateCoffee?: (coffee: Coffee) => void;
+  onPrintQR?: (coffee: Coffee) => void;
   onDeleteCoffee?: (id: string) => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
@@ -23,7 +24,7 @@ interface CoffeeDetailProps {
   showNavArrows?: boolean;
 }
 
-export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext, showNavArrows }: CoffeeDetailProps) {
+export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onPrintQR, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext, showNavArrows }: CoffeeDetailProps) {
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
   const [representativeImageUrl, setRepresentativeImageUrl] = useState<string | null>(null);
 
@@ -120,6 +121,12 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
           <DropdownMenuItem onSelect={() => onDuplicateCoffee(coffee)} className="cursor-pointer">
             <Plus className="w-4 h-4 mr-2" />
             Add Another Bag
+          </DropdownMenuItem>
+        )}
+        {onPrintQR && (
+          <DropdownMenuItem onSelect={() => onPrintQR(coffee)} className="cursor-pointer">
+            <QrCode className="w-4 h-4 mr-2" />
+            Print Label
           </DropdownMenuItem>
         )}
         {onDeleteCoffee && (
