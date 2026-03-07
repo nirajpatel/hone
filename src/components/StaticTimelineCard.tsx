@@ -385,7 +385,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
           }
           .static-timeline-card h3 {
             text-align: center !important;
-            font-size: 12px !important;
+            font-size: 14px !important;
             display: block !important;
             margin-bottom: 0 !important;
           }
