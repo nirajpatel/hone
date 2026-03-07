@@ -386,6 +386,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
           .static-timeline-card h3 {
             text-align: center !important;
             font-size: 14px !important;
+            line-height: 1.4 !important;
             display: block !important;
             margin-bottom: 0 !important;
           }
@@ -393,10 +394,12 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             text-align: center !important;
             justify-content: center !important;
             font-size: 12px !important;
+            line-height: 1.4 !important;
             margin-top: 0 !important;
           }
           .static-timeline-card .roaster-label {
             font-size: 10px !important;
+            line-height: 1.4 !important;
           }
           .static-timeline-card p svg {
             width: 12px !important;
