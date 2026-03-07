@@ -395,6 +395,9 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             font-size: 12px !important;
             margin-top: 0 !important;
           }
+          .static-timeline-card .roaster-label {
+            font-size: 10px !important;
+          }
           .static-timeline-card p svg {
             width: 12px !important;
             height: 12px !important;
@@ -405,19 +408,22 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
         }
       `}</style>
       <div 
-        className="bg-white rounded-lg p-3 md:p-4 mobile-timeline-card static-timeline-card" 
+        className="bg-white rounded-lg p-4 mobile-timeline-card static-timeline-card" 
         style={{ 
           borderRadius: '0.5rem'
         }}
       >
       {/* Header */}
       <div className="mb-3">
-        <h3 className="text-gray-900" style={{ fontWeight: 'var(--font-weight-medium)' }}>
-          {coffee.roaster} – {coffee.name} • {capitalizeBrewMethod(brewMethod)}
+        <p className="roaster-label text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{coffee.roaster}</p>
+        <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>
+          {coffee.name}
         </h3>
-        <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-1">
+        <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
+          <span>{capitalizeBrewMethod(brewMethod)}</span>
+          <span>•</span>
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Dialed In • No adjustment needed</span>
+          <span>Dialed In</span>
         </p>
       </div>
 
