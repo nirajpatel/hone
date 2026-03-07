@@ -1354,7 +1354,7 @@ export default function App() {
                   onClick={() => setActiveView('coffees')}
                   className="cursor-pointer"
                 >
-                  <span>Coffees</span>
+                  <span>Beans</span>
                 </Button>
               </div>
               

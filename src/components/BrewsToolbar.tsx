@@ -156,7 +156,7 @@ export function BrewsToolbar({
       
       {/* Mobile Header */}
       <h2 className="mobile-section-header">
-        Previous Brews
+        Brews
       </h2>
       
       {!canCreateBrew ? (
