@@ -777,7 +777,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       <StandardDialog 
         open={!showCameraModal} 
         onOpenChange={(open) => !open && onClose()}
-        title="Add Coffee"
+        title={editData ? 'Edit Bean Details' : 'Add Beans'}
         titleAlign="center"
         footerContent={
           <div className="flex gap-3">
@@ -791,7 +791,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   {editData ? 'Saving...' : 'Adding...'}
                 </>
               ) : (
-                editData ? 'Save Changes' : 'Add Coffee'
+                editData ? 'Save Changes' : 'Save Beans'
               )}
             </Button>
           </div>
@@ -804,7 +804,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
-                  Auto-fill details from your bag. Photos are saved with your coffee.
+                  Auto-fill details from your bag. Photos are saved with your beans.
                 </p>
               </div>
 

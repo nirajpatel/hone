@@ -1694,7 +1694,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       <StandardDialog
         open={true}
         onOpenChange={(open) => !open && onClose()}
-        title={isEditMode ? 'Edit Brew' : 'New Brew'}
+        title={isEditMode ? 'Edit Brew Details' : 'New Brew'}
         footerContent={
           <div className="flex gap-3">
             <Button variant="outline" onClick={onClose} className="cursor-pointer" disabled={isSaving}>
@@ -1707,7 +1707,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   {isEditMode ? 'Saving...' : 'Adding...'}
                 </>
               ) : (
-                isEditMode ? 'Save Changes' : 'Add Brew'
+                isEditMode ? 'Save Changes' : 'Save Brew'
               )}
             </Button>
           </div>

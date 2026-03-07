@@ -202,7 +202,7 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
             Close
           </Button>
           <Button onClick={() => onEdit(brew)} className="flex-1 cursor-pointer">
-            Edit Brew
+            Edit Details
           </Button>
         </div>
       }

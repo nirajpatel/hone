@@ -170,7 +170,7 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
             Close
           </Button>
           <Button onClick={() => onEdit(coffee)} className="flex-1 cursor-pointer">
-            Edit Coffee
+            Edit Details
           </Button>
         </div>
       }

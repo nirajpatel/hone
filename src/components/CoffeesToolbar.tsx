@@ -102,7 +102,7 @@ export function CoffeesToolbar({
 
       <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
         <Plus className="w-4 h-4" />
-        Add Coffee
+        Add Beans
       </Button>
     </div>
   );

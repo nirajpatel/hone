@@ -250,7 +250,7 @@ export function CoffeesTableView({
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
                 <Plus className="w-4 h-4" />
-                Add Coffee
+                Add Beans
               </Button>
             </div>
           </div>

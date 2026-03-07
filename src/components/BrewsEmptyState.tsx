@@ -42,7 +42,7 @@ export function BrewsEmptyState({
 
   const nextAction =
     !step1Done
-      ? { label: 'Add Coffee', onClick: onOpenAddCoffee }
+      ? { label: 'Add Beans', onClick: onOpenAddCoffee }
       : !step2Done
         ? { label: 'Add Equipment', onClick: onOpenEquipment }
         : { label: 'New Brew', onClick: onNewBrew };
@@ -61,7 +61,7 @@ export function BrewsEmptyState({
         <div className="flex flex-col md:flex-row md:flex-wrap items-center justify-center gap-2 md:gap-y-1 md:gap-x-1 text-sm mb-6">
           <span className={step1Done ? 'text-gray-500' : firstIncomplete === 1 ? 'text-gray-900 font-medium' : 'text-gray-400'}>
             {step1Done ? <Check className="w-4 h-4 inline-block align-middle mr-1" /> : '①'}
-            {' '}Add Coffee
+            {' '}Add Beans
           </span>
           <span className="hidden md:inline shrink-0 text-gray-300" style={{ marginLeft: '0.125rem', marginRight: '0.125rem' }}>——</span>
           <span className={step2Done ? 'text-gray-500' : firstIncomplete === 2 ? 'text-gray-900 font-medium' : 'text-gray-400'}>
