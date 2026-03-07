@@ -171,7 +171,6 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
         borderRadius: '0.5rem',
         flexDirection: isDesktop ? 'row' : 'column',
         padding: isDesktop ? '0rem' : undefined,
-        paddingTop: isDesktop ? undefined : '1em',
       }}
     >
       {/* Image area */}
@@ -179,10 +178,9 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
         className="flex-shrink-0 overflow-hidden flex items-center justify-center relative"
         style={{
           backgroundColor: '#FFFFFF',
-          paddingTop: isDesktop ? undefined : '1em',
           padding: isDesktop ? '0.75rem' : undefined,
           width: isDesktop ? '179px' : '100%',
-          height: isDesktop ? '208px' : '200px',
+          height: isDesktop ? '208px' : 'calc(200px + 1em)',
           boxSizing: 'border-box',
         }}
       >
@@ -222,6 +220,7 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
                 transformStyle: 'preserve-3d',
                 opacity: imgLoaded ? 1 : 0,
                 transition: 'opacity 0.3s ease',
+                paddingTop: '1em',
               }}
               onLoad={() => setImgLoaded(true)}
             />
@@ -231,7 +230,7 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
 
       {/* Details */}
       <div
-        className="p-4 space-y-2 min-w-0"
+        className="p-4 pt-2 space-y-2 min-w-0"
         style={isDesktop ? { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: '1.5em', paddingBottom: '1.5em', paddingLeft: 0, paddingRight: '0.75rem' } : undefined}
       >
         <div className="space-y-2 min-w-0">

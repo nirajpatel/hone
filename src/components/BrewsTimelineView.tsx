@@ -321,8 +321,11 @@ export function BrewsTimelineView({
               <div key={key} className="bg-white rounded-lg border border-gray-200 p-3 md:p-4 mobile-timeline-card">
                 {/* Header with Coffee and Method */}
                 <div className="mb-3">
-                  <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.roaster} – {group.coffeeName} • {capitalizeBrewMethod(group.method)}</h3>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
+                  <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.coffeeName}</h3>
                   <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
+                    <span>{capitalizeBrewMethod(group.method)}</span>
+                    <span>•</span>
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     <span className="hidden md:inline">•</span>
                     <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
