@@ -64,8 +64,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
           skipBrowserRedirect: false,
           scopes: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid', // Explicit scopes - required for some Google Workspace; ensures user creation
           queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
+            prompt: 'select_account',
           },
         },
       });
