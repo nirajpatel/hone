@@ -318,7 +318,7 @@ export function BrewsTimelineView({
               : trendInfo;
 
             return (
-              <div key={key} className="bg-white rounded-lg border border-gray-200 p-3 md:p-4 mobile-timeline-card">
+              <div key={key} className="bg-white rounded-lg border border-gray-200 p-4 mobile-timeline-card">
                 {/* Header with Coffee and Method */}
                 <div className="mb-3">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
