@@ -117,9 +117,9 @@ export function BrewsMobileListView({
   return (
     <div className="mobile-list-view -mx-3">
       {Object.entries(grouped).map(([groupLabel, groupBrews]) => (
-        <div key={groupLabel} style={{ marginBottom: 'calc(var(--spacing))' }}>
+        <div key={groupLabel}>
           {/* Group Header */}
-          <div className="px-3 pt-2 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
+          <div className="px-3 pt-1 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
             {groupLabel}
           </div>
           

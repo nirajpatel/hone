@@ -683,7 +683,7 @@ export function CoffeesShelvesView({
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className={isDesktop ? 'space-y-2' : ''}>
           {sortedGroups.map(([groupName, coffeesInGroup]) => (
             <ScrollableShelf
                 key={groupName}
