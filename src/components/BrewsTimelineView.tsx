@@ -40,6 +40,14 @@ export function BrewsTimelineView({
   onOpenEquipment,
   onOpenAddCoffee,
 }: BrewsTimelineViewProps) {
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isMobileWidth = windowWidth < 768;
+
   // Filter brews
   const filteredBrews = filterMethod === 'all' 
     ? brews 
@@ -318,7 +326,7 @@ export function BrewsTimelineView({
               : trendInfo;
 
             return (
-              <div key={key} className="bg-white rounded-lg border border-gray-200 p-4 mobile-timeline-card">
+              <div key={key} className={`bg-white rounded-lg border border-gray-200 ${isMobileWidth ? 'p-4' : 'p-5'} mobile-timeline-card`}>
                 {/* Header with Coffee and Method */}
                 <div className="mb-3">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>

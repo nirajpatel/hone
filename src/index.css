@@ -1891,6 +1891,9 @@
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
 
   .p-6 {
     padding: calc(var(--spacing) * 6);
@@ -3825,6 +3828,7 @@ html {
     border: 1px solid #e5e7eb !important;
     border-radius: .5rem !important;
   }
+
 
   thead {
     display: none;
