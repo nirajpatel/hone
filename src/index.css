@@ -4435,15 +4435,11 @@ html {
 
 }
 
-/* Mobile timeline card gap */
-.mobile-timeline-gap > * + * {
-  margin-top: calc(var(--spacing) * 1.5);
-}
-
 /* Custom spacing utilities */
 .pt-1\.25 { padding-top: calc(var(--spacing) * 1.25); }
 .pb-1\.25 { padding-bottom: calc(var(--spacing) * 1.25); }
 .py-1\.25 { padding-top: calc(var(--spacing) * 1.25); padding-bottom: calc(var(--spacing) * 1.25); }
+.pt-2\.25 { padding-top: calc(var(--spacing) * 2.25); }
 .pt-2\.5 { padding-top: calc(var(--spacing) * 2.5); }
 .pb-1\.5 { padding-bottom: calc(var(--spacing) * 1.5); }
 
