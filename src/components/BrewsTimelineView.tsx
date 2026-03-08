@@ -320,7 +320,7 @@ export function BrewsTimelineView({
             return (
               <div key={key} className="bg-white rounded-lg border border-gray-200 p-4 mobile-timeline-card">
                 {/* Header with Coffee and Method */}
-                <div className="mb-2">
+                <div className="mb-3">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
                   <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.coffeeName}</h3>
                   <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
