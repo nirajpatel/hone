@@ -241,19 +241,6 @@ html {
 }
 
 .animate-radiate {
-  position: relative;
-}
-
-.animate-radiate::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: calc(100% + 4px);
-  height: calc(100% + 4px);
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
   animation: radiate 2s cubic-bezier(.4, 0, .6, 1) infinite;
 }
 
