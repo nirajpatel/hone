@@ -230,24 +230,21 @@ html {
 /* Radiating animation for timeline dots */
 @keyframes radiate {
   0% {
-    box-shadow: 0 0 0 0 currentColor;
     opacity: 0;
-  }
-  10% {
     box-shadow: 0 0 0 0 currentColor;
-    opacity: 0.6;
+  }
+  5% {
+    opacity: .6;
+    box-shadow: 0 0 0 0 currentColor;
   }
   100% {
-    box-shadow: 0 0 0 4px currentColor;
     opacity: 0;
+    box-shadow: 0 0 0 4px currentColor;
   }
 }
 
 .animate-radiate {
   position: relative;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
 }
 
 .animate-radiate::before {
@@ -255,11 +252,8 @@ html {
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  animation: radiate 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: radiate 2s cubic-bezier(.4, 0, .6, 1) infinite;
   pointer-events: none;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
 }
 
 /* Hide scrollbar for horizontal scroll containers */
