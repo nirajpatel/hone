@@ -26,7 +26,7 @@ export function BrewsEmptyState({
       <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
         <div className="max-w-lg mx-auto">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Brews Found</h3>
-          <p className="text-sm text-gray-600">Try changing the filter or create a new brew</p>
+          <p className="text-sm text-gray-600">Start a new brew or change the filter</p>
         </div>
       </div>
     );
@@ -52,7 +52,7 @@ export function BrewsEmptyState({
       <div className="max-w-lg mx-auto">
         <h3 className="text-xl font-semibold text-gray-900 mb-2 text-center">Let's dial in your first coffee</h3>
         <p className="text-base text-gray-600 mb-8 text-center">
-          Start by adding your coffee and equipment,
+          Start by adding your beans and equipment,
           <br />
           then log brews for personalized guidance to improve every cup.
         </p>

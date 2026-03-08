@@ -675,9 +675,9 @@ export function CoffeesShelvesView({
         <div className="flex flex-1 items-center justify-center min-h-0">
           <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
             <div className="max-w-lg mx-auto">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No coffees yet</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No beans yet</h3>
               <p className="text-base text-gray-600 mb-6">
-                Add your coffee to start logging brews and getting personalized guidance.
+                Add your beans to start logging brews and getting personalized guidance.
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
                 <Plus className="w-4 h-4" />

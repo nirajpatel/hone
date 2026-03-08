@@ -244,8 +244,8 @@ export function BrewsTableView({
 
   return (
     <>
-      {/* Toolbar - hidden during empty state */}
-      {filteredBrews.length > 0 && (
+      {/* Toolbar - hidden only when user has no brews at all */}
+      {brews.length > 0 && (
         <BrewsToolbar
           filterMethod={filterMethod}
           groupBy={groupBy}
@@ -261,19 +261,30 @@ export function BrewsTableView({
 
       {/* Table */}
       {filteredBrews.length === 0 ? (
-        <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
-          <div className="flex flex-1 items-center justify-center min-h-0">
-            <BrewsEmptyState
-            filterMethod={filterMethod}
-            hasEquipment={hasCompleteEquipment()}
-            hasCoffees={coffees.length > 0}
-            hasBrews={brews.length > 0}
-            onOpenEquipment={onOpenEquipment ?? (() => {})}
-            onOpenAddCoffee={onOpenAddCoffee ?? (() => {})}
-            onNewBrew={onNewBrew}
-            />
+        brews.length === 0 ? (
+          <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
+            <div className="flex flex-1 items-center justify-center min-h-0">
+              <BrewsEmptyState
+                filterMethod={filterMethod}
+                hasEquipment={hasCompleteEquipment()}
+                hasCoffees={coffees.length > 0}
+                hasBrews={false}
+                onOpenEquipment={onOpenEquipment ?? (() => {})}
+                onOpenAddCoffee={onOpenAddCoffee ?? (() => {})}
+                onNewBrew={onNewBrew}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center min-h-0">
+            <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+              <div className="max-w-lg mx-auto">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No {filterMethod} brews yet</h3>
+                <p className="text-sm text-gray-600">Start a new brew or change the filter</p>
+              </div>
+            </div>
+          </div>
+        )
       ) : (
         <>
           {/* Mobile View (iOS messages style) - shown on small screens */}

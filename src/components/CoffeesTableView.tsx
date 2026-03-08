@@ -239,13 +239,13 @@ export function CoffeesTableView({
             <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
             <div className="max-w-lg mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {filterMethod !== 'all' ? 'No Coffees Found' : 'No coffees yet'}
+                {filterMethod !== 'all' ? 'No Coffees Found' : 'No beans yet'}
               </h3>
               <p className="text-base text-gray-600 mb-6">
                 {filterMethod !== 'all' ? (
                   'Try changing the filter or add a new coffee'
                 ) : (
-                  'Add your coffee to start logging brews and getting personalized guidance.'
+                  'Add your beans to start logging brews and getting personalized guidance.'
                 )}
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
