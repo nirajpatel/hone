@@ -427,7 +427,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
         }}
       >
       {/* Header */}
-      <div className="mb-3">
+      <div className="mb-2">
         <p className="roaster-label text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{coffee.roaster}</p>
         <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>
           {coffee.name}
