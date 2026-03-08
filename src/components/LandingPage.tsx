@@ -573,7 +573,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-page > div,
           .landing-main {
-            gap: 1.75em !important;
+            gap: 1.5em !important;
           }
           .landing-page > div {
             padding: 16px !important;
