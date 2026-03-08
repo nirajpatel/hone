@@ -3607,10 +3607,13 @@ html {
 
 @keyframes radiate {
   0% {
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+  }
+  10% {
     opacity: .6;
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
   }
-
   100% {
     opacity: 0;
     box-shadow: 0 0 0 4px rgba(0, 0, 0, 1);

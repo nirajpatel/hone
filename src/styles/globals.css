@@ -231,6 +231,10 @@ html {
 @keyframes radiate {
   0% {
     box-shadow: 0 0 0 0 currentColor;
+    opacity: 0;
+  }
+  10% {
+    box-shadow: 0 0 0 0 currentColor;
     opacity: 0.6;
   }
   100% {
