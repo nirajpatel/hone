@@ -245,7 +245,7 @@ export function CoffeesTableView({
                 {filterMethod !== 'all' ? (
                   'Try changing the filter or add a new coffee'
                 ) : (
-                  'Add your beans to start logging brews and getting personalized guidance.'
+                  'Add your beans to log brews and start getting personalized guidance.'
                 )}
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">

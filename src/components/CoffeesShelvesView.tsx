@@ -677,7 +677,7 @@ export function CoffeesShelvesView({
             <div className="max-w-lg mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No beans yet</h3>
               <p className="text-base text-gray-600 mb-6">
-                Add your beans to start logging brews and getting personalized guidance.
+                Add your beans to log brews and start getting personalized guidance.
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
                 <Plus className="w-4 h-4" />
