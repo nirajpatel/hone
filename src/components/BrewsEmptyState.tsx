@@ -54,7 +54,7 @@ export function BrewsEmptyState({
         <p className="text-base text-gray-600 mb-8 text-center">
           Start by adding your beans and equipment,
           <br />
-          then log brews for personalized guidance to improve every cup.
+          then log brews for personalized guidance to improve every cup
         </p>
 
         {/* Stepper — vertical on mobile, horizontal on tablet+ */}
