@@ -367,9 +367,6 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
           .static-timeline-card p {
             line-height: 1.4 !important;
           }
-          .static-timeline-card .mb-2 {
-            margin-bottom: 0.75rem !important;
-          }
         }
         @media (min-width: 768px) and (max-width: 1024px) {
           .static-timeline-card {
