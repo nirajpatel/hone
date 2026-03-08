@@ -3625,8 +3625,12 @@ html {
   content: "";
   pointer-events: none;
   position: absolute;
-  inset: -2px;
-  border-radius: 9999px;
+  top: 50%;
+  left: 50%;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
   animation: radiate 2s cubic-bezier(.4, 0, .6, 1) infinite;
 }
 
