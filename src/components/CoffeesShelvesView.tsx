@@ -335,7 +335,7 @@ function ScrollableShelf({
   return (
     <div className={isDesktop ? 'space-y-2' : ''}>
       <h3
-        className={`sticky left-0${!isDesktop ? ' pt-2.25 pb-1.25' : ''}`}
+        className={`sticky left-0${!isDesktop ? ' pt-2.5 pb-1.25' : ''}`}
         style={{
           fontWeight: 'var(--font-weight-medium)',
           fontSize: isDesktop ? 'var(--text-sm)' : 'var(--text-xs)',
