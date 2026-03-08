@@ -333,8 +333,15 @@ function ScrollableShelf({
   };
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-sm text-gray-900 sticky left-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>
+    <div className={isDesktop ? 'space-y-2' : ''}>
+      <h3
+        className={`sticky left-0${!isDesktop ? ' pt-2 pb-1.25' : ''}`}
+        style={{
+          fontWeight: 'var(--font-weight-medium)',
+          fontSize: isDesktop ? 'var(--text-sm)' : 'var(--text-xs)',
+          color: isDesktop ? '#111827' : 'var(--color-gray-500)',
+        }}
+      >
         {groupName}
       </h3>
       <div className="relative group">
@@ -361,7 +368,7 @@ function ScrollableShelf({
           className="overflow-x-auto shelf-scroll-bleed scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          <div className="flex flex-row gap-4 pb-2 shelf-scroll-inner" style={{ minWidth: 'min-content' }}>
+          <div className={`flex flex-row gap-4 shelf-scroll-inner${isDesktop ? ' pb-2' : ''}`} style={{ minWidth: 'min-content' }}>
             {coffeesInGroup.map((coffee) => {
               const rating = groupBy === 'month'
                 ? getCoffeeBagRating(coffee.id)
@@ -663,7 +670,7 @@ export function CoffeesShelvesView({
   });
 
   return (
-    <div className={`space-y-6${!isDesktop ? ' pt-2' : ''}`}>
+    <div className="space-y-6">
       {/* Shelves */}
       {sortedGroups.length === 0 ? (
         <div className="flex flex-1 flex-col min-h-0">
