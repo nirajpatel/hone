@@ -419,7 +419,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           }
           .landing-text-content h1 {
             margin-top: 0 !important;
-            margin-bottom: 12px !important;
+            margin-bottom: 0.125em !important;
             font-size: clamp(1.75rem, 4vw, 2.5rem) !important;
             text-align: left !important;
           }
@@ -842,7 +842,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: 0 !important;
             margin-right: auto !important;
             width: 100% !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 0.125em !important;
           }
           .landing-text-content .landing-subtitle {
             text-align: left !important;
