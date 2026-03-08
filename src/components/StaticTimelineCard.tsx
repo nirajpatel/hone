@@ -374,9 +374,8 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             margin-left: auto !important;
             margin-right: auto !important;
           }
-          .static-timeline-card .mb-2 {
+          .static-timeline-card .mb-3 {
             text-align: center !important;
-            margin-bottom: 0.75rem !important;
           }
           .static-timeline-card h3 {
             text-align: center !important;
@@ -392,7 +391,6 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
         @media (max-width: 767px) {
           .static-timeline-card .mb-2 {
             text-align: center !important;
-            margin-bottom: 0.5em !important;
           }
           .static-timeline-card h3 {
             text-align: center !important;
@@ -428,7 +426,7 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
         }}
       >
       {/* Header */}
-      <div className="mb-2">
+      <div className={windowWidth < 768 ? 'mb-2' : 'mb-3'}>
         <p className="roaster-label text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{coffee.roaster}</p>
         <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>
           {coffee.name}

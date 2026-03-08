@@ -528,14 +528,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-bottom: 0 !important;
             font-size: 20px !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 {
             text-align: center !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 h3,
-          .landing-graph-container .static-timeline-card .mb-2 p {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 h3,
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 p {
             text-align: center !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 p {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 p {
             justify-content: center !important;
           }
           .landing-footer,
@@ -599,7 +599,7 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-graph-container .static-timeline-card {
             align-self: flex-start !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 {
             text-align: left !important;
           }
           .landing-cta-block {
@@ -797,14 +797,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
             margin-left: auto !important;
             margin-right: auto !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 {
             text-align: center !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 h3,
-          .landing-graph-container .static-timeline-card .mb-2 p {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 h3,
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 p {
             text-align: center !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 p {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 p {
             justify-content: center !important;
           }
           .landing-footer,
@@ -857,14 +857,14 @@ export function LandingPage({ onLoginSuccess }: LandingPageProps) {
           .landing-text-content .landing-subtitle {
             text-align: left !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 {
             text-align: left !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 h3,
-          .landing-graph-container .static-timeline-card .mb-2 p {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 h3,
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 p {
             text-align: left !important;
           }
-          .landing-graph-container .static-timeline-card .mb-2 p {
+          .landing-graph-container .static-timeline-card .mb-3, .landing-graph-container .static-timeline-card .mb-2 p {
             justify-content: flex-start !important;
           }
           .landing-graph-container {
