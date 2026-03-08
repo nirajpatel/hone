@@ -417,7 +417,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                 </div>
               </form>
 
-              {/* New here? Sign up - only show in sign-in flow; hide in sign-up flow */}
+              {/* New here? Sign up - only show in sign-in flow */}
               {!isSignUpMode && (
                 <div style={{ marginTop: '1rem', textAlign: 'center' }}>
                   <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>New here? </span>
@@ -439,6 +439,32 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                     }}
                   >
                     Sign up
+                  </button>
+                </div>
+              )}
+
+              {/* Have an account? Sign in - only show in sign-up flow */}
+              {isSignUpMode && (
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                  <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>Have an account? </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUpMode(false);
+                      window.history.replaceState({}, '', '/login');
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#111827',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: 0,
+                    }}
+                  >
+                    Sign in
                   </button>
                 </div>
               )}
