@@ -161,7 +161,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
     <div style={{ minHeight: '100dvh', height: '100dvh', backgroundColor: 'rgb(255, 255, 255)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Hone Branding */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <div className="text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-xl)', marginBottom: '0.5rem', color: '#111827' }}>Hone</div>
         </div>
 
@@ -257,7 +257,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
                 onClick={handleGoogleLogin}
                 disabled={isGoogleSubmitting}
                 variant="default"
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer mb-4 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-0 focus-visible:outline-none"
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:ring-0 focus-visible:outline-none"
                 style={{
                   fontWeight: 500,
                   padding: '12px 16px',
@@ -292,7 +292,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
               </Button>
 
               {/* Divider */}
-              <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', margin: '0.75rem 0' }}>
                 <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
                 <span style={{ padding: '0 1rem', color: '#6b7280', fontSize: '0.875rem' }}>or</span>
                 <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
@@ -392,7 +392,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
 
                   {/* Sign in with password instead / Use magic link instead - only in sign-in flow */}
                   {!isSignUpMode && (
-                    <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                    <div style={{ textAlign: 'center', marginTop: '0.25rem' }}>
                       <button
                         type="button"
                         onClick={() => {
@@ -419,7 +419,7 @@ export function SignInPage({ onLoginSuccess }: SignInPageProps) {
 
               {/* New here? Sign up - only show in sign-in flow; hide in sign-up flow */}
               {!isSignUpMode && (
-                <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
                   <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>New here? </span>
                   <button
                     type="button"

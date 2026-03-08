@@ -98,7 +98,7 @@ export function CoffeesToolbar({
         )}
       </div>
 
-      <h2 className="mobile-section-header">Beans</h2>
+      <h2 className="mobile-section-header">Coffee Collection</h2>
 
       <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
         <Plus className="w-4 h-4" />

@@ -1466,7 +1466,7 @@ export default function App() {
       )}
 
       {/* Main Content — grows with content so footer stays at bottom of page when content overflows */}
-      <div className="px-3 py-4 md:px-6 md:py-6 flex flex-col flex-1" style={{ flex: '1 1 auto' }}>
+      <div className="px-3 py-4 md:px-6 md:py-6 flex flex-col flex-1 mobile-page-content" style={{ flex: '1 1 auto' }}>
         {activeView === 'brews' ? (
           brewsView === 'table' ? (
             <BrewsTableView

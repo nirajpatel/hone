@@ -300,7 +300,7 @@ export function BrewsTimelineView({
           </div>
         </div>
       ) : (
-        <div className="timeline-cards-mobile-mt space-y-2 md:space-y-4">
+        <div className="space-y-2 md:space-y-4">
           {sortedGroups.map(([key, group]) => {
             // Sort brews by date ascending for timeline (oldest to newest left to right)
             const sortedExtractions = [...group.brews].sort((a, b) => 
@@ -328,7 +328,7 @@ export function BrewsTimelineView({
             return (
               <div key={key} className={`bg-white rounded-lg border border-gray-200 ${isMobileWidth ? 'p-4' : 'p-5'} mobile-timeline-card`}>
                 {/* Header with Coffee and Method */}
-                <div className="mb-2">
+                <div className="mb-3">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
                   <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.coffeeName}</h3>
                   <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
