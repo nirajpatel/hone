@@ -30,6 +30,9 @@ import { getTastingNoteSuggestions, capitalize } from '../utils/tastingNotes';
 import { getAllBrewMethodConfigs, supportsStages } from '../utils/brewMethods';
 import { FormattedAISuggestions, type AISuggestionsData, type FirstTimeSuggestionsData } from './DialInGuidance';
 
+// DEV: set to true to always show the brewing popover for UI iteration
+const DEV_SHOW_BREWING = false;
+
 // Helper function to validate numeric input
 const validateNumericInput = (value: string): string => {
   // Allow empty string
@@ -1666,22 +1669,20 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   return (
     <>
       {/* Brewing Popover - Show when La Marzocco is actively brewing */}
-      {!isEditMode && machineStatus?.state.toUpperCase() === 'BREWING' && (
+      {!isEditMode && (DEV_SHOW_BREWING || machineStatus?.state.toUpperCase() === 'BREWING') && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4" style={{ zIndex: 50 }}>
           <Card className="w-full max-w-xs">
-            <div className="p-6 flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-gray-900" />
-              <div className="text-center">
+            <div className="p-6 flex flex-col items-center" style={{ gap: '1em' }}>
+              <div className="flex flex-col items-center gap-1.5 text-center">
+                <Loader2 className="w-8 h-8 animate-spin text-gray-900" style={{ animationDuration: '1s' }} />
                 <h2 className="text-lg font-semibold">Brewing</h2>
-                {selectedCoffee && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {selectedCoffee.roaster} – {selectedCoffee.name}
-                  </p>
-                )}
               </div>
-              <p className="text-center text-sm font-normal text-gray-600">
-                Recording your brew…
-              </p>
+              {selectedCoffee && (
+                <div className="text-center">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{selectedCoffee.roaster}</p>
+                  <p className="text-sm font-medium text-gray-900" style={{ marginTop: '0.125em' }}>{selectedCoffee.name}</p>
+                </div>
+              )}
               <Button variant="outline" onClick={onClose} className="cursor-pointer w-full">
                 Stop Brew
               </Button>
@@ -1690,7 +1691,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         </div>
       )}
 
-      {!showQRScanner && !showPreviousBrews && !(machineStatus?.state.toUpperCase() === 'BREWING' && !isEditMode) && (
+      {!showQRScanner && !showPreviousBrews && !((DEV_SHOW_BREWING || machineStatus?.state.toUpperCase() === 'BREWING') && !isEditMode) && (
       <StandardDialog
         open={true}
         onOpenChange={(open) => !open && onClose()}
