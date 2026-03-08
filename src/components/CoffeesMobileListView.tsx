@@ -275,7 +275,7 @@ export function CoffeesMobileListView({
         .map(([groupLabel, groupCoffees]) => (
         <div key={groupLabel}>
           {/* Group Header */}
-          <div className="px-3 pt-1 pb-1" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
+          <div className="px-3 py-1.25" style={{ color: 'var(--color-gray-500)', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-weight-medium)' }}>
             {groupLabel}
           </div>
           

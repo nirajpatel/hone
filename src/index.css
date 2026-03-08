@@ -4435,6 +4435,11 @@ html {
 
 }
 
+/* Custom spacing utilities */
+.pt-1\.25 { padding-top: calc(var(--spacing) * 1.25); }
+.pb-1\.25 { padding-bottom: calc(var(--spacing) * 1.25); }
+.py-1\.25 { padding-top: calc(var(--spacing) * 1.25); padding-bottom: calc(var(--spacing) * 1.25); }
+
 /* Empty state card: no background/border on tablet+ (loads after Tailwind so it wins) */
 @media (min-width: 768px) {
   .empty-state-card-md {
