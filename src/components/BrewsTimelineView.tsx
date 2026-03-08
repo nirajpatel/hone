@@ -300,7 +300,7 @@ export function BrewsTimelineView({
           </div>
         </div>
       ) : (
-        <div className={`space-y-2 md:space-y-4${isMobileWidth ? ' pt-1' : ''}`}>
+        <div className={`space-y-2 md:space-y-4${isMobileWidth ? ' pt-2' : ''}`}>
           {sortedGroups.map(([key, group]) => {
             // Sort brews by date ascending for timeline (oldest to newest left to right)
             const sortedExtractions = [...group.brews].sort((a, b) => 

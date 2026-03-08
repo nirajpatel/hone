@@ -663,7 +663,7 @@ export function CoffeesShelvesView({
   });
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6${!isDesktop ? ' pt-2' : ''}`}>
       {/* Shelves */}
       {sortedGroups.length === 0 ? (
         <div className="flex flex-1 flex-col min-h-0">
