@@ -3805,7 +3805,7 @@ html {
     order: 3;
     align-items: center;
     gap: 0.5rem;
-    margin: 0.5em -0.75rem 0;
+    margin: 0.75em -0.75rem 0;
     padding: 0 0.75rem 0;
     flex-direction: row !important;
     display: flex !important;
