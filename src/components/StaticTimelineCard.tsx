@@ -367,6 +367,9 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
           .static-timeline-card p {
             line-height: 1.4 !important;
           }
+          .static-timeline-card .mb-2 {
+            margin-bottom: 0.5rem !important;
+          }
         }
         @media (min-width: 768px) and (max-width: 1024px) {
           .static-timeline-card {
@@ -374,8 +377,9 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
             margin-left: auto !important;
             margin-right: auto !important;
           }
-          .static-timeline-card .mb-3 {
+          .static-timeline-card .mb-2 {
             text-align: center !important;
+            margin-bottom: 0.5rem !important;
           }
           .static-timeline-card h3 {
             text-align: center !important;
@@ -389,9 +393,9 @@ export function StaticTimelineCard({ coffee, brews }: StaticTimelineCardProps) {
           }
         }
         @media (max-width: 767px) {
-          .static-timeline-card .mb-3 {
+          .static-timeline-card .mb-2 {
             text-align: center !important;
-            margin-bottom: 0.25em !important;
+            margin-bottom: 0.5em !important;
           }
           .static-timeline-card h3 {
             text-align: center !important;
