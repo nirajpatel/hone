@@ -3753,8 +3753,15 @@ html {
     display: block !important;
   }
 
-  [data-slot="dialog-content"], [data-slot="sheet-content"] {
+  [data-slot="dialog-content"], [data-slot="sheet-content"], [data-slot="alert-dialog-content"] {
     padding: 1rem !important;
+  }
+
+  [data-slot="alert-dialog-header"] {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 
   /* ── Mobile page layout: shared style for add-button / header / toolbar ── */
