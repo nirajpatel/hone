@@ -3780,7 +3780,7 @@ html {
   .flex.items-center.justify-between.mb-4:not(.equipment-section-header) .mobile-add-button {
     order: 1;
     width: 100%;
-    margin: 0.5em 0 0 0;
+    margin: 0.75em 0 0 0;
   }
 
   /* 2. Page header — side margins expand to full width; no vertical margins/padding creating gaps */
