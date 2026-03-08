@@ -1531,14 +1531,15 @@ export default function App() {
           )
         ) : (
           <>
-            <CoffeesToolbar
-              view={coffeesView}
-              groupBy={groupBy}
-              onViewChange={setCoffeesView}
-              onGroupByChange={setGroupBy}
-              onNewCoffee={() => setShowAddCoffee(true)}
-              isEmpty={coffees.length === 0}
-            />
+            {coffees.length > 0 && (
+              <CoffeesToolbar
+                view={coffeesView}
+                groupBy={groupBy}
+                onViewChange={setCoffeesView}
+                onGroupByChange={setGroupBy}
+                onNewCoffee={() => setShowAddCoffee(true)}
+              />
+            )}
             {coffeesView === 'table' ? (
               <CoffeesTableView
                 coffees={coffees}
@@ -1553,18 +1554,16 @@ export default function App() {
                 onPrintQR={setQrCodeCoffee}
               />
             ) : (
-              <div className="shelf-content-top-margin">
-                <CoffeesShelvesView
-                  coffees={coffees}
-                  brews={brews}
-                  groupBy={groupBy}
-                  onNewCoffee={() => setShowAddCoffee(true)}
-                  onSelectCoffee={(coffee, siblings) => {
-                    setSelectedCoffee(coffee);
-                    setSelectedCoffeeSiblings(siblings ?? null);
-                  }}
-                />
-              </div>
+              <CoffeesShelvesView
+                coffees={coffees}
+                brews={brews}
+                groupBy={groupBy}
+                onNewCoffee={() => setShowAddCoffee(true)}
+                onSelectCoffee={(coffee, siblings) => {
+                  setSelectedCoffee(coffee);
+                  setSelectedCoffeeSiblings(siblings ?? null);
+                }}
+              />
             )}
           </>
         )}

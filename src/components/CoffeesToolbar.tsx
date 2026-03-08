@@ -9,7 +9,6 @@ interface CoffeesToolbarProps {
   onViewChange: (view: 'shelf' | 'table') => void;
   onGroupByChange: (groupBy: 'month' | 'coffee') => void;
   onNewCoffee: () => void;
-  isEmpty?: boolean;
 }
 
 export function CoffeesToolbar({
@@ -18,13 +17,10 @@ export function CoffeesToolbar({
   onViewChange,
   onGroupByChange,
   onNewCoffee,
-  isEmpty = false,
 }: CoffeesToolbarProps) {
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2 desktop-filters">
-        {!isEmpty && (
-          <>
             {/* View Toggle: Shelf (left) | Table (right) */}
             <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
               <div className="hidden md:block">
@@ -94,8 +90,6 @@ export function CoffeesToolbar({
                 <SelectItem value="coffee">By Roaster</SelectItem>
               </SelectContent>
             </Select>
-          </>
-        )}
       </div>
 
       <h2 className="mobile-section-header">Coffee Collection</h2>

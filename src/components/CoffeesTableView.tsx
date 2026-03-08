@@ -234,7 +234,7 @@ export function CoffeesTableView({
     <>
       {/* Table */}
       {filteredCoffees.length === 0 ? (
-        <div className="flex flex-1 flex-col min-h-0">
+        <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
           <div className="flex flex-1 items-center justify-center min-h-0">
             <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
             <div className="max-w-lg mx-auto">

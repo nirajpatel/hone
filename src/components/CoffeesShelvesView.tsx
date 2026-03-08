@@ -669,44 +669,45 @@ export function CoffeesShelvesView({
     }
   });
 
-  return (
-    <div className="space-y-6">
-      {/* Shelves */}
-      {sortedGroups.length === 0 ? (
-        <div className="flex flex-1 flex-col min-h-0">
-          <div className="flex flex-1 items-center justify-center min-h-0">
-            <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
-              <div className="max-w-lg mx-auto">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No coffees yet</h3>
-                <p className="text-base text-gray-600 mb-6">
-                  Add your coffee to start logging brews and getting personalized guidance.
-                </p>
-                <Button onClick={onNewCoffee} className="cursor-pointer">
-                  <Plus className="w-4 h-4" />
-                  Add Beans
-                </Button>
-              </div>
+  if (sortedGroups.length === 0) {
+    return (
+      <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
+        <div className="flex flex-1 items-center justify-center min-h-0">
+          <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
+            <div className="max-w-lg mx-auto">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No coffees yet</h3>
+              <p className="text-base text-gray-600 mb-6">
+                Add your coffee to start logging brews and getting personalized guidance.
+              </p>
+              <Button onClick={onNewCoffee} className="cursor-pointer">
+                <Plus className="w-4 h-4" />
+                Add Beans
+              </Button>
             </div>
           </div>
         </div>
-      ) : (
-        <div className={isDesktop ? 'space-y-2' : ''}>
-          {sortedGroups.map(([groupName, coffeesInGroup]) => (
-            <ScrollableShelf
-                key={groupName}
-                groupName={groupName}
-                coffeesInGroup={[...coffeesInGroup].sort((a, b) => (b.roastDate ?? '').localeCompare(a.roastDate ?? ''))}
-                groupBy={groupBy}
-                allCoffees={coffees}
-                isDesktop={isDesktop}
-                getCoffeeImage={getCoffeeImage}
-                getCoffeeBagRating={getCoffeeBagRating}
-                getAggregatedCoffeeRating={getAggregatedCoffeeRating}
-                onSelectCoffee={onSelectCoffee}
-              />
-          ))}
-        </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className={isDesktop ? 'space-y-2' : ''}>
+        {sortedGroups.map(([groupName, coffeesInGroup]) => (
+          <ScrollableShelf
+              key={groupName}
+              groupName={groupName}
+              coffeesInGroup={[...coffeesInGroup].sort((a, b) => (b.roastDate ?? '').localeCompare(a.roastDate ?? ''))}
+              groupBy={groupBy}
+              allCoffees={coffees}
+              isDesktop={isDesktop}
+              getCoffeeImage={getCoffeeImage}
+              getCoffeeBagRating={getCoffeeBagRating}
+              getAggregatedCoffeeRating={getAggregatedCoffeeRating}
+              onSelectCoffee={onSelectCoffee}
+            />
+        ))}
+      </div>
     </div>
   );
 }
