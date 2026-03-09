@@ -71,17 +71,20 @@ export function QRCodeDialog({ coffee, onClose }: QRCodeDialogProps) {
               box-sizing: border-box;
             }
             h1 {
-              font-size: 13pt;
-              margin: 0 0 3px 0;
-              font-weight: 600;
+              font-size: 7pt;
+              margin: 0 0 1px 0;
+              font-weight: 500;
               line-height: 1.2;
               text-align: center;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              color: #666;
             }
             h2 {
-              font-size: 11pt;
+              font-size: 13pt;
               margin: 0 0 3px 0;
               font-weight: 500;
-              color: #444;
+              color: #111;
               line-height: 1.2;
               text-align: center;
             }
@@ -146,10 +149,10 @@ export function QRCodeDialog({ coffee, onClose }: QRCodeDialogProps) {
       maxWidth="28rem"
     >
       <div className="space-y-4">
-        <div className="text-center space-y-2">
-          <div className="font-medium text-gray-900">{coffee.roaster}</div>
-          <div className="text-gray-700">{coffee.name}</div>
-          <div className="text-sm text-gray-500">
+        <div className="text-center">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{coffee.roaster}</p>
+          <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{coffee.name}</h3>
+          <div className="text-sm text-gray-500 mt-1">
             Roasted {formatRoastDate(coffee.roastDate)}
           </div>
         </div>
@@ -157,7 +160,7 @@ export function QRCodeDialog({ coffee, onClose }: QRCodeDialogProps) {
           <QRCodeCanvas value={coffee.id} size={256} level="H" />
         </div>
         <div className="text-sm text-gray-600 text-center">
-          This label can be used to track beans and scanned whenever adding a new brew.
+          This label can be used to track beans and scanned whenever starting a new brew.
         </div>
         <Button onClick={handlePrint} className="w-full cursor-pointer">
           <Printer className="w-4 h-4 mr-2" />
