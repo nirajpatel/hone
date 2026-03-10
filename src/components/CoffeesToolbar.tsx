@@ -22,7 +22,7 @@ export function CoffeesToolbar({
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2 desktop-filters">
             {/* View Toggle: Shelf (left) | Table (right) */}
-            <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
+            <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-lg p-0.5 flex-none">
               <div className="hidden md:block">
                 <DelayedHelpTooltip content="Shelf">
                   <Button

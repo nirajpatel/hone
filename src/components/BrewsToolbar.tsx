@@ -69,7 +69,7 @@ export function BrewsToolbar({
         {!isEmpty && (
           <>
             {/* View Toggle Buttons */}
-            <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-md p-0.5 flex-none">
+            <div className="view-toggle flex items-center gap-0.5 border border-gray-200 rounded-lg p-0.5 flex-none">
               <div className="hidden md:block">
                 <DelayedHelpTooltip content="Timeline">
                   <Button
