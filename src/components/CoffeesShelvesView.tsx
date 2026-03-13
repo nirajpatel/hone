@@ -13,6 +13,12 @@ import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
 const _repImageCache = new Map<string, string>(); // key -> url ('' means confirmed no image)
 let _defaultImageCache: string | null | '__loading__' = null;
 
+/** Update the representative image cache from outside the component (e.g. after auto-generating a bag image). */
+export function setRepImageCacheEntry(roaster: string, coffeeName: string, imageUrl: string) {
+  const key = `${roaster.trim().toLowerCase()}|${coffeeName.trim().toLowerCase()}`;
+  _repImageCache.set(key, imageUrl);
+}
+
 /** Shows as many full tasting notes as fit in one line, then "+n" with tooltip; measures to avoid mid-word truncation */
 function TastingNotesLine({ notes }: { notes: string[] }) {
   const titled = notes.map(n => toTitleCase(n));
@@ -465,7 +471,8 @@ export function CoffeesShelvesView({
       const coffeeArray = Array.from(uniqueCoffees.values());
 
       if (coffeeArray.length === 0 && _defaultImageCache !== null && _defaultImageCache !== '__loading__') {
-        // Everything already cached — nothing to fetch
+        // Everything already cached — sync state from cache in case entries were added externally
+        setRepresentativeImages(new Map(_repImageCache));
         setLoadingImages(false);
         return;
       }

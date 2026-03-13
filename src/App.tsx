@@ -10,7 +10,8 @@ import { LandingPage } from './components/LandingPage';
 import { SignInPage } from './components/SignInPage';
 import { BrewsTableView } from './components/BrewsTableView';
 import { BrewsTimelineView } from './components/BrewsTimelineView';
-import { CoffeesShelvesView } from './components/CoffeesShelvesView';
+import { CoffeesShelvesView, setRepImageCacheEntry } from './components/CoffeesShelvesView';
+import { generateDefaultBagImage, hasRepresentativeImage, saveRepresentativeImage } from './utils/generateBagImage';
 import { CoffeesTableView } from './components/CoffeesTableView';
 import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { Profile } from './components/Profile';
@@ -729,6 +730,24 @@ export default function App() {
 
       if (res.ok) {
         const newCoffee = await res.json();
+
+        // Generate bag image BEFORE updating coffees state so the shelves
+        // effect finds the cache already populated (avoids race condition).
+        try {
+          const alreadyHasImage = await hasRepresentativeImage(newCoffee.roaster, newCoffee.name);
+          if (!alreadyHasImage) {
+            const dataUrl = await generateDefaultBagImage(newCoffee.roaster, newCoffee.name);
+            if (dataUrl) {
+              const saved = await saveRepresentativeImage(newCoffee.roaster, newCoffee.name, dataUrl);
+              if (saved) {
+                setRepImageCacheEntry(newCoffee.roaster, newCoffee.name, dataUrl);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Auto bag image generation failed:', e);
+        }
+
         setCoffees([...coffees, newCoffee]);
         setShowAddCoffee(false);
         toast.success('Coffee added');
