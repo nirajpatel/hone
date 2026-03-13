@@ -750,22 +750,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
 
     if (allExtractions.length === 0) return '';
 
-    // Build points array - include button if it exists
     const points: [number, number][] = allExtractions.map(item => [item.x, item.y]);
-    
-    // If button exists, add intermediate point at 90% then button
-    if (coffeeId && brewMethod && onAddExtraction) {
-      const lastExtractionX = allExtractions[allExtractions.length - 1].x;
-      const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
-      const buttonY = isMobile ? 45 : 60; // Responsive center position
-      
-      // Add intermediate point at 90% of the distance, at vertical center
-      const intermediateX = lastExtractionX + 0.9 * (buttonCenterX - lastExtractionX);
-      points.push([intermediateX, buttonY]);
-      
-      // Then add the button point
-      points.push([buttonCenterX, buttonY]);
-    }
 
     const lineGenerator = line<[number, number]>()
       .x(d => d[0])
@@ -854,22 +839,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
 
     if (allExtractions.length === 0) return '';
 
-    // Build points array - include button if it exists to match the line curve
     const points: [number, number][] = allExtractions.map(item => [item.x, item.y]);
-    
-    // If button exists, add intermediate point at 90% then button (match the line path)
-    if (coffeeId && brewMethod && onAddExtraction) {
-      const lastExtractionX = allExtractions[allExtractions.length - 1].x;
-      const buttonCenterX = brews.length * (containerWidth + gap) + containerWidth / 2;
-      const buttonY = isMobile ? 45 : 60; // Responsive center position
-      
-      // Add intermediate point at 90% of the distance, at vertical center
-      const intermediateX = lastExtractionX + 0.9 * (buttonCenterX - lastExtractionX);
-      points.push([intermediateX, buttonY]);
-      
-      // Then add the button point
-      points.push([buttonCenterX, buttonY]);
-    }
 
     const areaGenerator = area<[number, number]>()
       .x(d => d[0])
