@@ -123,6 +123,29 @@ export default function App() {
     return session?.access_token || null;
   };
 
+  // Refresh data when app resumes from iOS home screen frozen state
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && currentUser && accessToken) {
+        fetchData();
+      }
+    };
+
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        window.location.reload();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [currentUser, accessToken]);
+
   // Version check - poll server for updates every 30 seconds
   useEffect(() => {
     const checkVersion = async () => {
