@@ -1,5 +1,5 @@
-import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2, FileText } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { formatTime, formatExtractionTime } from './TimeInput';
 import { Brew, BrewMethod, User as UserType } from '../types';
 import { Button } from './ui/button';
@@ -25,11 +25,15 @@ interface BrewDetailProps {
   hasNext?: boolean;
   scrollToGuidance?: boolean;
   onScrollComplete?: () => void;
+  onViewGuidancePrompt?: (brew: Brew) => Promise<{ systemMessage: string; userPrompt: string }>;
 }
 
-export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext, scrollToGuidance, onScrollComplete }: BrewDetailProps) {
+export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext, scrollToGuidance, onScrollComplete, onViewGuidancePrompt }: BrewDetailProps) {
   const guidanceRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
+  const [showGuidancePrompt, setShowGuidancePrompt] = useState(false);
+  const [guidancePromptData, setGuidancePromptData] = useState<{ systemMessage: string; userPrompt: string } | null>(null);
+  const [loadingPrompt, setLoadingPrompt] = useState(false);
 
   // Scroll to guidance section
   const scrollToGuidanceSection = (element: HTMLDivElement) => {
@@ -179,6 +183,27 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
             Brew From This
           </DropdownMenuItem>
         )}
+        {onViewGuidancePrompt && (
+          <DropdownMenuItem
+            onSelect={async () => {
+              setLoadingPrompt(true);
+              setShowGuidancePrompt(true);
+              try {
+                const data = await onViewGuidancePrompt(brew);
+                setGuidancePromptData(data);
+              } catch (e) {
+                console.error('Failed to fetch guidance prompt:', e);
+                setGuidancePromptData({ systemMessage: 'Error', userPrompt: 'Failed to fetch guidance prompt.' });
+              } finally {
+                setLoadingPrompt(false);
+              }
+            }}
+            className="cursor-pointer"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            Guidance Prompt
+          </DropdownMenuItem>
+        )}
         {onDeleteBrew && (
           <DropdownMenuItem onSelect={() => onDeleteBrew(brew.id)} className="cursor-pointer">
             <Trash2 className="w-4 h-4 mr-2" />
@@ -190,6 +215,7 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
   );
 
   return (
+    <>
     <StandardDialog
       open={true}
       onOpenChange={(open) => !open && onClose()}
@@ -462,5 +488,59 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
             </div>
       </div>
     </StandardDialog>
+
+    {showGuidancePrompt && (
+      <StandardDialog
+        open={showGuidancePrompt}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowGuidancePrompt(false);
+            setGuidancePromptData(null);
+          }
+        }}
+        title="Guidance Prompt"
+        subtitle="Debug view of the prompt sent to the AI model"
+        footerContent={
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => { setShowGuidancePrompt(false); setGuidancePromptData(null); }} className="cursor-pointer flex-1">
+              Close
+            </Button>
+            {guidancePromptData && (
+              <Button
+                onClick={() => {
+                  const text = `=== SYSTEM MESSAGE ===\n${guidancePromptData.systemMessage}\n\n=== USER PROMPT ===\n${guidancePromptData.userPrompt}`;
+                  navigator.clipboard.writeText(text);
+                }}
+                className="cursor-pointer flex-1"
+              >
+                Copy to Clipboard
+              </Button>
+            )}
+          </div>
+        }
+      >
+        {loadingPrompt ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-gray-900" />
+          </div>
+        ) : guidancePromptData ? (
+          <div className="space-y-4">
+            <div>
+              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">System Message</h4>
+              <pre className="text-xs text-gray-800 bg-gray-50 rounded-lg p-3 whitespace-pre-wrap break-words border border-gray-200 max-h-32 overflow-y-auto">
+                {guidancePromptData.systemMessage}
+              </pre>
+            </div>
+            <div>
+              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">User Prompt</h4>
+              <pre className="text-xs text-gray-800 bg-gray-50 rounded-lg p-3 whitespace-pre-wrap break-words border border-gray-200 max-h-[60vh] overflow-y-auto">
+                {guidancePromptData.userPrompt}
+              </pre>
+            </div>
+          </div>
+        ) : null}
+      </StandardDialog>
+    )}
+  </>
   );
 }

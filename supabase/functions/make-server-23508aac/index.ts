@@ -2584,7 +2584,7 @@ REQUIREMENTS:
 // Get AI suggestions for improving brew
 app.post('/make-server-23508aac/brew-suggestions', async (c) => {
   try {
-    const { coffee, brews, brewMethod, targetBrewId, brewerName, grinderName } = await c.req.json();
+    const { coffee, brews, brewMethod, targetBrewId, brewerName, grinderName, debugPrompt } = await c.req.json();
     
     if (!coffee) {
       return c.json({ error: 'Coffee data required' }, 400);
@@ -2835,6 +2835,10 @@ REQUIREMENTS:
 - You must provide at least 1 suggestion and at most 3 suggestions
 - Each suggestion must follow the structure: Action → Expected effect → Why it matters (based on history)
 - Only include high-quality, non-redundant suggestions`;
+    }
+
+    if (debugPrompt) {
+      return c.json({ systemMessage, userPrompt: prompt });
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
