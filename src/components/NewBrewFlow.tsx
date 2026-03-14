@@ -1256,7 +1256,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         if (container) {
           const firstInput = container.querySelector('input');
           if (firstInput) {
-            (firstInput as HTMLInputElement).focus();
+            (firstInput as HTMLInputElement).focus({ preventScroll: true });
           }
         }
       }, 50);
@@ -2720,11 +2720,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                               setTimeout(() => {
                                 const weightInput = stageWeightRefs.current[index];
                                 if (weightInput) {
-                                  weightInput.focus();
+                                  weightInput.focus({ preventScroll: true });
                                 } else {
-                                  // Fallback: Query DOM directly if ref isn't set yet
                                   const input = document.getElementById(`stage-${index}-weight`) as HTMLInputElement;
-                                  input?.focus();
+                                  input?.focus({ preventScroll: true });
                                 }
                               }, 100);
                             }}
