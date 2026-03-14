@@ -731,33 +731,43 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     previousBrewingStateRef.current = currentBrewingState || null;
   }, [machineStatus?.state, isEditMode, isEspresso]);
 
-  // Fetch equipment on mount
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      setEquipmentLoading(true);
-      try {
-        const response = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/equipment`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setEquipment(data);
+  // Fetch equipment on mount and when app resumes from background
+  const fetchEquipment = async () => {
+    setEquipmentLoading(true);
+    try {
+      const response = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/equipment`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
-      } catch (error) {
-        console.error('Error fetching equipment:', error);
-      } finally {
-        setEquipmentLoading(false);
-      }
-    };
+      );
 
+      if (response.ok) {
+        const data = await response.json();
+        setEquipment(data);
+      }
+    } catch (error) {
+      console.error('Error fetching equipment:', error);
+    } finally {
+      setEquipmentLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchEquipment();
   }, [accessToken, equipmentChangeCounter]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchEquipment();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [accessToken]);
 
   // Auto-select equipment when coffee or brew method changes or equipment loads
   useEffect(() => {
