@@ -472,7 +472,7 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
             {/* Dial-In Guidance */}
             {brew.suggestion?.full && (
               <div ref={setGuidanceRef} id="dial-in-guidance" className="border-t border-gray-200 pt-6 mb-6">
-                <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Dial-In Guidance</h3>
+                <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Next Brew: Dial-In Guidance</h3>
                 <FormattedAISuggestions suggestions={brew.suggestion.full} />
               </div>
             )}

@@ -1616,15 +1616,23 @@ export default function App() {
       </div>
 
       {selectedBrew && (() => {
-        // Get flat list of filtered brews in table order
-        const flatBrews: Brew[] = [];
-        Object.entries(groupedBrews).forEach(([_, groupBrews]) => {
-          flatBrews.push(...groupBrews);
-        });
+        // In timeline view, navigate between brews of the same coffee
+        // In table view, navigate through all brews in table order
+        const navBrews = brewsView === 'timeline'
+          ? brews
+              .filter(b => b.coffeeId === selectedBrew.coffeeId)
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          : (() => {
+              const flat: Brew[] = [];
+              Object.entries(groupedBrews).forEach(([_, groupBrews]) => {
+                flat.push(...groupBrews);
+              });
+              return flat;
+            })();
         
-        const currentIndex = flatBrews.findIndex(e => e.id === selectedBrew.id);
+        const currentIndex = navBrews.findIndex(e => e.id === selectedBrew.id);
         const hasPrev = currentIndex > 0;
-        const hasNext = currentIndex < flatBrews.length - 1;
+        const hasNext = currentIndex < navBrews.length - 1;
         
         return (
           <BrewDetail
@@ -1712,11 +1720,11 @@ export default function App() {
             } : undefined}
             onNavigatePrev={hasPrev ? () => {
               setScrollToGuidance(false);
-              setSelectedBrew(flatBrews[currentIndex - 1]);
+              setSelectedBrew(navBrews[currentIndex - 1]);
             } : undefined}
             onNavigateNext={hasNext ? () => {
               setScrollToGuidance(false);
-              setSelectedBrew(flatBrews[currentIndex + 1]);
+              setSelectedBrew(navBrews[currentIndex + 1]);
             } : undefined}
             hasPrev={hasPrev}
             hasNext={hasNext}
