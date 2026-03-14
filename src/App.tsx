@@ -126,9 +126,13 @@ export default function App() {
 
   // Refresh data when app resumes from iOS home screen frozen state
   useEffect(() => {
-    const handleVisibilityChange = () => {
+    const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible' && currentUser && accessToken) {
-        fetchData();
+        const freshToken = await getAccessToken();
+        if (freshToken) {
+          setAccessToken(freshToken);
+          fetchData(freshToken);
+        }
       }
     };
 
@@ -545,7 +549,7 @@ export default function App() {
   };
 
   const fetchData = async (token?: string) => {
-    const authToken = token || accessToken;
+    const authToken = token || await getAccessToken() || accessToken;
     if (!authToken) {
       console.error('No access token available');
       return;

@@ -783,6 +783,29 @@ html, body {
   z-index: 2;
 }
 
+/* Mobile: full-viewport dialogs */
+@media (max-width: 639px) {
+  [data-slot="dialog-overlay"] {
+    background: var(--background, #ffffff) !important;
+  }
+
+  [data-slot="dialog-content"] {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  [data-slot="dialog-content"] > div {
+    max-height: none !important;
+  }
+}
+
 /* Desktop and Tablet overrides - reset mobile-specific toolbar styling */
 @media (min-width: 768px) {
   .timeline-line {

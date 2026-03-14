@@ -4476,3 +4476,31 @@ html {
   animation: voice-value-flash-kf 0.6s ease-out;
   border-radius: 4px;
 }
+
+/* Mobile: full-viewport dialogs that look like pages */
+@media (max-width: 639px) {
+  [data-slot="dialog-overlay"] {
+    background: var(--background, #ffffff) !important;
+  }
+
+  .fixed.inset-0:has(> [data-slot="dialog-content"]) {
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  [data-slot="dialog-content"] {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  [data-slot="dialog-content"] > div {
+    max-height: none !important;
+  }
+}
