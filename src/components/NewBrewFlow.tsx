@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Coffee, BrewMethod, User, Brew, CoffeeTemperature, BrewStage, Equipment } from '../types';
-import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale } from 'lucide-react';
+import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale, Mic } from 'lucide-react';
 import { StandardDialog } from './ui/standard-dialog';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -29,6 +29,8 @@ import { GrinderIcon } from './icons/GrinderIcon';
 import { getTastingNoteSuggestions, capitalize } from '../utils/tastingNotes';
 import { getAllBrewMethodConfigs, supportsStages } from '../utils/brewMethods';
 import { FormattedAISuggestions, type AISuggestionsData, type FirstTimeSuggestionsData } from './DialInGuidance';
+import { VoiceStagesMode } from './VoiceStagesMode';
+import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
 // DEV: set to true to always show the brewing popover for UI iteration
 const DEV_SHOW_BREWING = false;
@@ -189,6 +191,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const stageWeightRefs = useRef<(HTMLInputElement | null)[]>([]);
   const stageContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const shouldFocusNewStage = useRef(false);
+
+  // Voice mode for stages
+  const [voiceMode, setVoiceMode] = useState(false);
+  const { isSupported: voiceSupported } = useVoiceRecognition();
 
   // Tasting notes
   const [tastingNotesPills, setTastingNotesPills] = useState<string[]>([]);
@@ -2654,8 +2660,31 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             {/* Pour Over: Multiple stages */}
             {supportsStages(brewMethod) && (
               <div>
-                <Label>Brew Stages</Label>
-                
+                <div className="flex items-center justify-between">
+                  <Label>Brew Stages</Label>
+                  {voiceSupported && (
+                    <Button
+                      type="button"
+                      variant={voiceMode ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVoiceMode(prev => !prev)}
+                      className={`cursor-pointer gap-1.5 h-7 text-xs ${voiceMode ? 'bg-red-500 hover:bg-red-600 text-white' : ''}`}
+                    >
+                      <Mic className="w-3.5 h-3.5" />
+                      {voiceMode ? 'Stop' : 'Voice Mode'}
+                    </Button>
+                  )}
+                </div>
+
+                {voiceMode ? (
+                  <div className="mt-2">
+                    <VoiceStagesMode
+                      stages={stages}
+                      setStages={setStages}
+                      onExit={() => setVoiceMode(false)}
+                    />
+                  </div>
+                ) : (
                 <div className="mt-2 space-y-3">
                   {stages.map((stage, index) => (
                     <div 
@@ -2771,6 +2800,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     <span>Add Stage</span>
                   </Button>
                 </div>
+                )}
               </div>
             )}
 
