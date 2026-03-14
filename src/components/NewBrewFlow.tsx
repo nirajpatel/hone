@@ -229,6 +229,12 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const [browseAllIndex, setBrowseAllIndex] = useState(0);
   const lastSuggestionBrewIdRef = useRef<string>('');
 
+  useEffect(() => {
+    if (voiceMode && brewStagesRef.current) {
+      brewStagesRef.current.scrollIntoView({ block: 'start' });
+    }
+  }, [voiceMode, loadingSuggestions, suggestions, thinkingText]);
+
   const isEditMode = !!editingBrew;
 
   // La Marzocco machine status
@@ -2668,15 +2674,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                       type="button"
                       variant={voiceMode ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => {
-                        const entering = !voiceMode;
-                        setVoiceMode(prev => !prev);
-                        if (entering) {
-                          requestAnimationFrame(() => {
-                            brewStagesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          });
-                        }
-                      }}
+                      onClick={() => setVoiceMode(prev => !prev)}
                       className={`cursor-pointer gap-1.5 h-7 text-xs ${voiceMode ? 'bg-red-500 hover:bg-red-600 text-white' : ''}`}
                     >
                       <Mic className="w-3.5 h-3.5" />

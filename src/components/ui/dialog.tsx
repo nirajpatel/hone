@@ -58,7 +58,7 @@ function DialogContent({
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
-      <div className="fixed inset-0 sm:inset-auto sm:top-[50%] sm:left-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] z-50 flex flex-col items-center gap-0 sm:gap-4 w-full sm:max-w-[40rem] pointer-events-none">
+      <div className="fixed inset-4 sm:top-[50%] sm:left-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:inset-auto z-50 flex flex-col items-center gap-4 w-auto sm:w-full sm:max-w-[40rem] pointer-events-none">
         {/* Side arrows — tablet and desktop */}
         {sideNavLeft && (
           <div className="hidden md:block absolute top-1/2 -translate-y-1/2 pointer-events-auto z-10" style={{ left: '-20px' }}>
@@ -73,7 +73,7 @@ function DialogContent({
         <DialogPrimitive.Content
           data-slot="dialog-content"
           className={cn(
-            "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 grid w-full flex-1 sm:flex-initial min-h-0 gap-0 rounded-none sm:rounded-lg border-0 sm:border p-6 shadow-none sm:shadow-lg duration-200 focus:outline-none pointer-events-auto overflow-x-hidden overflow-y-auto",
+            "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 grid w-full gap-0 rounded-lg border p-6 shadow-lg duration-200 focus:outline-none pointer-events-auto overflow-x-hidden",
             className,
           )}
           onPointerDownOutside={(e) => e.preventDefault()}
