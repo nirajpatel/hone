@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Coffee, BrewMethod, User, Brew, CoffeeTemperature, BrewStage, Equipment } from '../types';
 import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale, Mic } from 'lucide-react';
@@ -195,10 +195,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   // Voice mode for stages
   const [voiceMode, setVoiceMode] = useState(false);
   const { isSupported: voiceSupported } = useVoiceRecognition();
-
-  // Scroll preservation refs (used by effects below, after state declarations)
-  const dialogScrollElRef = useRef<HTMLElement | null>(null);
-  const voiceScrollTopRef = useRef<number>(0);
+  const brewStagesRef = useRef<HTMLDivElement>(null);
 
   // Tasting notes
   const [tastingNotesPills, setTastingNotesPills] = useState<string[]>([]);
@@ -231,47 +228,6 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   }, [baselineMode]);
   const [browseAllIndex, setBrowseAllIndex] = useState(0);
   const lastSuggestionBrewIdRef = useRef<string>('');
-
-  // Preserve dialog scroll position during voice mode so background
-  // content changes (e.g. dial-in guidance loading) don't cause jumps
-  useEffect(() => {
-    const dialogContent = document.querySelector('[data-slot="dialog-content"]');
-    if (dialogContent) {
-      dialogScrollElRef.current = dialogContent.children[0] as HTMLElement;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!voiceMode) return;
-    const el = dialogScrollElRef.current;
-    if (!el) return;
-
-    voiceScrollTopRef.current = el.scrollTop;
-
-    let userScrolling = false;
-    const onTouchStart = () => { userScrolling = true; };
-    const onTouchEnd = () => { setTimeout(() => { userScrolling = false; }, 300); };
-    const onScroll = () => { if (userScrolling) voiceScrollTopRef.current = el.scrollTop; };
-
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchend', onTouchEnd);
-      el.removeEventListener('scroll', onScroll);
-    };
-  }, [voiceMode]);
-
-  useLayoutEffect(() => {
-    if (!voiceMode) return;
-    const el = dialogScrollElRef.current;
-    if (!el) return;
-    el.scrollTop = voiceScrollTopRef.current;
-    requestAnimationFrame(() => {
-      if (voiceMode && el) el.scrollTop = voiceScrollTopRef.current;
-    });
-  }, [voiceMode, loadingSuggestions, suggestions, stages]);
 
   const isEditMode = !!editingBrew;
 
@@ -2704,7 +2660,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
             {/* Pour Over: Multiple stages */}
             {supportsStages(brewMethod) && (
-              <div>
+              <div ref={brewStagesRef}>
                 <div className="flex items-center justify-between">
                   <Label>Brew Stages</Label>
                   {voiceSupported && (
@@ -2712,7 +2668,15 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                       type="button"
                       variant={voiceMode ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setVoiceMode(prev => !prev)}
+                      onClick={() => {
+                        const entering = !voiceMode;
+                        setVoiceMode(prev => !prev);
+                        if (entering) {
+                          requestAnimationFrame(() => {
+                            brewStagesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          });
+                        }
+                      }}
                       className={`cursor-pointer gap-1.5 h-7 text-xs ${voiceMode ? 'bg-red-500 hover:bg-red-600 text-white' : ''}`}
                     >
                       <Mic className="w-3.5 h-3.5" />

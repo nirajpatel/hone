@@ -3991,9 +3991,9 @@ html {
   }
 
   [data-slot="dialog-content"] {
-    max-width: calc(100vw - 2rem) !important;
-    max-height: calc(100vh - 2rem) !important;
-    margin: 1rem !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
     padding: 1rem !important;
     overflow-y: auto !important;
   }
@@ -4003,7 +4003,7 @@ html {
   }
 
   [data-slot="dialog-content"] > div {
-    max-height: calc(90vh - 6rem);
+    max-height: calc(100dvh - 4rem);
     overflow-y: auto;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
