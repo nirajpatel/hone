@@ -47,7 +47,7 @@ export function StandardDialog({
         sideNavLeft={sideNavLeft}
         sideNavRight={sideNavRight}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-1 min-h-0" style={{ overflowAnchor: 'none' }}>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-1 min-h-0">
           <DialogHeader
             className="border-b border-gray-200 -mx-6 px-6"
             style={{

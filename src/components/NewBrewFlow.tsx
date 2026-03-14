@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Coffee, BrewMethod, User, Brew, CoffeeTemperature, BrewStage, Equipment } from '../types';
 import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale, Mic } from 'lucide-react';
@@ -196,6 +196,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const [voiceMode, setVoiceMode] = useState(false);
   const { isSupported: voiceSupported } = useVoiceRecognition();
 
+  // Scroll preservation refs (used by effects below, after state declarations)
+  const dialogScrollElRef = useRef<HTMLElement | null>(null);
+  const voiceScrollTopRef = useRef<number>(0);
+
   // Tasting notes
   const [tastingNotesPills, setTastingNotesPills] = useState<string[]>([]);
   const [tastingNotesInput, setTastingNotesInput] = useState('');
@@ -227,6 +231,47 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   }, [baselineMode]);
   const [browseAllIndex, setBrowseAllIndex] = useState(0);
   const lastSuggestionBrewIdRef = useRef<string>('');
+
+  // Preserve dialog scroll position during voice mode so background
+  // content changes (e.g. dial-in guidance loading) don't cause jumps
+  useEffect(() => {
+    const dialogContent = document.querySelector('[data-slot="dialog-content"]');
+    if (dialogContent) {
+      dialogScrollElRef.current = dialogContent.children[0] as HTMLElement;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!voiceMode) return;
+    const el = dialogScrollElRef.current;
+    if (!el) return;
+
+    voiceScrollTopRef.current = el.scrollTop;
+
+    let userScrolling = false;
+    const onTouchStart = () => { userScrolling = true; };
+    const onTouchEnd = () => { setTimeout(() => { userScrolling = false; }, 300); };
+    const onScroll = () => { if (userScrolling) voiceScrollTopRef.current = el.scrollTop; };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('scroll', onScroll);
+    };
+  }, [voiceMode]);
+
+  useLayoutEffect(() => {
+    if (!voiceMode) return;
+    const el = dialogScrollElRef.current;
+    if (!el) return;
+    el.scrollTop = voiceScrollTopRef.current;
+    requestAnimationFrame(() => {
+      if (voiceMode && el) el.scrollTop = voiceScrollTopRef.current;
+    });
+  }, [voiceMode, loadingSuggestions, suggestions, stages]);
 
   const isEditMode = !!editingBrew;
 
@@ -1256,7 +1301,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         if (container) {
           const firstInput = container.querySelector('input');
           if (firstInput) {
-            (firstInput as HTMLInputElement).focus({ preventScroll: true });
+            (firstInput as HTMLInputElement).focus();
           }
         }
       }, 50);
@@ -2720,10 +2765,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                               setTimeout(() => {
                                 const weightInput = stageWeightRefs.current[index];
                                 if (weightInput) {
-                                  weightInput.focus({ preventScroll: true });
+                                  weightInput.focus();
                                 } else {
+                                  // Fallback: Query DOM directly if ref isn't set yet
                                   const input = document.getElementById(`stage-${index}-weight`) as HTMLInputElement;
-                                  input?.focus({ preventScroll: true });
+                                  input?.focus();
                                 }
                               }, 100);
                             }}
