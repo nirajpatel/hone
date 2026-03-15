@@ -1,5 +1,6 @@
 import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2, FileText } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { formatTime, formatExtractionTime } from './TimeInput';
 import { Brew, BrewMethod, User as UserType } from '../types';
 import { Button } from './ui/button';
@@ -173,6 +174,11 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
     window.addEventListener('keydown', handleKeyboard);
     return () => window.removeEventListener('keydown', handleKeyboard);
   }, [onClose, onNavigatePrev, onNavigateNext, hasPrev, hasNext]);
+
+  // Swipe left/right mirrors arrow keys: left = older, right = newer
+  const swipeLeft = useMemo(() => hasPrev && onNavigatePrev ? onNavigatePrev : undefined, [hasPrev, onNavigatePrev]);
+  const swipeRight = useMemo(() => hasNext && onNavigateNext ? onNavigateNext : undefined, [hasNext, onNavigateNext]);
+  useSwipeNavigation(swipeLeft, swipeRight);
 
   const formatHeaderDate = (dateString: string) => {
     const date = new Date(dateString);

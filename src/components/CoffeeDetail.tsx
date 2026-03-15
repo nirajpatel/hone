@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { Coffee, Brew } from '../types';
 import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, QrCode, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
@@ -52,6 +53,11 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
     window.addEventListener('keydown', handleKeyboard);
     return () => window.removeEventListener('keydown', handleKeyboard);
   }, [onClose, onNavigatePrev, onNavigateNext, hasPrev, hasNext]);
+
+  // Swipe left/right mirrors arrow keys: left = next, right = prev
+  const swipeLeft = useMemo(() => hasNext && onNavigateNext ? onNavigateNext : undefined, [hasNext, onNavigateNext]);
+  const swipeRight = useMemo(() => hasPrev && onNavigatePrev ? onNavigatePrev : undefined, [hasPrev, onNavigatePrev]);
+  useSwipeNavigation(swipeLeft, swipeRight);
 
   const formatRoastDate = (dateString: string) => {
     const [year, monthNum, day] = dateString.split('-').map(Number);
