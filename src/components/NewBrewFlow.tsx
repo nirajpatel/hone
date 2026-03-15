@@ -274,59 +274,47 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     return currentUser.id === allowedUserId || currentUser.householdId === allowedHouseholdId;
   };
 
-  // Get coffees for dropdown - filter by last extracted (within 1 month) and limit to 8
   const getCoffeesForDropdown = () => {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-    // Create a map of coffee ID to last brew date
-    const coffeeLastExtracted = new Map<string, Date>();
+    const coffeeLastBrewed = new Map<string, Date>();
     brews.forEach(brew => {
       const brewDate = new Date(brew.createdAt);
-      const currentLast = coffeeLastExtracted.get(brew.coffeeId);
+      const currentLast = coffeeLastBrewed.get(brew.coffeeId);
       if (!currentLast || brewDate > currentLast) {
-        coffeeLastExtracted.set(brew.coffeeId, brewDate);
+        coffeeLastBrewed.set(brew.coffeeId, brewDate);
       }
     });
 
-    // Filter coffees extracted within last month
-    const recentlyBrewedCoffees = coffees.filter(coffee => {
-      const lastExtracted = coffeeLastExtracted.get(coffee.id);
-      return lastExtracted && lastExtracted >= oneMonthAgo;
-    });
+    const recentlyUsed = coffees
+      .filter(c => coffeeLastBrewed.has(c.id))
+      .sort((a, b) => coffeeLastBrewed.get(b.id)!.getTime() - coffeeLastBrewed.get(a.id)!.getTime())
+      .slice(0, 3);
 
-    // If we have recently extracted coffees, sort by last extracted date (most recent first) and take top 8
-    // Otherwise, show all coffees sorted alphabetically and take top 8
-    let sortedCoffees: Coffee[];
-    const hasRecentBrews = recentlyBrewedCoffees.length > 0;
-    
-    if (hasRecentBrews) {
-      sortedCoffees = recentlyBrewedCoffees.sort((a, b) => {
-        const aDate = coffeeLastExtracted.get(a.id)!;
-        const bDate = coffeeLastExtracted.get(b.id)!;
-        return bDate.getTime() - aDate.getTime();
-      });
-    } else {
-      sortedCoffees = [...coffees].sort((a, b) => {
-        const aName = `${a.roaster} - ${a.name}`.toLowerCase();
-        const bName = `${b.roaster} - ${b.name}`.toLowerCase();
-        return aName.localeCompare(bName);
-      });
-    }
+    const recentlyUsedIds = new Set(recentlyUsed.map(c => c.id));
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
-    // Limit to top 8 options
-    return {
-      coffees: sortedCoffees.slice(0, 8),
-      hasRecentBrews,
-    };
+    const recentlyAdded = coffees
+      .filter(c => {
+        if (recentlyUsedIds.has(c.id)) return false;
+        if (!c.roastDate) return false;
+        const [year, monthNum, day] = c.roastDate.split('-').map(Number);
+        return new Date(year, monthNum - 1, day) >= twoWeeksAgo;
+      })
+      .sort((a, b) => {
+        const [ay, am, ad] = a.roastDate.split('-').map(Number);
+        const [by, bm, bd] = b.roastDate.split('-').map(Number);
+        return new Date(by, bm - 1, bd).getTime() - new Date(ay, am - 1, ad).getTime();
+      })
+      .slice(0, 2);
+
+    return { recentlyUsed, recentlyAdded, coffeeLastBrewed };
   };
 
-  // Get the dropdown label based on context
-  const getDropdownLabel = (searchQuery: string, hasRecentBrews: boolean) => {
+  const getDropdownLabel = (searchQuery: string) => {
     if (searchQuery) {
-      return `Coffees matching "${searchQuery}"`;
+      return `Beans matching "${searchQuery}"`;
     }
-    return hasRecentBrews ? 'Recently used coffees' : 'All coffees';
+    return '';
   };
 
   // Fetch machine status (for polling)
@@ -1758,7 +1746,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
             )}
 
             <div>
-              <Label htmlFor="coffee">Coffee</Label>
+              <Label htmlFor="coffee">Beans</Label>
               <div className="flex gap-[calc(var(--spacing)*2.5)] mt-2">
                 <AutocompleteDropdown
                   value={coffeeId}
@@ -1783,31 +1771,43 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     });
                   })()}
                   defaultOptions={(() => {
-                    // Limited set for default display (recently extracted, top 8)
-                    const { coffees: dropdownCoffees } = getCoffeesForDropdown();
-                    return dropdownCoffees.map(coffee => {
-                      let formattedDate = 'Unknown';
-                      if (coffee.roastDate) {
-                        const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
-                        const date = new Date(year, monthNum - 1, day);
-                        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                        const month = months[date.getMonth()];
-                        formattedDate = `${month} ${date.getDate()}, ${date.getFullYear()}`;
+                    const { recentlyUsed, recentlyAdded, coffeeLastBrewed } = getCoffeesForDropdown();
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    const formatDate = (d: Date) => `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+                    const result: { value: string; line1: string; line2?: string; isSectionHeader?: boolean }[] = [];
+
+                    if (recentlyUsed.length > 0) {
+                      result.push({ value: '_header_used', line1: 'Recently used beans', isSectionHeader: true });
+                      recentlyUsed.forEach(coffee => {
+                        const lastBrew = coffeeLastBrewed.get(coffee.id);
+                        result.push({
+                          value: coffee.id,
+                          line1: `${coffee.roaster} - ${coffee.name}`,
+                          line2: lastBrew ? `Last brewed: ${formatDate(lastBrew)}` : undefined,
+                        });
+                      });
+                    }
+
+                    if (recentlyAdded.length > 0) {
+                      if (recentlyUsed.length > 0) {
+                        result.push({ value: '_divider', line1: '', isSectionHeader: true });
                       }
-                      
-                      return {
-                        value: coffee.id,
-                        line1: `${coffee.roaster} - ${coffee.name}`,
-                        line2: `Roasted: ${formattedDate}`,
-                      };
-                    });
+                      result.push({ value: '_header_added', line1: 'Recently added beans', isSectionHeader: true });
+                      recentlyAdded.forEach(coffee => {
+                        const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
+                        result.push({
+                          value: coffee.id,
+                          line1: `${coffee.roaster} - ${coffee.name}`,
+                          line2: `Roasted: ${formatDate(new Date(year, monthNum - 1, day))}`,
+                        });
+                      });
+                    }
+
+                    return result;
                   })()}
-                  placeholder="Search for a coffee"
+                  placeholder="Search beans"
                   className="flex-1"
-                  getDropdownLabel={(searchQuery) => {
-                    const { hasRecentBrews } = getCoffeesForDropdown();
-                    return getDropdownLabel(searchQuery, hasRecentBrews);
-                  }}
+                  getDropdownLabel={(searchQuery) => getDropdownLabel(searchQuery)}
                 />
                 <Button
                   type="button"
