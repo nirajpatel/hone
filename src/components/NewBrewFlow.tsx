@@ -167,6 +167,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const [preFilledBrew, setPreFilledBrew] = useState<Brew | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Newer bag detection
+  const [newerBag, setNewerBag] = useState<Coffee | null>(null);
+
   // QR Scanner Modal
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [qrCameraStream, setQrCameraStream] = useState<MediaStream | null>(null);
@@ -963,6 +966,44 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     }
   }, [editingBrew]);
 
+  // Detect if a newer bag of the same bean exists that hasn't been brewed yet
+  useEffect(() => {
+    if (!coffeeId || editingBrew) {
+      setNewerBag(null);
+      return;
+    }
+    const selected = coffees.find(c => c.id === coffeeId);
+    if (!selected) {
+      setNewerBag(null);
+      return;
+    }
+    const sameBeanBags = coffees
+      .filter(c => c.roaster === selected.roaster && c.name === selected.name && c.id !== selected.id);
+    if (sameBeanBags.length === 0) {
+      setNewerBag(null);
+      return;
+    }
+    const parseRoastDate = (d: string) => {
+      const [y, m, day] = d.split('-').map(Number);
+      return new Date(y, m - 1, day);
+    };
+    const allBags = [selected, ...sameBeanBags].sort((a, b) => {
+      if (a.roastDate && b.roastDate) return parseRoastDate(b.roastDate).getTime() - parseRoastDate(a.roastDate).getTime();
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    const newest = allBags[0];
+    if (newest.id === coffeeId) {
+      setNewerBag(null);
+      return;
+    }
+    const newestHasBrews = brews.some(b => b.coffeeId === newest.id);
+    if (newestHasBrews) {
+      setNewerBag(null);
+      return;
+    }
+    setNewerBag(newest);
+  }, [coffeeId, coffees, brews, editingBrew]);
+
   // Pre-fill grind setting and dosage from most recent brew with same coffee and method
   useEffect(() => {
     if (coffeeId && brewMethod && !duplicateData && !editingBrew) {
@@ -1522,11 +1563,17 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           const code = jsQR(imageData.data, imageData.width, imageData.height);
 
           if (code && code.data) {
-            // Check if the decoded data is a valid coffee ID
             const coffee = coffees.find(c => c.id === code.data);
             if (coffee) {
+              const prevCoffee = coffees.find(c => c.id === coffeeId);
+              const isBagSwitch = prevCoffee && prevCoffee.roaster === coffee.roaster && prevCoffee.name === coffee.name && prevCoffee.id !== coffee.id;
               setCoffeeId(code.data);
-              toast.success(`Coffee scanned: ${coffee.roaster} - ${coffee.name}`);
+              if (isBagSwitch) {
+                const roastInfo = coffee.roastDate ? ` (Roasted ${coffee.roastDate})` : '';
+                toast.success(`New bag scanned: ${coffee.roaster} - ${coffee.name}${roastInfo}`);
+              } else {
+                toast.success(`Coffee scanned: ${coffee.roaster} - ${coffee.name}`);
+              }
             } else {
               toast.error('QR code does not match any coffee');
             }
@@ -1593,11 +1640,17 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
           if (code && code.data) {
             console.log('QR code detected:', code.data);
-            // Check if the decoded data is a valid coffee ID
             const coffee = coffees.find(c => c.id === code.data);
             if (coffee) {
+              const prevCoffee = coffees.find(c => c.id === coffeeId);
+              const isBagSwitch = prevCoffee && prevCoffee.roaster === coffee.roaster && prevCoffee.name === coffee.name && prevCoffee.id !== coffee.id;
               setCoffeeId(code.data);
-              toast.success(`Coffee scanned: ${coffee.roaster} - ${coffee.name}`);
+              if (isBagSwitch) {
+                const roastInfo = coffee.roastDate ? ` (Roasted ${coffee.roastDate})` : '';
+                toast.success(`New bag scanned: ${coffee.roaster} - ${coffee.name}${roastInfo}`);
+              } else {
+                toast.success(`Coffee scanned: ${coffee.roaster} - ${coffee.name}`);
+              }
               closeQRScanner();
             } else {
               console.log('QR code does not match any coffee:', code.data);
@@ -1830,6 +1883,29 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   )}
                 </Button>
               </div>
+              {newerBag && (() => {
+                let roastLabel = '';
+                if (newerBag.roastDate) {
+                  const [y, m, d] = newerBag.roastDate.split('-').map(Number);
+                  const date = new Date(y, m - 1, d);
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  roastLabel = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                }
+                return (
+                  <div className="mt-2 flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                    <span className="flex-1">
+                      Newer bag available{roastLabel ? ` (Roasted ${roastLabel})` : ''}
+                    </span>
+                    <button
+                      type="button"
+                      className="font-medium underline underline-offset-2 cursor-pointer whitespace-nowrap"
+                      onClick={() => setCoffeeId(newerBag.id)}
+                    >
+                      Switch
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
 
             <div>

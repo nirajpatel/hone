@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -1331,34 +1331,47 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     }
                   }
 
+                  const bagChanged = index > 0 && brew.coffeeId !== brews[index - 1].coffeeId;
+
                   return (
-                    <div 
-                      key={brew.id} 
-                      ref={(el) => { nodeRefs.current[index] = el; }}
-                      className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
-                      style={{ opacity: nodeOpacity, transition: 'opacity 0.2s' }}
-                    >
-                      {/* Node Circle - centered on the curve */}
-                      <button
-                        onClick={() => onSelectBrew(brew)}
-                        className={`w-2.5 h-2.5 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
-                          isUnrated 
-                            ? 'border-dashed bg-transparent border-gray-400' 
-                            : `${dotColor} ${dotBorderColor} ${isNewest ? 'animate-radiate' : ''}`
-                        }`}
-                        style={{ 
-                          marginTop: `${yPos - 5}px`,
-                          opacity: 1,
-                          backgroundColor: isUnrated ? 'transparent' : undefined,
-                          ...(brew.quality === 2 ? {
-                            backgroundColor: 'oklch(0.76 0.18 88.84)',
-                            borderColor: 'oklch(0.76 0.18 88.84)'
-                          } : {})
-                        }}
-                        title={isUnrated ? 'Click to rate this brew' : ''}
+                    <React.Fragment key={brew.id}>
+                      {bagChanged && (
+                        <div
+                          className="flex flex-col items-center justify-center self-stretch"
+                          style={{ marginTop: `${(isMobile ? mobileSvgHeight : desktopSvgHeight) * 0.15}px` }}
+                        >
+                          <div className="border-l border-dashed border-gray-300 flex-1 min-h-[16px]" />
+                          <span className="text-[9px] text-gray-400 whitespace-nowrap" style={{ writingMode: 'vertical-lr' }}>new bag</span>
+                          <div className="border-l border-dashed border-gray-300 flex-1 min-h-[16px]" />
+                        </div>
+                      )}
+                      <div 
+                        ref={(el) => { nodeRefs.current[index] = el; }}
+                        className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
+                        style={{ opacity: nodeOpacity, transition: 'opacity 0.2s' }}
                       >
-                      </button>
-                    </div>
+                        {/* Node Circle - centered on the curve */}
+                        <button
+                          onClick={() => onSelectBrew(brew)}
+                          className={`w-2.5 h-2.5 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
+                            isUnrated 
+                              ? 'border-dashed bg-transparent border-gray-400' 
+                              : `${dotColor} ${dotBorderColor} ${isNewest ? 'animate-radiate' : ''}`
+                          }`}
+                          style={{ 
+                            marginTop: `${yPos - 5}px`,
+                            opacity: 1,
+                            backgroundColor: isUnrated ? 'transparent' : undefined,
+                            ...(brew.quality === 2 ? {
+                              backgroundColor: 'oklch(0.76 0.18 88.84)',
+                              borderColor: 'oklch(0.76 0.18 88.84)'
+                            } : {})
+                          }}
+                          title={isUnrated ? 'Click to rate this brew' : ''}
+                        >
+                        </button>
+                      </div>
+                    </React.Fragment>
                   );
                 })}
 
