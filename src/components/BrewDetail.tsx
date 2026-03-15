@@ -138,8 +138,11 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
+    const currentYear = new Date().getFullYear();
     const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    return `${month} ${day}, ${year} at ${time}`;
+    return year === currentYear
+      ? `${month} ${day} at ${time}`
+      : `${month} ${day}, ${year} at ${time}`;
   };
 
   const getTemperatureLabel = (temp: string) => {
