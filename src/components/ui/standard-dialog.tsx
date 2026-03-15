@@ -86,7 +86,7 @@ export function StandardDialog({
         </div>
 
         {footerContent && (
-          <div className="flex-shrink-0 border-t border-gray-200 -mx-6 px-6 pt-4">
+          <div className="standard-dialog-footer flex-shrink-0 border-t border-gray-200 -mx-6 px-6 pt-4">
             {footerContent}
           </div>
         )}
