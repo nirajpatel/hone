@@ -130,6 +130,8 @@ function renderRating(rating: number) {
 
 // ─── CoffeeCard ────────────────────────────────────────────────────────────────
 
+const loadedImageUrls = new Set<string>();
+
 interface CoffeeCardProps {
   coffee: Coffee;
   rating: number;
@@ -141,8 +143,8 @@ interface CoffeeCardProps {
 
 function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop, getCoffeeImage }: CoffeeCardProps) {
   const tiltRef = useRef<HTMLImageElement>(null);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const imgSrc = getCoffeeImage(coffee);
+  const [imgLoaded, setImgLoaded] = useState(() => !!imgSrc && loadedImageUrls.has(imgSrc));
 
   useEffect(() => {
     if (!imgSrc || !tiltRef.current) return;
@@ -213,7 +215,7 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
                   opacity: imgLoaded ? 1 : 0,
                   transition: 'opacity 0.3s ease',
                 }}
-                onLoad={() => setImgLoaded(true)}
+                onLoad={() => { if (imgSrc) loadedImageUrls.add(imgSrc); setImgLoaded(true); }}
               />
             </div>
           ) : (
@@ -228,7 +230,7 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
                 transition: 'opacity 0.3s ease',
                 paddingTop: '1em',
               }}
-              onLoad={() => setImgLoaded(true)}
+              onLoad={() => { if (imgSrc) loadedImageUrls.add(imgSrc); setImgLoaded(true); }}
             />
           )
         )}
@@ -433,13 +435,19 @@ export function CoffeesShelvesView({
   
   // State for representative images — initialised from module-level cache so navigation doesn't re-fetch
   const [representativeImages, setRepresentativeImages] = useState<Map<string, string>>(() => new Map(_repImageCache));
-  const [loadingImages, setLoadingImages] = useState(true);
+  const [loadingImages, setLoadingImages] = useState(() => {
+    // On remount with warm cache, skip loading state to avoid shimmer flicker
+    if (_repImageCache.size > 0 && _defaultImageCache && _defaultImageCache !== '__loading__') {
+      return false;
+    }
+    return true;
+  });
   const [defaultImage, setDefaultImage] = useState<string | null>(
     typeof _defaultImageCache === 'string' && _defaultImageCache !== '__loading__' ? _defaultImageCache : null
   );
   
   // State for window width to calculate card sizes
-  const [isDesktop, setIsDesktop] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
 
   // Track window size for responsive card widths
   useEffect(() => {
