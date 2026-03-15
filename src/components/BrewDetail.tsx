@@ -10,7 +10,49 @@ import { GrinderIcon } from './icons/GrinderIcon';
 import { capitalizeBrewMethod, getRatingEmoji, getRatingText } from '../utils/formatters';
 import { capitalize } from '../utils/tastingNotes';
 import { supportsStages } from '../utils/brewMethods';
-import { FormattedAISuggestions } from './DialInGuidance';
+import { FormattedAISuggestions, AISuggestionsData, FirstTimeSuggestionsData } from './DialInGuidance';
+
+// In the detail view "this brew" IS the baseline, so reword references accordingly.
+function rewordBaseline(text: string): string {
+  return text
+    .replace(/\b[Tt]he baseline brew\b/g, (m) => m[0] === 'T' ? 'This brew' : 'this brew')
+    .replace(/\bbaseline brew\b/gi, (m) => m[0] === 'B' ? 'This brew' : 'this brew')
+    .replace(/\b[Tt]he baseline\b/g, (m) => m[0] === 'T' ? 'The current' : 'the current')
+    .replace(/\bbaseline\b/gi, (m) => m[0] === 'B' ? 'Current' : 'current');
+}
+
+function rewordSuggestions(
+  data: string | AISuggestionsData | FirstTimeSuggestionsData
+): string | AISuggestionsData | FirstTimeSuggestionsData {
+  if (typeof data === 'string') return rewordBaseline(data);
+
+  if ('introduction' in data) {
+    const d = data as FirstTimeSuggestionsData;
+    return {
+      ...d,
+      introduction: rewordBaseline(d.introduction),
+      note: rewordBaseline(d.note),
+      parameters: d.parameters.map((p) => ({
+        ...p,
+        recommendation: rewordBaseline(p.recommendation),
+        explanation: rewordBaseline(p.explanation),
+      })),
+    };
+  }
+
+  const d = data as AISuggestionsData;
+  return {
+    ...d,
+    summary: rewordBaseline(d.summary),
+    primaryIssue: rewordBaseline(d.primaryIssue),
+    suggestions: d.suggestions.map((s) => ({
+      ...s,
+      action: rewordBaseline(s.action),
+      effect: rewordBaseline(s.effect),
+      reasoning: rewordBaseline(s.reasoning),
+    })),
+  };
+}
 
 interface BrewDetailProps {
   brew: Brew;
@@ -476,7 +518,7 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
             {brew.suggestion?.full && (
               <div ref={setGuidanceRef} id="dial-in-guidance" className="border-t border-gray-200 pt-6 mb-6">
                 <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Next Brew: Dial-In Guidance</h3>
-                <FormattedAISuggestions suggestions={brew.suggestion.full} />
+                <FormattedAISuggestions suggestions={rewordSuggestions(brew.suggestion.full)} />
               </div>
             )}
 
