@@ -58,7 +58,10 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
     const date = new Date(year, monthNum - 1, day);
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const month = months[date.getMonth()];
-    return `${month} ${day}, ${year}`;
+    const currentYear = new Date().getFullYear();
+    return year === currentYear
+      ? `${month} ${day}`
+      : `${month} ${day}, ${year}`;
   };
 
   const getDaysOld = (roastDate: string) => {
