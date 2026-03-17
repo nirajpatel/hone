@@ -731,7 +731,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     const g = isMobile ? mobileGap : desktopGap;
     const brewCount = brews.length;
     const startTime = performance.now();
-    const duration = 500;
+    const duration = 1000;
 
     [staticRectMobileRef, staticRectDesktopRef].forEach(ref => {
       ref.current?.setAttribute('width', String(visibleLeft));
@@ -1180,12 +1180,16 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   <mask id={`${uniqueId}-mobileMask`}>
                     <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} fill={`url(#${uniqueId}-mobileFadeMask)`} />
                   </mask>
-                  {animationPhase !== 'done' && (
-                    <clipPath id={`${uniqueId}-mobileRevealClip`}>
-                      <rect ref={staticRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
-                      <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
-                    </clipPath>
-                  )}
+                  <clipPath id={`${uniqueId}-mobileRevealClip`}>
+                    {animationPhase !== 'done' ? (
+                      <>
+                        <rect ref={staticRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
+                        <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
+                      </>
+                    ) : (
+                      <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} />
+                    )}
+                  </clipPath>
                 </defs>
                 {bagChangeIndices.map(i => {
                   const prevX = (i - 1) * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
@@ -1194,7 +1198,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   return (
                     <g
                       key={`bag-${i}`}
-                      clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-mobileRevealClip)` : undefined}
+                      clipPath={`url(#${uniqueId}-mobileRevealClip)`}
                     >
                       <line x1={midX} y1={0} x2={midX} y2={mobileSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
                       <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
@@ -1217,7 +1221,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-mobileRevealClip)` : undefined}
+                  clipPath={`url(#${uniqueId}-mobileRevealClip)`}
                   opacity="1"
                 />
               </svg>
@@ -1242,12 +1246,16 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   <mask id={`${uniqueId}-desktopMask`}>
                     <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFadeMask)`} />
                   </mask>
-                  {animationPhase !== 'done' && (
-                    <clipPath id={`${uniqueId}-desktopRevealClip`}>
-                      <rect ref={staticRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
-                      <rect ref={revealRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
-                    </clipPath>
-                  )}
+                  <clipPath id={`${uniqueId}-desktopRevealClip`}>
+                    {animationPhase !== 'done' ? (
+                      <>
+                        <rect ref={staticRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
+                        <rect ref={revealRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
+                      </>
+                    ) : (
+                      <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} />
+                    )}
+                  </clipPath>
                   {/* Gradient mask for highlight effect - peaks at hovered node, fades to 0 at edges */}
                   {desktopGradientStops && (() => {
                     const { hoveredX, leftFadeStart, leftFadeEnd, rightFadeStart, rightFadeEnd, immediateLeftX, immediateRightX, secondLeftX, secondRightX } = desktopGradientStops;
@@ -1411,7 +1419,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   return (
                     <g
                       key={`bag-${i}`}
-                      clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
+                      clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                     >
                       <line x1={midX} y1={0} x2={midX} y2={desktopSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
                       <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
@@ -1456,7 +1464,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine60Mask)` : undefined}
-                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
+                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Line at 80% opacity - mask controls visibility to 80% */}
@@ -1468,7 +1476,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine80Mask)` : undefined}
-                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
+                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Line at 100% opacity - mask controls visibility to 100% */}
@@ -1480,7 +1488,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine100Mask)` : undefined}
-                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
+                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Base line at full opacity when not hovering */}
@@ -1491,7 +1499,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
+                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "0" : "1"}
                 />
               </svg>
