@@ -319,8 +319,8 @@ export function BrewsTimelineView({
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             );
 
-            // Get the coffee ID from the first brew
-            const coffeeId = sortedExtractions[0]?.coffeeId;
+            // Use the most recent brew's bag so "Change bag" dropdown shows the bag already in use
+            const coffeeId = sortedExtractions[sortedExtractions.length - 1]?.coffeeId;
 
             // Calculate trend for this group
             const trendInfo = calculateTrend(sortedExtractions);
