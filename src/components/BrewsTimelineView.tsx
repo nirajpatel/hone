@@ -757,7 +757,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
       });
 
       // Area fades in during the last 30% of the line trace
-      const areaOpacity = progress < 0.7 ? 0 : Math.min(1, (progress - 0.7) / 0.3);
+      const areaOpacity = progress < 0.5 ? 0 : Math.min(1, (progress - 0.5) / 0.5);
       mobileAreaPathRef.current?.setAttribute('opacity', String(areaOpacity));
       desktopAreaBasePathRef.current?.setAttribute('opacity', String(areaOpacity));
 
