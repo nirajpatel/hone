@@ -682,7 +682,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     }
   }, [brews.length]);
 
-  // IntersectionObserver for entrance animation
+  // IntersectionObserver for entrance animation — only animate timelines that are in viewport on load; others show by default
   useEffect(() => {
     const row = rowRef.current;
     if (!row) return;
@@ -706,6 +706,11 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
           }
 
           setAnimationPhase('animating');
+        } else if (!entry.isIntersecting && !hasAnimated.current) {
+          // Row is outside viewport — show in final state, never animate when scrolled into view
+          hasAnimated.current = true;
+          if (timelineKey) animatedTimelineKeys.add(timelineKey);
+          setAnimationPhase('done');
         }
       });
     }, { threshold: 0.2 });
@@ -726,7 +731,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     const g = isMobile ? mobileGap : desktopGap;
     const brewCount = brews.length;
     const startTime = performance.now();
-    const duration = 1800;
+    const duration = 500;
 
     [staticRectMobileRef, staticRectDesktopRef].forEach(ref => {
       ref.current?.setAttribute('width', String(visibleLeft));

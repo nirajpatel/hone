@@ -2008,7 +2008,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              {coffeeId && activeBags.length > 0 && activeBags[0].id !== coffeeId && (() => {
+              {coffeeId && activeBags.length > 0 && activeBags[0].id !== coffeeId && !brews.some(b => b.coffeeId === activeBags[0].id) && (() => {
                 const newerBag = activeBags[0];
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 const currentYear = new Date().getFullYear();
