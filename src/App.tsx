@@ -1514,6 +1514,10 @@ export default function App() {
                           </DropdownMenuItem>
                         </>
                       )}
+                      <DropdownMenuItem onClick={() => setShowFeedback(true)}>
+                        <MessageSquare className="w-4 h-4" />
+                        Feedback
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setShowLogoutConfirm(true)}>
                         <LogOut className="w-4 h-4" />
                         Sign Out
