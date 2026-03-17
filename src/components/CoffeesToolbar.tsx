@@ -2,6 +2,7 @@ import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Plus, LayoutGrid, Table as TableIcon } from 'lucide-react';
 import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
+import { COPY } from '../constants/copy';
 
 interface CoffeesToolbarProps {
   view: 'shelf' | 'table';
@@ -96,7 +97,7 @@ export function CoffeesToolbar({
 
       <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
         <Plus className="w-4 h-4" />
-        Add Beans
+        {COPY.addBag}
       </Button>
     </div>
   );

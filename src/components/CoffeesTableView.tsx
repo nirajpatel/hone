@@ -8,6 +8,7 @@ import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
 import React from 'react';
 import { CoffeesMobileListView } from './CoffeesMobileListView';
+import { COPY } from '../constants/copy';
 
 interface CoffeesTableViewProps {
   coffees: Coffee[];
@@ -250,7 +251,7 @@ export function CoffeesTableView({
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
                 <Plus className="w-4 h-4" />
-                Add Beans
+                {COPY.addBag}
               </Button>
             </div>
           </div>
@@ -378,7 +379,7 @@ export function CoffeesTableView({
                                 {onDuplicateCoffee && (
                                   <DropdownMenuItem onSelect={() => onDuplicateCoffee(coffee)} className="cursor-pointer">
                                     <Plus className="w-4 h-4" />
-                                    Add Another Bag
+                                    {COPY.addAnotherBag}
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onSelect={() => onEditCoffee(coffee)} className="cursor-pointer">

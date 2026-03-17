@@ -8,6 +8,7 @@ import { projectId, publicAnonKey } from '../utils/supabase/info';
 import VanillaTilt from 'vanilla-tilt';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
+import { COPY } from '../constants/copy';
 
 // Module-level caches — survive component unmount/remount during navigation
 const _repImageCache = new Map<string, string>(); // key -> url ('' means confirmed no image)
@@ -696,7 +697,7 @@ export function CoffeesShelvesView({
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
                 <Plus className="w-4 h-4" />
-                Add Beans
+                {COPY.addBag}
               </Button>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsToolbar } from './BrewsToolbar';
 import { BrewsEmptyState } from './BrewsEmptyState';
 import { line, area, curveMonotoneX } from 'd3-shape';
+import { COPY } from '../constants/copy';
 
 interface BrewsTimelineViewProps {
   brews: Brew[];
@@ -880,7 +881,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     return acc;
   }, []);
 
-  // Single source of truth for "New Bag" divider x positions (used by SVG and HTML overlay)
+  // Single source of truth for new-bag divider x positions (used by SVG and HTML overlay)
   const bagChangePositions = bagChangeIndices.map((i) => {
     const mobilePrevX = (i - 1) * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
     const mobileCurrX = i * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
@@ -1514,7 +1515,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 />
               </svg>
 
-              {/* "New Bag" labels as HTML overlay so the B isn't clipped by SVG viewport */}
+              {/* New-bag labels as HTML overlay so text isn't clipped by SVG viewport */}
               {bagChangeIndices.map((i, j) => {
                 const { mobileMidX, desktopMidX } = bagChangePositions[j];
                 return (
@@ -1531,7 +1532,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                         zIndex: 1,
                       }}
                     >
-                      New Bag
+                      {COPY.newBagLabel}
                     </span>
                     <span
                       className="absolute pointer-events-none hidden md:inline"
@@ -1545,7 +1546,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                         zIndex: 1,
                       }}
                     >
-                      New Bag
+                      {COPY.newBagLabel}
                     </span>
                   </React.Fragment>
                 );

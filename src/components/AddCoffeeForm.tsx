@@ -17,6 +17,7 @@ import {
 } from './ui/select';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { sanitizeErrorMessage } from '../utils/errorHandling';
+import { COPY } from '../constants/copy';
 
 interface AddCoffeeFormProps {
   onClose: () => void;
@@ -763,7 +764,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       <StandardDialog 
         open={!showCameraModal} 
         onOpenChange={(open) => !open && onClose()}
-        title={editData ? 'Edit Bean Details' : 'Add Beans'}
+        title={editData ? COPY.editBagDetails : COPY.addBag}
         titleAlign="center"
         footerContent={
           <div className="flex gap-3">
@@ -777,7 +778,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   {editData ? 'Saving...' : 'Adding...'}
                 </>
               ) : (
-                editData ? 'Save Changes' : 'Save Beans'
+                editData ? 'Save Changes' : COPY.saveBag
               )}
             </Button>
           </div>
@@ -790,7 +791,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
               
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
-                  Auto-fill details from your bag. Photos are saved with your beans.
+                  Auto-fill details from your bag. Photos are saved with this bag.
                 </p>
               </div>
 

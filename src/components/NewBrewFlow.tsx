@@ -33,6 +33,7 @@ import { getAllBrewMethodConfigs, supportsStages } from '../utils/brewMethods';
 import { FormattedAISuggestions, type AISuggestionsData, type FirstTimeSuggestionsData } from './DialInGuidance';
 import { VoiceStagesMode } from './VoiceStagesMode';
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
+import { COPY } from '../constants/copy';
 
 // DEV: set to true to always show the brewing popover for UI iteration
 const DEV_SHOW_BREWING = false;
@@ -1012,7 +1013,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     }
   }, [editingBrew]);
 
-  // Re-open bag dropdown after "Add New Bag" flow completes
+  // Re-open bag dropdown after add-new-bag flow completes
   useEffect(() => {
     if (pendingBagSelectRef.current && coffeeId) {
       const selected = coffees.find(c => c.id === coffeeId);
@@ -1594,7 +1595,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               setCoffeeId(code.data);
               if (isBagSwitch) {
                 const roastInfo = coffee.roastDate ? ` (Roasted ${coffee.roastDate})` : '';
-                toast.success(`New bag scanned: ${coffee.roaster} - ${coffee.name}${roastInfo}`);
+                toast.success(COPY.newBagScanned(coffee.roaster, coffee.name, roastInfo));
               } else {
                 toast.success(`Coffee scanned: ${coffee.roaster} - ${coffee.name}`);
               }
@@ -1671,7 +1672,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               setCoffeeId(code.data);
               if (isBagSwitch) {
                 const roastInfo = coffee.roastDate ? ` (Roasted ${coffee.roastDate})` : '';
-                toast.success(`New bag scanned: ${coffee.roaster} - ${coffee.name}${roastInfo}`);
+                toast.success(COPY.newBagScanned(coffee.roaster, coffee.name, roastInfo));
               } else {
                 toast.success(`Coffee scanned: ${coffee.roaster} - ${coffee.name}`);
               }
@@ -1942,7 +1943,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel inset className="text-xs text-muted-foreground font-normal">
-                          Change Bag
+                          {COPY.changeBag}
                         </DropdownMenuLabel>
                         {activeBags.map(bag => {
                           const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1999,7 +2000,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                               }}
                             >
                               <Plus className="w-4 h-4" />
-                              Add New Bag
+                              {COPY.addNewBag}
                             </DropdownMenuItem>
                           </>
                         )}
@@ -2020,7 +2021,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                 }
                 return (
                   <p className="text-xs text-gray-500" style={{ marginTop: '4px' }}>
-                    New bag{roastLabel ? ` ${roastLabel}` : ' available'}{' · '}
+                    {COPY.newBagAvailable}{roastLabel ? ` ${roastLabel}` : ' available'}{' · '}
                     <button
                       type="button"
                       className="font-medium text-gray-700 underline underline-offset-2 cursor-pointer hover:text-gray-900 transition-colors"
@@ -2034,9 +2035,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
               <AlertDialog open={!!finishBagPrompt} onOpenChange={(open) => !open && setFinishBagPrompt(null)}>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Did you finish the previous bag?</AlertDialogTitle>
+                    <AlertDialogTitle>{COPY.didYouFinishPreviousBag}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      You can also mark bags as finished from the beans page.
+                      {COPY.markBagsFinishedFromPage}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

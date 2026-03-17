@@ -230,7 +230,7 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
       <DropdownMenuContent align="end">
         {onDuplicateBrew && (
           <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)} className="cursor-pointer">
-            <RotateCcw className="w-4 h-4 mr-2" />
+            <RotateCcw className="w-4 h-4" />
             Brew From This
           </DropdownMenuItem>
         )}
@@ -251,13 +251,13 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
             }}
             className="cursor-pointer"
           >
-            <FileText className="w-4 h-4 mr-2" />
+            <FileText className="w-4 h-4" />
             Guidance Prompt
           </DropdownMenuItem>
         )}
         {onDeleteBrew && (
           <DropdownMenuItem onSelect={() => onDeleteBrew(brew.id)} className="cursor-pointer">
-            <Trash2 className="w-4 h-4 mr-2" />
+            <Trash2 className="w-4 h-4" />
             Delete
           </DropdownMenuItem>
         )}

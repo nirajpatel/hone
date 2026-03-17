@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
 import { toTitleCase } from '../utils/tastingNotes';
 import { projectId } from '../utils/supabase/info';
+import { COPY } from '../constants/copy';
 
 interface CoffeeDetailProps {
   coffee: Coffee;
@@ -138,28 +139,28 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
       <DropdownMenuContent align="end">
         {onDuplicateCoffee && (
           <DropdownMenuItem onSelect={() => onDuplicateCoffee(coffee)} className="cursor-pointer">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Another Bag
+            <Plus className="w-4 h-4" />
+            {COPY.addAnotherBag}
           </DropdownMenuItem>
         )}
         {onPrintQR && (
           <DropdownMenuItem onSelect={() => onPrintQR(coffee)} className="cursor-pointer">
-            <QrCode className="w-4 h-4 mr-2" />
+            <QrCode className="w-4 h-4" />
             Print Label
           </DropdownMenuItem>
         )}
         {onMarkFinished && (
           <DropdownMenuItem onSelect={() => onMarkFinished(coffee.id, !coffee.finished)} className="cursor-pointer">
             {coffee.finished ? (
-              <><RotateCcw className="w-4 h-4 mr-2" />Mark As Active</>
+              <><RotateCcw className="w-4 h-4" />Mark As Active</>
             ) : (
-              <><CheckCircle2 className="w-4 h-4 mr-2" />Mark As Finished</>
+              <><CheckCircle2 className="w-4 h-4" />Mark As Finished</>
             )}
           </DropdownMenuItem>
         )}
         {onDeleteCoffee && (
           <DropdownMenuItem onSelect={() => onDeleteCoffee(coffee.id)} className="cursor-pointer">
-            <Trash2 className="w-4 h-4 mr-2" />
+            <Trash2 className="w-4 h-4" />
             Delete
           </DropdownMenuItem>
         )}
@@ -180,8 +181,8 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
     </button>
   );
 
-  const leftArrow  = showNavArrows ? makeArrow(!!hasPrev, hasPrev ? onNavigatePrev : undefined, 'Previous bag', ChevronLeft)  : undefined;
-  const rightArrow = showNavArrows ? makeArrow(!!hasNext, hasNext ? onNavigateNext : undefined, 'Next bag',      ChevronRight) : undefined;
+  const leftArrow  = showNavArrows ? makeArrow(!!hasPrev, hasPrev ? onNavigatePrev : undefined, COPY.previousBagArrow, ChevronLeft)  : undefined;
+  const rightArrow = showNavArrows ? makeArrow(!!hasNext, hasNext ? onNavigateNext : undefined, COPY.nextBagArrow,      ChevronRight) : undefined;
 
   return (
     <StandardDialog
