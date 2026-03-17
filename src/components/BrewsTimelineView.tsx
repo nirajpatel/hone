@@ -1212,7 +1212,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     >
                       <line x1={midX} y1={0} x2={midX} y2={mobileSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
                       <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
-                      <text x={midX} y={5} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
+                      <text x={midX} y={3} textAnchor="middle" dominantBaseline="central" fontSize="10" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
                     </g>
                   );
                 })}
@@ -1427,7 +1427,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     >
                       <line x1={midX} y1={0} x2={midX} y2={desktopSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
                       <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
-                      <text x={midX} y={5} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
+                      <text x={midX} y={3} textAnchor="middle" dominantBaseline="central" fontSize="10" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
                     </g>
                   );
                 })}
