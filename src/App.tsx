@@ -130,8 +130,11 @@ export default function App() {
 
   // Refresh data when app resumes from iOS home screen frozen state
   const isRefreshingRef = useRef(false);
+  const mountTimeRef = useRef(Date.now());
   useEffect(() => {
     const handleVisibilityChange = async () => {
+      // Skip refresh for the first 3s after load so we don't run it on reload and sign out on transient errors
+      if (Date.now() - mountTimeRef.current < 3000) return;
       if (document.visibilityState === 'visible' && currentUser && accessToken && !isRefreshingRef.current) {
         isRefreshingRef.current = true;
         try {
@@ -368,6 +371,9 @@ export default function App() {
       
       if (event === 'INITIAL_SESSION' && session?.access_token) {
         setAccessToken(session.access_token);
+        await createOrGetUserRef.current(session.access_token);
+        setLoading(false);
+        setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.access_token) {
         setAccessToken(session.access_token);
       } else if (event === 'SIGNED_IN' && session?.access_token) {
