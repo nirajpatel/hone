@@ -1,85 +1,61 @@
-/**
- * Determines if an error is user-facing (user's fault) or a backend error
- * User-facing errors should be shown to users, backend errors should be sanitized
- */
-export function isUserFacingError(error: any): boolean {
+type ErrorClassification =
+  | { kind: 'access_denied' }
+  | { kind: 'invalid_credentials' }
+  | { kind: 'email_not_confirmed' }
+  | { kind: 'rate_limited' }
+  | { kind: 'network' }
+  | { kind: 'user_input'; message: string }
+  | { kind: 'backend' };
+
+function classifyError(error: any): ErrorClassification {
   const errorMessage = error?.message || String(error);
   const errorCode = error?.code || error?.status;
-  const lowerMessage = errorMessage.toLowerCase();
+  const lower = errorMessage.toLowerCase();
 
-  // User-facing errors (user's fault):
-  // - Authentication/authorization errors
-  if (errorCode === 403 || lowerMessage.includes('access denied') || lowerMessage.includes('not authorized') || lowerMessage.includes('not approved')) {
-    return true;
+  if (errorCode === 403 || lower.includes('access denied') || lower.includes('not authorized') || lower.includes('not approved')) {
+    return { kind: 'access_denied' };
   }
-  
-  // - Invalid credentials
-  if (lowerMessage.includes('invalid login credentials') || lowerMessage.includes('invalid credentials') || lowerMessage.includes('incorrect')) {
-    return true;
+  if (lower.includes('invalid login credentials') || lower.includes('invalid credentials')) {
+    return { kind: 'invalid_credentials' };
   }
-  
-  // - Email not confirmed
-  if (lowerMessage.includes('email not confirmed') || lowerMessage.includes('email_not_confirmed')) {
-    return true;
+  if (lower.includes('email not confirmed') || lower.includes('email_not_confirmed')) {
+    return { kind: 'email_not_confirmed' };
   }
-  
-  // - Rate limiting (user making too many requests)
-  if (lowerMessage.includes('too many requests') || lowerMessage.includes('rate_limit')) {
-    return true;
+  if (lower.includes('too many requests') || lower.includes('rate_limit')) {
+    return { kind: 'rate_limited' };
   }
-  
-  // - Validation errors (user input issues)
-  if (errorCode === 400 && (lowerMessage.includes('required') || lowerMessage.includes('invalid') || lowerMessage.includes('validation'))) {
-    return true;
+  if (lower.includes('network') || lower.includes('fetch') || lower.includes('connection') || lower.includes('timeout')) {
+    return { kind: 'network' };
   }
-  
-  // - Network/connection errors (user's network issue)
-  if (lowerMessage.includes('network') || lowerMessage.includes('fetch') || lowerMessage.includes('connection') || lowerMessage.includes('timeout')) {
-    return true;
+  if (errorCode === 400 && (lower.includes('required') || lower.includes('invalid') || lower.includes('validation'))) {
+    return { kind: 'user_input', message: errorMessage };
   }
 
-  // Backend errors (not user's fault):
-  // - 500 errors, database errors, server errors, etc.
-  return false;
+  return { kind: 'backend' };
 }
 
+const userFacingMessages: Record<string, string> = {
+  access_denied: "Thanks for your interest! This email isn't approved for beta access yet.",
+  invalid_credentials: 'Incorrect email or password. Please try again.',
+  email_not_confirmed: 'Please verify your email before signing in.',
+  rate_limited: 'Too many sign-in attempts. Please wait a moment.',
+  network: 'Connection error. Please check your internet and try again.',
+};
+
 /**
- * Sanitizes error messages for display to users
- * Returns user-friendly message for user-facing errors
- * Returns generic "Something went wrong" for backend errors
+ * Returns a user-friendly error message.
+ * User-facing errors get specific messaging; backend errors get the defaultMessage.
  */
 export function sanitizeErrorMessage(error: any, defaultMessage: string = 'Something went wrong'): string {
-  // If it's a user-facing error, return the message (or a friendly version)
-  if (isUserFacingError(error)) {
-    const errorMessage = error?.message || String(error);
-    const errorCode = error?.code || error?.status;
-    const lowerMessage = errorMessage.toLowerCase();
+  const classification = classifyError(error);
 
-    // Map to user-friendly messages
-    if (errorCode === 403 || lowerMessage.includes('access denied') || lowerMessage.includes('not authorized') || lowerMessage.includes('not approved')) {
-      return 'Thanks for your interest! This email isn\'t approved for beta access yet.';
-    }
-    
-    if (lowerMessage.includes('invalid login credentials') || lowerMessage.includes('invalid credentials')) {
-      return 'Incorrect email or password. Please try again.';
-    }
-    
-    if (lowerMessage.includes('email not confirmed') || lowerMessage.includes('email_not_confirmed')) {
-      return 'Please verify your email before signing in.';
-    }
-    
-    if (lowerMessage.includes('too many requests') || lowerMessage.includes('rate_limit')) {
-      return 'Too many sign-in attempts. Please wait a moment.';
-    }
-    
-    if (lowerMessage.includes('network') || lowerMessage.includes('fetch') || lowerMessage.includes('connection')) {
-      return 'Connection error. Please check your internet and try again.';
-    }
-
-    // For other user-facing errors, return the message
-    return errorMessage || defaultMessage;
+  if (classification.kind === 'backend') {
+    return defaultMessage;
   }
 
-  // For backend errors, return generic message
-  return defaultMessage;
+  if (classification.kind === 'user_input') {
+    return classification.message || defaultMessage;
+  }
+
+  return userFacingMessages[classification.kind] ?? defaultMessage;
 }

@@ -569,6 +569,10 @@ export function BrewsTimelineView({
 // Counter for generating unique IDs for each timeline
 let timelineIdCounter = 0;
 
+// Tracks which timelines have already animated this session.
+// Survives tab switches (component remounts) but clears on page reload (module re-init).
+const animatedTimelineKeys = new Set<string>();
+
 interface TimelineRowProps {
   brews: Brew[];
   onSelectBrew: (brew: Brew, scrollToGuidance?: boolean) => void;
@@ -587,6 +591,25 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [hoveredNodeIndex, setHoveredNodeIndex] = useState<number | null>(null);
   const [mouseX, setMouseX] = useState<number | null>(null);
+
+  // Animation refs and state for entrance microinteraction
+  const timelineKey = brews.length > 0 ? `${brews[0].coffeeId}-${brews[0].brewMethod}` : '';
+  const alreadyAnimated = !!timelineKey && animatedTimelineKeys.has(timelineKey);
+  const [animationPhase, setAnimationPhase] = useState<'pending' | 'animating' | 'done'>(alreadyAnimated ? 'done' : 'pending');
+  const hasAnimated = useRef(alreadyAnimated);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const revealRectMobileRef = useRef<SVGRectElement>(null);
+  const revealRectDesktopRef = useRef<SVGRectElement>(null);
+  const staticRectMobileRef = useRef<SVGRectElement>(null);
+  const staticRectDesktopRef = useRef<SVGRectElement>(null);
+  const mobileAreaPathRef = useRef<SVGPathElement>(null);
+  const desktopAreaBasePathRef = useRef<SVGPathElement>(null);
+  const dotButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const addButtonWrapRef = useRef<HTMLDivElement>(null);
+  const animScrollRef = useRef({ scrollLeft: 0, clientWidth: 0 });
+  const rafIdRef = useRef<number>(0);
+  const doneTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Generate unique IDs for this timeline's SVG elements using incrementor
   const uniqueId = useRef(`timeline-${timelineIdCounter++}`).current;
@@ -659,6 +682,121 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     }
   }, [brews.length]);
 
+  // IntersectionObserver for entrance animation
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          if (timelineKey) animatedTimelineKeys.add(timelineKey);
+
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            setAnimationPhase('done');
+            return;
+          }
+
+          if (scrollRef.current) {
+            animScrollRef.current = {
+              scrollLeft: scrollRef.current.scrollLeft,
+              clientWidth: scrollRef.current.clientWidth,
+            };
+          }
+
+          setAnimationPhase('animating');
+        }
+      });
+    }, { threshold: 0.2 });
+
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, []);
+
+  // Run reveal animation when phase changes to 'animating'
+  useEffect(() => {
+    if (animationPhase !== 'animating') return;
+
+    const { scrollLeft, clientWidth } = animScrollRef.current;
+    const padding = 8;
+    const visibleLeft = Math.max(0, scrollLeft - padding);
+    const isMobile = window.innerWidth < 768;
+    const cw = isMobile ? mobileContainerWidth : desktopContainerWidth;
+    const g = isMobile ? mobileGap : desktopGap;
+    const brewCount = brews.length;
+    const startTime = performance.now();
+    const duration = 1800;
+
+    [staticRectMobileRef, staticRectDesktopRef].forEach(ref => {
+      ref.current?.setAttribute('width', String(visibleLeft));
+    });
+
+    [revealRectMobileRef, revealRectDesktopRef].forEach(ref => {
+      if (ref.current) {
+        ref.current.setAttribute('x', String(visibleLeft));
+        ref.current.setAttribute('width', '0');
+      }
+    });
+
+    const easeInOutQuad = (t: number) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const rawProgress = Math.min(elapsed / duration, 1);
+      const progress = easeInOutQuad(rawProgress);
+      const revealWidth = clientWidth * progress;
+
+      [revealRectMobileRef, revealRectDesktopRef].forEach(ref => {
+        ref.current?.setAttribute('width', String(revealWidth));
+      });
+
+      // Area fades in during the last 30% of the line trace
+      const areaOpacity = progress < 0.7 ? 0 : Math.min(1, (progress - 0.7) / 0.3);
+      mobileAreaPathRef.current?.setAttribute('opacity', String(areaOpacity));
+      desktopAreaBasePathRef.current?.setAttribute('opacity', String(areaOpacity));
+
+      for (let i = 0; i < brewCount; i++) {
+        const dotX = i * (cw + g) + cw / 2;
+        const normalizedPos = clientWidth > 0 ? (dotX - visibleLeft) / clientWidth : 0;
+
+        if (normalizedPos <= progress || normalizedPos < 0) {
+          const dotEl = dotButtonRefs.current[i];
+          if (dotEl && dotEl.style.opacity !== '1') {
+            dotEl.style.opacity = '1';
+            dotEl.style.transform = 'scale(1)';
+          }
+          const labelEl = labelRefs.current[i];
+          if (labelEl && labelEl.style.opacity !== '1') {
+            labelEl.style.opacity = '1';
+          }
+        }
+      }
+
+      const addBtnX = brewCount * (cw + g) + cw / 2;
+      const addBtnNorm = clientWidth > 0 ? (addBtnX - visibleLeft) / clientWidth : 0;
+      if ((addBtnNorm <= progress || addBtnNorm < 0) && addButtonWrapRef.current) {
+        addButtonWrapRef.current.style.opacity = '1';
+      }
+
+      if (rawProgress < 1) {
+        rafIdRef.current = requestAnimationFrame(animate);
+      } else {
+        doneTimeoutRef.current = setTimeout(() => {
+          setAnimationPhase('done');
+        }, 400);
+      }
+    };
+
+    rafIdRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      if (doneTimeoutRef.current) clearTimeout(doneTimeoutRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animationPhase]);
+
   // Get dot color based on rating
   const getDotColor = (quality: number | null) => {
     if (!quality) return 'bg-gray-300';
@@ -724,6 +862,13 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
   const mobileSvgHeight = 90; // 25% reduction from 120px
   const desktopSvgHeight = 120;
   const hasButton = coffeeId && brewMethod && onAddExtraction;
+
+  const bagChangeIndices = brews.reduce<number[]>((acc, brew, index) => {
+    if (index > 0 && brew.coffeeId !== brews[index - 1].coffeeId) {
+      acc.push(index);
+    }
+    return acc;
+  }, []);
 
   // Calculate graph path for rated brews
   const calculateGraphPath = (isMobile: boolean) => {
@@ -958,7 +1103,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     : brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth;
   
   return (
-    <div>
+    <div ref={rowRef}>
       {/* Timeline Container with fade overlay */}
       <div className="relative">
         {/* Left fade gradient - shows when scrolled right (content hidden on left) */}
@@ -1030,13 +1175,35 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   <mask id={`${uniqueId}-mobileMask`}>
                     <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} fill={`url(#${uniqueId}-mobileFadeMask)`} />
                   </mask>
+                  {animationPhase !== 'done' && (
+                    <clipPath id={`${uniqueId}-mobileRevealClip`}>
+                      <rect ref={staticRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
+                      <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
+                    </clipPath>
+                  )}
                 </defs>
+                {bagChangeIndices.map(i => {
+                  const prevX = (i - 1) * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
+                  const currX = i * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
+                  const midX = (prevX + currX) / 2;
+                  return (
+                    <g
+                      key={`bag-${i}`}
+                      clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-mobileRevealClip)` : undefined}
+                    >
+                      <line x1={midX} y1={0} x2={midX} y2={mobileSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
+                      <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
+                      <text x={midX} y={5} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
+                    </g>
+                  );
+                })}
                 {/* Mobile: Base graph always at 100% opacity (no hover effects) */}
                 <path
+                  ref={mobileAreaPathRef}
                   d={mobileFillPath}
                   fill={`url(#${uniqueId}-mobileGradient)`}
                   mask={`url(#${uniqueId}-mobileMask)`}
-                  opacity="1"
+                  opacity={animationPhase === 'done' ? "1" : "0"}
                 />
                 <path
                   d={mobileGraphPath}
@@ -1045,6 +1212,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-mobileRevealClip)` : undefined}
                   opacity="1"
                 />
               </svg>
@@ -1069,6 +1237,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   <mask id={`${uniqueId}-desktopMask`}>
                     <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFadeMask)`} />
                   </mask>
+                  {animationPhase !== 'done' && (
+                    <clipPath id={`${uniqueId}-desktopRevealClip`}>
+                      <rect ref={staticRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
+                      <rect ref={revealRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
+                    </clipPath>
+                  )}
                   {/* Gradient mask for highlight effect - peaks at hovered node, fades to 0 at edges */}
                   {desktopGradientStops && (() => {
                     const { hoveredX, leftFadeStart, leftFadeEnd, rightFadeStart, rightFadeEnd, immediateLeftX, immediateRightX, secondLeftX, secondRightX } = desktopGradientStops;
@@ -1225,13 +1399,29 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     );
                   })()}
                 </defs>
+                {bagChangeIndices.map(i => {
+                  const prevX = (i - 1) * (desktopContainerWidth + desktopGap) + desktopContainerWidth / 2;
+                  const currX = i * (desktopContainerWidth + desktopGap) + desktopContainerWidth / 2;
+                  const midX = (prevX + currX) / 2;
+                  return (
+                    <g
+                      key={`bag-${i}`}
+                      clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
+                    >
+                      <line x1={midX} y1={0} x2={midX} y2={desktopSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
+                      <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
+                      <text x={midX} y={5} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
+                    </g>
+                  );
+                })}
                 {/* Base fill - always rendered, opacity controlled for smooth transitions */}
                 {/* Smooth transition when entering hover, no transition when leaving to prevent darker appearance */}
                 <path
+                  ref={desktopAreaBasePathRef}
                   d={desktopFillPath}
                   fill={`url(#${uniqueId}-desktopGradient)`}
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopFillBaseMaskElement)` : `url(#${uniqueId}-desktopMask)`}
-                  opacity={desktopGradientStops ? "0.6" : "1"}
+                  opacity={animationPhase === 'done' ? (desktopGradientStops ? "0.6" : "1") : "0"}
                   style={desktopGradientStops ? { 
                     transition: 'opacity 0.2s ease-out',
                   } : {
@@ -1261,6 +1451,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine60Mask)` : undefined}
+                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Line at 80% opacity - mask controls visibility to 80% */}
@@ -1272,6 +1463,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine80Mask)` : undefined}
+                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Line at 100% opacity - mask controls visibility to 100% */}
@@ -1283,6 +1475,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine100Mask)` : undefined}
+                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Base line at full opacity when not hovering */}
@@ -1293,6 +1486,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  clipPath={animationPhase !== 'done' ? `url(#${uniqueId}-desktopRevealClip)` : undefined}
                   opacity={desktopGradientStops ? "0" : "1"}
                 />
               </svg>
@@ -1331,36 +1525,27 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     }
                   }
 
-                  const bagChanged = index > 0 && brew.coffeeId !== brews[index - 1].coffeeId;
-
                   return (
-                    <React.Fragment key={brew.id}>
-                      {bagChanged && (
-                        <div
-                          className="flex flex-col items-center justify-center self-stretch"
-                          style={{ marginTop: `${(isMobile ? mobileSvgHeight : desktopSvgHeight) * 0.15}px` }}
-                        >
-                          <div className="border-l border-dashed border-gray-300 flex-1 min-h-[16px]" />
-                          <span className="text-[9px] text-gray-400 whitespace-nowrap" style={{ writingMode: 'vertical-lr' }}>new bag</span>
-                          <div className="border-l border-dashed border-gray-300 flex-1 min-h-[16px]" />
-                        </div>
-                      )}
                       <div 
+                        key={brew.id}
                         ref={(el) => { nodeRefs.current[index] = el; }}
                         className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
                         style={{ opacity: nodeOpacity, transition: 'opacity 0.2s' }}
                       >
                         {/* Node Circle - centered on the curve */}
                         <button
+                          ref={(el) => { dotButtonRefs.current[index] = el; }}
                           onClick={() => onSelectBrew(brew)}
                           className={`w-2.5 h-2.5 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
                             isUnrated 
                               ? 'border-dashed bg-transparent border-gray-400' 
-                              : `${dotColor} ${dotBorderColor} ${isNewest ? 'animate-radiate' : ''}`
+                              : `${dotColor} ${dotBorderColor} ${isNewest && animationPhase === 'done' ? 'animate-radiate' : ''}`
                           }`}
                           style={{ 
                             marginTop: `${yPos - 5}px`,
-                            opacity: 1,
+                            opacity: animationPhase === 'done' ? 1 : 0,
+                            transform: animationPhase === 'done' ? undefined : 'scale(0)',
+                            transition: animationPhase !== 'done' ? 'opacity 250ms ease-out, transform 250ms ease-out' : undefined,
                             backgroundColor: isUnrated ? 'transparent' : undefined,
                             ...(brew.quality === 2 ? {
                               backgroundColor: 'oklch(0.76 0.18 88.84)',
@@ -1371,7 +1556,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                         >
                         </button>
                       </div>
-                    </React.Fragment>
                   );
                 })}
 
@@ -1384,8 +1568,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   
                   return (
                     <div 
+                      ref={addButtonWrapRef}
                       className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
-                      style={{ opacity: 1 }}
+                      style={{
+                        opacity: animationPhase === 'done' ? 1 : 0,
+                        transition: animationPhase !== 'done' ? 'opacity 250ms ease-out' : undefined,
+                      }}
                     >
                       {/* Vertically centered button - responsive for mobile height */}
                       <button
@@ -1435,9 +1623,13 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
 
                 return (
                   <div 
+                    ref={(el) => { labelRefs.current[index] = el; }}
                     key={brew.id} 
                     className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"
-                    style={{ opacity: labelOpacity, transition: 'opacity 0.2s' }}
+                    style={{
+                      opacity: animationPhase === 'done' ? labelOpacity : 0,
+                      transition: animationPhase !== 'done' ? 'opacity 250ms ease-out' : 'opacity 0.2s',
+                    }}
                   >
                     <div 
                       className="text-xs text-gray-900 whitespace-nowrap"

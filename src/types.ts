@@ -47,6 +47,7 @@ export interface Coffee {
   roastLevel?: RoastLevel;
   imageUrls?: string[];
   personalNotes?: string;
+  finished?: boolean;
   createdAt: string;
 }
 

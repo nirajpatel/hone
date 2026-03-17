@@ -73,7 +73,6 @@ export function EquipmentDialog({
       }
 
       const data = await response.json();
-      console.log('Equipment loaded successfully:', data);
       setEquipment(data);
     } catch (error) {
       console.error('Error loading equipment:', error);
@@ -124,7 +123,7 @@ export function EquipmentDialog({
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         throw new Error(error.error || 'Failed to save equipment');
       }
 

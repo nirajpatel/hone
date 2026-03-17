@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { Coffee, Brew } from '../types';
-import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, QrCode, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Calendar, FileText, Flame, MoreVertical, Plus, Trash2, QrCode, ChevronLeft, ChevronRight, CheckCircle2, RotateCcw } from 'lucide-react';
 import { Button } from './ui/button';
 import { StandardDialog } from './ui/standard-dialog';
 import { Badge } from './ui/badge';
@@ -18,6 +18,7 @@ interface CoffeeDetailProps {
   onDuplicateCoffee?: (coffee: Coffee) => void;
   onPrintQR?: (coffee: Coffee) => void;
   onDeleteCoffee?: (id: string) => void;
+  onMarkFinished?: (id: string, finished: boolean) => void;
   onNavigatePrev?: () => void;
   onNavigateNext?: () => void;
   hasPrev?: boolean;
@@ -25,7 +26,7 @@ interface CoffeeDetailProps {
   showNavArrows?: boolean;
 }
 
-export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onPrintQR, onDeleteCoffee, onNavigatePrev, onNavigateNext, hasPrev, hasNext, showNavArrows }: CoffeeDetailProps) {
+export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee, onPrintQR, onDeleteCoffee, onMarkFinished, onNavigatePrev, onNavigateNext, hasPrev, hasNext, showNavArrows }: CoffeeDetailProps) {
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
   const [representativeImageUrl, setRepresentativeImageUrl] = useState<string | null>(null);
 
@@ -33,10 +34,19 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
   useEffect(() => {
     if (!coffee.roaster || !coffee.name) return;
     setRepresentativeImageUrl(null);
+    let cancelled = false;
     fetch(`${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(coffee.roaster)}&coffeeName=${encodeURIComponent(coffee.name)}`)
-      .then(r => r.json())
-      .then(data => { if (data.imageUrl) setRepresentativeImageUrl(data.imageUrl); })
-      .catch(() => {});
+      .then(r => {
+        if (!r.ok) return null;
+        return r.json();
+      })
+      .then(data => {
+        if (!cancelled && data?.imageUrl) setRepresentativeImageUrl(data.imageUrl);
+      })
+      .catch(err => {
+        console.error('Failed to load representative image:', err);
+      });
+    return () => { cancelled = true; };
   }, [coffee.roaster, coffee.name]);
 
   // Handle Escape key to close and arrow keys for navigation
@@ -136,6 +146,15 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
           <DropdownMenuItem onSelect={() => onPrintQR(coffee)} className="cursor-pointer">
             <QrCode className="w-4 h-4 mr-2" />
             Print Label
+          </DropdownMenuItem>
+        )}
+        {onMarkFinished && (
+          <DropdownMenuItem onSelect={() => onMarkFinished(coffee.id, !coffee.finished)} className="cursor-pointer">
+            {coffee.finished ? (
+              <><RotateCcw className="w-4 h-4 mr-2" />Mark As Active</>
+            ) : (
+              <><CheckCircle2 className="w-4 h-4 mr-2" />Mark As Finished</>
+            )}
           </DropdownMenuItem>
         )}
         {onDeleteCoffee && (

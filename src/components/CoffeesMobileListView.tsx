@@ -1,4 +1,4 @@
-import { Coffee, Extraction, Brew } from '../types';
+import { Coffee, Brew } from '../types';
 import { getRatingEmoji } from '../utils/formatters';
 import { SimpleTooltip } from './ui/simple-tooltip';
 

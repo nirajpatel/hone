@@ -3,15 +3,15 @@ import { Heart, MessageCircle, Star } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { capitalizeBrewMethod } from '../utils/formatters';
 import { capitalize } from '../utils/tastingNotes';
-import { Extraction, Coffee } from '../types';
+import { Brew, Coffee } from '../types';
 
 interface FeedProps {
-  brews: Extraction[];
+  brews: Brew[];
   coffees: Coffee[];
 }
 
 interface FeedCardProps {
-  brew: Extraction;
+  brew: Brew;
   coffeeImages?: string[];
 }
 

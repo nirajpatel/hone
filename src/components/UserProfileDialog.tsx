@@ -145,9 +145,12 @@ export function UserProfileDialog({
         const data = await response.json();
         setHousehold(data.household);
         setHouseholdMembers(data.members || []);
+      } else {
+        toast.error('Failed to load household data');
       }
     } catch (error) {
       console.error('Error fetching household:', error);
+      toast.error('Failed to load household data');
     } finally {
       setLoadingHousehold(false);
     }
@@ -181,7 +184,7 @@ export function UserProfileDialog({
         // Refresh household data
         await fetchHousehold();
       } else {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         toast.error(error.error || 'Failed to create household');
       }
     } catch (error) {
@@ -212,7 +215,7 @@ export function UserProfileDialog({
         // Reload page to refresh all data with household scope
         window.location.reload();
       } else {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         setInviteCodeError(error.error || 'Failed to join household');
         toast.error(error.error || 'Failed to join household');
       }
@@ -371,7 +374,7 @@ export function UserProfileDialog({
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         console.error('Error response from server:', error);
         throw new Error(error.error || 'Failed to update profile');
       }

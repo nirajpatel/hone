@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Brew, Coffee, User, BrewMethod, Equipment } from './types';
+import { useState, useEffect, useRef } from 'react';
+import { Brew, Coffee, User, BrewMethod, Equipment, CoffeeTemperature, BrewStage } from './types';
 import { BrewDetail } from './components/BrewDetail';
 import { CoffeeDetail } from './components/CoffeeDetail';
 import { NewBrewFlow } from './components/NewBrewFlow';
 import { AddCoffeeForm } from './components/AddCoffeeForm';
 import { QRCodeDialog } from './components/QRCodeDialog';
-import { Login } from './components/Login';
 import { LandingPage } from './components/LandingPage';
 import { SignInPage } from './components/SignInPage';
 import { BrewsTableView } from './components/BrewsTableView';
@@ -67,6 +66,7 @@ import {
 import { SimpleTooltip } from './components/ui/simple-tooltip';
 import { supabase } from './utils/supabase/client';
 import { sanitizeErrorMessage } from './utils/errorHandling';
+import { fetchWithRetry } from './utils/fetchWithRetry';
 
 export default function App() {
   const [brews, setBrews] = useState<Brew[]>([]);
@@ -77,7 +77,7 @@ export default function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [selectedBrew, setSelectedBrew] = useState<Extraction | null>(null);
+  const [selectedBrew, setSelectedBrew] = useState<Brew | null>(null);
   const [scrollToGuidance, setScrollToGuidance] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
   const [showNewBrew, setShowNewBrew] = useState(false);
@@ -124,14 +124,30 @@ export default function App() {
     return session?.access_token || null;
   };
 
+  // Stable refs so the onAuthStateChange listener always calls the latest functions
+  const checkAuthRef = useRef<() => Promise<void>>(null!);
+  const createOrGetUserRef = useRef<(token: string) => Promise<void>>(null!);
+
   // Refresh data when app resumes from iOS home screen frozen state
+  const isRefreshingRef = useRef(false);
   useEffect(() => {
     const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && currentUser && accessToken) {
-        const freshToken = await getAccessToken();
-        if (freshToken) {
-          setAccessToken(freshToken);
-          fetchData(freshToken);
+      if (document.visibilityState === 'visible' && currentUser && accessToken && !isRefreshingRef.current) {
+        isRefreshingRef.current = true;
+        try {
+          const { data: { session }, error } = await supabase.auth.refreshSession();
+          if (error || !session?.access_token) {
+            console.error('Failed to refresh session on tab resume:', error);
+            await supabase.auth.signOut();
+            setCurrentUser(null);
+            setAccessToken(null);
+            toast.error('Session expired. Please sign in again.');
+            return;
+          }
+          setAccessToken(session.access_token);
+          fetchData(session.access_token);
+        } finally {
+          isRefreshingRef.current = false;
         }
       }
     };
@@ -326,6 +342,7 @@ export default function App() {
       setAllCoffeesLoading(true);
       try {
         const token = await getAccessToken();
+        if (!token) return;
         const res = await fetch(`${apiUrl}/coffees/all`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -341,20 +358,21 @@ export default function App() {
   }, [showBagImages, currentUser, accessToken]);
 
   useEffect(() => {
-    checkAuth();
+    checkAuthRef.current();
     
-    // Set up auth state listener
+    // Set up auth state listener — uses refs to always call the latest function versions
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Skip auth state change handling if we're processing /auth/confirm
-      // The checkAuth function handles it directly
       if (window.location.pathname === '/auth/confirm') {
         return;
       }
       
-      if (event === 'SIGNED_IN' && session?.access_token) {
+      if (event === 'INITIAL_SESSION' && session?.access_token) {
         setAccessToken(session.access_token);
-        await createOrGetUser(session.access_token);
-        // Redirect from /login to root after successful sign-in
+      } else if (event === 'TOKEN_REFRESHED' && session?.access_token) {
+        setAccessToken(session.access_token);
+      } else if (event === 'SIGNED_IN' && session?.access_token) {
+        setAccessToken(session.access_token);
+        await createOrGetUserRef.current(session.access_token);
         if (window.location.pathname === '/login') {
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
@@ -501,6 +519,7 @@ export default function App() {
       setAuthChecked(true);
     } catch (error) {
       console.error('Error checking auth:', error);
+      toast.error('Something went wrong. Please refresh and try again.');
       setLoading(false);
       setAuthChecked(true);
     }
@@ -519,34 +538,31 @@ export default function App() {
       if (res.ok) {
         const userData = await res.json();
         setCurrentUser(userData);
-        // Fetch brews and coffees after successful auth
         await fetchData(token);
-        // Redirect from /login to root after successful sign-in
-        if (window.location.pathname === '/login') {
-          window.history.pushState({}, '', '/');
-          setCurrentRoute('/');
-        }
       } else {
         const errorData = await res.json().catch(() => ({}));
         
-        // Handle 403 (access denied) - sign out user and redirect to login
         if (res.status === 403) {
           await supabase.auth.signOut();
           setCurrentUser(null);
           setAccessToken(null);
           window.history.pushState({}, '', '/login');
           window.dispatchEvent(new PopStateEvent('popstate'));
-          // Don't show toast - SignInPage will handle the error display
         } else {
-          // Other errors - don't show toast
+          console.error('Error creating/getting user:', res.status, errorData);
+          toast.error('Failed to load your account. Please try again.');
         }
       }
     } catch (error) {
       console.error('Error creating/getting user:', error);
+      toast.error('Failed to connect. Please check your internet and try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  checkAuthRef.current = checkAuth;
+  createOrGetUserRef.current = createOrGetUser;
 
   const fetchData = async (token?: string) => {
     const authToken = token || await getAccessToken() || accessToken;
@@ -556,33 +572,38 @@ export default function App() {
     }
 
     try {
+      const headers = { Authorization: `Bearer ${authToken}` };
       const [brewsRes, coffeesRes, usersRes, equipmentRes] = await Promise.all([
-        fetch(`${apiUrl}/brews`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }),
-        fetch(`${apiUrl}/coffees`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }),
-        fetch(`${apiUrl}/users`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }),
-        fetch(`${apiUrl}/equipment`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }),
+        fetchWithRetry(`${apiUrl}/brews`, { headers }),
+        fetchWithRetry(`${apiUrl}/coffees`, { headers }),
+        fetchWithRetry(`${apiUrl}/users`, { headers }),
+        fetchWithRetry(`${apiUrl}/equipment`, { headers }),
       ]);
 
-      if (brewsRes.ok && coffeesRes.ok && usersRes.ok && equipmentRes.ok) {
-        const brewsData = await brewsRes.json();
-        const coffeesData = await coffeesRes.json();
-        const usersData = await usersRes.json();
-        const equipmentData = await equipmentRes.json();
-        setBrews(brewsData);
-        setCoffees(coffeesData);
-        setUsers(usersData);
-        setEquipment(equipmentData);
-      } else {
-        console.error('Failed to fetch data');
-        toast.error('Failed to load data');
+      const anyUnauthorized = [brewsRes, coffeesRes, usersRes, equipmentRes].some(r => r.status === 401 || r.status === 403);
+      if (anyUnauthorized) {
+        await supabase.auth.signOut();
+        setCurrentUser(null);
+        setAccessToken(null);
+        toast.error('Session expired. Please sign in again.');
+        return;
+      }
+
+      // Update each resource independently so a single failure doesn't discard the rest
+      if (brewsRes.ok) setBrews(await brewsRes.json());
+      if (coffeesRes.ok) setCoffees(await coffeesRes.json());
+      if (usersRes.ok) setUsers(await usersRes.json());
+      if (equipmentRes.ok) setEquipment(await equipmentRes.json());
+
+      const failed = [
+        !brewsRes.ok && 'brews',
+        !coffeesRes.ok && 'beans',
+        !usersRes.ok && 'users',
+        !equipmentRes.ok && 'equipment',
+      ].filter(Boolean);
+      if (failed.length > 0) {
+        console.error('Failed to fetch:', failed.join(', '));
+        toast.error(`Failed to load ${failed.join(', ')}`);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -590,15 +611,15 @@ export default function App() {
     }
   };
 
-  const handleAddExtraction = async (brew: Omit<Extraction, 'id' | 'createdAt'>) => {
+  const handleAddExtraction = async (brew: Omit<Brew, 'id' | 'createdAt'>) => {
     if (!accessToken) {
       toast.error('Please sign in to create brews');
       return;
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       // Create a local timestamp string for SMS display (in user's timezone)
       const now = new Date();
@@ -634,7 +655,7 @@ export default function App() {
         setShowNewBrew(false);
         toast.success('Brew logged');
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to create brew:', error);
         toast.error(sanitizeErrorMessage(error, 'Failed to log brew'));
       }
@@ -651,8 +672,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       const res = await fetch(`${apiUrl}/brews/${id}`, {
         method: 'PUT',
@@ -669,7 +690,7 @@ export default function App() {
         setSelectedBrew(null);
         toast.success(quality ? 'Quality updated' : 'Quality cleared');
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to update brew:', error);
         toast.error(sanitizeErrorMessage(error, 'Failed to update quality'));
       }
@@ -686,8 +707,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       const res = await fetch(`${apiUrl}/brews/${id}`, {
         method: 'PUT',
@@ -703,7 +724,7 @@ export default function App() {
         setBrews(brews.map((e) => (e.id === id ? updated : e)));
         toast.success('Notes updated successfully');
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to update notes:', error);
         toast.error(sanitizeErrorMessage(error, 'Failed to update notes'));
       }
@@ -720,8 +741,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       const res = await fetch(`${apiUrl}/coffees`, {
         method: 'POST',
@@ -756,13 +777,13 @@ export default function App() {
         setShowAddCoffee(false);
         toast.success('Coffee added');
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to create coffee:', error);
-        toast.error('Failed to add coffee');
+        toast.error(sanitizeErrorMessage(error, 'Failed to add coffee'));
       }
     } catch (error) {
       console.error('Error creating coffee:', error);
-      toast.error('Error adding coffee');
+      toast.error(sanitizeErrorMessage(error, 'Failed to add coffee'));
     }
   };
 
@@ -778,7 +799,7 @@ export default function App() {
     }
   };
 
-  const handleDuplicateExtraction = (brew: Extraction) => {
+  const handleDuplicateExtraction = (brew: Brew) => {
     setDuplicateBrewData(brew);
     setShowNewBrew(true);
   };
@@ -790,8 +811,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       const res = await fetch(`${apiUrl}/brews/${id}`, {
         method: 'DELETE',
@@ -805,7 +826,7 @@ export default function App() {
         toast.success('Brew deleted');
         setDeletingBrewId(null);
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to delete brew:', error);
         toast.error(sanitizeErrorMessage(error, 'Failed to delete brew'));
       }
@@ -822,8 +843,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       const res = await fetch(`${apiUrl}/coffees/${id}`, {
         method: 'DELETE',
@@ -839,13 +860,13 @@ export default function App() {
         toast.success('Coffee and associated brews deleted');
         setDeletingCoffeeId(null);
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to delete coffee:', error);
-        toast.error('Failed to delete coffee');
+        toast.error(sanitizeErrorMessage(error, 'Failed to delete coffee'));
       }
     } catch (error) {
       console.error('Error deleting coffee:', error);
-      toast.error('Error deleting coffee');
+      toast.error(sanitizeErrorMessage(error, 'Failed to delete coffee'));
     }
   };
 
@@ -872,8 +893,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       const res = await fetch(`${apiUrl}/coffees/${id}`, {
         method: 'PUT',
@@ -891,17 +912,48 @@ export default function App() {
         setEditingCoffee(null);
         toast.success('Coffee updated');
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to update coffee:', error);
-        toast.error('Failed to update coffee');
+        toast.error(sanitizeErrorMessage(error, 'Failed to update coffee'));
       }
     } catch (error) {
       console.error('Error updating coffee:', error);
-      toast.error('Error updating coffee');
+      toast.error(sanitizeErrorMessage(error, 'Failed to update coffee'));
     }
   };
 
-  const handleEditExtraction = (brew: Extraction) => {
+  const handleMarkCoffeeFinished = async (id: string, finished: boolean = true) => {
+    const coffee = coffees.find(c => c.id === id);
+    if (!coffee || !accessToken) return;
+
+    try {
+      const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
+
+      const { id: _id, createdAt: _ca, ...data } = coffee;
+      const res = await fetch(`${apiUrl}/coffees/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${freshToken}`,
+        },
+        body: JSON.stringify({ ...data, finished }),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setCoffees(coffees.map(c => (c.id === id ? updated : c)));
+      } else {
+        const error = await res.json().catch(() => ({}));
+        toast.error(sanitizeErrorMessage(error, 'Failed to update bag status'));
+      }
+    } catch (error) {
+      console.error('Error marking coffee as finished:', error);
+      toast.error(sanitizeErrorMessage(error, 'Failed to update bag status'));
+    }
+  };
+
+  const handleEditExtraction = (brew: Brew) => {
     setShowNewBrew(false); // Close new brew form if open
     setDuplicateBrewData(null); // Clear any duplicate data
     setEditingBrew(brew);
@@ -935,8 +987,8 @@ export default function App() {
     }
 
     try {
-      // Get fresh access token (auto-refreshed by Supabase if needed)
       const freshToken = await getAccessToken();
+      if (!freshToken) { toast.error('Session expired. Please sign in again.'); return; }
 
       // Get coffee and user details for the updated brew
       const coffee = coffees.find(o => o.id === data.coffeeId);
@@ -969,7 +1021,7 @@ export default function App() {
         setEditingBrew(null);
         toast.success('Brew updated successfully');
       } else {
-        const error = await res.json();
+        const error = await res.json().catch(() => ({}));
         console.error('Failed to update brew:', error);
         toast.error(sanitizeErrorMessage(error, 'Failed to update brew'));
       }
@@ -1771,6 +1823,10 @@ export default function App() {
               setSelectedCoffeeSiblings(null);
               setDeletingCoffeeId(id);
             }}
+            onMarkFinished={(id, finished) => {
+              handleMarkCoffeeFinished(id, finished);
+              setSelectedCoffee(prev => prev ? { ...prev, finished } : null);
+            }}
             onNavigatePrev={hasPrev ? () => setSelectedCoffee(navList[currentIndex - 1]) : undefined}
             onNavigateNext={hasNext ? () => setSelectedCoffee(navList[currentIndex + 1]) : undefined}
             hasPrev={hasPrev}
@@ -1799,6 +1855,9 @@ export default function App() {
             equipmentChangeCounter={equipmentChangeCounter}
             prefilledCoffeeId={prefilledCoffeeId}
             prefilledBrewMethod={prefilledBrewMethod}
+            onMarkCoffeeFinished={handleMarkCoffeeFinished}
+            onAddAnotherBag={handleDuplicateCoffee}
+            hidden={showAddCoffee}
           />
         ) : (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -1838,6 +1897,9 @@ export default function App() {
           editingBrew={editingBrew}
           onUpdate={handleUpdateExtraction}
           equipmentChangeCounter={equipmentChangeCounter}
+          onMarkCoffeeFinished={handleMarkCoffeeFinished}
+          onAddAnotherBag={handleDuplicateCoffee}
+          hidden={showAddCoffee}
         />
       )}
 

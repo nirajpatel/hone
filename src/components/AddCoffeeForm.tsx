@@ -142,6 +142,8 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       return;
     }
 
+    let cancelled = false;
+
     // Find the most recent coffee with the same roaster and name that has region, notes, or roast level
     const matchingCoffees = existingCoffees.filter(
       c => c.roaster.toLowerCase() === roaster.toLowerCase() && 
@@ -166,7 +168,8 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       }
       
       // After auto-filling, check if any fields are still empty and trigger AI lookup in parallel
-      setTimeout(async () => {
+      const timerId = setTimeout(async () => {
+        if (cancelled) return;
         const lookups: Promise<void>[] = [];
         
         if (!mostRecent.roastLevel && !roastLevelLoading) {
@@ -179,14 +182,15 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
           lookups.push(handleNotesLookup());
         }
         
-        // Run all AI lookups in parallel
         if (lookups.length > 0) {
           await Promise.all(lookups);
         }
       }, 300);
+      return () => { cancelled = true; clearTimeout(timerId); };
     } else {
       // No previous coffee found, trigger AI lookup for all fields in parallel
-      setTimeout(async () => {
+      const timerId = setTimeout(async () => {
+        if (cancelled) return;
         const lookups: Promise<void>[] = [];
         
         if (!roastLevel && !roastLevelLoading) {
@@ -199,11 +203,11 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
           lookups.push(handleNotesLookup());
         }
         
-        // Run all AI lookups in parallel
         if (lookups.length > 0) {
           await Promise.all(lookups);
         }
       }, 300);
+      return () => { cancelled = true; clearTimeout(timerId); };
     }
   }, [roaster, name, roasterFocused, nameFocused, existingCoffees, editData]);
 
@@ -395,7 +399,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       setImages([...images, ...newImages]);
     } catch (error) {
       console.error('Error reading files:', error);
-      alert('Failed to read images. Please try again.');
+      toast.error('Failed to read images. Please try again.');
     }
   };
 
@@ -427,7 +431,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
           });
         } catch (error) {
           console.error('Error reading camera images:', error);
-          alert('Failed to read camera images. Please try again.');
+          toast.error('Failed to read camera images. Please try again.');
         } finally {
           // Clean up
           document.body.removeChild(input);
@@ -453,7 +457,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       setCameraStream(stream);
     } catch (error) {
       console.error('Error accessing camera:', error);
-      alert('Failed to access camera. Please make sure you have granted camera permissions.');
+      toast.error('Failed to access camera. Please check your camera permissions.');
       setShowCameraModal(false);
     }
   };
@@ -518,7 +522,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
   // Extract details from images
   const extractFromImages = async () => {
     if (images.length === 0) {
-      alert('Please add at least one image first.');
+      toast.error('Please add at least one image first.');
       return;
     }
 
@@ -537,7 +541,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to extract details');
       }
 
@@ -626,14 +630,8 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       );
 
       if (!response.ok) {
-        let errorMessage = 'Failed to lookup roast level';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          // If JSON parsing fails, use default error message
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to lookup roast level');
       }
 
       const data = await response.json();
@@ -674,14 +672,8 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       );
 
       if (!response.ok) {
-        let errorMessage = 'Failed to lookup region';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          // If JSON parsing fails, use default error message
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to lookup region');
       }
 
       const data = await response.json();
@@ -724,14 +716,8 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
       );
 
       if (!response.ok) {
-        let errorMessage = 'Failed to lookup tasting notes';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          // If JSON parsing fails, use default error message
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to lookup tasting notes');
       }
 
       const data = await response.json();

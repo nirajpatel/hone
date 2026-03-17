@@ -18,6 +18,7 @@ interface AutocompleteDropdownProps {
   className?: string;
   disabled?: boolean;
   getDropdownLabel?: (searchQuery: string) => string;
+  getDisplayValue?: (value: string) => string;
 }
 
 export function AutocompleteDropdown({
@@ -30,6 +31,7 @@ export function AutocompleteDropdown({
   className = '',
   disabled = false,
   getDropdownLabel,
+  getDisplayValue,
 }: AutocompleteDropdownProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -48,8 +50,8 @@ export function AutocompleteDropdown({
       )
     : defaultOptions || options;
 
-  // Display value in input
-  const displayValue = showDropdown ? searchQuery : (selectedOption?.line1 || '');
+  // Display value in input (fall back to getDisplayValue for values not in options, e.g. after bag switch)
+  const displayValue = showDropdown ? searchQuery : (selectedOption?.line1 || (getDisplayValue ? getDisplayValue(value) : ''));
 
   // Highlight matching text
   const highlightMatch = (text: string, query: string) => {

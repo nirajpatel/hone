@@ -57,7 +57,7 @@ export function Profile({
   // Fetch profile data
   useEffect(() => {
     fetchProfileData();
-  }, [currentUser.id]);
+  }, [currentUser.id, accessToken]);
 
   const fetchProfileData = async () => {
     setLoading(true);
@@ -74,9 +74,12 @@ export function Profile({
       if (response.ok) {
         const data = await response.json();
         setProfileData(data || {});
+      } else {
+        toast.error('Failed to load profile');
       }
     } catch (err) {
       console.error('Error fetching profile:', err);
+      toast.error('Failed to load profile');
     } finally {
       setLoading(false);
     }

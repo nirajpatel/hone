@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, ChangeEvent } from 'react';
+import { useState, useEffect, useCallback, useRef, ChangeEvent } from 'react';
 import { Coffee } from '../types';
 import { Button } from './ui/button';
 import { X, Upload, RefreshCw, Check, ChevronLeft, ChevronRight, LayoutGrid, Pencil } from 'lucide-react';
@@ -45,6 +45,8 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
 
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     // Always clear caches on mount so stale pre-normalization data is never reused
     _cachedUniqueCoffees = null;
@@ -53,11 +55,14 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
     _fetchInProgress = false;
     setExistingImages(new Map());
     setDefaultExistingImage(null);
-    loadCoffeesNeedingImages();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    loadCoffeesNeedingImages(controller.signal);
+    return () => { controller.abort(); };
   }, []);
 
 
-  const loadCoffeesNeedingImages = async () => {
+  const loadCoffeesNeedingImages = async (signal?: AbortSignal) => {
     _fetchInProgress = true;
     try {
       // Fetch alias maps so variant roaster/coffee names are grouped under their canonical key
@@ -66,6 +71,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
       try {
         const aliasRes = await fetch(`${apiUrl}/aliases`, {
           headers: { Authorization: `Bearer ${publicAnonKey}` },
+          signal,
         });
         if (aliasRes.ok) {
           const data = await aliasRes.json();
@@ -134,7 +140,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
         try {
           const res = await fetch(
             `${apiUrl}/coffee-representative-image?roaster=__default__&coffeeName=__default__`,
-            { headers: { Authorization: `Bearer ${publicAnonKey}` } }
+            { headers: { Authorization: `Bearer ${publicAnonKey}` }, signal }
           );
           if (res.ok) {
             const data = await res.json();
@@ -158,7 +164,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
               try {
                 const res = await fetch(
                   `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(coffee.roaster)}&coffeeName=${encodeURIComponent(coffee.name)}`,
-                  { headers: { Authorization: `Bearer ${publicAnonKey}` } }
+                  { headers: { Authorization: `Bearer ${publicAnonKey}` }, signal }
                 );
                 if (res.ok) {
                   const data = await res.json();

@@ -1,4 +1,4 @@
-import { Coffee, Extraction } from '../types';
+import { Coffee, Brew } from '../types';
 import {
   Table,
   TableBody,

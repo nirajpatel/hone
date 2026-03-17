@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Coffee, BrewMethod, User, Brew, CoffeeTemperature, BrewStage, Equipment } from '../types';
-import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale, Mic } from 'lucide-react';
+import { QrCode, Loader2, History, Info, Plus, Trash2, X, ChevronDown, ChevronLeft, ChevronRight, Calendar, Thermometer, Gauge, Weight, Droplet, Clock, Scale, Mic, Check, MoreVertical, ArrowRightLeft } from 'lucide-react';
 import { StandardDialog } from './ui/standard-dialog';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
@@ -22,6 +22,8 @@ import { Badge } from './ui/badge';
 import { TimeInput, formatTime } from './TimeInput';
 import { toast } from 'sonner@2.0.3';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from './ui/dropdown-menu';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from './ui/alert-dialog';
 import { AutocompleteDropdown } from './ui/autocomplete-dropdown';
 import { getRatingEmoji, getRatingText, formatEquipmentName, capitalizeBrewMethod } from '../utils/formatters';
 import { BrewEquipmentIcon } from './icons/BrewEquipmentIcon';
@@ -136,9 +138,12 @@ interface NewBrewFlowProps {
     personalNotes?: string;
   }) => void;
   equipmentChangeCounter?: number;
+  onMarkCoffeeFinished?: (id: string) => void;
+  onAddAnotherBag?: (coffee: Coffee) => void;
+  hidden?: boolean;
 }
 
-export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, onClose, onSave, duplicateData, editingBrew, onUpdate, equipmentChangeCounter, prefilledCoffeeId, prefilledBrewMethod }: NewBrewFlowProps) {
+export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, onClose, onSave, duplicateData, editingBrew, onUpdate, equipmentChangeCounter, prefilledCoffeeId, prefilledBrewMethod, onMarkCoffeeFinished, onAddAnotherBag, hidden }: NewBrewFlowProps) {
   // Detect if mobile device
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
@@ -167,8 +172,10 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const [preFilledBrew, setPreFilledBrew] = useState<Brew | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Newer bag detection
-  const [newerBag, setNewerBag] = useState<Coffee | null>(null);
+  // Bag selector dropdown
+  const [bagDropdownOpen, setBagDropdownOpen] = useState(false);
+  const pendingBagSelectRef = useRef(false);
+  const [finishBagPrompt, setFinishBagPrompt] = useState<{ oldBagId: string; oldBagLabel: string } | null>(null);
 
   // QR Scanner Modal
   const [showQRScanner, setShowQRScanner] = useState(false);
@@ -253,6 +260,31 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const previousBrewingStateRef = useRef<string | null>(null);
   
   const selectedCoffee = coffees.find(c => c.id === coffeeId);
+
+  // All bag IDs for the same bean (same roaster + name) so baseline matching spans bags
+  const sameCoffeeBagIds = useMemo(() => {
+    if (!selectedCoffee) return new Set<string>(coffeeId ? [coffeeId] : []);
+    return new Set(
+      coffees
+        .filter(c => c.roaster === selectedCoffee.roaster && c.name === selectedCoffee.name)
+        .map(c => c.id)
+    );
+  }, [coffeeId, coffees, selectedCoffee]);
+
+  const activeBags = useMemo(() => {
+    if (!selectedCoffee) return [];
+    return coffees
+      .filter(c => c.roaster === selectedCoffee.roaster && c.name === selectedCoffee.name && !c.finished)
+      .sort((a, b) => {
+        if (a.roastDate && b.roastDate) {
+          const [ay, am, ad] = a.roastDate.split('-').map(Number);
+          const [by, bm, bd] = b.roastDate.split('-').map(Number);
+          return new Date(by, bm - 1, bd).getTime() - new Date(ay, am - 1, ad).getTime();
+        }
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+  }, [selectedCoffee, coffees]);
+
   const isEspresso = brewMethod === 'espresso';
   const isImmersion = brewMethod === 'immersion';
 
@@ -333,7 +365,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.details || errorData.error || 'Failed to fetch status');
       }
 
@@ -751,9 +783,12 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       if (response.ok) {
         const data = await response.json();
         setEquipment(data);
+      } else {
+        toast.error('Failed to load equipment');
       }
     } catch (error) {
       console.error('Error fetching equipment:', error);
+      toast.error('Failed to load equipment');
     } finally {
       setEquipmentLoading(false);
     }
@@ -869,7 +904,18 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         if (baselineBrew.brewerId) setBrewerId(baselineBrew.brewerId);
         if (baselineBrew.grinderId) setGrinderId(baselineBrew.grinderId);
         setPreFilledBrew(baselineBrew);
-        setBaselineMode('most-recent'); // Set mode to most-recent so it shows the baseline
+
+        // Set to Browse All mode scrolled to the selected brew (match across all bags of same bean)
+        const baselineCoffee = coffees.find(c => c.id === baselineBrew.coffeeId);
+        const bagIds = baselineCoffee
+          ? new Set(coffees.filter(c => c.roaster === baselineCoffee.roaster && c.name === baselineCoffee.name).map(c => c.id))
+          : new Set([baselineBrew.coffeeId]);
+        const matching = brews
+          .filter(e => bagIds.has(e.coffeeId) && e.brewMethod === baselineBrew.brewMethod)
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const idx = matching.findIndex(b => b.id === baselineBrew.id);
+        setBaselineMode('browse-all');
+        setBrowseAllIndex(idx >= 0 ? idx : 0);
       } else {
         // Fallback: if brew not found, set fields manually from duplicateData
       setGrindSetting(duplicateData.grindSetting);
@@ -966,43 +1012,21 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     }
   }, [editingBrew]);
 
-  // Detect if a newer bag of the same bean exists that hasn't been brewed yet
+  // Re-open bag dropdown after "Add New Bag" flow completes
   useEffect(() => {
-    if (!coffeeId || editingBrew) {
-      setNewerBag(null);
-      return;
+    if (pendingBagSelectRef.current && coffeeId) {
+      const selected = coffees.find(c => c.id === coffeeId);
+      if (selected) {
+        const sameBeanBags = coffees.filter(
+          c => c.roaster === selected.roaster && c.name === selected.name
+        );
+        if (sameBeanBags.length > 1) {
+          pendingBagSelectRef.current = false;
+          setBagDropdownOpen(true);
+        }
+      }
     }
-    const selected = coffees.find(c => c.id === coffeeId);
-    if (!selected) {
-      setNewerBag(null);
-      return;
-    }
-    const sameBeanBags = coffees
-      .filter(c => c.roaster === selected.roaster && c.name === selected.name && c.id !== selected.id);
-    if (sameBeanBags.length === 0) {
-      setNewerBag(null);
-      return;
-    }
-    const parseRoastDate = (d: string) => {
-      const [y, m, day] = d.split('-').map(Number);
-      return new Date(y, m - 1, day);
-    };
-    const allBags = [selected, ...sameBeanBags].sort((a, b) => {
-      if (a.roastDate && b.roastDate) return parseRoastDate(b.roastDate).getTime() - parseRoastDate(a.roastDate).getTime();
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    const newest = allBags[0];
-    if (newest.id === coffeeId) {
-      setNewerBag(null);
-      return;
-    }
-    const newestHasBrews = brews.some(b => b.coffeeId === newest.id);
-    if (newestHasBrews) {
-      setNewerBag(null);
-      return;
-    }
-    setNewerBag(newest);
-  }, [coffeeId, coffees, brews, editingBrew]);
+  }, [coffees, coffeeId]);
 
   // Pre-fill grind setting and dosage from most recent brew with same coffee and method
   useEffect(() => {
@@ -1025,9 +1049,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           setIsPreFilledFromSelection(false);
           setPreFilledBrew(null);
           
-          // Find the most recent brew with the same coffee and method
+          // Find the most recent brew with the same coffee (any bag) and method
           const matchingBrews = brews
-            .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
+            .filter(e => sameCoffeeBagIds.has(e.coffeeId) && e.brewMethod === brewMethod)
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
           
           if (matchingBrews.length > 0) {
@@ -1096,9 +1120,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       const selectedCoffee = coffees.find(c => c.id === coffeeId);
       if (!selectedCoffee) return;
 
-      // Find all brews with the same coffee and method
+      // Find all brews with the same coffee (any bag) and method
       const matchingBrews = brews
-        .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
+        .filter(e => sameCoffeeBagIds.has(e.coffeeId) && e.brewMethod === brewMethod)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       // Check if baseline brew is the most recent brew
@@ -1403,16 +1427,16 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       }
     } catch (error) {
       console.error('Error saving brew:', error);
-      alert(`Failed to save brew: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error('Failed to save brew. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Helper functions to get baseline brew
+  // Helper functions to get baseline brew (matches across all bags of the same bean)
   const getMatchingBrews = () => {
     return brews
-      .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
+      .filter(e => sameCoffeeBagIds.has(e.coffeeId) && e.brewMethod === brewMethod)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   };
 
@@ -1553,7 +1577,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           const ctx = canvas.getContext('2d');
           
           if (!ctx) {
-            alert('Failed to process image');
+            toast.error('Failed to process image');
             setIsScanning(false);
             return;
           }
@@ -1611,7 +1635,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       console.log('Camera stream started successfully');
     } catch (error) {
       console.error('Error accessing camera:', error);
-      alert('Failed to access camera. Please make sure you have granted camera permissions.');
+      toast.error('Failed to access camera. Please check your camera permissions.');
       setShowQRScanner(false);
       setIsScanning(false);
     }
@@ -1730,6 +1754,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     if (file) processQRImage(file);
   };
 
+  if (hidden) return null;
+
   return (
     <>
       {/* Brewing Popover - Show when La Marzocco is actively brewing */}
@@ -1805,20 +1831,43 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   value={coffeeId}
                   onChange={setCoffeeId}
                   options={(() => {
-                    // All coffees for searching
-                    return coffees.map(coffee => {
-                      let formattedDate = 'Unknown';
-                      if (coffee.roastDate) {
-                        const [year, monthNum, day] = coffee.roastDate.split('-').map(Number);
-                        const date = new Date(year, monthNum - 1, day);
-                        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                        const month = months[date.getMonth()];
-                        formattedDate = `${month} ${date.getDate()}, ${date.getFullYear()}`;
+                    // Deduplicate by bean (roaster + name), picking the most recently brewed bag per coffee
+                    const { coffeeLastBrewed } = getCoffeesForDropdown();
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    const groups = new Map<string, typeof coffees>();
+                    coffees.forEach(coffee => {
+                      const key = `${coffee.roaster}\0${coffee.name}`;
+                      const group = groups.get(key);
+                      if (group) {
+                        group.push(coffee);
+                      } else {
+                        groups.set(key, [coffee]);
                       }
-                      
+                    });
+
+                    return Array.from(groups.values()).map(bags => {
+                      // Pick the most recently brewed bag, or most recently created if none brewed
+                      const representative = bags
+                        .slice()
+                        .sort((a, b) => {
+                          const aBrewDate = coffeeLastBrewed.get(a.id);
+                          const bBrewDate = coffeeLastBrewed.get(b.id);
+                          if (aBrewDate && bBrewDate) return bBrewDate.getTime() - aBrewDate.getTime();
+                          if (aBrewDate) return -1;
+                          if (bBrewDate) return 1;
+                          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                        })[0];
+
+                      let formattedDate = 'Unknown';
+                      if (representative.roastDate) {
+                        const [year, monthNum, day] = representative.roastDate.split('-').map(Number);
+                        const date = new Date(year, monthNum - 1, day);
+                        formattedDate = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                      }
+
                       return {
-                        value: coffee.id,
-                        line1: `${coffee.roaster} - ${coffee.name}`,
+                        value: representative.id,
+                        line1: `${representative.roaster} - ${representative.name}`,
                         line2: `Roasted: ${formattedDate}`,
                       };
                     });
@@ -1861,51 +1910,151 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                   placeholder="Search beans"
                   className="flex-1"
                   getDropdownLabel={(searchQuery) => getDropdownLabel(searchQuery)}
+                  getDisplayValue={(id) => {
+                    const coffee = coffees.find(c => c.id === id);
+                    return coffee ? `${coffee.roaster} - ${coffee.name}` : '';
+                  }}
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCameraCapture}
-                  disabled={isScanning}
-                  className="cursor-pointer whitespace-nowrap flex-shrink-0 self-center h-9 font-normal"
-                >
-                  {isScanning ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Scanning...</span>
-                    </>
-                  ) : (
-                    <>
-                      <QrCode className="w-4 h-4" />
-                      {!isMobile && <span>Scan Label</span>}
-                    </>
-                  )}
-                </Button>
+                <DropdownMenu open={bagDropdownOpen} onOpenChange={setBagDropdownOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer flex-shrink-0 self-center h-9 px-2"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      disabled={isScanning}
+                      onSelect={handleCameraCapture}
+                    >
+                      {isScanning ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" />Scanning...</>
+                      ) : (
+                        <><QrCode className="w-4 h-4" />Scan Label</>
+                      )}
+                    </DropdownMenuItem>
+                    {coffeeId && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel inset className="text-xs text-muted-foreground font-normal">
+                          Change Bag
+                        </DropdownMenuLabel>
+                        {activeBags.map(bag => {
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const isSelected = bag.id === coffeeId;
+                          let label = '';
+                          if (bag.roastDate) {
+                            const [y, m, d] = bag.roastDate.split('-').map(Number);
+                            const date = new Date(y, m - 1, d);
+                            label = `Roasted ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                          } else {
+                            const date = new Date(bag.createdAt);
+                            label = `Added ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                          }
+                          return (
+                            <DropdownMenuItem
+                              key={bag.id}
+                              inset
+                              disabled={isSelected}
+                              className={`${isSelected ? 'opacity-100 text-muted-foreground' : 'cursor-pointer'}`}
+                              onSelect={() => {
+                                const oldBagId = coffeeId;
+                                setCoffeeId(bag.id);
+                                if (onMarkCoffeeFinished && oldBagId) {
+                                  const oldBag = coffees.find(c => c.id === oldBagId);
+                                  if (oldBag && !oldBag.finished) {
+                                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                    let oldLabel = '';
+                                    if (oldBag.roastDate) {
+                                      const [oy, om, od] = oldBag.roastDate.split('-').map(Number);
+                                      const d = new Date(oy, om - 1, od);
+                                      oldLabel = `Roasted ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+                                    } else {
+                                      const d = new Date(oldBag.createdAt);
+                                      oldLabel = `Added ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+                                    }
+                                    setFinishBagPrompt({ oldBagId, oldBagLabel: oldLabel });
+                                  }
+                                }
+                              }}
+                            >
+                              {isSelected && <Check className="w-4 h-4 flex-shrink-0 absolute left-2" />}
+                              {label}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                        {onAddAnotherBag && selectedCoffee && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onSelect={() => {
+                                pendingBagSelectRef.current = true;
+                                onAddAnotherBag(selectedCoffee);
+                              }}
+                            >
+                              <Plus className="w-4 h-4" />
+                              Add New Bag
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              {newerBag && (() => {
+              {coffeeId && activeBags.length > 0 && activeBags[0].id !== coffeeId && (() => {
+                const newerBag = activeBags[0];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const currentYear = new Date().getFullYear();
                 let roastLabel = '';
                 if (newerBag.roastDate) {
                   const [y, m, d] = newerBag.roastDate.split('-').map(Number);
                   const date = new Date(y, m - 1, d);
-                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                  roastLabel = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+                  roastLabel = `roasted ${months[date.getMonth()]} ${date.getDate()}${date.getFullYear() !== currentYear ? `, ${date.getFullYear()}` : ''}`;
                 }
                 return (
-                  <div className="mt-2 flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-                    <span className="flex-1">
-                      Newer bag available{roastLabel ? ` (Roasted ${roastLabel})` : ''}
-                    </span>
+                  <p className="text-xs text-gray-500" style={{ marginTop: '4px' }}>
+                    New bag{roastLabel ? ` ${roastLabel}` : ' available'}{' · '}
                     <button
                       type="button"
-                      className="font-medium underline underline-offset-2 cursor-pointer whitespace-nowrap"
-                      onClick={() => setCoffeeId(newerBag.id)}
+                      className="font-medium text-gray-700 underline underline-offset-2 cursor-pointer hover:text-gray-900 transition-colors"
+                      onClick={() => setBagDropdownOpen(true)}
                     >
-                      Switch
+                      Use
                     </button>
-                  </div>
+                  </p>
                 );
               })()}
+              <AlertDialog open={!!finishBagPrompt} onOpenChange={(open) => !open && setFinishBagPrompt(null)}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Did you finish the previous bag?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You can also mark bags as finished from the beans page.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="cursor-pointer">Keep Active</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (finishBagPrompt && onMarkCoffeeFinished) {
+                          onMarkCoffeeFinished(finishBagPrompt.oldBagId);
+                        }
+                        setFinishBagPrompt(null);
+                      }}
+                    >
+                      Mark Finished
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             <div>
@@ -2285,7 +2434,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
             {!editingBrew && (() => {
               const hasBrews = coffeeId && brewMethod && brews.some(
-                e => e.coffeeId === coffeeId && e.brewMethod === brewMethod
+                e => sameCoffeeBagIds.has(e.coffeeId) && e.brewMethod === brewMethod
               );
               
               const canExpand = coffeeId && brewMethod;
@@ -3015,7 +3164,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
 
               {(() => {
                 const previousBrews = brews
-                  .filter(e => e.coffeeId === coffeeId && e.brewMethod === brewMethod)
+                  .filter(e => sameCoffeeBagIds.has(e.coffeeId) && e.brewMethod === brewMethod)
                   .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
                 if (previousBrews.length === 0) {
