@@ -1143,9 +1143,8 @@ export default function App() {
     (e) => filterMethod === 'all' || e.brewMethod === filterMethod
   );
 
-  const filteredCoffees = coffees.filter(
-    (o) => filterMethod === 'all' || o.brewMethod === filterMethod
-  );
+  // Beans view shows all beans; brew method filter applies only to brews.
+  const filteredCoffees = coffees;
 
   // Group data
   const groupExtractionsByMonth = (brews: Brew[]) => {
@@ -1648,7 +1647,6 @@ export default function App() {
               <CoffeesTableView
                 coffees={coffees}
                 brews={brews}
-                filterMethod={filterMethod}
                 groupBy={groupBy}
                 onNewCoffee={() => setShowAddCoffee(true)}
                 onSelectCoffee={setSelectedCoffee}

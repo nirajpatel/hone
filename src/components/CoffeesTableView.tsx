@@ -1,10 +1,9 @@
-import { Coffee, BrewMethod } from '../types';
+import { Coffee, Brew } from '../types';
 import { Button } from './ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Plus, MoreVertical, Pencil, Trash2, QrCode } from 'lucide-react';
 import { SimpleTooltip } from './ui/simple-tooltip';
-import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { getRatingEmoji, getRatingText } from '../utils/formatters';
 import React from 'react';
 import { CoffeesMobileListView } from './CoffeesMobileListView';
@@ -13,7 +12,6 @@ import { COPY } from '../constants/copy';
 interface CoffeesTableViewProps {
   coffees: Coffee[];
   brews: Brew[];
-  filterMethod: BrewMethod | 'all';
   groupBy: 'month' | 'coffee';
   onNewCoffee: () => void;
   onSelectCoffee: (coffee: Coffee) => void;
@@ -26,7 +24,6 @@ interface CoffeesTableViewProps {
 export function CoffeesTableView({
   coffees,
   brews,
-  filterMethod,
   groupBy,
   onNewCoffee,
   onSelectCoffee,
@@ -174,16 +171,9 @@ export function CoffeesTableView({
     };
   };
 
-  // Filter coffees
-  const filteredCoffees = coffees.filter(coffee => {
-    if (filterMethod === 'all') return true;
-    const coffeeBrews = brews.filter(e => e.coffeeId === coffee.id);
-    return coffeeBrews.some(e => e.brewMethod === filterMethod);
-  });
-
   // Sort coffees by roast date descending (most recent first)
   // Coffees without roast dates go to the end
-  const sortedCoffees = [...filteredCoffees].sort((a, b) => {
+  const sortedCoffees = [...coffees].sort((a, b) => {
     // If both have roast dates, sort normally
     if (a.roastDate && b.roastDate) {
     const dateA = new Date(a.roastDate);
@@ -234,20 +224,16 @@ export function CoffeesTableView({
   return (
     <>
       {/* Table */}
-      {filteredCoffees.length === 0 ? (
+      {coffees.length === 0 ? (
         <div className="flex min-h-[calc(100dvh-8rem)] flex-1 flex-col">
           <div className="flex flex-1 items-center justify-center min-h-0">
             <div className="empty-state-card-md bg-white rounded-lg border border-gray-200 p-0 md:p-16 text-center" style={{ marginTop: '-2rem' }}>
             <div className="max-w-lg mx-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {filterMethod !== 'all' ? 'No Coffees Found' : 'No beans yet'}
+                No beans yet
               </h3>
               <p className="text-base text-gray-600 mb-6">
-                {filterMethod !== 'all' ? (
-                  'Try changing the filter or add a new coffee'
-                ) : (
-                  'Add your beans to log brews and start getting personalized guidance'
-                )}
+                Add your beans to log brews and start getting personalized guidance
               </p>
               <Button onClick={onNewCoffee} className="cursor-pointer">
                 <Plus className="w-4 h-4" />
@@ -262,7 +248,7 @@ export function CoffeesTableView({
           {/* Mobile View (iOS messages style) - shown on small screens */}
           <div className="md:hidden">
             <CoffeesMobileListView
-              coffees={filteredCoffees}
+              coffees={coffees}
               brews={brews}
               onSelectCoffee={onSelectCoffee}
               groupBy={groupBy}
@@ -283,16 +269,7 @@ export function CoffeesTableView({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCoffees.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="py-8 whitespace-normal">
-                      <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-sm text-gray-500 font-normal max-w-md mx-auto">
-                        No coffees found. {filterMethod !== 'all' ? 'Try changing the filter or add a new one!' : 'Add your first one!'}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  Object.entries(groupedCoffees)
+                {Object.entries(groupedCoffees)
                     .sort((a, b) => {
                       // Put "Unknown" group at the end
                       if (a[0] === 'Unknown') return 1;
@@ -404,7 +381,7 @@ export function CoffeesTableView({
                       })}
                     </React.Fragment>
                   ))
-                )}
+                }
               </TableBody>
             </Table>
           </div>
