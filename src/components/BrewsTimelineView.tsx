@@ -880,6 +880,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     return acc;
   }, []);
 
+  // Single source of truth for "New Bag" divider x positions (used by SVG and HTML overlay)
+  const bagChangePositions = bagChangeIndices.map((i) => {
+    const mobilePrevX = (i - 1) * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
+    const mobileCurrX = i * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
+    const desktopPrevX = (i - 1) * (desktopContainerWidth + desktopGap) + desktopContainerWidth / 2;
+    const desktopCurrX = i * (desktopContainerWidth + desktopGap) + desktopContainerWidth / 2;
+    return {
+      mobileMidX: (mobilePrevX + mobileCurrX) / 2,
+      desktopMidX: (desktopPrevX + desktopCurrX) / 2,
+    };
+  });
+
   // Calculate graph path for rated brews
   const calculateGraphPath = (isMobile: boolean) => {
     const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
@@ -1201,10 +1213,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
                   </clipPath>
                 </defs>
-                {bagChangeIndices.map(i => {
-                  const prevX = (i - 1) * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
-                  const currX = i * (mobileContainerWidth + mobileGap) + mobileContainerWidth / 2;
-                  const midX = (prevX + currX) / 2;
+                {bagChangeIndices.map((i, j) => {
+                  const { mobileMidX: midX } = bagChangePositions[j];
                   return (
                     <g
                       key={`bag-${i}`}
@@ -1212,7 +1222,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     >
                       <line x1={midX} y1={0} x2={midX} y2={mobileSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
                       <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
-                      <text x={midX} y={3} textAnchor="middle" dominantBaseline="central" fontSize="10" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
                     </g>
                   );
                 })}
@@ -1416,10 +1425,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     );
                   })()}
                 </defs>
-                {bagChangeIndices.map(i => {
-                  const prevX = (i - 1) * (desktopContainerWidth + desktopGap) + desktopContainerWidth / 2;
-                  const currX = i * (desktopContainerWidth + desktopGap) + desktopContainerWidth / 2;
-                  const midX = (prevX + currX) / 2;
+                {bagChangeIndices.map((i, j) => {
+                  const { desktopMidX: midX } = bagChangePositions[j];
                   return (
                     <g
                       key={`bag-${i}`}
@@ -1427,7 +1434,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     >
                       <line x1={midX} y1={0} x2={midX} y2={desktopSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
                       <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
-                      <text x={midX} y={3} textAnchor="middle" dominantBaseline="central" fontSize="10" fill="#b0b5bd" fontFamily="inherit">New Bag</text>
                     </g>
                   );
                 })}
@@ -1507,6 +1513,43 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   opacity={desktopGradientStops ? "0" : "1"}
                 />
               </svg>
+
+              {/* "New Bag" labels as HTML overlay so the B isn't clipped by SVG viewport */}
+              {bagChangeIndices.map((i, j) => {
+                const { mobileMidX, desktopMidX } = bagChangePositions[j];
+                return (
+                  <React.Fragment key={`newbag-${i}`}>
+                    <span
+                      className="absolute pointer-events-none md:hidden"
+                      style={{
+                        left: mobileMidX,
+                        top: -1,
+                        transform: 'translateX(-50%)',
+                        fontSize: 10,
+                        color: '#b0b5bd',
+                        lineHeight: 1,
+                        zIndex: 1,
+                      }}
+                    >
+                      New Bag
+                    </span>
+                    <span
+                      className="absolute pointer-events-none hidden md:inline"
+                      style={{
+                        left: desktopMidX,
+                        top: -1,
+                        transform: 'translateX(-50%)',
+                        fontSize: 10,
+                        color: '#b0b5bd',
+                        lineHeight: 1,
+                        zIndex: 1,
+                      }}
+                    >
+                      New Bag
+                    </span>
+                  </React.Fragment>
+                );
+              })}
 
               {/* Nodes */}
               <div className="flex items-start gap-2 md:gap-8 relative"> {/* Mobile gap-2 (8px) */}
