@@ -731,7 +731,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     const g = isMobile ? mobileGap : desktopGap;
     const brewCount = brews.length;
     const startTime = performance.now();
-    const duration = 500;
+    const duration = 1000;
 
     [staticRectMobileRef, staticRectDesktopRef].forEach(ref => {
       ref.current?.setAttribute('width', String(visibleLeft));
