@@ -172,12 +172,8 @@ const getUser = async (accessToken: string | undefined, retries = 2) => {
       const { data: { user }, error } = await supabase.auth.getUser(accessToken);
       
       if (error) {
-        // Only log significant errors, not expected auth failures
-        if (!error.message?.includes('Invalid') && !error.message?.includes('expired') && error.status !== 401) {
-          // Don't log on retry attempts
-          if (attempt === retries) {
-            console.log('Auth error after retries:', error.message);
-          }
+        if (attempt === retries) {
+          console.log('Auth getUser failed:', error.message, 'status:', error.status);
         }
         return null;
       }

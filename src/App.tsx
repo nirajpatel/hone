@@ -140,11 +140,7 @@ export default function App() {
         try {
           const { data: { session }, error } = await supabase.auth.refreshSession();
           if (error || !session?.access_token) {
-            console.error('Failed to refresh session on tab resume:', error);
-            await supabase.auth.signOut();
-            setCurrentUser(null);
-            setAccessToken(null);
-            toast.error('Session expired. Please sign in again.');
+            console.warn('Could not refresh session on tab resume:', error?.message ?? error);
             return;
           }
           setAccessToken(session.access_token);
@@ -540,14 +536,14 @@ export default function App() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (res.ok) {
         const userData = await res.json();
         setCurrentUser(userData);
         await fetchData(token);
       } else {
         const errorData = await res.json().catch(() => ({}));
-        
+
         if (res.status === 403) {
           await supabase.auth.signOut();
           setCurrentUser(null);
