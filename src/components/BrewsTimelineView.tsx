@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment } from '../types';
 import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -731,7 +731,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     const g = isMobile ? mobileGap : desktopGap;
     const brewCount = brews.length;
     const startTime = performance.now();
-    const duration = 1000;
+    const duration = 500;
 
     [staticRectMobileRef, staticRectDesktopRef].forEach(ref => {
       ref.current?.setAttribute('width', String(visibleLeft));
@@ -787,9 +787,14 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
       if (rawProgress < 1) {
         rafIdRef.current = requestAnimationFrame(animate);
       } else {
-        doneTimeoutRef.current = setTimeout(() => {
-          setAnimationPhase('done');
-        }, 400);
+        // Set clip rects to full so transition to 'done' doesn't change clip shape (avoids shift)
+        staticRectMobileRef.current?.setAttribute('width', '0');
+        revealRectMobileRef.current?.setAttribute('x', '0');
+        revealRectMobileRef.current?.setAttribute('width', String(mobileSvgWidth));
+        staticRectDesktopRef.current?.setAttribute('width', '0');
+        revealRectDesktopRef.current?.setAttribute('x', '0');
+        revealRectDesktopRef.current?.setAttribute('width', String(desktopSvgWidth));
+        requestAnimationFrame(() => setAnimationPhase('done'));
       }
     };
 
@@ -1106,7 +1111,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
   const desktopSvgWidth = hasButton
     ? brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth
     : brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth;
-  
+
+  // When phase is 'done', set clip rects to full so clip never changes shape (avoids post-animation shift)
+  useLayoutEffect(() => {
+    if (animationPhase !== 'done') return;
+    staticRectMobileRef.current?.setAttribute('width', '0');
+    revealRectMobileRef.current?.setAttribute('x', '0');
+    revealRectMobileRef.current?.setAttribute('width', String(mobileSvgWidth));
+    staticRectDesktopRef.current?.setAttribute('width', '0');
+    revealRectDesktopRef.current?.setAttribute('x', '0');
+    revealRectDesktopRef.current?.setAttribute('width', String(desktopSvgWidth));
+  }, [animationPhase, mobileSvgWidth, desktopSvgWidth]);
+
   return (
     <div ref={rowRef}>
       {/* Timeline Container with fade overlay */}
@@ -1181,14 +1197,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} fill={`url(#${uniqueId}-mobileFadeMask)`} />
                   </mask>
                   <clipPath id={`${uniqueId}-mobileRevealClip`}>
-                    {animationPhase !== 'done' ? (
-                      <>
-                        <rect ref={staticRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
-                        <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
-                      </>
-                    ) : (
-                      <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} />
-                    )}
+                    <rect ref={staticRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
+                    <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
                   </clipPath>
                 </defs>
                 {bagChangeIndices.map(i => {
@@ -1247,14 +1257,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFadeMask)`} />
                   </mask>
                   <clipPath id={`${uniqueId}-desktopRevealClip`}>
-                    {animationPhase !== 'done' ? (
-                      <>
-                        <rect ref={staticRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
-                        <rect ref={revealRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
-                      </>
-                    ) : (
-                      <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} />
-                    )}
+                    <rect ref={staticRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
+                    <rect ref={revealRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
                   </clipPath>
                   {/* Gradient mask for highlight effect - peaks at hovered node, fades to 0 at edges */}
                   {desktopGradientStops && (() => {
