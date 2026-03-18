@@ -249,8 +249,8 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
               <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Extraction Quality</h3>
               {rating > 0 ? (
                 <>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-3xl">{getRatingEmoji(rating)}</span>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className="text-2xl">{getRatingEmoji(rating)}</span>
                     <span className="text-sm text-gray-900">{getRatingText(rating)}</span>
                   </div>
                   <p className="text-sm text-gray-500">Average of {count} brew{count !== 1 ? 's' : ''}</p>
