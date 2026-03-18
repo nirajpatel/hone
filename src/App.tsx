@@ -11,6 +11,7 @@ import { BrewsTableView } from './components/BrewsTableView';
 import { BrewsTimelineView } from './components/BrewsTimelineView';
 import { CoffeesShelvesView, setRepImageCacheEntry } from './components/CoffeesShelvesView';
 import { generateDefaultBagImage, hasRepresentativeImage, saveRepresentativeImage } from './utils/generateBagImage';
+import { canonicalCoffeeKey } from './utils/coffeeCanonical';
 import { CoffeesTableView } from './components/CoffeesTableView';
 import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { Profile } from './components/Profile';
@@ -110,6 +111,7 @@ export default function App() {
   const [brewsView, setBrewsView] = useState<'table' | 'timeline'>('timeline');
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [aliases, setAliases] = useState<{ roasterAliases: Record<string, string>; coffeeNameAliases: Record<string, string> }>({ roasterAliases: {}, coffeeNameAliases: {} });
   const [isFeedbackHovered, setIsFeedbackHovered] = useState(false);
 
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
@@ -358,6 +360,18 @@ export default function App() {
 
     fetchAllCoffees();
   }, [showBagImages, currentUser, accessToken]);
+
+  // Fetch aliases for canonical coffee matching (brew nav, same as backend/bag images)
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${apiUrl}/aliases`, { headers: { Authorization: `Bearer ${publicAnonKey}` } })
+      .then((res) => (res.ok ? res.json() : { roasterAliases: {}, coffeeNameAliases: {} }))
+      .then((data) => {
+        if (!cancelled) setAliases({ roasterAliases: data.roasterAliases ?? {}, coffeeNameAliases: data.coffeeNameAliases ?? {} });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [apiUrl]);
 
   useEffect(() => {
     checkAuthRef.current();
@@ -770,7 +784,7 @@ export default function App() {
             if (dataUrl) {
               const saved = await saveRepresentativeImage(newCoffee.roaster, newCoffee.name, dataUrl);
               if (saved) {
-                setRepImageCacheEntry(newCoffee.roaster, newCoffee.name, dataUrl);
+                setRepImageCacheEntry(newCoffee.roaster, newCoffee.name, dataUrl, aliases);
               }
             }
           }
@@ -1663,6 +1677,7 @@ export default function App() {
                 coffees={coffees}
                 brews={brews}
                 groupBy={groupBy}
+                aliases={aliases}
                 onNewCoffee={() => setShowAddCoffee(true)}
                 onSelectCoffee={(coffee, siblings) => {
                   setSelectedCoffee(coffee);
@@ -1675,19 +1690,19 @@ export default function App() {
       </div>
 
       {selectedBrew && (() => {
-        // In timeline view, navigate between brews of the same coffee
-        // In table view, navigate through all brews in table order
-        const navBrews = brewsView === 'timeline'
-          ? brews
-              .filter(b => b.coffeeId === selectedBrew.coffeeId)
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          : (() => {
-              const flat: Brew[] = [];
-              Object.entries(groupedBrews).forEach(([_, groupBrews]) => {
-                flat.push(...groupBrews);
-              });
-              return flat;
-            })();
+        // Same as NewBrewFlow baseline + alias resolution: same coffee (all bags, canonical roaster + name) + same brew method
+        const selectedCoffee = coffees.find(c => c.id === selectedBrew.coffeeId);
+        const selectedKey = selectedCoffee ? canonicalCoffeeKey(selectedCoffee.roaster, selectedCoffee.name, aliases) : null;
+        const sameCoffeeBagIds = selectedKey
+          ? new Set(
+              coffees
+                .filter((c) => canonicalCoffeeKey(c.roaster, c.name, aliases) === selectedKey)
+                .map((c) => c.id)
+            )
+          : new Set(selectedCoffee ? [selectedCoffee.id] : [selectedBrew.coffeeId]);
+        const navBrews = brews
+          .filter(b => sameCoffeeBagIds.has(b.coffeeId) && b.brewMethod === selectedBrew.brewMethod)
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         
         const currentIndex = navBrews.findIndex(e => e.id === selectedBrew.id);
         const hasPrev = currentIndex > 0;

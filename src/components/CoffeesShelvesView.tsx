@@ -9,14 +9,15 @@ import VanillaTilt from 'vanilla-tilt';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
 import { COPY } from '../constants/copy';
+import { resolveCanonicalCoffee, canonicalCoffeeKey, normalizeCoffeeKey, type CoffeeAliases } from '../utils/coffeeCanonical';
 
 // Module-level caches — survive component unmount/remount during navigation
 const _repImageCache = new Map<string, string>(); // key -> url ('' means confirmed no image)
 let _defaultImageCache: string | null | '__loading__' = null;
 
-/** Update the representative image cache from outside the component (e.g. after auto-generating a bag image). */
-export function setRepImageCacheEntry(roaster: string, coffeeName: string, imageUrl: string) {
-  const key = `${roaster.trim().toLowerCase()}|${coffeeName.trim().toLowerCase()}`;
+/** Update the representative image cache from outside the component (e.g. after auto-generating a bag image). Uses canonical key when aliases provided. */
+export function setRepImageCacheEntry(roaster: string, coffeeName: string, imageUrl: string, aliases?: CoffeeAliases) {
+  const key = aliases ? canonicalCoffeeKey(roaster, coffeeName, aliases) : `${normalizeCoffeeKey(roaster)}|${normalizeCoffeeKey(coffeeName)}`;
   _repImageCache.set(key, imageUrl);
 }
 
@@ -118,13 +119,14 @@ function getCoffeeAge(roastDate: string): string {
   return years === 1 ? '1 year ago' : `${years} years ago`;
 }
 
-function renderRating(rating: number) {
+function renderRating(rating: number, count?: number) {
   if (rating === 0) return <span className="text-sm text-gray-500 leading-5">Not rated</span>;
   const roundedRating = Math.round(rating);
+  const label = count != null && count > 0 ? `${getRatingText(roundedRating)} • ${count} brew${count !== 1 ? 's' : ''}` : getRatingText(roundedRating);
   return (
     <div className="flex items-center gap-1" style={{ height: '1.25rem' }}>
       <span className="text-lg flex-shrink-0">{getRatingEmoji(roundedRating)}</span>
-      <span className="text-sm text-gray-500">{getRatingText(roundedRating)}</span>
+      <span className="text-sm text-gray-500">{label}</span>
     </div>
   );
 }
@@ -136,13 +138,14 @@ const loadedImageUrls = new Set<string>();
 interface CoffeeCardProps {
   coffee: Coffee;
   rating: number;
+  ratingCount?: number;
   onClick?: () => void;
   roastLabel?: string;
   isDesktop: boolean;
   getCoffeeImage: (coffee: Coffee) => string | null;
 }
 
-function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop, getCoffeeImage }: CoffeeCardProps) {
+function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roasted', isDesktop, getCoffeeImage }: CoffeeCardProps) {
   const tiltRef = useRef<HTMLImageElement>(null);
   const imgSrc = getCoffeeImage(coffee);
   const [imgLoaded, setImgLoaded] = useState(() => !!imgSrc && loadedImageUrls.has(imgSrc));
@@ -272,7 +275,7 @@ function CoffeeCard({ coffee, rating, onClick, roastLabel = 'Roasted', isDesktop
               ) : null}
             </p>
 
-            <div style={{ height: '1.25rem' }}>{renderRating(rating)}</div>
+            <div style={{ height: '1.25rem' }}>{renderRating(rating, ratingCount)}</div>
           </div>
         </div>
       </div>
@@ -289,8 +292,9 @@ interface ScrollableShelfProps {
   allCoffees: Coffee[];
   isDesktop: boolean;
   getCoffeeImage: (coffee: Coffee) => string | null;
-  getCoffeeBagRating: (coffeeId: string) => number;
-  getAggregatedCoffeeRating: (roaster: string, coffeeName: string) => number;
+  getCoffeeBagRating: (coffeeId: string) => { rating: number; count: number };
+  getAggregatedCoffeeRating: (roaster: string, coffeeName: string) => { rating: number; count: number };
+  getSameCoffeeSiblings?: (coffee: Coffee) => Coffee[];
   onSelectCoffee?: (coffee: Coffee, siblings?: Coffee[]) => void;
 }
 
@@ -303,6 +307,7 @@ function ScrollableShelf({
   getCoffeeImage,
   getCoffeeBagRating,
   getAggregatedCoffeeRating,
+  getSameCoffeeSiblings,
   onSelectCoffee,
 }: ScrollableShelfProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -379,16 +384,19 @@ function ScrollableShelf({
         >
           <div className={`flex flex-row gap-4 shelf-scroll-inner${isDesktop ? ' pb-2' : ''}`} style={{ minWidth: 'min-content' }}>
             {coffeesInGroup.map((coffee) => {
-              const rating = groupBy === 'month'
+              const { rating, count: ratingCount } = groupBy === 'month'
                 ? getCoffeeBagRating(coffee.id)
                 : getAggregatedCoffeeRating(coffee.roaster, coffee.name);
 
               const handleClick = onSelectCoffee
                 ? () => {
-                    if (groupBy === 'coffee') {
+                    if (groupBy === 'coffee' && getSameCoffeeSiblings) {
+                      const siblings = getSameCoffeeSiblings(coffee).sort((a, b) => (b.roastDate ?? '').localeCompare(a.roastDate ?? ''));
+                      onSelectCoffee(coffee, siblings);
+                    } else if (groupBy === 'coffee') {
                       const siblings = allCoffees
                         .filter(c => c.roaster === coffee.roaster && c.name === coffee.name)
-                        .sort((a, b) => b.roastDate.localeCompare(a.roastDate));
+                        .sort((a, b) => (b.roastDate ?? '').localeCompare(a.roastDate ?? ''));
                       onSelectCoffee(coffee, siblings);
                     } else {
                       onSelectCoffee(coffee);
@@ -401,6 +409,7 @@ function ScrollableShelf({
                   key={coffee.id}
                   coffee={coffee}
                   rating={rating}
+                  ratingCount={ratingCount}
                   onClick={handleClick}
                   roastLabel={groupBy === 'coffee' ? 'Latest Roast' : 'Roasted'}
                   isDesktop={isDesktop}
@@ -421,6 +430,7 @@ interface CoffeesShelvesViewProps {
   coffees: Coffee[];
   brews: Brew[];
   groupBy: 'month' | 'coffee';
+  aliases?: { roasterAliases: Record<string, string>; coffeeNameAliases: Record<string, string> };
   onNewCoffee: () => void;
   onSelectCoffee?: (coffee: Coffee, siblings?: Coffee[]) => void;
 }
@@ -429,6 +439,7 @@ export function CoffeesShelvesView({
   coffees,
   brews,
   groupBy,
+  aliases = { roasterAliases: {}, coffeeNameAliases: {} },
   onNewCoffee,
   onSelectCoffee,
 }: CoffeesShelvesViewProps) {
@@ -466,12 +477,10 @@ export function CoffeesShelvesView({
     const abortController = new AbortController();
 
     const fetchRepresentativeImages = async () => {
-      const norm = (s: string) => s.trim().toLowerCase();
-
-      // Get unique coffee combinations that are NOT yet cached
+      // Get unique coffee combinations (by canonical key) that are NOT yet cached
       const uniqueCoffees = new Map<string, Coffee>();
       coffees.forEach(coffee => {
-        const key = `${norm(coffee.roaster)}|${norm(coffee.name)}`;
+        const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
         if (!uniqueCoffees.has(key) && !_repImageCache.has(key)) {
           uniqueCoffees.set(key, coffee);
         }
@@ -499,10 +508,10 @@ export function CoffeesShelvesView({
             const requestAbortController = new AbortController();
             const timeoutId = setTimeout(() => requestAbortController.abort(), 5000);
 
-            const normRoaster = coffee.roaster.trim().toLowerCase();
-            const normName = coffee.name.trim().toLowerCase();
+            const resolved = resolveCanonicalCoffee(coffee.roaster, coffee.name, aliases);
+            const key = `${resolved.normalizedRoaster}|${resolved.normalizedName}`;
             const res = await fetch(
-              `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(normRoaster)}&coffeeName=${encodeURIComponent(normName)}`,
+              `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(resolved.normalizedRoaster)}&coffeeName=${encodeURIComponent(resolved.normalizedName)}`,
               {
                 headers: { Authorization: `Bearer ${publicAnonKey}` },
                 signal: requestAbortController.signal,
@@ -510,8 +519,6 @@ export function CoffeesShelvesView({
             );
 
             clearTimeout(timeoutId);
-
-            const key = `${normRoaster}|${normName}`;
             if (res.ok) {
               const data = await res.json();
               // Store url if found, empty string as "confirmed missing" sentinel
@@ -571,12 +578,12 @@ export function CoffeesShelvesView({
     return () => {
       abortController.abort();
     };
-  }, [coffees, apiUrl]);
+  }, [coffees, apiUrl, aliases]);
 
-  // Get the best image for a coffee.
+  // Get the best image for a coffee (by canonical key so aliased coffees share the same image).
   // Returns null when still loading (caller should show shimmer instead of fallback).
   const getCoffeeImage = (coffee: Coffee): string | null => {
-    const key = `${coffee.roaster.trim().toLowerCase()}|${coffee.name.trim().toLowerCase()}`;
+    const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
     const representativeImage = representativeImages.get(key);
 
     // Non-empty string = confirmed URL
@@ -591,21 +598,22 @@ export function CoffeesShelvesView({
   };
 
   // Get coffee average rating for a specific coffee bag (by coffeeId)
-  const getCoffeeBagRating = (coffeeId: string): number => {
+  const getCoffeeBagRating = (coffeeId: string): { rating: number; count: number } => {
     const coffeeBrews = brews.filter(e => e.coffeeId === coffeeId && e.quality);
-    if (coffeeBrews.length === 0) return 0;
+    if (coffeeBrews.length === 0) return { rating: 0, count: 0 };
     const sum = coffeeBrews.reduce((acc, e) => acc + (e.quality || 0), 0);
-    return sum / coffeeBrews.length;
+    return { rating: Math.round(sum / coffeeBrews.length), count: coffeeBrews.length };
   };
 
-  // Get average rating across all bags of the same coffee (by roaster + name)
-  const getAggregatedCoffeeRating = (roaster: string, coffeeName: string): number => {
-    const relatedCoffees = coffees.filter(c => c.roaster === roaster && c.name === coffeeName);
+  // Get average rating across all bags of the same coffee (canonical roaster + name, aliases + normalized)
+  const getAggregatedCoffeeRating = (roaster: string, coffeeName: string): { rating: number; count: number } => {
+    const key = canonicalCoffeeKey(roaster, coffeeName, aliases);
+    const relatedCoffees = coffees.filter(c => canonicalCoffeeKey(c.roaster, c.name, aliases) === key);
     const coffeeIds = relatedCoffees.map(c => c.id);
     const relevantExtractions = brews.filter(e => coffeeIds.includes(e.coffeeId) && e.quality);
-    if (relevantExtractions.length === 0) return 0;
+    if (relevantExtractions.length === 0) return { rating: 0, count: 0 };
     const sum = relevantExtractions.reduce((acc, e) => acc + (e.quality || 0), 0);
-    return sum / relevantExtractions.length;
+    return { rating: Math.round(sum / relevantExtractions.length), count: relevantExtractions.length };
   };
 
   // Format roast date
@@ -637,26 +645,24 @@ export function CoffeesShelvesView({
       groupedCoffees[monthYear].push(coffee);
     });
   } else {
-    // Group by roaster - unique coffees only
+    // Group by roaster - unique coffees by canonical (roaster + name), then group by canonical roaster
     const uniqueCoffeeMap = new Map<string, Coffee>();
-    
     coffees.forEach(coffee => {
-      const key = `${coffee.roaster}|${coffee.name}`;
+      const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
       const existing = uniqueCoffeeMap.get(key);
-      
-      // Keep the most recent roast date
       if (!existing || coffee.roastDate > existing.roastDate) {
         uniqueCoffeeMap.set(key, coffee);
       }
     });
 
-    // Group by roaster
+    // Group by canonical roaster (so aliased/variant roaster names merge)
     uniqueCoffeeMap.forEach(coffee => {
-      const roaster = coffee.roaster;
-      if (!groupedCoffees[roaster]) {
-        groupedCoffees[roaster] = [];
+      const can = resolveCanonicalCoffee(coffee.roaster, coffee.name, aliases);
+      const groupName = can.roaster;
+      if (!groupedCoffees[groupName]) {
+        groupedCoffees[groupName] = [];
       }
-      groupedCoffees[roaster].push(coffee);
+      groupedCoffees[groupName].push(coffee);
     });
   }
 
@@ -720,6 +726,7 @@ export function CoffeesShelvesView({
               getCoffeeImage={getCoffeeImage}
               getCoffeeBagRating={getCoffeeBagRating}
               getAggregatedCoffeeRating={getAggregatedCoffeeRating}
+              getSameCoffeeSiblings={groupBy === 'coffee' ? (coffee) => coffees.filter(c => canonicalCoffeeKey(c.roaster, c.name, aliases) === canonicalCoffeeKey(coffee.roaster, coffee.name, aliases)) : undefined}
               onSelectCoffee={onSelectCoffee}
             />
         ))}

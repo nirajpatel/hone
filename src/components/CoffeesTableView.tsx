@@ -338,8 +338,7 @@ export function CoffeesTableView({
                                 <div className="flex items-center gap-1 md:gap-2">
                                   <span className="text-lg">{getRatingEmoji(rating)}</span>
                                   <span className="text-gray-900 text-sm">
-                                    {getRatingText(rating)}
-                                    {count > 0 && ` (${count} brew${count !== 1 ? 's' : ''})`}
+                                    {getRatingText(rating)}{count > 0 ? ` • ${count} brew${count !== 1 ? 's' : ''}` : ''}
                                   </span>
                                 </div>
                               );

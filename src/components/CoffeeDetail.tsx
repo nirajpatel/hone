@@ -248,13 +248,12 @@ export function CoffeeDetail({ coffee, brews, onClose, onEdit, onDuplicateCoffee
             <div className="border-t border-gray-200 pt-6 mb-6">
               <h3 className="text-gray-900 mb-4" style={{ fontWeight: 'var(--font-weight-semibold)' }}>Extraction Quality</h3>
               {rating > 0 ? (
-                <>
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl">{getRatingEmoji(rating)}</span>
-                    <span className="text-base text-gray-900">{getRatingText(rating)}</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Average of {count} brew{count !== 1 ? 's' : ''}</p>
-                </>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{getRatingEmoji(rating)}</span>
+                  <span className="text-base text-gray-900">
+                    {getRatingText(rating)}{count > 0 ? ` • ${count} brew${count !== 1 ? 's' : ''}` : ''}
+                  </span>
+                </div>
               ) : (
                 <p className="text-sm text-gray-500">No brews logged yet</p>
               )}
