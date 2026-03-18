@@ -192,6 +192,32 @@ function tryParseWeight(tokens: string[], startIdx: number): ParsedWeight | null
   return { grams: num.value, endIndex: unitIdx + 1 };
 }
 
+const DECIMAL_WORDS = new Set(['point', 'dot']);
+
+/**
+ * In voice mode, a number with a decimal/dot is assumed to be weight (grams).
+ * Matches: single token "18.5" or "18." or ".5", or "18 point 5" / "18 dot 5" sequence.
+ */
+function tryParseBareDecimalWeight(tokens: string[], startIdx: number): ParsedWeight | null {
+  if (startIdx >= tokens.length) return null;
+  const t = tokens[startIdx];
+  // Single token: "18.5", "18.", ".5"
+  if (/^\d+\.\d*$|^\d*\.\d+$/.test(t)) {
+    const value = parseFloat(t);
+    if (!isNaN(value) && isFinite(value) && value > 0) return { grams: value, endIndex: startIdx + 1 };
+  }
+  // "18" "point" "5" or "18" "dot" "5" → 18.5
+  const first = collectNumber(tokens, startIdx);
+  if (!first || first.consumed === 0) return null;
+  const decimalIdx = startIdx + first.consumed;
+  if (decimalIdx >= tokens.length || !DECIMAL_WORDS.has(tokens[decimalIdx])) return null;
+  const second = collectNumber(tokens, decimalIdx + 1);
+  if (!second) return null;
+  const fracDigits = Math.max(0, Math.floor(Math.log10(second.value)) + 1);
+  const grams = first.value + second.value / Math.pow(10, fracDigits);
+  return { grams: Math.round(grams * 100) / 100, endIndex: decimalIdx + 1 + second.consumed };
+}
+
 function matchesPhrase(tokens: string[], startIdx: number, phrases: string[][]): { matched: string[][]; endIndex: number } | null {
   for (const phrase of phrases) {
     let match = true;
@@ -322,6 +348,13 @@ export function parseVoiceCommand(transcript: string): VoiceCommand | null {
       if (weightResult) {
         parsedWeight = weightResult.grams;
         i = weightResult.endIndex;
+        continue;
+      }
+      // Number with decimal or "point"/"dot" → assume weight (e.g. "18.5" or "18 point 5" or "18 dot 5")
+      const bareDecimalWeight = tryParseBareDecimalWeight(scanTokens, i);
+      if (bareDecimalWeight) {
+        parsedWeight = bareDecimalWeight.grams;
+        i = bareDecimalWeight.endIndex;
         continue;
       }
     }
