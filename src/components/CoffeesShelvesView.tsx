@@ -194,7 +194,7 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
           backgroundColor: '#FFFFFF',
           padding: isDesktop ? '0.75rem' : undefined,
           width: isDesktop ? '179px' : '100%',
-          height: '13.5em',
+          height: isDesktop ? '14em' : '13em',
           boxSizing: 'border-box',
         }}
       >
