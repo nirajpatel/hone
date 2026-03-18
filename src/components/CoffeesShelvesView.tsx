@@ -265,7 +265,7 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
               />
             </div>
 
-            <div className="flex items-center gap-1 text-sm text-gray-500" style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight, marginTop: 6 }}>
+            <div className="flex items-center gap-1 text-sm text-gray-500" style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight, marginTop: 4 }}>
               <span className={iconColumnClass}>{!coffee.roastDate ? '—' : freshness?.emoji ?? '—'}</span>
               <span className="text-left">
                 {!coffee.roastDate ? (
@@ -284,7 +284,7 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
               </span>
             </div>
 
-            <div style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight, marginTop: 6 }}>{renderRating(rating, ratingCount)}</div>
+            <div style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight, marginTop: 4 }}>{renderRating(rating, ratingCount)}</div>
           </div>
         </div>
       </div>
