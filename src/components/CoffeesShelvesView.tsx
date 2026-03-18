@@ -118,13 +118,15 @@ function getCoffeeAge(roastDate: string): string {
   return years === 1 ? '1 year ago' : `${years} years ago`;
 }
 
+const iconColumnClass = 'w-4 flex-shrink-0 flex items-center justify-center overflow-visible';
+
 function renderRating(rating: number, count?: number) {
   if (rating === 0) return <span className="text-sm text-gray-500 leading-5">Not rated</span>;
   const roundedRating = Math.round(rating);
   const label = count != null && count > 0 ? `${getRatingText(roundedRating)} • ${count} brew${count !== 1 ? 's' : ''}` : getRatingText(roundedRating);
   return (
     <div className="flex items-center gap-1" style={{ height: '1.25rem' }}>
-      <span className="text-lg flex-shrink-0">{getRatingEmoji(roundedRating)}</span>
+      <span className={`${iconColumnClass} text-lg`}>{getRatingEmoji(roundedRating)}</span>
       <span className="text-sm text-gray-500">{label}</span>
     </div>
   );
@@ -242,7 +244,7 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
       {/* Details */}
       <div
         className="p-4 pt-2 space-y-2 min-w-0"
-        style={isDesktop ? { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: '1.5em', paddingBottom: '1.5em', paddingLeft: 0, paddingRight: '0.75rem' } : undefined}
+        style={isDesktop ? { flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: '1.5em', paddingBottom: '1.5em', paddingLeft: 2, paddingRight: '0.75rem', marginLeft: -2 } : undefined}
       >
         <div className="space-y-2 min-w-0">
           <div className="min-w-0 overflow-hidden">
@@ -254,27 +256,32 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
             </h4>
           </div>
 
-          <div className="space-y-2">
+          <div>
             <TastingNotesLine
               key={coffee.id}
               notes={coffee.notes ? coffee.notes.split(',').map(n => n.trim()).filter(Boolean) : []}
             />
 
-            <p className="text-sm text-gray-500 m-0 leading-5">
-              {!coffee.roastDate ? (
-                <span className="text-gray-500">—</span>
-              ) : freshness && freshness.tooltip ? (
-                <SimpleTooltip content={<div className="text-xs">{freshness.tooltip.split('\n').map((line, i) => <div key={i}>{line}</div>)}</div>}>
-                  <span className="cursor-help">
-                    <span>{freshness.emoji}</span> {freshness.label} • {getCoffeeAge(coffee.roastDate)}
-                  </span>
-                </SimpleTooltip>
-              ) : freshness ? (
-                <><span>{freshness.emoji}</span> {freshness.label} • {getCoffeeAge(coffee.roastDate)}</>
-              ) : null}
-            </p>
+            <div className="flex items-center gap-1 text-sm text-gray-500 leading-5 min-h-[1.25rem]" style={{ marginTop: 4 }}>
+              <span className={iconColumnClass}>{!coffee.roastDate ? '—' : freshness?.emoji ?? '—'}</span>
+              <span className="text-left">
+                {!coffee.roastDate ? (
+                  <span className="text-gray-500">—</span>
+                ) : freshness && freshness.tooltip ? (
+                  <SimpleTooltip content={<div className="text-xs">{freshness.tooltip.split('\n').map((line, i) => <div key={i}>{line}</div>)}</div>}>
+                    <span className="cursor-help">
+                      {freshness.label} • {getCoffeeAge(coffee.roastDate)}
+                    </span>
+                  </SimpleTooltip>
+                ) : freshness ? (
+                  <>{freshness.label} • {getCoffeeAge(coffee.roastDate)}</>
+                ) : (
+                  <span className="text-gray-500">—</span>
+                )}
+              </span>
+            </div>
 
-            <div style={{ height: '1.25rem' }}>{renderRating(rating, ratingCount)}</div>
+            <div style={{ height: '1.25rem', marginTop: 4 }}>{renderRating(rating, ratingCount)}</div>
           </div>
         </div>
       </div>
