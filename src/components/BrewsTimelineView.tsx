@@ -1214,18 +1214,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
                   </clipPath>
                 </defs>
-                {bagChangeIndices.map((i, j) => {
-                  const { mobileMidX: midX } = bagChangePositions[j];
-                  return (
-                    <g
-                      key={`bag-${i}`}
-                      clipPath={`url(#${uniqueId}-mobileRevealClip)`}
-                    >
-                      <line x1={midX} y1={0} x2={midX} y2={mobileSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
-                      <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
-                    </g>
-                  );
-                })}
+                {/* bag-change dividers hidden for now */}
                 {/* Mobile: Base graph always at 100% opacity (no hover effects) */}
                 <path
                   ref={mobileAreaPathRef}
@@ -1426,18 +1415,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     );
                   })()}
                 </defs>
-                {bagChangeIndices.map((i, j) => {
-                  const { desktopMidX: midX } = bagChangePositions[j];
-                  return (
-                    <g
-                      key={`bag-${i}`}
-                      clipPath={`url(#${uniqueId}-desktopRevealClip)`}
-                    >
-                      <line x1={midX} y1={0} x2={midX} y2={desktopSvgHeight} stroke="#e5e7eb" strokeWidth="1" />
-                      <rect x={midX - 20} y={0} width={40} height={14} fill="white" />
-                    </g>
-                  );
-                })}
+                {/* bag-change dividers hidden for now */}
                 {/* Base fill - always rendered, opacity controlled for smooth transitions */}
                 {/* Smooth transition when entering hover, no transition when leaving to prevent darker appearance */}
                 <path
@@ -1515,42 +1493,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 />
               </svg>
 
-              {/* New-bag labels as HTML overlay so text isn't clipped by SVG viewport */}
-              {bagChangeIndices.map((i, j) => {
-                const { mobileMidX, desktopMidX } = bagChangePositions[j];
-                return (
-                  <React.Fragment key={`newbag-${i}`}>
-                    <span
-                      className="absolute pointer-events-none md:hidden"
-                      style={{
-                        left: mobileMidX,
-                        top: -1,
-                        transform: 'translateX(-50%)',
-                        fontSize: 10,
-                        color: '#b0b5bd',
-                        lineHeight: 1,
-                        zIndex: 1,
-                      }}
-                    >
-                      {COPY.newBagLabel}
-                    </span>
-                    <span
-                      className="absolute pointer-events-none hidden md:inline"
-                      style={{
-                        left: desktopMidX,
-                        top: -1,
-                        transform: 'translateX(-50%)',
-                        fontSize: 10,
-                        color: '#b0b5bd',
-                        lineHeight: 1,
-                        zIndex: 1,
-                      }}
-                    >
-                      {COPY.newBagLabel}
-                    </span>
-                  </React.Fragment>
-                );
-              })}
+              {/* New-bag labels hidden for now */}
 
               {/* Nodes */}
               <div className="flex items-start gap-2 md:gap-8 relative"> {/* Mobile gap-2 (8px) */}
