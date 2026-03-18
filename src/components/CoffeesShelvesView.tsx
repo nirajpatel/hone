@@ -119,13 +119,14 @@ function getCoffeeAge(roastDate: string): string {
 }
 
 const iconColumnClass = 'w-4 flex-shrink-0 flex items-center justify-center overflow-visible';
+const shelfCardLineHeight = '1.25rem';
 
 function renderRating(rating: number, count?: number) {
   if (rating === 0) return <span className="text-sm text-gray-500 leading-5">Not rated</span>;
   const roundedRating = Math.round(rating);
   const label = count != null && count > 0 ? `${getRatingText(roundedRating)} • ${count} brew${count !== 1 ? 's' : ''}` : getRatingText(roundedRating);
   return (
-    <div className="flex items-center gap-1" style={{ height: '1.25rem' }}>
+    <div className="flex items-center gap-1" style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight }}>
       <span className={`${iconColumnClass} text-lg`}>{getRatingEmoji(roundedRating)}</span>
       <span className="text-sm text-gray-500">{label}</span>
     </div>
@@ -257,12 +258,14 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
           </div>
 
           <div>
-            <TastingNotesLine
-              key={coffee.id}
-              notes={coffee.notes ? coffee.notes.split(',').map(n => n.trim()).filter(Boolean) : []}
-            />
+            <div style={{ height: shelfCardLineHeight, display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+              <TastingNotesLine
+                key={coffee.id}
+                notes={coffee.notes ? coffee.notes.split(',').map(n => n.trim()).filter(Boolean) : []}
+              />
+            </div>
 
-            <div className="flex items-center gap-1 text-sm text-gray-500 leading-5 min-h-[1.25rem]" style={{ marginTop: 4 }}>
+            <div className="flex items-center gap-1 text-sm text-gray-500" style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight, marginTop: 4 }}>
               <span className={iconColumnClass}>{!coffee.roastDate ? '—' : freshness?.emoji ?? '—'}</span>
               <span className="text-left">
                 {!coffee.roastDate ? (
@@ -281,7 +284,7 @@ function CoffeeCard({ coffee, rating, ratingCount, onClick, roastLabel = 'Roaste
               </span>
             </div>
 
-            <div style={{ height: '1.25rem', marginTop: 4 }}>{renderRating(rating, ratingCount)}</div>
+            <div style={{ height: shelfCardLineHeight, lineHeight: shelfCardLineHeight, marginTop: 4 }}>{renderRating(rating, ratingCount)}</div>
           </div>
         </div>
       </div>
