@@ -9,15 +9,14 @@ import VanillaTilt from 'vanilla-tilt';
 import { SimpleTooltip } from './ui/simple-tooltip';
 import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
 import { COPY } from '../constants/copy';
-import { resolveCanonicalCoffee, canonicalCoffeeKey, normalizeCoffeeKey, type CoffeeAliases } from '../utils/coffeeCanonical';
 
 // Module-level caches — survive component unmount/remount during navigation
 const _repImageCache = new Map<string, string>(); // key -> url ('' means confirmed no image)
 let _defaultImageCache: string | null | '__loading__' = null;
 
-/** Update the representative image cache from outside the component (e.g. after auto-generating a bag image). Uses canonical key when aliases provided. */
-export function setRepImageCacheEntry(roaster: string, coffeeName: string, imageUrl: string, aliases?: CoffeeAliases) {
-  const key = aliases ? canonicalCoffeeKey(roaster, coffeeName, aliases) : `${normalizeCoffeeKey(roaster)}|${normalizeCoffeeKey(coffeeName)}`;
+/** Update the representative image cache from outside the component (e.g. after auto-generating a bag image). */
+export function setRepImageCacheEntry(roaster: string, coffeeName: string, imageUrl: string) {
+  const key = `${roaster.trim().toLowerCase()}|${coffeeName.trim().toLowerCase()}`;
   _repImageCache.set(key, imageUrl);
 }
 
@@ -477,10 +476,12 @@ export function CoffeesShelvesView({
     const abortController = new AbortController();
 
     const fetchRepresentativeImages = async () => {
-      // Get unique coffee combinations (by canonical key) that are NOT yet cached
+      const norm = (s: string) => s.trim().toLowerCase();
+
+      // Get unique coffee combinations that are NOT yet cached
       const uniqueCoffees = new Map<string, Coffee>();
       coffees.forEach(coffee => {
-        const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
+        const key = `${norm(coffee.roaster)}|${norm(coffee.name)}`;
         if (!uniqueCoffees.has(key) && !_repImageCache.has(key)) {
           uniqueCoffees.set(key, coffee);
         }
@@ -508,10 +509,10 @@ export function CoffeesShelvesView({
             const requestAbortController = new AbortController();
             const timeoutId = setTimeout(() => requestAbortController.abort(), 5000);
 
-            const resolved = resolveCanonicalCoffee(coffee.roaster, coffee.name, aliases);
-            const key = `${resolved.normalizedRoaster}|${resolved.normalizedName}`;
+            const normRoaster = coffee.roaster.trim().toLowerCase();
+            const normName = coffee.name.trim().toLowerCase();
             const res = await fetch(
-              `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(resolved.normalizedRoaster)}&coffeeName=${encodeURIComponent(resolved.normalizedName)}`,
+              `${apiUrl}/coffee-representative-image?roaster=${encodeURIComponent(normRoaster)}&coffeeName=${encodeURIComponent(normName)}`,
               {
                 headers: { Authorization: `Bearer ${publicAnonKey}` },
                 signal: requestAbortController.signal,
@@ -519,6 +520,8 @@ export function CoffeesShelvesView({
             );
 
             clearTimeout(timeoutId);
+
+            const key = `${normRoaster}|${normName}`;
             if (res.ok) {
               const data = await res.json();
               // Store url if found, empty string as "confirmed missing" sentinel
@@ -578,12 +581,12 @@ export function CoffeesShelvesView({
     return () => {
       abortController.abort();
     };
-  }, [coffees, apiUrl, aliases]);
+  }, [coffees, apiUrl]);
 
-  // Get the best image for a coffee (by canonical key so aliased coffees share the same image).
+  // Get the best image for a coffee.
   // Returns null when still loading (caller should show shimmer instead of fallback).
   const getCoffeeImage = (coffee: Coffee): string | null => {
-    const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
+    const key = `${coffee.roaster.trim().toLowerCase()}|${coffee.name.trim().toLowerCase()}`;
     const representativeImage = representativeImages.get(key);
 
     // Non-empty string = confirmed URL
@@ -605,10 +608,35 @@ export function CoffeesShelvesView({
     return { rating: Math.round(sum / coffeeBrews.length), count: coffeeBrews.length };
   };
 
+  // Same as brew nav: resolve to canonical roaster + name (aliases + normalized) for "same coffee"
+  const norm = (s: string) => (s || '').trim().toLowerCase();
+  const resolveCanonical = (roaster: string, name: string) => {
+    const ra = aliases.roasterAliases;
+    const cna = aliases.coffeeNameAliases;
+    let canonicalRoaster = roaster;
+    for (const [variant, canonical] of Object.entries(ra)) {
+      if (norm(variant) === norm(roaster)) { canonicalRoaster = canonical as string; break; }
+    }
+    const normCoffeeKey = `${norm(canonicalRoaster)}|${norm(name)}`;
+    let canonicalCoffeeName = name;
+    for (const [variantKey, canonicalValue] of Object.entries(cna)) {
+      const [kr, kn] = variantKey.split('|');
+      if (`${norm(kr)}|${norm(kn)}` === normCoffeeKey) {
+        canonicalCoffeeName = (canonicalValue as string).split('|')[1] ?? name;
+        break;
+      }
+    }
+    return { roaster: canonicalRoaster, coffeeName: canonicalCoffeeName };
+  };
+  const canonicalKey = (r: string, n: string) => {
+    const can = resolveCanonical(r, n);
+    return `${norm(can.roaster)}|${norm(can.coffeeName)}`;
+  };
+
   // Get average rating across all bags of the same coffee (canonical roaster + name, aliases + normalized)
   const getAggregatedCoffeeRating = (roaster: string, coffeeName: string): { rating: number; count: number } => {
-    const key = canonicalCoffeeKey(roaster, coffeeName, aliases);
-    const relatedCoffees = coffees.filter(c => canonicalCoffeeKey(c.roaster, c.name, aliases) === key);
+    const key = canonicalKey(roaster, coffeeName);
+    const relatedCoffees = coffees.filter(c => canonicalKey(c.roaster, c.name) === key);
     const coffeeIds = relatedCoffees.map(c => c.id);
     const relevantExtractions = brews.filter(e => coffeeIds.includes(e.coffeeId) && e.quality);
     if (relevantExtractions.length === 0) return { rating: 0, count: 0 };
@@ -648,7 +676,7 @@ export function CoffeesShelvesView({
     // Group by roaster - unique coffees by canonical (roaster + name), then group by canonical roaster
     const uniqueCoffeeMap = new Map<string, Coffee>();
     coffees.forEach(coffee => {
-      const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
+      const key = canonicalKey(coffee.roaster, coffee.name);
       const existing = uniqueCoffeeMap.get(key);
       if (!existing || coffee.roastDate > existing.roastDate) {
         uniqueCoffeeMap.set(key, coffee);
@@ -657,7 +685,7 @@ export function CoffeesShelvesView({
 
     // Group by canonical roaster (so aliased/variant roaster names merge)
     uniqueCoffeeMap.forEach(coffee => {
-      const can = resolveCanonicalCoffee(coffee.roaster, coffee.name, aliases);
+      const can = resolveCanonical(coffee.roaster, coffee.name);
       const groupName = can.roaster;
       if (!groupedCoffees[groupName]) {
         groupedCoffees[groupName] = [];
@@ -726,7 +754,7 @@ export function CoffeesShelvesView({
               getCoffeeImage={getCoffeeImage}
               getCoffeeBagRating={getCoffeeBagRating}
               getAggregatedCoffeeRating={getAggregatedCoffeeRating}
-              getSameCoffeeSiblings={groupBy === 'coffee' ? (coffee) => coffees.filter(c => canonicalCoffeeKey(c.roaster, c.name, aliases) === canonicalCoffeeKey(coffee.roaster, coffee.name, aliases)) : undefined}
+              getSameCoffeeSiblings={groupBy === 'coffee' ? (coffee) => coffees.filter(c => canonicalKey(c.roaster, c.name) === canonicalKey(coffee.roaster, coffee.name)) : undefined}
               onSelectCoffee={onSelectCoffee}
             />
         ))}

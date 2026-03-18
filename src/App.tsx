@@ -11,7 +11,6 @@ import { BrewsTableView } from './components/BrewsTableView';
 import { BrewsTimelineView } from './components/BrewsTimelineView';
 import { CoffeesShelvesView, setRepImageCacheEntry } from './components/CoffeesShelvesView';
 import { generateDefaultBagImage, hasRepresentativeImage, saveRepresentativeImage } from './utils/generateBagImage';
-import { canonicalCoffeeKey } from './utils/coffeeCanonical';
 import { CoffeesTableView } from './components/CoffeesTableView';
 import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { Profile } from './components/Profile';
@@ -784,7 +783,7 @@ export default function App() {
             if (dataUrl) {
               const saved = await saveRepresentativeImage(newCoffee.roaster, newCoffee.name, dataUrl);
               if (saved) {
-                setRepImageCacheEntry(newCoffee.roaster, newCoffee.name, dataUrl, aliases);
+                setRepImageCacheEntry(newCoffee.roaster, newCoffee.name, dataUrl);
               }
             }
           }
@@ -1691,12 +1690,36 @@ export default function App() {
 
       {selectedBrew && (() => {
         // Same as NewBrewFlow baseline + alias resolution: same coffee (all bags, canonical roaster + name) + same brew method
+        const norm = (s: string) => (s || '').trim().toLowerCase();
+        const resolveCanonical = (roaster: string, name: string) => {
+          const ra = aliases.roasterAliases;
+          const cna = aliases.coffeeNameAliases;
+          const normR = norm(roaster);
+          let canonicalRoaster = roaster;
+          for (const [variant, canonical] of Object.entries(ra)) {
+            if (norm(variant) === normR) { canonicalRoaster = canonical as string; break; }
+          }
+          const normCoffeeKey = `${norm(canonicalRoaster)}|${norm(name)}`;
+          let canonicalCoffeeName = name;
+          for (const [variantKey, canonicalValue] of Object.entries(cna)) {
+            const [kr, kn] = variantKey.split('|');
+            if (`${norm(kr)}|${norm(kn)}` === normCoffeeKey) {
+              canonicalCoffeeName = (canonicalValue as string).split('|')[1] ?? name;
+              break;
+            }
+          }
+          return { roaster: canonicalRoaster, coffeeName: canonicalCoffeeName };
+        };
         const selectedCoffee = coffees.find(c => c.id === selectedBrew.coffeeId);
-        const selectedKey = selectedCoffee ? canonicalCoffeeKey(selectedCoffee.roaster, selectedCoffee.name, aliases) : null;
+        const selectedCanonical = selectedCoffee ? resolveCanonical(selectedCoffee.roaster, selectedCoffee.name) : null;
+        const selectedKey = selectedCanonical ? `${norm(selectedCanonical.roaster)}|${norm(selectedCanonical.coffeeName)}` : null;
         const sameCoffeeBagIds = selectedKey
           ? new Set(
               coffees
-                .filter((c) => canonicalCoffeeKey(c.roaster, c.name, aliases) === selectedKey)
+                .filter((c) => {
+                  const can = resolveCanonical(c.roaster, c.name);
+                  return `${norm(can.roaster)}|${norm(can.coffeeName)}` === selectedKey;
+                })
                 .map((c) => c.id)
             )
           : new Set(selectedCoffee ? [selectedCoffee.id] : [selectedBrew.coffeeId]);

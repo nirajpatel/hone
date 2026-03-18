@@ -1,5 +1,5 @@
 import { Coffee, Brew } from '../types';
-import { getRatingEmoji, getRatingText } from '../utils/formatters';
+import { getRatingEmoji } from '../utils/formatters';
 import { SimpleTooltip } from './ui/simple-tooltip';
 
 interface CoffeesMobileListViewProps {
@@ -86,12 +86,12 @@ export function CoffeesMobileListView({
     });
   }
 
-  // Get coffee average rating and count of rated brews
-  const getCoffeeAverageRating = (coffeeId: string): { rating: number; count: number } => {
+  // Get coffee average rating
+  const getCoffeeAverageRating = (coffeeId: string): number => {
     const coffeeBrews = brews.filter(e => e.coffeeId === coffeeId && e.quality);
-    if (coffeeBrews.length === 0) return { rating: 0, count: 0 };
+    if (coffeeBrews.length === 0) return 0;
     const sum = coffeeBrews.reduce((acc, e) => acc + (e.quality || 0), 0);
-    return { rating: Math.round(sum / coffeeBrews.length), count: coffeeBrews.length };
+    return Math.round(sum / coffeeBrews.length);
   };
 
   // Get brew count for a coffee
@@ -282,7 +282,7 @@ export function CoffeesMobileListView({
           {/* Coffee List */}
           <div className="bg-white border-y border-gray-200 overflow-hidden mobile-brew-card">
             {groupCoffees.map((coffee, index) => {
-              const { rating: avgRating, count: ratingCount } = getCoffeeAverageRating(coffee.id);
+              const avgRating = getCoffeeAverageRating(coffee.id);
               const brewCount = getBrewCount(coffee.id);
               
               return (
@@ -341,17 +341,14 @@ export function CoffeesMobileListView({
                         </div>
                       </div>
                       
-                      {/* Right side - Emoji + label (e.g. Exceptional (5)) */}
-                      <div className="flex-shrink-0 self-center flex items-center gap-1.5">
+                      {/* Right side - Emoji rating only (vertically centered) */}
+                      <div className="flex-shrink-0 self-center flex items-center justify-center w-6">
                         {avgRating > 0 ? (
-                          <>
-                            <span className="text-xl leading-none">{getRatingEmoji(avgRating)}</span>
-                            <span className="text-sm text-gray-600 whitespace-nowrap">
-                              {getRatingText(avgRating)}{ratingCount > 0 ? ` • ${ratingCount} brew${ratingCount !== 1 ? 's' : ''}` : ''}
-                            </span>
-                          </>
+                          <span className="text-xl leading-none block text-center">
+                            {getRatingEmoji(avgRating)}
+                          </span>
                         ) : (
-                          <span className="text-gray-500 text-xl leading-none">–</span>
+                          <span className="text-gray-500 text-xl leading-none block text-center">–</span>
                         )}
                       </div>
                     </div>

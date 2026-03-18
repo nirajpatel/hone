@@ -5,11 +5,6 @@ import { X, Upload, RefreshCw, Check, ChevronLeft, ChevronRight, LayoutGrid, Pen
 import { toast } from 'sonner@2.0.3';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { toTitleCase } from '../utils/tastingNotes';
-import {
-  resolveCanonicalCoffee,
-  canonicalCoffeeKey,
-  type CoffeeAliases,
-} from '../utils/coffeeCanonical';
 
 interface CoffeeBagImageFlowProps {
   coffees: Coffee[];
@@ -101,20 +96,45 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
         }
       } catch { /* non-fatal — proceed without aliases */ }
 
-      const aliases: CoffeeAliases = { roasterAliases, coffeeNameAliases };
+      const norm = (s: string) => s.trim().toLowerCase();
+
+      const resolveCanonical = (roaster: string, name: string) => {
+        const normR = norm(roaster);
+        // Case-insensitive roaster alias lookup
+        let canonicalRoaster = roaster; // original case for display
+        for (const [variant, canonical] of Object.entries(roasterAliases)) {
+          if (norm(variant) === normR) { canonicalRoaster = canonical; break; }
+        }
+        // Case-insensitive coffee-name alias lookup
+        const normCoffeeKey = `${norm(canonicalRoaster)}|${norm(name)}`;
+        let canonicalName = name; // original case for display
+        for (const [variantKey, canonicalValue] of Object.entries(coffeeNameAliases)) {
+          const [kr, kn] = variantKey.split('|');
+          if (`${norm(kr)}|${norm(kn)}` === normCoffeeKey) {
+            canonicalName = canonicalValue.split('|')[1] ?? name;
+            break;
+          }
+        }
+        return {
+          roaster: norm(canonicalRoaster),    // normalized for keys/API
+          name: norm(canonicalName),          // normalized for keys/API
+          displayRoaster: canonicalRoaster,   // original case for display
+          displayName: canonicalName,         // original case for display
+        };
+      };
 
       // Build unique coffees list immediately and show UI
       const uniqueMap = new Map<string, UniqueCoffee>();
       for (const coffee of coffees) {
-        const canonical = resolveCanonicalCoffee(coffee.roaster, coffee.name, aliases);
-        const key = canonicalCoffeeKey(coffee.roaster, coffee.name, aliases);
+        const canonical = resolveCanonical(coffee.roaster, coffee.name);
+        const key = `${canonical.roaster}|${canonical.name}`;
         const ownerName = (coffee as any).ownerName as string | undefined;
         if (!uniqueMap.has(key)) {
           uniqueMap.set(key, {
-            roaster: canonical.normalizedRoaster,
-            name: canonical.normalizedName,
-            displayRoaster: canonical.roaster,
-            displayName: canonical.coffeeName,
+            roaster: canonical.roaster,
+            name: canonical.name,
+            displayRoaster: canonical.displayRoaster,
+            displayName: canonical.displayName,
             region: coffee.region,
             notes: coffee.notes,
             roastLevel: coffee.roastLevel,
