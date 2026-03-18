@@ -18,6 +18,7 @@ import {
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { sanitizeErrorMessage } from '../utils/errorHandling';
 import { COPY } from '../constants/copy';
+import { useWakeLock } from '../hooks/useWakeLock';
 
 interface AddCoffeeFormProps {
   onClose: () => void;
@@ -41,6 +42,8 @@ const toTitleCase = (str: string): string => {
 };
 
 export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpdate, existingCoffees = [] }: AddCoffeeFormProps) {
+  useWakeLock(true);
+
   const [roaster, setRoaster] = useState('');
   const [name, setName] = useState('');
   const [roastDate, setRoastDate] = useState('');

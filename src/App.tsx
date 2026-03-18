@@ -128,7 +128,10 @@ export default function App() {
   const checkAuthRef = useRef<() => Promise<void>>(null!);
   const createOrGetUserRef = useRef<(token: string) => Promise<void>>(null!);
 
-  // Refresh data when app resumes from iOS home screen frozen state
+  // Refresh data when app resumes from iOS home screen frozen state.
+  // Use getSession() only — do NOT call refreshSession() here. Forcing refresh on tab focus
+  // can race with Supabase's autoRefreshToken and trigger "Refresh Token Not Found" (e.g. when
+  // the server has already rotated the token), logging the user out.
   const isRefreshingRef = useRef(false);
   const mountTimeRef = useRef(Date.now());
   useEffect(() => {
@@ -138,9 +141,9 @@ export default function App() {
       if (document.visibilityState === 'visible' && currentUser && accessToken && !isRefreshingRef.current) {
         isRefreshingRef.current = true;
         try {
-          const { data: { session }, error } = await supabase.auth.refreshSession();
+          const { data: { session }, error } = await supabase.auth.getSession();
           if (error || !session?.access_token) {
-            console.warn('Could not refresh session on tab resume:', error?.message ?? error);
+            // Session missing or error — don't force refresh; let autoRefreshToken or next navigation handle it
             return;
           }
           setAccessToken(session.access_token);

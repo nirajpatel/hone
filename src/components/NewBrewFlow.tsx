@@ -34,6 +34,7 @@ import { FormattedAISuggestions, type AISuggestionsData, type FirstTimeSuggestio
 import { VoiceStagesMode } from './VoiceStagesMode';
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 import { COPY } from '../constants/copy';
+import { useWakeLock } from '../hooks/useWakeLock';
 
 // DEV: set to true to always show the brewing popover for UI iteration
 const DEV_SHOW_BREWING = false;
@@ -145,6 +146,8 @@ interface NewBrewFlowProps {
 }
 
 export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, onClose, onSave, duplicateData, editingBrew, onUpdate, equipmentChangeCounter, prefilledCoffeeId, prefilledBrewMethod, onMarkCoffeeFinished, onAddAnotherBag, hidden }: NewBrewFlowProps) {
+  useWakeLock(true);
+
   // Detect if mobile device
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   

@@ -22,6 +22,18 @@ interface UniqueCoffee {
   owners: string[];
 }
 
+// Default prompt used by backend for generic bag (no reference image). Must stay in sync with make-server generate-coffee-bag-image.
+const DEFAULT_BAG_PROMPT =
+  'Create a clean modern 3D studio product render of a generic specialty coffee bag. The bag should be a tall, upright kraft paper or matte-finish bag with a simple, elegant design. No text, no logos, no labels — completely plain. Rendering style: high-quality 3D product render with subtle material depth, soft natural studio lighting, crisp edges, smooth surfaces, minimal wrinkles, no grain, no noise, no dirt, no scratches, no photoreal texture. The coffee bag should look fresh, brand new, and pristine. Shadow: Add a soft, realistic contact shadow directly beneath the base of the bag, perfectly centered and symmetrical. Scale + framing: The bag must fit within a virtual container of 920x920 pixels (centered within a 1024x1024 canvas). Scale the bag proportionally until it touches either the width OR height boundary of this container, then center it on the white 1024x1024 canvas. Camera: front-facing, centered, no tilt, no rotation, symmetrical, premium ecommerce product hero shot. Use #FFFFFF hex code for the background.';
+
+// Reference-image prompt (uploaded bag photo, no text-overlay). Roaster and coffeeName are interpolated.
+const REFERENCE_IMAGE_PROMPT_TEMPLATE = (roaster: string, coffeeName: string) =>
+  `Create a clean modern 3D studio product render of the coffee bag shown in the reference image. Preserve the exact layout, logo placement, typography hierarchy, and major artwork shapes from the reference, but simplify fine textures and micro-details. Text policy: The reference image may have incomplete, partially visible, or misspelled text for the roaster/brand name and coffee name. Use the provided names as strong hints: Roaster is "${roaster}" and Coffee name is "${coffeeName}". Keep only text that matches or closely resembles these names, even if partially visible or slightly misspelled on the bag. Use your judgment to identify which text on the bag corresponds to the roaster name and which to the coffee name based on these hints. Remove all other text including region, origin, tasting notes, weight, dates, brewing instructions, and any other descriptive text. Keep the preserved text placement, alignment, and spatial relationships identical to the reference. Rendering style: high-quality 3D product render with subtle material depth, soft natural studio lighting, crisp edges, smooth surfaces, minimal wrinkles, no grain, no noise, no dirt, no scratches, no photoreal texture. The coffee bag should look fresh, brand new, and pristine - not used or wrinkled. The bag should appear as if it just came from the factory with perfect condition and no wear. The coffee bag colors must look natural and normal. Shadow: Add a soft, realistic contact shadow directly beneath the base of the bag. Crucially, this shadow must be perfectly centered and symmetrical, extending equally on both the left and right sides of the bag to create a balanced, professional product showcase aesthetic on the white background. Scale + framing: The bag must fit within a virtual container of 920x920 pixels (centered within a 1024x1024 canvas). Scale the bag proportionally until it touches either the width OR height boundary of this container, whichever comes first. Then center it perfectly on the white 1024x1024 canvas. Camera must be fixed and consistent: front-facing, centered, no tilt, no rotation, symmetrical, presented like a premium ecommerce product hero shot. Use #FFFFFF hex code for the background.`;
+
+// Text-overlay prompt (default bag + text or your bag photo + text). Roaster and coffeeName are interpolated.
+const TEXT_OVERLAY_PROMPT_TEMPLATE = (roaster: string, coffeeName: string) =>
+  `Take the coffee bag shown in the reference image as the exact base. Keep the bag's shape, color, material finish, and all visual elements precisely as shown — do not alter the bag design in any way. The bag has no text on it. Add exactly two lines of text directly onto the front face of the bag, centered horizontally, following these precise rules: Line 1 — Roaster name: "${roaster}". Position: centered horizontally, vertically placed at 38% from the top of the bag face. Font: all-caps, clean geometric sans-serif (e.g. Futura, Montserrat, or equivalent). Font size: occupies approximately 18–22% of the bag's visible width. Letter-spacing: wide (tracking ~0.15em). Weight: bold. Line 2 — Coffee name: "${coffeeName}". Position: centered horizontally, vertically placed at 50% from the top of the bag face, directly below Line 1 with a gap equal to roughly 1.5× the Line 1 cap height. Font: same typeface family as Line 1. Font size: exactly 60% of the Line 1 font size. Letter-spacing: same wide tracking as Line 1. Weight: regular (not bold). Both lines must be perfectly horizontally centered relative to each other and to the bag. Text color: choose a single color (white, cream, off-white, or near-black) that provides strong contrast against the bag surface and reads clearly. The text must appear to sit on the bag surface with correct perspective foreshortening and subtle lighting integration — not pasted on top. No other text, logos, or decorative elements. Maintain the same rendering quality: high-quality 3D product render, soft natural studio lighting, crisp edges, white #FFFFFF background, 1024x1024 canvas, bag centered within 920x920 pixel area, front-facing camera, perfectly symmetrical composition, soft centered contact shadow beneath the bag.`;
+
 // Module-level caches so data survives tab switches (component unmount/remount)
 let _cachedUniqueCoffees: UniqueCoffee[] | null = null;
 let _cachedExistingImages: Map<string, string> | null = null;
@@ -39,6 +51,8 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
   const [customPrompt, setCustomPrompt] = useState<string>('');
   const [isDefaultStep, setIsDefaultStep] = useState(true);
   const [defaultExistingImage, setDefaultExistingImage] = useState<string | null>(_cachedDefaultImage);
+  const [defaultImageLoading, setDefaultImageLoading] = useState(_cachedDefaultImage === null);
+  const [gridImagesLoaded, setGridImagesLoaded] = useState(false);
   const [overlayUploadedImage, setOverlayUploadedImage] = useState<string | null>(null);
   const [defaultBagSelected, setDefaultBagSelected] = useState(false);
   const [viewMode, setViewMode] = useState<'edit' | 'grid'>('grid');
@@ -55,6 +69,8 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
     _fetchInProgress = false;
     setExistingImages(new Map());
     setDefaultExistingImage(null);
+    setDefaultImageLoading(true);
+    setGridImagesLoaded(false);
     const controller = new AbortController();
     abortControllerRef.current = controller;
     loadCoffeesNeedingImages(controller.signal);
@@ -150,6 +166,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
             }
           }
         } catch { /* non-fatal */ }
+        setDefaultImageLoading(false);
       };
 
       // Fetch images in batches of 8, updating state and cache after each batch
@@ -187,6 +204,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
           }
         }
         _fetchInProgress = false;
+        setGridImagesLoaded(true);
       };
 
       // Run both concurrently in the background
@@ -197,6 +215,7 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
       toast.error('Failed to load coffees');
       setLoading(false);
       _fetchInProgress = false;
+      setGridImagesLoaded(true);
     }
   };
 
@@ -503,7 +522,11 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 flex-none">
         <div className="text-sm font-semibold text-gray-900">
-          {viewMode === 'grid' ? `All Bags (${uniqueCoffees.length})` : isDefaultStep ? 'Default' : `Coffee ${currentIndex + 1} / ${uniqueCoffees.length}`}
+          {viewMode === 'grid'
+            ? `All Bags (${uniqueCoffees.length})`
+            : isDefaultStep
+              ? (defaultImageLoading ? 'Loading…' : 'Default')
+              : `Coffee ${currentIndex + 1} / ${uniqueCoffees.length}`}
         </div>
 
         <div className="flex items-center gap-2">
@@ -541,7 +564,11 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
             {uniqueCoffees.map((coffee) => {
               const key = `${coffee.roaster}|${coffee.name}`;
-              const img = existingImages.get(key) ?? defaultExistingImage;
+              const hasRealImage = existingImages.has(key);
+              // Only use default image as fallback after we've finished loading all coffees (avoids flash of default before real image)
+              const img = hasRealImage
+                ? existingImages.get(key)!
+                : (gridImagesLoaded ? defaultExistingImage : null);
               return (
                 <button
                   key={key}
@@ -565,11 +592,17 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs text-gray-300">No image</span>
+                      <div className="absolute inset-0 overflow-hidden rounded-sm">
+                        {gridImagesLoaded ? (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs text-gray-300">No image</span>
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 w-full h-full animate-shimmer rounded-sm" />
+                        )}
                       </div>
                     )}
-                    {!existingImages.get(key) && (
+                    {gridImagesLoaded && !hasRealImage && defaultExistingImage != null && (
                       <div className="absolute bottom-1 right-1 bg-black/50 text-white text-[10px] px-1 py-0.5 rounded">
                         default
                       </div>
@@ -630,6 +663,12 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
                 )}
               </div>
 
+              {/* Default prompt (backend) */}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Default prompt (backend)</p>
+                <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">{DEFAULT_BAG_PROMPT}</p>
+              </div>
+
               {/* Prompt */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -645,125 +684,161 @@ export function CoffeeBagImageFlow({ coffees, onClose }: CoffeeBagImageFlowProps
             </>
           ) : (
             <>
-              {/* Coffee meta */}
-              <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-1">
-                <p className="text-base font-semibold text-gray-900">{currentCoffee?.roaster}</p>
-                <p className="text-sm text-gray-700">{currentCoffee?.name}</p>
-                {currentCoffee && currentCoffee.owners.length > 0 && (
-                  <p className="text-sm text-gray-500">
-                    User: {currentCoffee.owners.join(', ')}
-                  </p>
-                )}
-                {currentCoffee?.region && <p className="text-sm text-gray-500">Region: {currentCoffee.region}</p>}
-                {currentCoffee?.roastLevel && <p className="text-sm text-gray-500">Roast: {currentCoffee.roastLevel}</p>}
-                {currentCoffee?.notes && <p className="text-sm text-gray-500">Notes: {toTitleCase(currentCoffee.notes)}</p>}
-                {currentExistingImage && (
-                  <p className="text-xs text-amber-600 pt-1">⚠️ This coffee already has an image. Generating replaces it.</p>
-                )}
-              </div>
+              {/* Section: Coffee details */}
+              <section className="pt-0">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Coffee details</h2>
+                <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-1">
+                  <p className="text-base font-semibold text-gray-900">{currentCoffee?.roaster}</p>
+                  <p className="text-sm text-gray-700">{currentCoffee?.name}</p>
+                  {currentCoffee && currentCoffee.owners.length > 0 && (
+                    <p className="text-sm text-gray-500">
+                      User: {currentCoffee.owners.join(', ')}
+                    </p>
+                  )}
+                  {currentCoffee?.region && <p className="text-sm text-gray-500">Region: {currentCoffee.region}</p>}
+                  {currentCoffee?.roastLevel && <p className="text-sm text-gray-500">Roast: {currentCoffee.roastLevel}</p>}
+                  {currentCoffee?.notes && <p className="text-sm text-gray-500">Notes: {toTitleCase(currentCoffee.notes)}</p>}
+                </div>
+              </section>
 
-              {/* AI generation — upload bag photo */}
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-3">Generate from Bag Photo</p>
-                {uploadedImage ? (
-                  <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white">
-                    <img src={uploadedImage} alt="Uploaded" className="w-12 h-16 object-contain rounded flex-none" />
-                    <label className="cursor-pointer text-sm text-blue-600 hover:text-blue-700">
-                      <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                      Change image
+              {/* Section: Image generation method */}
+              <section className="pt-4 mt-4 border-t border-gray-200">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Image generation method</h2>
+                {currentExistingImage && (
+                  <p className="text-xs text-amber-600 mb-3">⚠️ This coffee already has an image. Generating replaces it.</p>
+                )}
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Generate from bag photo</p>
+                    {uploadedImage ? (
+                      <div className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-white">
+                        <img src={uploadedImage} alt="Uploaded" className="w-12 h-16 object-contain rounded flex-none" />
+                        <label className="cursor-pointer text-sm text-blue-600 hover:text-blue-700">
+                          <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                          Change image
+                        </label>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                        <Upload className="w-7 h-7 mx-auto text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-600">Click to upload a bag photo</p>
+                        <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 10MB</p>
+                      </label>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-gray-200" />
+                    <span className="text-xs text-gray-400 flex-none">or add text overlay</span>
+                    <div className="flex-1 h-px bg-gray-200" />
+                  </div>
+
+                  {defaultExistingImage && !defaultBagSelected && (
+                    <button
+                      onClick={() => setDefaultBagSelected(true)}
+                      disabled={isGenerating}
+                      className="w-full flex items-center gap-4 px-4 py-4 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-left disabled:opacity-50 cursor-pointer"
+                    >
+                      <img src={defaultExistingImage} alt="Default bag" className="w-10 h-14 object-contain rounded flex-none" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800">Use default bag + add text</p>
+                        <p className="text-xs text-gray-500 mt-1 truncate">
+                          Add "{currentCoffee?.roaster}" and "{currentCoffee?.name}" in a minimalist font
+                        </p>
+                      </div>
+                    </button>
+                  )}
+                  {defaultExistingImage && defaultBagSelected && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-4">
+                      <div className="flex items-center gap-4">
+                        <img src={defaultExistingImage} alt="Default bag" className="w-10 h-14 object-contain rounded flex-none" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-800">Use default bag + add text</p>
+                        </div>
+                        <button onClick={() => setDefaultBagSelected(false)} className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer flex-shrink-0">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="rounded-lg border border-gray-200 bg-white px-4 py-4">
+                    <p className="text-sm font-medium text-gray-800 mb-3">Use your bag photo + add text</p>
+                    {coffeePhotos.length > 0 && (
+                      <div className="flex gap-2 flex-wrap mb-3">
+                        {coffeePhotos.map((url, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleGenerateWithOverlayImage(url)}
+                            disabled={isGenerating}
+                            className="relative rounded overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors disabled:opacity-50 cursor-pointer flex-none"
+                            title="Use this photo"
+                          >
+                            <img src={url} alt={`Bag photo ${i + 1}`} className="w-14 h-20 object-cover" />
+                            {isGenerating && (
+                              <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                                <RefreshCw className="w-4 h-4 text-gray-500 animate-spin" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <label className={`flex items-center gap-2 cursor-pointer w-fit ${isGenerating ? 'opacity-50 pointer-events-none' : ''}`}>
+                      <input type="file" accept="image/*" onChange={handleOverlayImageUpload} className="hidden" disabled={isGenerating} />
+                      <div className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700">
+                        <Upload className="w-3.5 h-3.5" />
+                        {coffeePhotos.length > 0 ? 'Upload a different photo' : 'Upload a photo'}
+                      </div>
                     </label>
                   </div>
-                ) : (
-                  <label className="cursor-pointer block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    <Upload className="w-7 h-7 mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">Click to upload a bag photo</p>
-                    <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 10MB</p>
-                  </label>
-                )}
-              </div>
+                </div>
+              </section>
 
-              {/* Separator */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400 flex-none">or add text overlay</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
-
-              {/* Default bag option */}
-              {defaultExistingImage && !defaultBagSelected && (
-                <button
-                  onClick={() => setDefaultBagSelected(true)}
-                  disabled={isGenerating}
-                  className="w-full flex items-center gap-4 px-4 py-4 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors text-left disabled:opacity-50 cursor-pointer"
-                >
-                  <img src={defaultExistingImage} alt="Default bag" className="w-10 h-14 object-contain rounded flex-none" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800">Use Default Bag + Add Text</p>
-                    <p className="text-xs text-gray-500 mt-1 truncate">
-                      Add "{currentCoffee?.roaster}" and "{currentCoffee?.name}" in a minimalist font
-                    </p>
+              {/* Section: Prompts */}
+              <section className="pt-6 mt-6 border-t border-gray-200">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Prompts</h2>
+                <div className="space-y-4">
+                  <div>
+                    <p className="block text-sm font-medium text-gray-700 mb-2">Base prompt</p>
+                    {(() => {
+                      const roaster = currentCoffee?.displayRoaster ?? currentCoffee?.roaster ?? '';
+                      const coffeeName = currentCoffee?.displayName ?? currentCoffee?.name ?? '';
+                      if (defaultBagSelected || overlayUploadedImage) {
+                        return (
+                          <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5">
+                            <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">{TEXT_OVERLAY_PROMPT_TEMPLATE(roaster, coffeeName)}</p>
+                          </div>
+                        );
+                      }
+                      if (uploadedImage) {
+                        return (
+                          <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5">
+                            <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap font-mono">{REFERENCE_IMAGE_PROMPT_TEMPLATE(roaster, coffeeName)}</p>
+                          </div>
+                        );
+                      }
+                      return (
+                        <p className="text-xs text-gray-500">
+                          Determined by your choice above (reference photo or default bag + text). Your text below is appended.
+                        </p>
+                      );
+                    })()}
                   </div>
-                </button>
-              )}
-              {defaultExistingImage && defaultBagSelected && (
-                <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-4">
-                  <div className="flex items-center gap-4">
-                    <img src={defaultExistingImage} alt="Default bag" className="w-10 h-14 object-contain rounded flex-none" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800">Use Default Bag + Add Text</p>
-                    </div>
-                    <button onClick={() => setDefaultBagSelected(false)} className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer flex-shrink-0">
-                      Cancel
-                    </button>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Additional prompt <span className="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <textarea
+                      value={customPrompt}
+                      onChange={(e) => setCustomPrompt(e.target.value)}
+                      placeholder="Extra instructions appended to whichever generation method you use..."
+                      className="w-full h-20 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
-              )}
-
-              {/* Upload own image + text overlay */}
-              <div className="rounded-lg border border-gray-200 bg-white px-4 py-4">
-                <p className="text-sm font-medium text-gray-800 mb-3">Use Your Bag Photo + Add Text</p>
-                {coffeePhotos.length > 0 && (
-                  <div className="flex gap-2 flex-wrap mb-3">
-                    {coffeePhotos.map((url, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleGenerateWithOverlayImage(url)}
-                        disabled={isGenerating}
-                        className="relative rounded overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors disabled:opacity-50 cursor-pointer flex-none"
-                        title="Use this photo"
-                      >
-                        <img src={url} alt={`Bag photo ${i + 1}`} className="w-14 h-20 object-cover" />
-                        {isGenerating && (
-                          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                            <RefreshCw className="w-4 h-4 text-gray-500 animate-spin" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <label className={`flex items-center gap-2 cursor-pointer w-fit ${isGenerating ? 'opacity-50 pointer-events-none' : ''}`}>
-                  <input type="file" accept="image/*" onChange={handleOverlayImageUpload} className="hidden" disabled={isGenerating} />
-                  <div className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700">
-                    <Upload className="w-3.5 h-3.5" />
-                    {coffeePhotos.length > 0 ? 'Upload a different photo' : 'Upload a photo'}
-                  </div>
-                </label>
-              </div>
-
-              {/* Prompt */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Additional Prompt <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <textarea
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder="Extra instructions appended to whichever generation method you use..."
-                  className="w-full h-20 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              </section>
             </>
           )}
         </div>
