@@ -3335,6 +3335,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                     playsInline
                     muted
                     className="w-full h-full object-cover"
+                    style={{ transform: 'scaleX(-1)' }}
                   />
                   <canvas
                     ref={qrCanvasRef}

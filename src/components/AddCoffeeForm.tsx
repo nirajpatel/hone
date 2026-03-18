@@ -18,6 +18,7 @@ import {
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { sanitizeErrorMessage } from '../utils/errorHandling';
 import { COPY } from '../constants/copy';
+import { toTitleCase } from '../utils/tastingNotes';
 import { useWakeLock } from '../hooks/useWakeLock';
 
 interface AddCoffeeFormProps {
@@ -168,7 +169,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
         setRegionPills(mostRecent.region.split(',').map(s => s.trim()).filter(Boolean));
       }
       if (mostRecent.notes) {
-        setNotesPills(mostRecent.notes.split(',').map(s => s.trim()).filter(Boolean));
+        setNotesPills(mostRecent.notes.split(',').map(s => toTitleCase(s.trim())).filter(Boolean));
       }
       
       // After auto-filling, check if any fields are still empty and trigger AI lookup in parallel
@@ -593,8 +594,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
         setRegionPills(regions);
       }
       if (data.notes) {
-        // Parse notes into pills (split by commas)
-        const notes = data.notes.split(',').map((s: string) => s.trim()).filter(Boolean);
+        const notes = data.notes.split(',').map((s: string) => toTitleCase(s.trim())).filter(Boolean);
         setNotesPills(notes);
       }
       if (data.roastLevel && ['Light', 'Medium-Light', 'Medium', 'Medium-Dark', 'Dark'].includes(data.roastLevel)) {
@@ -1134,6 +1134,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
                   autoPlay
                   playsInline
                   className="w-full h-full object-cover"
+                  style={{ transform: 'scaleX(-1)' }}
                 />
               </div>
 

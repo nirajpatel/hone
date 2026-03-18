@@ -1289,7 +1289,7 @@ app.post('/make-server-23508aac/extract-coffee-bag', async (c) => {
                   text: `Please analyze this coffee bag image(s) and extract the following details:
 1. Roaster name (the company that roasted the coffee)
 2. Coffee name/offering (the specific coffee product name)
-3. Roast date (in YYYY-MM-DD format if available)
+3. Roast date (in YYYY-MM-DD format if available. If the year is missing, assume the most recent past occurrence of that date — i.e. this year if the date hasn't passed yet, otherwise last year. Today is ${new Date().toISOString().slice(0, 10)}.)
 4. Region/Origin (e.g., "Ethiopia", "Colombia", "Kenya" - the country or region where the coffee was grown)
 5. Tasting notes (e.g., "chocolate, caramel, nutty" or "bright citrus, floral, berry" - flavor descriptors on the bag)
 6. Roast level (Light, Medium-Light, Medium, Medium-Dark, or Dark)
