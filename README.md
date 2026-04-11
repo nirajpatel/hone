@@ -1,23 +1,24 @@
 # Hone
 
-**Designed for better coffee.**
-
-Track your brews, analyze patterns, and get AI-powered guidance to improve your coffee — every time.
+A personal coffee lab for tracking beans, logging brews, and perfecting every cup.
 
 [hone.coffee](https://hone.coffee)
 
----
+![Brews view](docs/screenshots/brews.png)
+
+![Beans view](docs/screenshots/beans.png)
 
 ## Features
 
-- **Brew Logging** — Record grind size, dose, yield, time, and tasting notes for every brew
-- **Coffee Library** — Manage your coffee collection with roaster details, origins, and processing methods
-- **AI Brew Suggestions** — Get personalized guidance to dial in your next brew based on your history
-- **Equipment Tracking** — Track grinders, brewers, and accessories
-- **Household Sharing** — Share your coffee library and brews with your household
-- **La Marzocco Integration** — Monitor and control La Marzocco Linea Mini machines (optional)
-- **Coffee Bag Scanning** — Scan QR codes and extract coffee info from bag photos
-- **Custom Magic Link Emails** — Branded passwordless authentication via Resend
+- Brew Logging: Record grind size, dose, yield, time, and tasting notes for every brew
+- Coffee Library: Manage your coffee collection with roaster details, origins, and processing methods
+- AI Brew Guidance: Dial-in guidance based on your brew history
+- Equipment Tracking: Track grinders, brewers, and accessories
+- Household Sharing: Share your coffee library and brews with your household
+- La Marzocco Integration: Monitor and control Linea Mini machines (optional)
+- Voice Mode: Log brews hands-free with voice commands
+- Coffee Bag Scanning: Scan QR codes and extract coffee info from bag photos
+- Custom Magic Link Emails: Branded passwordless auth via Resend
 
 ## Tech Stack
 
@@ -27,7 +28,7 @@ Track your brews, analyze patterns, and get AI-powered guidance to improve your 
 | Styling | Tailwind CSS, Radix UI, Framer Motion |
 | Backend | Supabase (Auth, Database, Storage, Edge Functions) |
 | Edge Functions | Hono (Deno runtime) |
-| AI | OpenAI API (brew suggestions) |
+| AI | OpenAI API (brew guidance) |
 | Email | Resend (custom magic link emails) |
 | Hosting | Vercel (frontend), Supabase (backend) |
 
@@ -66,14 +67,14 @@ VITE_SUPABASE_PROJECT_ID=your-project-ref
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-You can find these values in your **Supabase Dashboard → Settings → API**.
+You can find these values in your Supabase Dashboard under Settings > API.
 
 ### 4. Set up Supabase
 
 #### Create a Supabase project
 
 1. Go to [supabase.com](https://supabase.com) and create a new project
-2. Note your **project reference** (the subdomain in your project URL) and **anon key**
+2. Note your project reference (the subdomain in your project URL) and anon key
 
 #### Run database migrations
 
@@ -97,11 +98,11 @@ npx supabase functions deploy send-email-hook --project-ref <your-project-ref> -
 
 #### Set Edge Function secrets
 
-In your **Supabase Dashboard → Settings → Edge Functions → Secrets**, add:
+In your Supabase Dashboard under Settings > Edge Functions > Secrets, add:
 
 | Secret | Required | Description |
 |--------|----------|-------------|
-| `OPENAI_API_KEY` | Yes | OpenAI API key for brew suggestions |
+| `OPENAI_API_KEY` | Yes | OpenAI API key for brew guidance |
 | `RESEND_API_KEY` | For custom emails | Resend API key |
 | `SEND_EMAIL_HOOK_SECRET` | For custom emails | Generate with `openssl rand -base64 32`, prefix with `v1,whsec_` |
 | `GOOGLE_API_KEY` | No | Google API key for additional AI features |
@@ -143,7 +144,7 @@ Vercel should auto-detect Vite. Verify these settings:
 
 ### 3. Add environment variables
 
-In **Vercel → Project Settings → Environment Variables**, add:
+In Vercel under Project Settings > Environment Variables, add:
 
 ```
 VITE_SUPABASE_PROJECT_ID=your-project-ref
@@ -158,10 +159,10 @@ VITE_LAMARZOCCO_ALLOWED_HOUSEHOLD_ID=<uuid>
 
 ### 4. Configure Supabase auth redirect
 
-In your **Supabase Dashboard → Authentication → URL Configuration**:
+In your Supabase Dashboard under Authentication > URL Configuration:
 
-- **Site URL**: `https://your-app.vercel.app`
-- **Redirect URLs**: Add `https://your-app.vercel.app/**`
+- Site URL: `https://your-app.vercel.app`
+- Redirect URLs: Add `https://your-app.vercel.app/**`
 
 This ensures magic links and OAuth redirects work correctly in production.
 
