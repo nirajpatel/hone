@@ -306,9 +306,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
     
     if (!isLaMarzoccoLineaMini) return false;
     
-    // Check if user or household matches the allowed IDs
-    const allowedUserId = 'LAMARZOCCO_ALLOWED_USER_ID';
-    const allowedHouseholdId = 'LAMARZOCCO_ALLOWED_HOUSEHOLD_ID';
+    const allowedUserId = import.meta.env.VITE_LAMARZOCCO_ALLOWED_USER_ID;
+    const allowedHouseholdId = import.meta.env.VITE_LAMARZOCCO_ALLOWED_HOUSEHOLD_ID;
+    if (!allowedUserId && !allowedHouseholdId) return false;
     
     return currentUser.id === allowedUserId || currentUser.householdId === allowedHouseholdId;
   };

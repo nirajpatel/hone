@@ -23,8 +23,7 @@ This will open a browser window for authentication. After logging in, you'll be 
 Deploy the `send-email-hook` function:
 
 ```bash
-cd /Users/npatel/Documents/code/hone-frontend
-npx supabase functions deploy send-email-hook --project-ref YOUR_PROJECT_REF
+npx supabase functions deploy send-email-hook --project-ref <your-project-ref>
 ```
 
 **Verification:**

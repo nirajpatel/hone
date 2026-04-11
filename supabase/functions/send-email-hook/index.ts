@@ -6,7 +6,7 @@ export const config = { auth: false };
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY") as string);
 const hookSecret = (Deno.env.get("SEND_EMAIL_HOOK_SECRET") as string)?.replace("v1,whsec_", "") || null;
-const projectRef = Deno.env.get('SUPABASE_PROJECT_REF') || 'YOUR_PROJECT_REF';
+const projectRef = Deno.env.get('SUPABASE_PROJECT_REF') || '';
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || `https://${projectRef}.supabase.co`;
 
 Deno.serve(async (req) => {
