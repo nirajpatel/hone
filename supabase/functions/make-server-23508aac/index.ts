@@ -8,6 +8,62 @@ import * as lamarzocco from './lamarzocco.ts';
 import { formatBrewForPrompt, supportsStages } from './brewMethods.ts';
 import { migrateExtractionToBrew, cleanupOldExtractions } from './migrate-extraction-to-brew.ts';
 
+// OpenAI model used by all prompts in this server. Keep this as the single
+// source of truth so model bumps are one-line edits.
+const OPENAI_MODEL = 'gpt-5.4';
+
+// Shared rules block injected into both brew-suggestion prompts (the cron/refresh
+// path and the on-demand path). Keeping these in one place prevents the two
+// call sites from drifting (which they had).
+//
+// Edit history is tracked in docs/ai-analysis/brew-failure-modes.md § "Edit
+// proposals". Each clause below traces back to a numbered failure mode (F1/F2/F3).
+function buildBrewRules(brewMethod: string): string {
+  const espressoFlow = brewMethod === 'espresso'
+    ? `\n   - Flow behavior / puck preparation (if flow issues indicate channeling, address distribution, tamping, or pre-infusion before changing core parameters)`
+    : '';
+  const immersionTime = brewMethod === 'immersion' ? `\n   - Steep time` : '';
+
+  return `
+IMPORTANT CONSIDERATIONS:
+1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried.
+2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
+3. Anti-repeat escalation: When the same parameter+direction has been suggested in any of the three prior brews on this coffee, you MUST NOT repeat the same magnitude. Either (a) escalate the magnitude meaningfully (~2× the prior step) and explain why, (b) switch to a different parameter from the decision hierarchy, or (c) explicitly recommend holding all parameters and re-tasting to confirm the diagnosis. The minimal-change preference does not apply once a small step in this direction has already been tried without improvement.
+4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
+5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew". This brew is the starting point for improvement suggestions.
+6. Do not infer causes that are not supported by recorded data.
+
+ADDITIONAL RULES TO FOLLOW:
+A) Decision hierarchy (use this order unless history strongly suggests otherwise; default to small steps for the first attempt at a parameter, then escalate per rule 3):
+   - Grind setting${espressoFlow}
+   - Final weight / ratio${immersionTime}
+   - Water temperature
+   - Dose
+
+B) Require directional reasoning (no vague advice):
+   - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
+   - Each suggestion must include the expected taste/texture impact (example: "should reduce sourness and increase body").
+
+C) Confidence score:
+   - Every suggestion must include a confidence score: High / Medium / Low.
+   - Use "High" only when supported by at least two prior brews or a direct comparison.
+   - Downgrade confidence to Medium or Low whenever the most recent brew that followed a similar suggestion regressed in quality, or whenever the suggested direction would push past a known-good baseline value (e.g. a previous excellent brew used a coarser grind than what you're proposing).
+
+D) Primary failure mode:
+   - Identify exactly ONE primary failure mode for the baseline brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield"). All suggestions must directly address it.
+   - Re-derive this from the baseline brew's recorded outcome alone; do not carry forward the diagnosis from any prior brew. If the same diagnosis recurs across consecutive brews despite parameter changes, treat that as evidence the diagnosis itself is wrong and consider an alternative cause (e.g. dose / ratio rather than grind, or puck preparation).
+
+E) Quality over quantity:
+   - If fewer than three high-quality, non-redundant suggestions exist, provide fewer.
+   - It is acceptable to provide only 1-2 suggestions if those are the most impactful.
+   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
+
+F) Exceptional brews:
+   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning. Reverting to a previously successful setting is not considered repetition.
+   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
+   - If a parameter appears optimal based on excellent brews, explicitly state it should remain unchanged.`;
+}
+
 // Coffee brew tracking server
 const app = new Hono();
 
@@ -1279,7 +1335,7 @@ app.post('/make-server-23508aac/extract-coffee-bag', async (c) => {
           'Authorization': `Bearer ${openaiApiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-5.2',
+          model: OPENAI_MODEL,
           messages: [
             {
               role: 'user',
@@ -1513,7 +1569,7 @@ Do not include any other text after the JSON block.`;
           'Authorization': `Bearer ${openaiApiKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-5.2',
+          model: OPENAI_MODEL,
           input: [
             {
               role: 'system',
@@ -2387,49 +2443,7 @@ BREW #${brewNum} (${formatDate(brew.createdAt)})${qualifiers}:
 `;
     });
 
-    const considerations = `
-IMPORTANT CONSIDERATIONS:
-1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried and avoid suggesting the same adjustments that were already attempted.
-2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
-3. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
-4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
-5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
-6. Do not infer causes that are not supported by recorded data.
-
-ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy and change magnitude (use this order unless history strongly suggests otherwise, prefer minimal changes):
-   - Grind / flow behavior
-   - Final weight / ratio
-   - Water temperature
-   - Dose
-   - If flow issues indicate puck preparation or channeling, address distribution, tamping, or pre-infusion before changing core parameters.
-   - Prefer the smallest reasonable change that could plausibly fix the issue. Avoid large jumps unless history clearly shows they are necessary.
-
-B) Require directional reasoning (no vague advice):
-   - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
-   - Each suggestion must include the expected taste/texture impact (example: "should reduce sourness and increase body").
-
-C) Confidence score:
-   - Every suggestion must include a confidence score: High / Medium / Low.
-   - Confidence should reflect how strongly the brew history supports the change (e.g., repeated evidence vs weak signal).
-   - Use "High" only when supported by at least two prior brews or a direct comparison.
-
-D) Primary failure mode:
-   - Before listing suggestions, identify exactly ONE primary failure mode for the selected brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield").
-   - All suggestions must directly address this failure mode.
-
-E) Quality over quantity:
-   - If fewer than three high-quality, non-redundant suggestions exist, provide fewer suggestions rather than forcing additional ones.
-   - It is acceptable to provide only 1-2 suggestions if those are the most impactful changes.
-   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
-
-F) Exceptional brews:
-   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
-   - Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
-
-G) Stability check:
-   - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.`;
+    const considerations = buildBrewRules(baselineBrew.brewMethod);
 
     // Build full format prompt (concise will be derived from first suggestion)
     const fullPrompt = `You are an expert barista analyzing the brew history for a specific coffee to provide improvement suggestions.
@@ -2485,7 +2499,7 @@ REQUIREMENTS:
         'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-5.2',
+        model: OPENAI_MODEL,
         messages: [
           { role: 'system', content: 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.' },
           { role: 'user', content: fullPrompt }
@@ -2765,50 +2779,7 @@ BREW #${brewNum} (${formatDate(brew.createdAt)})${qualifiers}:
 `;
     });
 
-    prompt += `
-IMPORTANT CONSIDERATIONS:
-1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried and avoid suggesting the same adjustments that were already attempted.
-2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
-3. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
-4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
-5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
-6. Do not infer causes that are not supported by recorded data.
-
-ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy and change magnitude (use this order unless history strongly suggests otherwise, prefer minimal changes):
-   - Grind setting${brewMethod === 'espresso' ? `
-   - Flow behavior / puck preparation (if flow issues indicate channeling, address distribution, tamping, or pre-infusion before changing core parameters)` : ''}
-   - Final weight / ratio${brewMethod === 'immersion' ? `
-   - Steep time` : ''}
-   - Water temperature
-   - Dose
-   - Prefer the smallest reasonable change that could plausibly fix the issue. Avoid large jumps unless history clearly shows they are necessary.
-
-B) Require directional reasoning (no vague advice):
-   - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
-   - Each suggestion must include the expected taste/texture impact (example: "should reduce sourness and increase body").
-
-C) Confidence score:
-   - Every suggestion must include a confidence score: High / Medium / Low.
-   - Confidence should reflect how strongly the brew history supports the change (e.g., repeated evidence vs weak signal).
-   - Use "High" only when supported by at least two prior brews or a direct comparison.
-
-D) Primary failure mode:
-   - Before listing suggestions, identify exactly ONE primary failure mode for the selected brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield").
-   - All suggestions must directly address this failure mode.
-
-E) Quality over quantity:
-   - If fewer than three high-quality, non-redundant suggestions exist, provide fewer suggestions rather than forcing additional ones.
-   - It is acceptable to provide only 1-2 suggestions if those are the most impactful changes.
-   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
-
-F) Exceptional brews:
-   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
-   - Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
-
-G) Stability check:
-   - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.
+    prompt += buildBrewRules(brewMethod) + `
 
 OUTPUT FORMAT:
 You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
@@ -2844,7 +2815,7 @@ REQUIREMENTS:
         'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-5.2',
+        model: OPENAI_MODEL,
         messages: [
           { role: 'system', content: systemMessage },
           { role: 'user', content: prompt }

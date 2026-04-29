@@ -1,0 +1,3982 @@
+[
+  {
+    "coffeeId": "55871452-ac3c-4598-b8c1-810eca4b11a1",
+    "coffee": {
+      "name": "Arboretum",
+      "roaster": "Small Planes Coffee",
+      "region": "Colombia, Ethiopia",
+      "roastLevel": "Medium-Light",
+      "notes": "Milk Chocolate, Toasted Nuts, Ripe Fruit"
+    },
+    "brews": [
+      {
+        "id": "bd33aff2-506a-4ecf-a9d4-dd299d0ae0cc",
+        "createdAt": "2026-04-13T14:10:36.212Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "21",
+        "dosage": 18.1,
+        "waterTemp": 201,
+        "brewTime": 40,
+        "finalWeight": 31.1,
+        "quality": 1,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "3a03ffeb-9d96-4e6e-ba9a-2b8254ac5a61",
+        "createdAt": "2026-04-14T14:04:28.367Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "22",
+        "dosage": 18.2,
+        "waterTemp": 201,
+        "brewTime": 31,
+        "finalWeight": 31,
+        "quality": 1,
+        "tastingNotes": "",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew (rated Bad) ran relatively fast for a tight 1:1.7 ratio and produced a cup that lacked balanced sweetness and structure. The shot needs more extraction without pushing bitterness.",
+            "suggestions": [
+              {
+                "action": "Grind finer by ~0.3–0.5 on the Niche Zero (from 22 to ~21.5–21.7) and keep yield at 31g",
+                "effect": "This should increase sweetness, body, and milk-chocolate/nut clarity while reducing sharpness",
+                "parameter": "Grind setting",
+                "reasoning": "An earlier attempt at a slightly finer grind increased shot time substantially at the same yield, so a smaller step from the baseline targets more extraction without overshooting into a very slow shot",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final weight to 33–34g while keeping the same grind as the baseline and aiming for ~30–33s",
+                "effect": "This will lift ripe-fruit sweetness and roundness while keeping enough chocolate/nut structure for balance",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Both recorded shots were held around 31g yield, so changing ratio is an untried lever to raise extraction when the baseline tasted poor at that tight yield",
+                "confidence": "Low"
+              },
+              {
+                "action": "Increase water temperature by 2°F (from 201°F to 203°F) while keeping the baseline grind and yield",
+                "effect": "This should increase perceived sweetness and reduce under-extracted dryness without adding much bitterness",
+                "parameter": "Water temperature",
+                "reasoning": "Temperature has been held constant across attempts, so a small bump is a controlled way to add extraction when the baseline cup was unbalanced",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "52fba443-aeb5-40e7-9bae-09ae55783903",
+        "createdAt": "2026-04-15T13:44:34.712Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "22",
+        "dosage": 18.2,
+        "waterTemp": 201,
+        "brewTime": 30,
+        "finalWeight": 33.1,
+        "quality": 2,
+        "tastingNotes": "Dry, Sweet, Short Finish",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with dry sweetness and a short finish, missing roundness and lingering flavor. The cup reads as slightly under-extracted for its ratio, leaving the finish clipped and the texture dry.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 36–38g while keeping grind at 22 and aiming for 30–33s",
+                "effect": "This should increase sweetness, round out the mid-palate, and lengthen the finish while reducing the dry impression",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Previous attempts at the same grind and temperature produced a tighter, lower yield that performed worse, and the baseline’s short finish points to needing a slightly longer ratio rather than more restriction",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase water temperature by 2°F to 203°F",
+                "effect": "This will boost extraction to add chocolate/nut depth and improve finish without pushing harsh bitterness",
+                "parameter": "Water temperature",
+                "reasoning": "All recorded shots were pulled at 201°F, and the baseline’s dry/short profile is consistent with needing a small extraction lift without repeating prior grind/time changes",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to slightly low extraction yield at the current ratio"
+          },
+          "concise": {
+            "goal": "Lengthen finish",
+            "action": "Increase yield",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "94394c2e-bd10-445b-b90a-456850869f3c",
+        "createdAt": "2026-04-16T13:45:44.835Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "22",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 38,
+        "finalWeight": 33,
+        "quality": 2,
+        "tastingNotes": "Thin, Sweet, Dry",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted thin, sweet, and dry, missing body and a longer, rounder finish. The shot is being pushed toward dryness by a long contact time at a relatively tight ratio without enough texture payoff.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by ~0.5–1.0 on the Niche Zero to target ~28–32s for the same 33g yield",
+                "effect": "This should reduce dryness, increase perceived sweetness, and add a rounder mouthfeel",
+                "parameter": "Grind / flow",
+                "reasoning": "Across recent attempts at the same dose and yield, the longer 38–40s shots skewed drier and thinner than the ~30–31s shots, so shortening contact time is the most direct fix",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight to 36–38g (keep dose ~18.2g) while keeping time in the ~28–32s window",
+                "effect": "This will increase body and lengthen the finish while keeping the cup more balanced and less drying",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline ratio (~1:1.8) is already on the tighter side and is presenting as thin and short, so a small move toward a slightly longer ratio can add balance without relying on extra contact time",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time at a tight ratio"
+          },
+          "concise": {
+            "goal": "Reduce dryness",
+            "action": "Grind coarser",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "3f2d0cdc-4441-404c-a20a-d64780d0ddd4",
+        "createdAt": "2026-04-18T15:41:21.217Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "22.25",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 24,
+        "finalWeight": 33,
+        "quality": 1,
+        "tastingNotes": "",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad and ran very fast (24s for 33g), producing a cup that lacked sweetness, body, and a rounded finish. The shot needs more extraction and texture without pushing harsh dryness.",
+            "suggestions": [
+              {
+                "action": "Grind finer by ~0.5–1.0 on the Niche Zero (from 22.25 to ~21.25–21.75)",
+                "effect": "This should increase body, deepen sweetness, and extend the finish while reducing hollow/flat flavors",
+                "parameter": "Grind setting",
+                "reasoning": "Previous attempts at the same dose and yield tasted thin/dry when the shot ran longer, and the baseline ran much faster, so slowing flow is the most direct way to raise extraction and texture at the same ratio",
+                "confidence": "High"
+              },
+              {
+                "action": "Reduce final weight to 30–31g (keep dose 18.2g) while keeping time in the ~28–34s range",
+                "effect": "This will increase concentration and mouthfeel and make chocolate/nut notes more prominent with less watery thinness",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Across prior shots, the 33g yield repeatedly presented as thin even when time increased, so tightening the ratio targets body without relying solely on more extraction",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a 5–8s low-flow pre-infusion (or manual gentle lever pre-wet) and do one consistent WDT pass before tamping",
+                "effect": "This should reduce channeling-driven fast flow and improve balance by making extraction more even and less drying",
+                "parameter": "Puck preparation (distribution/tamping)",
+                "reasoning": "The baseline’s unusually fast time at nearly the same grind/dose/yield as other attempts points to a flow instability that prep and pre-infusion can stabilize without changing the recipe dramatically",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "31e0bbcc-4c3d-4330-9696-acde5f48f67b",
+        "createdAt": "2026-04-19T17:05:55.506Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "22.1",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 28,
+        "finalWeight": 32.6,
+        "quality": 1,
+        "tastingNotes": "Bitter",
+        "suggestion": null
+      },
+      {
+        "id": "4894019b-effc-401f-8ad5-c04c9e1b8b94",
+        "createdAt": "2026-04-19T17:12:15.893Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "22.1",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 29,
+        "finalWeight": 33.4,
+        "quality": 1,
+        "tastingNotes": "Bitter",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with a distinctly bitter cup, missing sweetness and balance. The shot is extracting too harshly for the current ratio and temperature.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 30–31g (keep 18.2g dose) and stop the shot at that yield even if time stays ~27–30s",
+                "effect": "This will reduce bitterness and bring back milk-chocolate sweetness with a rounder finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Previous attempts at a similar dose and temperature tasted better when the yield was closer to ~31g, while the ~33g range repeatedly skewed bitter or dry",
+                "confidence": "High"
+              },
+              {
+                "action": "Lower water temperature by 2°F to 201°F while keeping the new 30–31g yield target",
+                "effect": "This should soften harsh roast/bitter edges and improve perceived balance without making the shot thin",
+                "parameter": "Water temperature",
+                "reasoning": "At the same general recipe, earlier pulls at 201°F avoided the pronounced bitterness seen at 203°F and presented more sweetness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a 10–15s WDT step and a single firm tamp, then keep all other variables the same for the next shot",
+                "effect": "This should reduce astringent bitterness and dryness and increase clarity and even sweetness",
+                "parameter": "Puck preparation (distribution)",
+                "reasoning": "The history shows swings from thin/dry to bitter at similar settings, and improving evenness is the highest-impact non-recipe change before further grind moves",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive yield at the current grind and temperature"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Reduce yield",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "51d4b882-40dd-45dd-a0e9-7470461cd5d1",
+        "createdAt": "2026-04-20T14:29:42.497Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "22.5",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 39,
+        "finalWeight": 32.8,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with a long 39s shot at ~1:1.8 (18.2g in, 32.8g out), but it missed balance by leaning too dry/firm and not fully expressing the ripe-fruit sweetness and round body.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by ~0.3–0.5 on the Niche Zero to target ~30–33s at the same yield",
+                "effect": "This should reduce dryness/bitterness, increase perceived sweetness, and make the cup feel more rounded",
+                "parameter": "Grind setting",
+                "reasoning": "Across previous attempts at the same dose/yield/temperature, the longer shots (including the baseline brew) were the ones that moved away from harsh bitterness but still trended dry, so shortening contact time is the most direct path to balance",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight to 35–36g while keeping the baseline grind and stop time similar",
+                "effect": "This will open up ripe-fruit clarity and lengthen the finish while softening the dry edge",
+                "parameter": "Final weight (yield)",
+                "reasoning": "You have been clustered around ~32–33g output; a small bump in yield is a new lever that can shift the balance toward sweetness/fruit without pushing grind finer and extending time further",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 2°F (to 201°F) while keeping the baseline grind and yield",
+                "effect": "This should reduce drying tannic notes and make the chocolate/nut sweetness read cleaner",
+                "parameter": "Water temperature",
+                "reasoning": "Earlier pulls at 201°F produced sweet but dry cups, and with the baseline brew already running long, a small temperature drop helps rein in harsher extraction without changing your ratio",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time"
+          },
+          "concise": {
+            "goal": "Reduce dryness",
+            "action": "Grind coarser",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "9b1699e8-bd83-4006-9051-e433209a5103",
+        "createdAt": "2026-04-21T13:51:20.212Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "23.5",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 27,
+        "finalWeight": 33,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "99a209b5-33c3-43ac-9fa5-104447fe7ea2",
+        "createdAt": "2026-04-22T14:02:01.770Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "23.25",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 36,
+        "finalWeight": 33.3,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "90ffab71-ee87-4900-9707-08f80d2f914e",
+        "createdAt": "2026-04-28T14:59:25.453Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "23.25",
+        "dosage": 18.2,
+        "waterTemp": 203,
+        "brewTime": 30,
+        "finalWeight": 33,
+        "quality": 1,
+        "tastingNotes": "Watery, Unbalanced",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with watery, unbalanced flavor, missing body and integration. The 1:1.8 ratio at 30s did not deliver enough concentration and structure for this medium-light blend.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 30–31g (keep 18.2g dose) while holding the same grind setting",
+                "effect": "This should increase body, sweetness, and balance by concentrating the shot and reducing watery dilution",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Across previous attempts you stayed near ~33g out; tightening the ratio is the smallest change that directly targets the watery, unbalanced result without re-treading grind changes already explored",
+                "confidence": "High"
+              },
+              {
+                "action": "If the shot still tastes thin at 30–31g, grind finer by ~0.3–0.5 on the Niche Zero and keep yield at 30–31g",
+                "effect": "This will increase extraction and texture, improving integration and reducing hollow, watery flavors",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "Earlier attempts showed that simply moving grind coarser/finer around this range changed time a lot without fixing the cup; pairing a small finer move with a tighter yield targets extraction and concentration together",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a 5–8s pre-infusion (or gentle line-pressure ramp) and do a consistent WDT + level tamp before locking in",
+                "effect": "This should reduce channeling-driven thinness and make the cup more even, with better sweetness and less sharp imbalance",
+                "parameter": "Puck preparation (distribution/tamping)",
+                "reasoning": "You’ve had large time swings at similar dose/yield, and the baseline cup was both watery and unbalanced, which is consistent with uneven flow that prep and a short pre-infusion can stabilize",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient concentration (yield too high for the achieved extraction)"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Reduce final weight",
+            "confidence": "High"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "f11fef7d-45bb-4e9d-a7bd-e8e31a5461c6",
+    "coffee": {
+      "name": "Mazateca Mujeres",
+      "roaster": "Small Planes Coffee",
+      "region": "Sierra Mazateca, Oaxaca, Mexico",
+      "roastLevel": "Light",
+      "notes": "Rosewater, Berry Jam, Marzipan"
+    },
+    "brews": [
+      {
+        "id": "d75b8fdb-2005-4105-bd05-7877dad65923",
+        "createdAt": "2026-04-01T14:15:08.786Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "5.3",
+        "dosage": 20,
+        "waterTemp": 205,
+        "brewTime": 155,
+        "finalWeight": 268.1,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 61.6
+          },
+          {
+            "endTime": 75,
+            "endWeight": 185.1
+          },
+          {
+            "endTime": 155,
+            "endWeight": 268.1
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Sour, Unbalanced, Notes were not present",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with sour, unbalanced flavor and the listed notes were absent, indicating the cup lacked sweetness and development. The brew needs higher extraction to bring out berry jam and marzipan while reducing sharp acidity.",
+            "suggestions": [
+              {
+                "action": "Grind finer by ~0.3–0.5 on the Ode Gen 2 (from 5.3 to ~5.0–4.8)",
+                "effect": "This should reduce sourness and increase sweetness and body so the berry jam and marzipan notes show up",
+                "parameter": "Grind setting",
+                "reasoning": "The baseline brew presented as sour and hollow, and the smallest high-impact lever on a V60 to raise extraction without changing the recipe is a modest move finer on the grinder",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase water temperature by 2–3°F (from 205°F to 207–208°F)",
+                "effect": "This will increase extraction and round the acidity into a more balanced, rosewater-like floral sweetness",
+                "parameter": "Water temperature",
+                "reasoning": "With a light roast and a sour, underdeveloped cup at 205°F, a small temperature increase supports more solubility without forcing major recipe changes",
+                "confidence": "Low"
+              },
+              {
+                "action": "Let the dose warm 5–10 minutes after grinding (or grind from room temp) before brewing",
+                "effect": "This should stabilize flow and improve evenness, reducing sharp sour spikes and helping the cup taste more integrated",
+                "parameter": "Bean temperature / prep",
+                "reasoning": "The baseline brew used frozen beans, and warming the grounds slightly is a low-risk way to reduce variability and improve extraction consistency without altering the pour structure",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Reduce sourness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "213f54c7-3426-4cac-8eab-a11c679e4002",
+        "createdAt": "2026-04-02T14:12:38.858Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "5.0",
+        "dosage": 20.3,
+        "waterTemp": 204,
+        "brewTime": 175,
+        "finalWeight": 275.6,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 40
+          },
+          {
+            "endTime": 60,
+            "endWeight": 132
+          },
+          {
+            "endTime": 90,
+            "endWeight": 203.5
+          },
+          {
+            "endTime": 175,
+            "endWeight": 275.6
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Unbalanced, Sour",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with an unbalanced, sour cup where the intended rosewater/berry jam/marzipan notes were muted. The brew needs higher extraction to round acidity and bring sweetness and aromatics forward.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.5 on the Ode Gen 2 (from 5.0 to 4.5)",
+                "effect": "This should reduce sourness and increase sweetness and body for a more balanced cup",
+                "parameter": "Grind setting",
+                "reasoning": "Both attempts at ~5.0–5.3 produced sour, unbalanced cups, so moving finer is the most direct way to increase extraction with the same brewer and dose",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final water to 305g (keep dose ~20.3g; target ~1:15)",
+                "effect": "This will increase sweetness and clarity and help the floral/berry notes show up without sharpening acidity",
+                "parameter": "Final brew ratio (final weight)",
+                "reasoning": "The baseline brew stopped at ~275.6g (~1:13.6), and a slightly longer ratio can lift extraction and balance when the cup is reading sour at similar grind ranges",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same stage weights but add a gentle swirl immediately after the bloom and another small swirl after the final pour",
+                "effect": "This should reduce unevenness and make the cup taste more integrated and less unbalanced",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "The repeated “unbalanced” note alongside sourness is consistent with uneven extraction, and small, repeatable swirls can improve bed leveling without changing core parameters",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to too-coarse grind/fast flow"
+          },
+          "concise": {
+            "goal": "Reduce sourness",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "d02fe2bd-f389-4a42-95b1-65c020aa8a4f",
+        "createdAt": "2026-04-03T13:27:54.349Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "4.5",
+        "dosage": 20,
+        "waterTemp": 204,
+        "brewTime": 205,
+        "finalWeight": 282,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 41.4
+          },
+          {
+            "endTime": 60,
+            "endWeight": 124.8
+          },
+          {
+            "endTime": 75,
+            "endWeight": 173.5
+          },
+          {
+            "endTime": 90,
+            "endWeight": 220
+          },
+          {
+            "endTime": 205,
+            "endWeight": 282
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Unbalanced, Not sweet, Mild",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew rated Bad with an unbalanced, mild cup that lacked sweetness and clarity. The profile missed the coffee’s rosewater/berry-jam character and finished thin rather than rounded.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.3–0.5 on the Ode Gen 2 (from 4.5 to ~4.0–4.2)",
+                "effect": "This should increase sweetness, body, and bring out the berry-jam/marzipan notes while reducing the mild, hollow finish",
+                "parameter": "Grind setting",
+                "reasoning": "Across previous attempts, cups stayed sour or not sweet even as grind moved coarser, so pushing finer is the most direct way to raise extraction and balance on the baseline brew",
+                "confidence": "High"
+              },
+              {
+                "action": "Keep the same total water (282g) but consolidate to 3 pours: 60g bloom for 45s with a gentle swirl, then pour to 180g by 1:15, then to 282g by 1:55 with minimal swirling after",
+                "effect": "This will improve evenness and sweetness and reduce unbalanced, sharp notes by limiting channeling and over-agitation",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "The baseline brew used many small stages and ended unbalanced and mild, and simplifying pours increases slurry depth and consistency without changing core recipe variables",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight to 270g (keep 20g dose; 1:13.5 instead of ~1:14.1)",
+                "effect": "This should increase perceived sweetness and concentration and make the cup feel more rounded and less mild",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Since the baseline brew presented as mild and not sweet at the current yield, a small reduction in yield increases strength without repeating prior grind/temperature changes",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+        "createdAt": "2026-04-06T13:16:26.348Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "4.5",
+        "dosage": 20,
+        "waterTemp": 204,
+        "brewTime": 170,
+        "finalWeight": 277.8,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 62.3
+          },
+          {
+            "endTime": 75,
+            "endWeight": 185.5
+          },
+          {
+            "endTime": 170,
+            "endWeight": 277.8
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Sweet, acidic, Astringent",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with sweet acidity but astringency, and it missed a balanced, rounded sweetness and clarity. The cup finished drying and sharp instead of jammy/floral and integrated.",
+            "suggestions": [
+              {
+                "action": "Keep the same weights but switch to a gentler 4-pour: 0:00 bloom to 60g (light swirl), 0:45 to 160g, 1:15 to 220g, 1:45 to 278g; no swirl after the final pour",
+                "effect": "This should reduce astringency and make sweetness and florals present with a cleaner finish",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "Across previous attempts at the same temperature and dose, the more segmented/higher-agitation style produced unbalanced cups and the baseline brew turned astringent, so reducing agitation targets the drying finish without changing extraction inputs",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind coarser by 0.3–0.5 on the Ode Gen 2 (from 4.5 to ~4.8–5.0)",
+                "effect": "This will soften the drying finish and shift the cup toward rounder sweetness and jammy notes",
+                "parameter": "Grind size",
+                "reasoning": "Earlier coarser settings reduced harshness compared with the baseline’s astringency at 4.5, so a small move coarser complements the lower-agitation pour to prevent over-extraction",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight to 270g (keep 20g dose; 1:13.5 instead of ~1:13.9)",
+                "effect": "This should increase perceived sweetness and body while trimming the drying, tea-like finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "With the baseline already showing astringency, a slightly shorter yield reduces extraction of late-stage bitter/drying compounds without changing temperature or dose",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive agitation and uneven flow"
+          },
+          "concise": {
+            "goal": "Reduce astringency",
+            "action": "Reduce agitation",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "1ac63659-c12a-4f7c-8608-ed3f269e1495",
+        "createdAt": "2026-04-07T13:56:38.047Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.1,
+        "waterTemp": 201,
+        "brewTime": 225,
+        "finalWeight": 281.5,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 43
+          },
+          {
+            "endTime": 60,
+            "endWeight": 123.4
+          },
+          {
+            "endTime": 90,
+            "endWeight": 171.4
+          },
+          {
+            "endTime": 120,
+            "endWeight": 223.4
+          },
+          {
+            "endTime": 225,
+            "endWeight": 281.5
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Short Finish, Lacks Sweetness, Muted",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was decent but came across muted with a short finish and lacked sweetness, leaving the rose/berry/marzipan notes subdued. The cup needs higher extraction and more evenness to build sweetness and extend the finish without adding astringency.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.3–0.5 on the Ode Gen 2 (from 5.0 to ~4.5–4.7) while keeping the same pour structure",
+                "effect": "This should increase sweetness, deepen berry-jam intensity, and lengthen the finish with a rounder mouthfeel",
+                "parameter": "Grind / flow",
+                "reasoning": "The baseline brew tasted muted and short, and earlier attempts at a finer setting showed more sweetness/acid presence, so a small step finer targets higher extraction without a big process change",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final yield by 8–12g (from 281.5g to ~270–273g) keeping dose the same",
+                "effect": "This will increase perceived sweetness and body and make the cup feel more complete rather than thin/short",
+                "parameter": "Final weight / ratio",
+                "reasoning": "With the baseline already reading as muted and lacking sweetness, a slightly tighter ratio concentrates flavor and reduces the chance of a washed-out finish at the same grind and temperature",
+                "confidence": "Medium"
+              },
+              {
+                "action": "After the bloom, add one gentle swirl (1–2 rotations) to fully wet and level the bed, then avoid additional swirling/stirring for the rest of the brew",
+                "effect": "This should improve clarity and sweetness by reducing uneven extraction that can mute flavor and shorten the finish",
+                "parameter": "Puck prep / agitation",
+                "reasoning": "Earlier brews showed astringency alongside sweetness/acid, so improving evenness with minimal agitation helps raise extraction without tipping into drying bitterness",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "d8fe6ebe-86a7-4fbf-9a89-a3df93918aca",
+        "createdAt": "2026-04-08T13:42:45.480Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "4.7",
+        "dosage": 20.1,
+        "waterTemp": 201,
+        "brewTime": 220,
+        "finalWeight": 283.1,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 43
+          },
+          {
+            "endTime": 60,
+            "endWeight": 121.5
+          },
+          {
+            "endTime": 90,
+            "endWeight": 174
+          },
+          {
+            "endTime": 120,
+            "endWeight": 221.3
+          },
+          {
+            "endTime": 220,
+            "endWeight": 283.1
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "One-Note, Thin, Short Finish",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was decent but came across one-note, thin, and with a short finish, leaving sweetness and structure underdeveloped. The cup needs more extraction and tactile weight without adding harshness.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2–0.3 (from 4.7 to ~4.4–4.5 on the Ode Gen 2)",
+                "effect": "This should increase body, deepen sweetness, and extend the finish without changing the recipe structure",
+                "parameter": "Grind setting",
+                "reasoning": "Across previous attempts, coarser settings produced muted cups with short finishes, while the finer setting brought more sweetness but needed better control to avoid astringency",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same stage weights but pour more gently in stages 2–5 (lower kettle height, avoid center punching) and do only one light swirl right after the bloom",
+                "effect": "This will reduce astringency risk while allowing the finer grind to add sweetness and body instead of drying the finish",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "A prior room-temp, hotter, fewer-pour approach produced astringency, so tightening extraction via grind should be paired with lower agitation to prevent harshness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight to 270–275g (keep dose ~20g) while keeping the same timing targets",
+                "effect": "This will increase concentration and perceived sweetness, making the cup feel less thin and more rounded",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew’s thinness and short finish persist at ~281–283g yield, so a small reduction in yield directly boosts strength without repeating prior grind/temperature changes",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "ac0020c8-ca1e-4138-88aa-e826a605bf41",
+        "createdAt": "2026-04-09T13:47:31.247Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "4.7",
+        "dosage": 20.1,
+        "waterTemp": 201,
+        "brewTime": 205,
+        "finalWeight": 278.2,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 50
+          },
+          {
+            "endTime": 60,
+            "endWeight": 121.6
+          },
+          {
+            "endTime": 90,
+            "endWeight": 173.6
+          },
+          {
+            "endTime": 120,
+            "endWeight": 223.9
+          },
+          {
+            "endTime": 205,
+            "endWeight": 278.2
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent but came across one-note with a thin body and short finish, missing sweetness and lingering complexity. The cup needs more extraction and concentration to bring out the rosewater/berry jam and marzipan sweetness.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2 on the Ode Gen 2 (from 4.7 to ~4.5) while keeping the same pour schedule",
+                "effect": "This should increase body, sweetness, and finish length while making the cup less one-note",
+                "parameter": "Grind / flow",
+                "reasoning": "A slightly coarser attempt at the same temperature and ratio tasted muted and lacked sweetness, so moving finer is the most direct way to raise extraction without changing the recipe structure",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight to 270g (keep 20.1g dose; target 1:13.4) by stopping the last pour earlier",
+                "effect": "This will add concentration and perceived sweetness, giving more jammy depth and a longer finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Multiple attempts around ~280g finished thin/short, so a small yield reduction increases strength without reintroducing the astringency seen in an earlier hotter, larger-bloom recipe",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "16b0ad09-59d7-4555-8597-e73ee0f31901",
+        "createdAt": "2026-04-13T13:33:39.071Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "4.7",
+        "dosage": 20.1,
+        "waterTemp": 201,
+        "brewTime": 205,
+        "finalWeight": 285,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.3
+          },
+          {
+            "endTime": 90,
+            "endWeight": 200.8
+          },
+          {
+            "endTime": 205,
+            "endWeight": 285
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "One-Note, Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and came across one-note and lacking sweetness, with the cup not developing the rosewater/berry-jam depth expected. The brew finished at a relatively tight ratio and moderate temperature, leaving the extraction too low to build sweetness and complexity.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 300g (keep dose ~20g) while keeping the same 3-stage structure",
+                "effect": "This should increase sweetness and bring more berry-jam depth with a longer finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Multiple previous attempts clustered around ~278–285g repeatedly read as one-note/short and lacking sweetness, so a small yield increase is the cleanest way to raise extraction without changing the grind you’ve already standardized",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase water temperature to 204°F",
+                "effect": "This will increase sweetness and roundness while improving aromatic clarity",
+                "parameter": "Water temperature",
+                "reasoning": "Earlier brews at 204°F showed more sweetness potential even when other aspects were off, and the baseline at 201°F is trending toward muted sweetness for a light roast",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind finer by 0.2 on the Ode Gen 2 (from 4.7 to 4.5) and keep the same pour timings",
+                "effect": "This should add body and sweetness and reduce the one-note character",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "A small step finer increases contact time and extraction, and you have not tested a finer setting than 4.7 at the baseline temperature/ratio combination",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient extraction strength at the current ratio and temperature"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase ratio",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "aeb34ff9-6d73-42b3-a051-88ead3bcc73e",
+        "createdAt": "2026-04-16T14:02:05.659Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "6.0",
+        "dosage": 20.1,
+        "waterTemp": 204,
+        "brewTime": 205,
+        "finalWeight": 280.3,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 62.2
+          },
+          {
+            "endTime": 90,
+            "endWeight": 200.3
+          },
+          {
+            "endTime": 205,
+            "endWeight": 280.3
+          }
+        ],
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "f2ab3b85-ab1b-45e9-9759-d29f3f63e843",
+        "createdAt": "2026-04-22T13:32:47.480Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 20.1,
+        "waterTemp": 203,
+        "brewTime": 195,
+        "finalWeight": 282,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.4
+          },
+          {
+            "endTime": 90,
+            "endWeight": 202.5
+          },
+          {
+            "endTime": 195,
+            "endWeight": 282
+          }
+        ],
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "52e43482-c2d6-4057-8941-10c8d9c4bede",
+        "createdAt": "2026-04-27T13:24:16.664Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 20.1,
+        "waterTemp": 203,
+        "brewTime": 210,
+        "finalWeight": 280.4,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 61.5
+          },
+          {
+            "endTime": 90,
+            "endWeight": 181.9
+          },
+          {
+            "endTime": 210,
+            "endWeight": 280.4
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Thin, One-Note",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted thin and one-note, missing sweetness, depth, and a longer finish. The cup needs more extraction and concentration to bring out the rosewater/berry jam/marzipan character.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.3–0.5 on the Ode Gen 2 (from 5.7 to ~5.2–5.4) and keep the same pour schedule",
+                "effect": "This should increase body, sweetness, and flavor layering while extending the finish",
+                "parameter": "Grind / flow",
+                "reasoning": "Across previous attempts, changing grind within a broad range did not resolve thin, one-note cups, so a smaller, targeted move finer from the baseline is the most direct way to slow flow and raise extraction without changing multiple variables at once",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final water to 270g (keep dose ~20g) while keeping the same stage timings",
+                "effect": "This will increase concentration and perceived sweetness, making the cup feel less thin and more rounded",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline ratio (~1:14) still presented as thin, so a small reduction in yield is a clean way to add intensity without pushing bitterness via higher temperature or much finer grinding",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a gentle 5–7 second swirl immediately after the bloom pour, then avoid additional swirling later",
+                "effect": "This should improve evenness, reduce one-note extraction, and add clarity without losing body",
+                "parameter": "Puck preparation / agitation",
+                "reasoning": "With similar recipes repeatedly tasting one-note, improving bed saturation and reducing channeling risk is a higher-leverage change than further reshaping the multi-stage pour structure",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "c71279c8-b492-41c6-84fe-668d1ec659d5",
+        "createdAt": "2026-04-28T13:35:11.817Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.3",
+        "dosage": 20.1,
+        "waterTemp": 203,
+        "brewTime": 225,
+        "finalWeight": 280.2,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 50.1
+          },
+          {
+            "endTime": 60,
+            "endWeight": 120.2
+          },
+          {
+            "endTime": 90,
+            "endWeight": 172
+          },
+          {
+            "endTime": 120,
+            "endWeight": 220
+          },
+          {
+            "endTime": 225,
+            "endWeight": 280.2
+          }
+        ],
+        "tastingNotes": "",
+        "suggestion": null
+      }
+    ]
+  },
+  {
+    "coffeeId": "9aa59a1f-d272-49cf-a4f9-a346926a5df5",
+    "coffee": {
+      "name": "Banko Taratu",
+      "roaster": "Flat Track",
+      "region": "Ethiopia",
+      "roastLevel": "Medium-Light",
+      "notes": "Peach, Black Tea, Lemon Zest"
+    },
+    "brews": [
+      {
+        "id": "72d6a21a-ccba-4af1-8db1-a8fbc3ea7f9f",
+        "createdAt": "2026-02-09T14:23:29.501Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "6",
+        "dosage": 18.1,
+        "brewTime": 195,
+        "finalWeight": 281.1,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 45
+          },
+          {
+            "endTime": 70,
+            "endWeight": 161.8
+          },
+          {
+            "endTime": 110,
+            "endWeight": 240.1
+          },
+          {
+            "endTime": 195,
+            "endWeight": 281.1
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Tea like, Muted",
+        "suggestion": null
+      },
+      {
+        "id": "b72d9a44-6179-4d8f-aeb7-ab04e22e8c42",
+        "createdAt": "2026-02-10T14:28:33.023Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "6",
+        "dosage": 21.2,
+        "waterTemp": 202,
+        "brewTime": 230,
+        "finalWeight": 299.7,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 45.2
+          },
+          {
+            "endTime": 70,
+            "endWeight": 162.7
+          },
+          {
+            "endTime": 130,
+            "endWeight": 240.4
+          },
+          {
+            "endTime": 230,
+            "endWeight": 299.7
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Burnt, Bitter",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew tasted bad with burnt, bitter notes and lacked the peach/tea clarity and balance expected for this Ethiopian pour over. The cup was pushed into harshness by over-extraction from a high dose at the same grind setting that previously produced a softer, muted cup.",
+            "suggestions": [
+              {
+                "action": "Reduce dose to 18.0g (keep grind at 6 and keep the same pour schedule)",
+                "effect": "This should reduce bitterness and burnt flavors while bringing back clearer peach/black-tea character",
+                "parameter": "Dose",
+                "reasoning": "A previous attempt at grind 6 produced a decent, tea-like cup at ~18g, while the baseline brew at the same grind jumped to 21.2g and turned burnt and bitter",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight to 315g (from ~300g) while keeping the same stage timing targets",
+                "effect": "This will lower concentration and soften harshness, improving balance and perceived sweetness",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew’s higher dose paired with a relatively low final weight concentrates bitter compounds, so a small yield increase counteracts that without changing grind",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature to 199–200°F (from 202°F)",
+                "effect": "This should reduce roasty/burnt bitterness and make the cup taste smoother and more tea-like",
+                "parameter": "Water temperature",
+                "reasoning": "With the baseline brew already presenting burnt and bitter notes, a small temperature drop reduces extraction aggressiveness without needing a large grind change",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive dose at the same grind setting"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Reduce dose",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "7d0de645-043e-4bbe-948f-d89d57137dfa",
+        "createdAt": "2026-02-11T14:52:38.135Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "6",
+        "dosage": 21.5,
+        "waterTemp": 200,
+        "brewTime": 230,
+        "finalWeight": 295.4,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 45.8
+          },
+          {
+            "endTime": 70,
+            "endWeight": 160.6
+          },
+          {
+            "endTime": 110,
+            "endWeight": 240.1
+          },
+          {
+            "endTime": 230,
+            "endWeight": 295.4
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Flat, Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted flat with a lack of sweetness, missing the peach-like sweetness and lively clarity expected from this Ethiopia.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 1 step on the Ode Gen 2 (from 6 to 5)",
+                "effect": "This should increase sweetness, body, and clarity while reducing the flat/tea-water impression",
+                "parameter": "Grind setting",
+                "reasoning": "Multiple attempts at the same grind setting produced muted/flat cups, so increasing extraction by tightening the grind is the most direct lever without changing the recipe structure",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight to 285g (keep dose 21.5g) to move from ~1:13.7 to ~1:13.3",
+                "effect": "This will increase perceived sweetness and concentration and make the cup feel more rounded instead of thin",
+                "parameter": "Final weight (brew ratio)",
+                "reasoning": "At ~295g the baseline cup read flat and lacking sweetness, and a slightly tighter ratio boosts intensity without pushing the bitterness seen when temperature was raised",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same stage weights but add a gentle swirl immediately after the final pour to level the bed (one controlled swirl, then hands off)",
+                "effect": "This should improve evenness and bring more sweetness and sparkle by reducing uneven extraction",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "With the same grind setting producing both muted and bitter outcomes across attempts, improving extraction uniformity is a low-risk way to lift sweetness without changing core parameters",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to too-coarse grind at the current flow profile"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "9de532f2-c9c5-43f6-887b-2d169c1fd2d5",
+        "createdAt": "2026-02-13T14:03:31.982Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21.1,
+        "waterTemp": 199.9,
+        "brewTime": 180,
+        "finalWeight": 285.1,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 50.8
+          },
+          {
+            "endTime": 70,
+            "endWeight": 160.8
+          },
+          {
+            "endTime": 110,
+            "endWeight": 241.6
+          },
+          {
+            "endTime": 180,
+            "endWeight": 285.1
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Tea like, One-Note",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was decent but came across tea-like and one-note, missing sweetness and depth. The cup needs more extraction to build body and bring out peach sweetness while keeping the black-tea clarity.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.3–0.5 on the Ode Gen 2 (from 5.7 to ~5.2–5.4)",
+                "effect": "This should increase sweetness, body, and flavor layering while keeping the tea-like character",
+                "parameter": "Grind setting",
+                "reasoning": "Across previous attempts at similar ratios and temperatures the cups stayed muted/flat, and the baseline brew’s tea-like one-note profile points to needing more contact time and extraction via a slightly finer grind",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final weight by 10–15g (from 285g to 295–300g) while keeping dose the same",
+                "effect": "This will increase extraction and roundness, helping peach sweetness show up without pushing bitterness too far",
+                "parameter": "Final weight / ratio",
+                "reasoning": "A prior attempt at a slightly higher yield produced a less one-note cup than the baseline, so a small bump in yield is a low-risk way to add extraction without changing the overall recipe structure",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a gentle swirl immediately after the bloom and another small swirl after the final pour to fully level the bed",
+                "effect": "This should improve evenness and clarity, reducing one-note results and increasing perceived sweetness",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "With similar stage timings and weights producing muted cups, improving slurry mixing and bed leveling is the smallest change that can raise extraction uniformity without altering core parameters",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "8ce50cc4-865c-4039-a4c0-91aebc4a822c",
+        "createdAt": "2026-02-17T15:50:25.241Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21.1,
+        "waterTemp": 199.9,
+        "brewTime": 195,
+        "finalWeight": 289.9,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 50.2
+          },
+          {
+            "endTime": 70,
+            "endWeight": 149.9
+          },
+          {
+            "endTime": 110,
+            "endWeight": 260.7
+          },
+          {
+            "endTime": 195,
+            "endWeight": 289.9
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Balanced, Sweet",
+        "suggestion": null
+      },
+      {
+        "id": "b97b3fe7-cab8-45e9-85bc-dc78920bed1a",
+        "createdAt": "2026-02-18T14:43:36.375Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21,
+        "waterTemp": 201,
+        "brewTime": 200,
+        "finalWeight": 291.5,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 49.8
+          },
+          {
+            "endTime": 70,
+            "endWeight": 150.2
+          },
+          {
+            "endTime": 110,
+            "endWeight": 260.5
+          },
+          {
+            "endTime": 200,
+            "endWeight": 291.5
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Clean Finish, Balanced, Sweet",
+        "personalNotes": "I still don’t like the bean, but I am finally tasting the notes.",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with a clean finish, balanced sweetness, and clearer flavor notes, but it still came across as not fully expressive of the peach/lemon character.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.7 to ~5.4–5.5)",
+                "effect": "This should increase clarity and sweetness while bringing more peach and lemon zest definition without adding harsh bitterness",
+                "parameter": "Grind setting",
+                "reasoning": "You already found a stable, excellent cup at 5.7, so a very small tightening is the most direct way to push extraction a notch without changing the overall profile",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final weight by 8–12g (keep dose 21g; target ~300–304g total)",
+                "effect": "This will open up aromatics and improve flavor separation while keeping the cup balanced and clean",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Your best cups clustered around the same grind and temperature, so a small yield increase is a controlled way to add a bit more extraction and lift without reworking the whole recipe",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "slightly muted flavor separation due to a slightly low extraction intensity at the current flow/ratio"
+          },
+          "concise": {
+            "goal": "Increase clarity",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "24371ca2-05ce-4523-bce9-8d0e86d41c7e",
+        "createdAt": "2026-02-19T14:50:25.512Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 19.8,
+        "waterTemp": 201,
+        "brewTime": 215,
+        "finalWeight": 283.7,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 51.6
+          },
+          {
+            "endTime": 70,
+            "endWeight": 150
+          },
+          {
+            "endTime": 110,
+            "endWeight": 242.5
+          },
+          {
+            "endTime": 215,
+            "endWeight": 283.7
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Juicy, Clear, Sweet",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with juicy, clear sweetness, but it can be pushed toward a more well-rounded, fuller cup without losing clarity. The current profile leans slightly toward bright/tea-like clarity rather than deeper sweetness and body.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 300–305g (keep dose 19.8g)",
+                "effect": "This should increase sweetness and roundness while keeping the cup clear",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Your excellent cups at the same grind and temperature were brewed with a higher dose and slightly higher final weight, and the baseline brew’s lower ratio can cap extraction and body even when it tastes clean",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.7 to ~5.4–5.5)",
+                "effect": "This will add a bit more body and deepen sweetness, reducing any remaining tea-like thinness",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "Multiple excellent brews clustered at the same grind setting, so a very small tightening is the lowest-risk way to push extraction without changing the overall character",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to slightly low brew ratio (concentrated yield limiting sweetness development)"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase final weight",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "5ce89977-031b-4748-8bfa-26b99e7d1c85",
+        "createdAt": "2026-02-20T15:06:31.588Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21.6,
+        "waterTemp": 201,
+        "brewTime": 190,
+        "finalWeight": 287.4,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 51.8
+          },
+          {
+            "endTime": 70,
+            "endWeight": 151.2
+          },
+          {
+            "endTime": 110,
+            "endWeight": 259.6
+          },
+          {
+            "endTime": 190,
+            "endWeight": 287.4
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Balanced",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with a balanced cup, but it muted the coffee’s peach and lemon-zest sparkle compared with earlier excellent brews that read juicier and clearer. What’s missing is a bit more clarity and sweetness lift without losing balance.",
+            "suggestions": [
+              {
+                "action": "Increase final weight by 10–15g (target ~297–302g total) while keeping dose the same",
+                "effect": "This should increase clarity and sweetness while keeping bitterness in check",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier excellent brews at the same grind and temperature but with a higher final yield tasted juicier, clearer, and sweeter than the baseline brew",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind finer by 0.1–0.2 on the Ode Gen 2 (from 5.7 to ~5.5–5.6)",
+                "effect": "This will add a touch more sweetness and roundness and make the fruit notes more present",
+                "parameter": "Grind / flow",
+                "reasoning": "You already improved quality moving from a coarser setting to 5.7, so a very small step finer is the minimal next move to increase extraction without tipping into bitterness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase water temperature by 1–2°F (to 202–203°F)",
+                "effect": "This should lift peach and lemon-zest brightness and slightly increase perceived sweetness",
+                "parameter": "Water temperature",
+                "reasoning": "Multiple excellent brews clustered around ~200–201°F, so a tiny temperature bump is a controlled way to add extraction intensity without changing the overall recipe structure",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "slightly under-extracted due to conservative yield and extraction intensity"
+          },
+          "concise": {
+            "goal": "Increase clarity",
+            "action": "Increase final weight",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "b767ba38-3385-44ce-a4b7-9ea2db601d17",
+        "createdAt": "2026-02-23T16:01:48.122Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21.5,
+        "waterTemp": 201,
+        "brewTime": 210,
+        "finalWeight": 287.1,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 51.1
+          },
+          {
+            "endTime": 70,
+            "endWeight": 151.2
+          },
+          {
+            "endTime": 110,
+            "endWeight": 243.2
+          },
+          {
+            "endTime": 210,
+            "endWeight": 287.1
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Lacks Sweetness, Dry",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted dry with lacking sweetness, indicating a thinner, more astringent balance than your earlier excellent, sweet cups on the same core recipe.",
+            "suggestions": [
+              {
+                "action": "Remove the late top-up: end the brew at ~243–260g total (skip the ~210s pour to ~287g)",
+                "effect": "This should increase sweetness and reduce the dry finish while keeping the cup balanced",
+                "parameter": "Pour structure (final pour)",
+                "reasoning": "Earlier exceptional brews at the same grind, temperature, and similar dose were excellent when the brew effectively finished around the mid-240s to ~260g without a small late dilution pour that can rinse tannins and emphasize dryness",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind coarser by +0.2 to +0.3 on the Ode Gen 2 (from 5.7 to ~5.9–6.0)",
+                "effect": "This will soften astringency and bring back perceived sweetness and roundness",
+                "parameter": "Grind / flow",
+                "reasoning": "With the baseline brew showing dryness at the same 5.7 setting that previously tasted sweet and balanced, a small coarsening is the lowest-impact way to reduce over-extracted fines contribution without changing your proven temperature",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "over-extracted finish due to late-stage bypass/uneven extraction from a small final top-up"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Remove final top-up",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "ea85d50c-5681-4b8d-99ba-1aae476ee7c0",
+        "createdAt": "2026-02-24T14:36:29.086Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21.1,
+        "waterTemp": 201,
+        "brewTime": 178,
+        "finalWeight": 271.8,
+        "stages": [
+          {
+            "endTime": 35,
+            "endWeight": 50.4
+          },
+          {
+            "endTime": 70,
+            "endWeight": 150.2
+          },
+          {
+            "endTime": 110,
+            "endWeight": 250.5
+          },
+          {
+            "endTime": 178,
+            "endWeight": 271.8
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was decent but lacked sweetness, indicating a cup that finished thin and less rounded than prior excellent, sweet brews. The final yield was notably lower than earlier successful attempts, reducing extraction and perceived sweetness.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 285–290g (keep dose ~21g)",
+                "effect": "This should increase sweetness and roundness while keeping the cup balanced",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier excellent brews with sweet, balanced notes consistently finished closer to ~285–292g, while the baseline brew ended at ~272g and tasted less sweet",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.7 to ~5.4–5.5)",
+                "effect": "This will increase extraction, boosting sweetness and body and reducing the hollow finish",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "With the same grind setting producing both excellent and less-sweet cups, a small move finer is the minimal lever to recover sweetness when the brew presents as under-extracted",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to low final yield"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase final weight",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "454694da-4386-4400-b636-a0c67e5f9e27",
+        "createdAt": "2026-04-20T13:51:52.852Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.7",
+        "dosage": 21.1,
+        "waterTemp": 201,
+        "brewTime": 250,
+        "finalWeight": 283,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 53.7
+          },
+          {
+            "endTime": 70,
+            "endWeight": 150
+          },
+          {
+            "endTime": 80,
+            "endWeight": 262.4
+          },
+          {
+            "endTime": 250,
+            "endWeight": 283
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Balanced",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent and tasted balanced, but it can be pushed toward a more expressive, sweeter cup without losing clarity. The main opportunity is improving extraction evenness to increase sweetness and roundness.",
+            "suggestions": [
+              {
+                "action": "After the final pour, give 1 gentle swirl (about 1–2 rotations) to level the bed and knock grounds off the sidewalls",
+                "effect": "This should increase sweetness and roundness while keeping the cup balanced",
+                "parameter": "Agitation / pour technique",
+                "reasoning": "Earlier cups that read as less sweet happened despite the same grind and temperature, pointing to extraction evenness and fines migration as the differentiator rather than core recipe",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind finer by 0.2 on the Ode Gen 2 (from 5.7 to 5.5)",
+                "effect": "This will increase sweetness and deepen peach/black-tea notes with a slightly fuller body",
+                "parameter": "Grind setting",
+                "reasoning": "You have multiple excellent brews at 5.7, so a very small tightening is the lowest-risk way to add extraction without changing the overall profile",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final water to 295g (keep dose 21.1g) to move from ~1:13.4 to ~1:14.0",
+                "effect": "This should open up clarity and lift lemon-zest aromatics while keeping the finish cleaner",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Your best cups cluster around similar temperatures and grind, so a small yield increase is a controlled way to adjust balance without reworking the whole recipe",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "slightly under-extracted due to uneven extraction from late-stage low bypass and minimal agitation"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Add gentle agitation",
+            "confidence": "Medium"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "e797baa2-a6d9-4cf0-ad53-c3ff0e1d059f",
+    "coffee": {
+      "name": "El Diviso - Java",
+      "roaster": "Greater Goods Coffee Co. ",
+      "region": "Colombia",
+      "roastLevel": "Light",
+      "notes": "Dried Dates, Mint Chocolate Chip, Cardamom Caraway"
+    },
+    "brews": [
+      {
+        "id": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+        "createdAt": "2026-03-06T14:50:29.617Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "7",
+        "dosage": 20.2,
+        "waterTemp": 204,
+        "brewTime": 160,
+        "finalWeight": 283.7,
+        "stages": [
+          {
+            "endTime": 60,
+            "endWeight": 61.2
+          },
+          {
+            "endTime": 100,
+            "endWeight": 235
+          },
+          {
+            "endTime": 160,
+            "endWeight": 283.7
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Bitter, Burnt, Unbalanced",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with bitter, burnt, unbalanced flavors, indicating harsh extraction that overwhelmed the coffee’s sweeter spice and mint-chocolate notes.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by 1 step on the Ode Gen 2 (from 7 to 8)",
+                "effect": "This should reduce bitterness and burnt flavors while bringing back clearer sweetness and spice definition",
+                "parameter": "Grind setting",
+                "reasoning": "The baseline brew’s bitter/burnt profile points to too much extraction, and a small coarsening is the most direct way to reduce extraction without changing the recipe structure",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final water to 270g (keep dose ~20g) to target ~1:13.5 instead of ~1:14",
+                "effect": "This will shorten extraction and soften harshness, improving balance and making the cup feel rounder",
+                "parameter": "Final water / ratio",
+                "reasoning": "With bitter/burnt notes in the baseline brew, slightly lowering yield reduces the amount of late-stage extraction that tends to taste woody/ashy",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 2°F (from 204°F to 202°F)",
+                "effect": "This should further tame roast-like bitterness and make the finish cleaner without flattening the cup",
+                "parameter": "Water temperature",
+                "reasoning": "Since the baseline brew already presents burnt bitterness, a small temperature reduction is a controlled way to reduce extraction intensity after addressing grind/ratio",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive brew water contact and harsh extraction"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Grind coarser",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "a6211741-c29a-4ec7-83c9-3ce59acb7928",
+        "createdAt": "2026-03-24T13:26:43.694Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "7",
+        "dosage": 19.8,
+        "waterTemp": 202,
+        "brewTime": 155,
+        "finalWeight": 302.8,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 71.2
+          },
+          {
+            "endTime": 90,
+            "endWeight": 201.8
+          },
+          {
+            "endTime": 155,
+            "endWeight": 302.8
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Nutty, One-Note, Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was decent but came across nutty and one-note, lacking sweetness and complexity. The cup needs higher extraction to bring out the dried date sweetness and spice notes without turning bitter.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 1 step on the Ode Gen 2 (from 7 to 6)",
+                "effect": "This should increase sweetness, deepen body, and add complexity beyond the nutty one-note profile",
+                "parameter": "Grind setting",
+                "reasoning": "With the same grind used across attempts and the baseline presenting as lacking sweetness, a small move finer is the most direct way to raise extraction without changing the overall recipe structure",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final water to 320g (keep dose ~19.8–20g) to target ~1:16.0 instead of ~1:15.3",
+                "effect": "This will lift sweetness and clarity and help the cup feel more balanced rather than dense and one-note",
+                "parameter": "Final brew ratio (yield)",
+                "reasoning": "The baseline yield is relatively tight for a light roast and can mute perceived sweetness; a small yield increase raises extraction while keeping strength in a similar range",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same total water but split Stage 3 into two smaller pours: 155s to 250g, then 185s to 303g with a gentle swirl after the final pour",
+                "effect": "This should improve evenness, bringing out more sweetness and layered spice notes while reducing the chance of harsh, uneven flavors",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "An earlier attempt at higher temperature tasted bitter and burnt, so improving extraction via more even percolation (rather than more heat) targets sweetness without pushing harshness",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient contact time at the current grind and pour structure"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "bbb49f1e-b684-44d8-b2f3-8b2402960039",
+        "createdAt": "2026-03-25T13:33:07.226Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "6.5",
+        "dosage": 19.5,
+        "waterTemp": 202,
+        "brewTime": 145,
+        "finalWeight": 287.3,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 52.7
+          },
+          {
+            "endTime": 90,
+            "endWeight": 206.2
+          },
+          {
+            "endTime": 145,
+            "endWeight": 287.3
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Bitter, Hollow",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with bitter, hollow flavors, missing sweetness and balance. The cup tasted simultaneously harsh and thin, indicating extraction was uneven and skewed toward bitter compounds without enough sweetness/body.",
+            "suggestions": [
+              {
+                "action": "Change to 4 pours with gentler flow: 60g bloom for 45s (swirl once), then add to 160g at 1:15, to 240g at 1:45, to 300g at 2:15 while keeping the slurry level steady and avoiding center-only pouring",
+                "effect": "This should reduce bitterness and hollowness while increasing sweetness and a more even, round body",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "Across previous attempts the flavor swings between bitter/burnt and one-note, which is consistent with uneven extraction that a steadier, lower-agitation pour pattern can correct",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind slightly coarser by +0.5 on the Ode Gen 2 (from 6.5 to 7.0)",
+                "effect": "This will soften harsh bitterness and make the finish cleaner while preserving clarity",
+                "parameter": "Grind setting",
+                "reasoning": "The baseline brew at 6.5 tasted bitter and hollow, and a coarser setting has already produced a less harsh cup in prior attempts, so moving back toward that should reduce over-extracted bitterness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 2°F (from 202°F to 200°F)",
+                "effect": "This should reduce sharp bitterness and help the cup taste smoother and more balanced",
+                "parameter": "Water temperature",
+                "reasoning": "With repeated bitter outcomes at 202–204°F, a small temperature drop is a minimal, targeted way to reduce bitter extraction without changing the recipe dramatically",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "uneven extraction due to channeling from aggressive pour structure"
+          },
+          "concise": {
+            "goal": "Fix channeling",
+            "action": "Smooth pour pattern",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "c7bf5953-7952-4d40-a66a-9d0d4399940b",
+        "createdAt": "2026-04-14T13:40:07.293Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "6.3",
+        "dosage": 19.5,
+        "waterTemp": 202,
+        "brewTime": 145,
+        "finalWeight": 280,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 65.9
+          },
+          {
+            "endTime": 90,
+            "endWeight": 204
+          },
+          {
+            "endTime": 145,
+            "endWeight": 280
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Muted, Heavy, Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted muted and heavy with low sweetness, leaving the cup flat and lacking the coffee’s brighter, spiced-fruit character.",
+            "suggestions": [
+              {
+                "action": "Increase water temperature to 205–206°F (keep everything else the same)",
+                "effect": "This should increase sweetness and clarity while reducing the muted, heavy finish",
+                "parameter": "Water temperature",
+                "reasoning": "A previous attempt at a slightly higher temperature tasted bitter and burnt at a different dose and pour structure, so a small temperature increase from the baseline targets more extraction without repeating that full setup",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 6.3 to ~6.0–6.1)",
+                "effect": "This will increase extraction and bring more dried-fruit sweetness and spice definition while keeping body controlled",
+                "parameter": "Grind setting",
+                "reasoning": "Across prior attempts, coarser settings produced one-note cups and the baseline still lacks sweetness, so a small move finer is the most direct way to lift extraction without a big risk of bitterness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final weight to 295g (from 280g) while keeping dose at 19.5g and the same 3-pour timing",
+                "effect": "This should lighten the heavy texture and open up balance without making the cup hollow",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline’s heavy, muted profile points to a slightly too-tight ratio, and a modest yield increase is a different lever than the earlier hollow cup that occurred under a different grind and bloom amount",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient extraction intensity at the current grind and temperature"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase temperature",
+            "confidence": "Medium"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "c003afe6-8d8c-48ff-bcca-22236cca647b",
+    "coffee": {
+      "name": "1st Rodeo",
+      "roaster": "Palomino Coffee",
+      "region": "Brazil, Ethiopia",
+      "roastLevel": "Light",
+      "notes": "Almond Butter, Blackberry, Honeysuckle"
+    },
+    "brews": [
+      {
+        "id": "12eabd9f-4f9b-421c-b0dc-1c5f6c63f8b4",
+        "createdAt": "2026-03-16T23:33:04.582Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "19.5",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 29,
+        "finalWeight": 32.1,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "9c5bf55e-b619-4050-9b86-3f94bc021fed",
+        "createdAt": "2026-03-17T14:33:44.403Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "19.5",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 24,
+        "finalWeight": 30.8,
+        "quality": 3,
+        "tastingNotes": "Clear, Balanced, Sweet, Complex",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with clear, balanced sweetness and complexity; the main risk to repeating that result is shot-to-shot inconsistency from bean temperature changing flow and extraction.",
+            "suggestions": [
+              {
+                "action": "Keep beans at room temperature (avoid grinding from frozen) for this coffee",
+                "effect": "This will improve consistency and preserve the clear, balanced sweetness you got in the baseline brew",
+                "parameter": "Bean temperature",
+                "reasoning": "The only logged change away from the baseline brew was grinding from frozen, which coincided with a longer shot time and a drop from Excellent to Decent at the same grind, dose, temperature, and similar yield",
+                "confidence": "High"
+              },
+              {
+                "action": "If you must grind from frozen, grind coarser by ~0.3–0.5 on the Niche Zero",
+                "effect": "This should bring flow back toward the baseline and reduce muddiness/flatness while keeping sweetness",
+                "parameter": "Grind setting (Niche Zero)",
+                "reasoning": "With frozen beans at the same grind setting the shot ran ~5s longer, so a small coarsening compensates for the slower flow without changing your proven dose, temperature, and ratio",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "inconsistent extraction due to bean temperature changing flow rate"
+          },
+          "concise": {
+            "goal": "Improve consistency",
+            "action": "Keep beans room-temp",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "c2b639c5-56e2-4686-bc77-777cc28a671a",
+        "createdAt": "2026-03-18T14:37:47.451Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "19.5",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 22,
+        "finalWeight": 30.9,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and came across less clear and sweet than the earlier exceptional brew; the shot ran faster at the same dose, yield, temperature, and grind, reducing extraction and balance.",
+            "suggestions": [
+              {
+                "action": "Grind finer by ~0.3–0.5 on the Niche Zero (e.g., 19.5 → ~19.0–19.2) to bring the shot to ~24s at the same 30–31g yield",
+                "effect": "This should increase sweetness, improve balance, and add a touch more body while keeping clarity",
+                "parameter": "Grind setting",
+                "reasoning": "An earlier exceptional brew used the same dose, yield, temperature, and grind number but ran ~2s longer and tasted clear, balanced, sweet, and complex, so matching that flow is the most direct fix",
+                "confidence": "High"
+              },
+              {
+                "action": "Add a brief WDT (5–10s) and a firm, level tamp, then keep the same grind and target time to see if you can hit ~24s without changing settings",
+                "effect": "This will reduce channeling-driven fast flow and make the cup more even, sweeter, and less sharp",
+                "parameter": "Puck preparation",
+                "reasoning": "With all core parameters held constant across attempts, the main variable left that can explain a faster 22s run is puck resistance consistency, so tightening prep can recover the missing extraction",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "9a90fe66-0014-433e-846c-a0d99e977940",
+        "createdAt": "2026-03-19T14:22:20.466Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "19",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 25,
+        "finalWeight": 31,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "5718d0e5-caa8-4c1d-b223-da784e2a34ad",
+        "createdAt": "2026-03-20T14:17:49.148Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "18.75",
+        "dosage": 18.3,
+        "waterTemp": 198,
+        "brewTime": 23,
+        "finalWeight": 31,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "573b95d4-577f-45af-ac5e-e13e08bc85b5",
+        "createdAt": "2026-03-26T14:02:10.792Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "20",
+        "dosage": 18.2,
+        "waterTemp": 204.8,
+        "brewTime": 28,
+        "finalWeight": 30.8,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "2ef3235a-5a91-4957-bf24-e95d404f0129",
+        "createdAt": "2026-04-01T14:22:18.711Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "19.75",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 25,
+        "finalWeight": 30.7,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "18ee05c8-f9c1-4833-b039-833064c08f57",
+        "createdAt": "2026-04-06T14:30:13.283Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "20.5",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 27,
+        "finalWeight": 30.6,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "eaf4559a-9090-4639-b555-1a825213655e",
+        "createdAt": "2026-04-07T14:16:50.449Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "20.5",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 27,
+        "finalWeight": 30.6,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "592e3a9a-85a5-423d-aeb3-2edd5ccc7ad1",
+        "createdAt": "2026-04-10T14:27:10.205Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "20",
+        "dosage": 18.2,
+        "waterTemp": 197.6,
+        "brewTime": 24,
+        "finalWeight": 30.6,
+        "quality": 2,
+        "tastingNotes": "Dry, Sweet, Muted",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with dry, sweet, muted flavors, missing the clarity and complexity found in an earlier exceptional shot. The lower brew temperature and frozen-bean workflow reduced extraction intensity and aromatic lift at the same ratio.",
+            "suggestions": [
+              {
+                "action": "Increase water temperature by 1–2°F (target 199–200°F) while keeping dose and yield the same",
+                "effect": "This should increase clarity, lift florals/berry, and reduce the dry-muted finish",
+                "parameter": "Water temperature",
+                "reasoning": "An earlier exceptional brew hit excellent balance at 198°F with the same dose/yield/time window, and the baseline is cooler at 197.6°F while tasting muted and dry",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind finer by ~0.3–0.5 on the Niche Zero to bring shot time to ~26–28s at the same 30.6g yield",
+                "effect": "This will increase sweetness and body and make the cup feel less dry by pushing extraction slightly higher",
+                "parameter": "Grind setting",
+                "reasoning": "With the same yield, previous attempts running closer to 27–28s indicate the coffee tolerates a touch more contact time than the baseline 24s without losing balance",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Use room-temperature beans (or extend preheat/flush routine) for 2–3 shots to match the earlier exceptional workflow",
+                "effect": "This should improve aromatic intensity and perceived complexity, reducing the muted character",
+                "parameter": "Bean temperature / workflow",
+                "reasoning": "The clearest, most complex result in your history was achieved with room-temperature beans at otherwise similar parameters, while the baseline used frozen beans and tasted muted",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient brew temperature"
+          },
+          "concise": {
+            "goal": "Increase clarity",
+            "action": "Increase temperature",
+            "confidence": "High"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "5ca1b263-46a2-4708-996e-b01567f6c6fa",
+    "coffee": {
+      "name": "Ethiopia Wuri",
+      "roaster": "Maru Coffee",
+      "region": "Ethiopia",
+      "notes": "Peach, Blackberry, Black Tea"
+    },
+    "brews": [
+      {
+        "id": "ef22bc2b-2d9f-4947-bdef-11c3a55e608b",
+        "createdAt": "2025-12-22T16:24:11.780Z",
+        "brewMethod": "pour over",
+        "brewerName": "Fellow Stagg [XF] Pour Over Dripper",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "7.25",
+        "dosage": 18.2,
+        "waterTemp": 198,
+        "brewTime": 235,
+        "finalWeight": 284.5,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 51.5
+          },
+          {
+            "endTime": 60,
+            "endWeight": 102.1
+          },
+          {
+            "endTime": 120,
+            "endWeight": 201.4
+          },
+          {
+            "endTime": 150,
+            "endWeight": 250.7
+          },
+          {
+            "endTime": 235,
+            "endWeight": 284.5
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Bland, Syrupy",
+        "suggestion": null
+      },
+      {
+        "id": "7e009f75-7a44-4be5-8e37-2ded77c31272",
+        "createdAt": "2025-12-23T16:09:27.557Z",
+        "brewMethod": "pour over",
+        "brewerName": "Fellow Stagg [XF] Pour Over Dripper",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "7.25",
+        "dosage": 23,
+        "waterTemp": 201,
+        "brewTime": 260,
+        "finalWeight": 280.9,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 50.6
+          },
+          {
+            "endTime": 60,
+            "endWeight": 102.8
+          },
+          {
+            "endTime": 120,
+            "endWeight": 202.9
+          },
+          {
+            "endTime": 150,
+            "endWeight": 252.7
+          },
+          {
+            "endTime": 260,
+            "endWeight": 280.9
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Bitter, Over-Extracted",
+        "suggestion": null
+      },
+      {
+        "id": "52f5f207-93c8-49dc-81c6-7b6dfb2f42cc",
+        "createdAt": "2026-01-07T14:52:07.894Z",
+        "brewMethod": "pour over",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "7.3",
+        "dosage": 22.3,
+        "waterTemp": 194,
+        "brewTime": 182,
+        "finalWeight": 252.3,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 47.7
+          },
+          {
+            "endTime": 60,
+            "endWeight": 150.4
+          },
+          {
+            "endTime": 182,
+            "endWeight": 252.3
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Bitter, Over-Extracted, Balanced",
+        "suggestion": null
+      },
+      {
+        "id": "ce1fdf0d-03aa-4e60-8574-129c8ed92731",
+        "createdAt": "2026-01-13T14:41:20.815Z",
+        "brewMethod": "pour over",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "7.5",
+        "dosage": 23.2,
+        "waterTemp": 194,
+        "brewTime": 120,
+        "finalWeight": 242.6,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 51.17
+          },
+          {
+            "endTime": 60,
+            "endWeight": 122.6
+          },
+          {
+            "endTime": 90,
+            "endWeight": 181.6
+          },
+          {
+            "endTime": 120,
+            "endWeight": 242.6
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Bitter, Unbalanced, Strong",
+        "suggestion": null
+      },
+      {
+        "id": "3a2abc0d-6b7e-4292-8c8c-e84cf572e694",
+        "createdAt": "2026-01-21T14:27:16.624Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "6.7",
+        "dosage": 23.3,
+        "waterTemp": 194,
+        "brewTime": 270,
+        "finalWeight": 299.1,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 30
+          },
+          {
+            "endTime": 60,
+            "endWeight": 130.8
+          },
+          {
+            "endTime": 131,
+            "endWeight": 230.2
+          },
+          {
+            "endTime": 270,
+            "endWeight": 299.1
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Bitter, Muddy, unclear notes",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with bitter, muddy, unclear notes, producing a heavy cup that hid the peach/blackberry/tea character. The brew pushed extraction too far and amplified harshness instead of clarity.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by +0.6 to +1.0 on the Ode Gen 2 (from 6.7 to ~7.3–7.7)",
+                "effect": "This should reduce bitterness and muddiness while increasing clarity and separation of fruit/tea notes",
+                "parameter": "Grind setting",
+                "reasoning": "Previous attempts at coarser settings produced less harshness than the baseline, and the baseline’s very late final stage indicates a slow drawdown that benefits most from a coarser grind",
+                "confidence": "High"
+              },
+              {
+                "action": "Keep the same total water but switch to 3 pours: 0:00 bloom 60g, 0:45 pour to 200g, 1:30 pour to 300g, then no swirl after the last pour (only a gentle swirl right after bloom)",
+                "effect": "This will lower astringent bitterness and make the cup cleaner by reducing fines migration and late-stage stalling",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "The baseline’s muddy bitterness plus the very slow finish is consistent with fines clogging from agitation and many stages, so simplifying pours and limiting late agitation directly targets the stall",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 3–5°F (from 194°F to 189–191°F)",
+                "effect": "This should soften harsh bitterness and bring a rounder, more tea-like balance without making the cup thin",
+                "parameter": "Water temperature",
+                "reasoning": "Bitterness has persisted across multiple brews even at 194°F, so a small temperature drop is a controlled way to reduce extraction intensity while you correct flow with grind and pouring",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time from a late stall/slow drawdown"
+          },
+          "concise": {
+            "goal": "Increase clarity",
+            "action": "Grind coarser",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "bde6f174-cb9d-4e9f-9613-066c2783929a",
+        "createdAt": "2026-04-10T14:00:28.303Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "6.3",
+        "dosage": 19,
+        "waterTemp": 202,
+        "brewTime": 190,
+        "finalWeight": 280.5,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.6
+          },
+          {
+            "endTime": 90,
+            "endWeight": 202.8
+          },
+          {
+            "endTime": 190,
+            "endWeight": 280.5
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Balanced, Sweet, Juicy, Layered",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with balanced, sweet, juicy, layered notes; what’s missing for a consistent 3/3 is a touch more clarity and separation of the peach/black tea character without losing sweetness.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight by 10–15g (end at ~265–270g total) while keeping dose at 19g",
+                "effect": "This should increase clarity and lift peach/black tea notes while keeping sweetness intact",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier attempts at higher dose and larger overall yields produced muddy, bitter cups, so a small yield reduction tightens the finish without changing the baseline’s successful grind and temperature",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind slightly coarser by +0.2 to +0.3 on the Ode Gen 2 (from 6.3 to ~6.5–6.6)",
+                "effect": "This will reduce drying bitterness and make the cup feel cleaner and more tea-like",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "Multiple previous brews skewed bitter/over-extracted, and a tiny coarsening is the smallest grind move that directly reduces extraction while staying close to the baseline brew",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same stage weights/timing but pour the final stage more gently (lower kettle height, minimal swirl; only a light center-to-edge rinse)",
+                "effect": "This should reduce muddiness and improve note separation without thinning the cup",
+                "parameter": "Pour structure (late-stage agitation)",
+                "reasoning": "Since the baseline parameters already hit balanced sweetness, reducing late agitation targets clarity by limiting fines migration and over-extraction in the drawdown",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "slightly muted clarity due to a bit too much late-stage extraction"
+          },
+          "concise": {
+            "goal": "Increase clarity",
+            "action": "Reduce final yield",
+            "confidence": "Medium"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "5f1452f5-ffe2-4749-a60b-957e1428e904",
+    "coffee": {
+      "name": "Colombia Finca La Secreta Lychee",
+      "roaster": "Willy’s Beans",
+      "region": "Colombia, Antioquia",
+      "roastLevel": "Medium-Light",
+      "notes": "lychee, tropical fruit"
+    },
+    "brews": [
+      {
+        "id": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+        "createdAt": "2026-02-26T14:39:55.198Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "6",
+        "dosage": 20,
+        "waterTemp": 204,
+        "brewTime": 160,
+        "finalWeight": 301.9,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 61.3
+          },
+          {
+            "endTime": 75,
+            "endWeight": 200.6
+          },
+          {
+            "endTime": 160,
+            "endWeight": 301.9
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Slightly fruity, strong, Slightly bitter but gets better as it cools down.",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with slight fruit but came across strong and slightly bitter, improving as it cooled; it missed the lychee/tropical clarity and balance due to harsh extraction at hotter serving temperature.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by 0.5–1.0 on the Ode Gen 2 (from 6 to ~6.5–7.0)",
+                "effect": "This should reduce bitterness/harshness and let the lychee/tropical notes read cleaner while keeping a balanced strength",
+                "parameter": "Grind / flow",
+                "reasoning": "The baseline brew presented as strong with slight bitterness that softened as it cooled, which is consistent with too much extraction intensity for this coffee at the current grind and temperature",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same total water but switch to a gentler 2-pour after bloom: bloom 45s to ~60g, then one continuous slow pour to 300g with minimal swirling (only a small swirl right after bloom)",
+                "effect": "This will reduce localized over-extraction and bitterness and improve sweetness and fruit definition",
+                "parameter": "Pour structure (agitation)",
+                "reasoning": "The baseline brew’s bitterness alongside only slight fruit points to uneven/high agitation extraction, and reducing agitation is a targeted way to smooth the cup without changing ratio or temperature",
+                "confidence": "Low"
+              },
+              {
+                "action": "Lower water temperature by 2–3°F (from 204°F to 201–202°F)",
+                "effect": "This should soften the bitter edge and make the cup taste more round and balanced at hotter drinking temperatures",
+                "parameter": "Water temperature",
+                "reasoning": "Because the cup improved as it cooled, a small temperature reduction directly targets the harshness perceived when hot without needing a large recipe change",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time and localized harsh extraction"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Grind coarser",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+        "createdAt": "2026-02-27T14:52:19.291Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "6.5",
+        "dosage": 20.1,
+        "waterTemp": 203,
+        "brewTime": 165,
+        "finalWeight": 301.1,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.2
+          },
+          {
+            "endTime": 75,
+            "endWeight": 200.2
+          },
+          {
+            "endTime": 165,
+            "endWeight": 301.1
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Burnt, Slightly fruity, Unbalanced",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew rated Bad with burnt, slightly fruity, unbalanced flavors, missing clarity and sweetness. The cup was pushed into harsh bitterness from over-extraction driven by too much contact time and agitation for this coffee.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by +0.5 to +1.0 on the Ode Gen 2 (from 6.5 to ~7.0–7.5)",
+                "effect": "This should reduce burnt bitterness, increase clarity, and let the lychee/tropical notes show more cleanly",
+                "parameter": "Grind setting",
+                "reasoning": "A previous attempt at a finer setting tasted slightly bitter but improved as it cooled, and the baseline brew became burnt and unbalanced, so backing off extraction with a coarser grind is the most direct correction",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same weights but pour more gently and reduce agitation: bloom 60g for 45s, then one continuous slow pour to 200g by ~1:15, then one continuous slow pour to 300g by ~2:00; do not swirl after the bloom (only a light tap to settle the bed)",
+                "effect": "This will lower harshness and dryness while improving sweetness and balance",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "With the same ratio and similar total time, the baseline brew tasted burnt, and reducing agitation is a high-leverage way to cut astringent over-extraction without changing the recipe targets",
+                "confidence": "Low"
+              },
+              {
+                "action": "Lower water temperature by 2–3°F (from 203°F to 200–201°F)",
+                "effect": "This should soften bitter/roasty edges and make the fruit read rounder and more integrated",
+                "parameter": "Water temperature",
+                "reasoning": "Both attempts used relatively high temperatures (203–204°F) and both showed bitterness, so a small temperature reduction helps rein in extraction while keeping the coffee expressive",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time and agitation"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Grind coarser",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "99c4de6d-fa8e-4346-8030-423b8df0ef14",
+        "createdAt": "2026-03-05T15:09:07.254Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "room-temperature",
+        "grindSetting": "6",
+        "dosage": 20.4,
+        "waterTemp": 204,
+        "brewTime": 167,
+        "finalWeight": 283.7,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 62.2
+          },
+          {
+            "endTime": 90,
+            "endWeight": 200.1
+          },
+          {
+            "endTime": 167,
+            "endWeight": 283.7
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Thin, Muted",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted thin and muted, missing sweetness, aromatics, and a rounder body for the lychee/tropical profile.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 300g (keep dose ~20.4g; target ~1:14.7 instead of ~1:13.9)",
+                "effect": "This will increase extraction and bring more sweetness and tropical aromatics, making the cup feel more complete rather than thin and quiet",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew stopped notably shorter than the other attempts that reached ~301g, and that shorter yield aligns with the muted, underdeveloped flavor you noted",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind finer by 0.5 on the Ode Gen 2 (from 6 to 5.5)",
+                "effect": "This should increase body, sweetness, and fruit clarity while reducing the muted finish",
+                "parameter": "Grind setting",
+                "reasoning": "At the same grind as an earlier attempt that tasted strong/bitter-leaning, the baseline brew finished thin/muted at a lower final yield, so a small finer move targets more extraction without changing the overall recipe structure",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Slow the last stage: after reaching ~200g, pour to final weight over 35–45s with a gentle, steady center-out spiral (avoid heavy swirling)",
+                "effect": "This should raise contact time and even out extraction, improving balance and reducing the hollow/thin impression",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "Your stage timings show a relatively quick finish to a short final weight, so extending the final pour slightly increases extraction without changing temperature or dose",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient contact time and low extraction strength"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "45aa7e98-34db-48f6-a9ab-ef98467952f8",
+        "createdAt": "2026-03-08T16:56:03.920Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "6",
+        "dosage": 20.4,
+        "waterTemp": 204,
+        "brewTime": 173,
+        "finalWeight": 282.5,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.4
+          },
+          {
+            "endTime": 90,
+            "endWeight": 200.2
+          },
+          {
+            "endTime": 173,
+            "endWeight": 282.5
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Watery, bitter, Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with watery, bitter notes and lacked sweetness, producing a thin cup without the lychee/tropical balance you’re aiming for. The cup needs more concentration and sweetness while reducing the bitter edge.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 265–270g (keep dose ~20.4g; target ~1:13.0–1:13.2)",
+                "effect": "This should increase sweetness and body while reducing the bitter, watery finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier attempts at a higher final weight around ~300g tasted stronger and more fruity, while the baseline’s lower concentration at ~282g read watery and bitter, so tightening the ratio directly addresses both issues",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind slightly finer by 0.5 on the Ode Gen 2 (from 6 to 5.5) and keep the same pour timing targets",
+                "effect": "This should increase sweetness and roundness and reduce the hollow, thin mid-palate",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "A coarser setting used previously produced burnt/unbalanced results, and the baseline is thin and lacking sweetness at the current setting, so a small move finer is the minimal change to raise extraction without pushing harshness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "After the bloom, split the remaining water into two gentler pours (e.g., to 180g then to final weight) and reduce swirling to a single light swirl only after the bloom",
+                "effect": "This will reduce bitterness and improve clarity while keeping tropical fruit notes more distinct",
+                "parameter": "Pour structure (agitation control)",
+                "reasoning": "The baseline shows bitterness alongside thinness, and lowering agitation is a targeted way to reduce harsh extraction without changing temperature or dose",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive yield (too long a ratio) causing bitterness while still tasting thin"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Reduce final weight",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "2ddbbc91-60a9-4fcf-97c2-d25ad7052121",
+        "createdAt": "2026-03-09T14:36:05.612Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.5",
+        "dosage": 20.4,
+        "waterTemp": 203,
+        "brewTime": 165,
+        "finalWeight": 269.7,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.8
+          },
+          {
+            "endTime": 90,
+            "endWeight": 231.2
+          },
+          {
+            "endTime": 165,
+            "endWeight": 269.7
+          }
+        ],
+        "quality": 1,
+        "tastingNotes": "Lacks Sweetness, Sour, Lychee flavor",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad and tasted sour with low sweetness and only faint lychee, producing a sharp, thin cup instead of a balanced tropical profile.",
+            "suggestions": [
+              {
+                "action": "Grind finer from 5.5 to 5.0 on the Ode Gen 2",
+                "effect": "This should reduce sourness and increase sweetness and body while making the lychee note feel rounder",
+                "parameter": "Grind setting",
+                "reasoning": "Across previous attempts, the cups that pushed extraction higher (finer grind and/or higher yield) moved away from sharp sourness toward more developed flavor, while the baseline brew presented classic under-extraction",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight from 269.7g to 285g (keep dose the same)",
+                "effect": "This will increase extraction and sweetness and reduce the thin, sour edge without making the cup heavy",
+                "parameter": "Final weight / ratio",
+                "reasoning": "A prior attempt at a higher final weight produced a more developed cup than the baseline, and the baseline’s lower yield aligns with the sour/low-sweetness outcome",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Keep the same stage targets but pour with a lower kettle height and gentler stream, then add one light swirl right after the bloom only",
+                "effect": "This should reduce channeling-driven sourness and improve balance and clarity of the tropical/lychee notes",
+                "parameter": "Pour structure (agitation/flow control)",
+                "reasoning": "The baseline showed sourness despite a normal brew time, which is consistent with uneven extraction from agitation/bed disturbance rather than simply needing hotter water",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Reduce sourness",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+        "createdAt": "2026-03-11T14:10:26.740Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.4,
+        "waterTemp": 203,
+        "brewTime": 175,
+        "finalWeight": 285,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 61.1
+          },
+          {
+            "endTime": 90,
+            "endWeight": 215.5
+          },
+          {
+            "endTime": 175,
+            "endWeight": 285
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Complex, Layered, Almost perfect",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with a complex, layered cup that was almost perfect, but it still has a small gap to a fully rounded, balanced finish. The main opportunity is tightening extraction uniformity so sweetness and structure stay consistent from hot to cool.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.0 to ~4.7–4.8) while keeping the same pour weights and temperature",
+                "effect": "This will add a touch more body and sweetness and reduce any thin edges without pushing bitterness",
+                "parameter": "Grind setting",
+                "reasoning": "A coarser setting in previous attempts produced sourness and reduced sweetness, and the baseline brew is already near ideal, so a very small finer move is the safest way to nudge extraction up without changing the recipe",
+                "confidence": "High"
+              },
+              {
+                "action": "Keep the same weights and times, but pour with a lower kettle height and gentler flow in stages 2 and 3, then do exactly one light swirl at the end of stage 1 only",
+                "effect": "This should increase sweetness and roundness while keeping the lychee/tropical clarity intact",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "The baseline brew already hits the target flavor complexity at the current grind and temperature, so the highest-impact improvement is making extraction more even by reducing late-stage agitation that can create localized over/under-extraction",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight by 5–10 g (from 285 g to 275–280 g) with the same dose and temperature",
+                "effect": "This will increase perceived sweetness and concentration and improve balance through the finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier higher-yield brews around ~301 g read as strong/bitter or unbalanced, so a small reduction from the baseline yield is a controlled way to tighten the cup without changing grind or temperature",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "slight uneven extraction due to pour structure and bed disturbance"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Reduce agitation",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "321d5e0c-7ee2-4f9d-b8d6-183f9afd3ab7",
+        "createdAt": "2026-03-12T13:47:47.231Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.3,
+        "waterTemp": 203,
+        "brewTime": 168,
+        "finalWeight": 287.2,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 65.2
+          },
+          {
+            "endTime": 90,
+            "endWeight": 216.8
+          },
+          {
+            "endTime": 168,
+            "endWeight": 287.2
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Balanced, Clear",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with balanced, clear flavor, but it can be pushed toward a more rounded, sweeter cup without losing clarity. What’s missing is a touch more sweetness/body to fully saturate the tropical/lychee character.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.0 to ~4.7–4.8) and keep the same final weight as the baseline brew",
+                "effect": "This will add a bit more body and sweetness and reduce any sharpness without turning the cup bitter",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "A coarser move away from the baseline grind produced a sour, less sweet cup, so a very small finer adjustment from the baseline targets more extraction while staying in the proven zone",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight by 10–15g (keep dose the same) while keeping the same pour structure",
+                "effect": "This should increase sweetness and roundness while keeping the cup clear",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Your two exceptional brews clustered around a similar grind and temperature, so a small yield increase is the cleanest way to add extraction without changing the flow behavior that already tastes balanced",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "slightly under-extracted due to conservative yield"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase final weight",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "e480f80b-5f86-40f2-ae46-2f56358c765a",
+        "createdAt": "2026-03-16T14:02:19.250Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.4,
+        "waterTemp": 203,
+        "brewTime": 177,
+        "finalWeight": 279.7,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.6
+          },
+          {
+            "endTime": 90,
+            "endWeight": 215.9
+          },
+          {
+            "endTime": 177,
+            "endWeight": 279.7
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Sour, balanced, Lychee notes there",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with sourness despite otherwise balanced structure and present lychee notes, indicating the cup was missing sweetness and fuller extraction to round out acidity.",
+            "suggestions": [
+              {
+                "action": "Increase final weight by 5–8g (target ~285–288g total) while keeping the same pour timing",
+                "effect": "This should reduce sourness and increase sweetness while keeping the lychee clarity",
+                "parameter": "Final weight / ratio",
+                "reasoning": "An earlier exceptional brew at the same grinder setting and temperature used a slightly higher final weight and tasted balanced/clear, while the baseline brew finished lower and presented as sour",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.0 to ~4.7–4.8) and keep the same total water",
+                "effect": "This will increase extraction, adding body and sweetness and smoothing the acidity",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "At the current setting the baseline cup reads sour, and prior attempts show that going coarser reduced sweetness and did not fix sourness, so the smallest move finer is the next non-redundant lever",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to slightly low extraction yield at the current flow/ratio"
+          },
+          "concise": {
+            "goal": "Reduce sourness",
+            "action": "Increase final yield",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "017fe338-bb63-41cb-8cf6-15f27d4b2705",
+        "createdAt": "2026-03-17T13:26:44.666Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.2,
+        "waterTemp": 203,
+        "brewTime": 160,
+        "finalWeight": 285.6,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.1
+          },
+          {
+            "endTime": 90,
+            "endWeight": 215.1
+          },
+          {
+            "endTime": 160,
+            "endWeight": 285.6
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Acidic, Lacks Sweetness, Strong",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and came across acidic, strong, and lacking sweetness, so the cup missed the round, juicy balance this coffee can deliver. Compared to earlier excellent cups at the same grind and temperature, the baseline brew needs more even extraction and a touch more development to bring sweetness forward.",
+            "suggestions": [
+              {
+                "action": "After the bloom, add a gentle swirl (one full rotation) and keep the final pour height low (1–2 cm above the bed) to reduce turbulence",
+                "effect": "This should increase sweetness and reduce sharp acidity while keeping the lychee clarity",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "Earlier exceptional cups were achieved at the same grind and temperature, so improving evenness via controlled agitation is the smallest change that directly targets the baseline brew’s acidic, less-sweet outcome",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.0 to ~4.7–4.8)",
+                "effect": "This will add body and sweetness and soften sour/acidic edges without turning the cup harsh",
+                "parameter": "Grind setting",
+                "reasoning": "When this coffee presented as sour/acidic and lacking sweetness at 5.0, a small move finer is the most direct way to raise extraction while staying close to the earlier excellent results",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase final water to 295–300 g (keep dose ~20.2 g) while holding the same stage timings as closely as possible",
+                "effect": "This should reduce the ‘strong’ impression and improve balance while preserving fruit character",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew finished around the high-280s and tasted strong and acidic, and earlier excellent cups were closer to the upper-280s, so a small yield increase can round the cup without a major recipe change",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to uneven extraction (channeling) at the same grind and temperature"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase agitation",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "4a68265c-6b55-4e84-912a-044a14763308",
+        "createdAt": "2026-03-18T14:21:22.455Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "4.6",
+        "dosage": 20.3,
+        "waterTemp": 203,
+        "brewTime": 165,
+        "finalWeight": 287.7,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 61.1
+          },
+          {
+            "endTime": 90,
+            "endWeight": 202.1
+          },
+          {
+            "endTime": 165,
+            "endWeight": 287.7
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Flat, Lacks Sweetness, Lychee notes",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent and tasted flat with low sweetness, with lychee notes present but not supported by a rounded structure. What’s missing is sweetness and depth to balance the fruit character.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.3–0.4 on the Ode Gen 2 (from 4.6 to ~4.2–4.3)",
+                "effect": "This should increase sweetness, body, and roundness while keeping the lychee note clear",
+                "parameter": "Grind setting",
+                "reasoning": "An earlier exceptional brew at the coarser 5.0 setting was balanced and clear, while moving finer to 4.6 in the baseline brew coincided with a flatter, less sweet cup, so a small step finer than baseline targets more extraction without overshooting",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight by 10–15g (to ~298–303g) while keeping dose the same",
+                "effect": "This will soften sharp edges and improve balance, making the fruit read more like ripe tropical sweetness instead of intensity without depth",
+                "parameter": "Final brew weight / ratio",
+                "reasoning": "Your best cups clustered around a slightly higher final weight than the baseline brew, and the baseline’s lower yield aligns with the flat/low-sweetness outcome",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a gentle 2–3 second swirl immediately after the final pour, then stop all movement and let it draw down",
+                "effect": "This should reduce uneven extraction and increase perceived sweetness and clarity",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "With the same temperature and similar stage targets producing both excellent and dull cups, tightening consistency via a small, repeatable settling step helps prevent channeling-driven flatness without changing core parameters",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "96f32231-5183-4fbd-bc07-493d322b5518",
+        "createdAt": "2026-03-19T13:32:53.111Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.6,
+        "waterTemp": 203,
+        "brewTime": 160,
+        "finalWeight": 294.7,
+        "stages": [
+          {
+            "endTime": 30,
+            "endWeight": 62.6
+          },
+          {
+            "endTime": 75,
+            "endWeight": 202.8
+          },
+          {
+            "endTime": 160,
+            "endWeight": 294.7
+          }
+        ],
+        "quality": 2,
+        "tastingNotes": "Muted, Lacks Sweetness",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated decent and tasted muted with a clear lack of sweetness, missing the bright lychee/tropical clarity achieved in earlier exceptional cups. The cup needs higher extraction to bring back sweetness and definition without adding harshness.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.0 to ~4.7–4.8)",
+                "effect": "This should increase sweetness, improve fruit clarity, and add a rounder mouthfeel",
+                "parameter": "Grind / flow",
+                "reasoning": "A slightly finer setting in a previous attempt brought out lychee notes but still lacked sweetness, so a small additional step finer targets more extraction while staying close to the earlier exceptional grind range",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final yield to 305–310g while keeping dose ~20.6g (add ~10–15g to the last pour)",
+                "effect": "This will raise overall extraction and lift sweetness and juiciness while keeping the cup balanced",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew used a lower final weight than the earlier exceptional brews that tasted balanced and clear, so returning closer to that yield should restore sweetness and definition",
+                "confidence": "High"
+              },
+              {
+                "action": "Keep the same stage times but pour the last stage more slowly and evenly (aim for a gentler stream and avoid heavy center pours)",
+                "effect": "This should reduce bypass and improve even extraction, making the cup less muted and more cohesive",
+                "parameter": "Pour structure / agitation",
+                "reasoning": "With the same temperature and similar grind as earlier excellent cups, improving evenness and contact time via a calmer final pour directly addresses muted flavor without changing core parameters",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient contact time from a slightly fast/low-resistance flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "72e25dce-0143-4239-a177-f56a311a835e",
+        "createdAt": "2026-03-20T13:26:09.647Z",
+        "brewMethod": "pour over",
+        "brewerName": "Hario V60",
+        "grinderName": "Fellow Ode Brew Grinder Gen 2",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "5.0",
+        "dosage": 20.4,
+        "waterTemp": 203,
+        "brewTime": 165,
+        "finalWeight": 286,
+        "stages": [
+          {
+            "endTime": 45,
+            "endWeight": 60.9
+          },
+          {
+            "endTime": 75,
+            "endWeight": 219.2
+          },
+          {
+            "endTime": 165,
+            "endWeight": 286
+          }
+        ],
+        "quality": 3,
+        "tastingNotes": "Rounded, Clean Finish",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Excellent with a rounded cup and clean finish, but it still left some sweetness and tropical/lychee intensity on the table. The goal is to keep the clean finish while nudging extraction and concentration slightly upward for a more vivid, balanced cup.",
+            "suggestions": [
+              {
+                "action": "Grind finer by 0.2–0.3 on the Ode Gen 2 (from 5.0 to ~4.7–4.8)",
+                "effect": "This should increase sweetness, deepen tropical fruit character, and add a touch more body while keeping the finish clean",
+                "parameter": "Grind / flow",
+                "reasoning": "Earlier attempts that tasted muted/flat at similar temperature and ratio point to needing a small extraction bump, and the baseline brew’s timing leaves room to slow the drawdown slightly without pushing bitterness",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight by 6–10g (keep dose ~20.4g; target ~276–280g total)",
+                "effect": "This will increase perceived sweetness and intensity and make the lychee note pop more without adding harshness",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew is already clean and rounded, so a small tightening of ratio is the lowest-risk way to add concentration and balance without changing the overall profile",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "slightly under-extracted due to slightly low contact time/strength at the current flow"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind finer",
+            "confidence": "Medium"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "b88387f8-320b-49d1-8628-c05bc370fd62",
+    "coffee": {
+      "name": "Jitterfree Delight (Decaf)",
+      "roaster": "Frequent Coffee",
+      "region": "Ethiopia",
+      "roastLevel": "Medium",
+      "notes": "milk chocolate, cane sugar, jasmine"
+    },
+    "brews": [
+      {
+        "id": "ea3db1e1-4f10-4f79-9fb2-3181a150755e",
+        "createdAt": "2026-02-11T23:35:21.427Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "24",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 30,
+        "finalWeight": 32,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "5eee2971-2188-4b70-b479-389baf5b0199",
+        "createdAt": "2026-03-16T00:20:25.565Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "24.25",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 30,
+        "finalWeight": 34,
+        "tastingNotes": "",
+        "suggestion": null
+      }
+    ]
+  },
+  {
+    "coffeeId": "5773d9f9-a11a-4739-9a70-fee7288cb130",
+    "coffee": {
+      "name": "4\" x 6\" Espresso Blend",
+      "roaster": "Frame Coffee Roasters",
+      "region": "Brazil, Ethiopia",
+      "roastLevel": "Medium",
+      "notes": "Milk Chocolate, Vanilla, Sugarcane"
+    },
+    "brews": [
+      {
+        "id": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+        "createdAt": "2026-03-05T15:38:26.656Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "24",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 40,
+        "finalWeight": 32,
+        "quality": 1,
+        "tastingNotes": "Bitter, Burnt, Harsh",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew tasted bitter, burnt, and harsh with a 40s shot to 32g from 18.1g, indicating an overly aggressive extraction that lost sweetness and balance.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by ~0.5–1.0 on the Niche Zero (move from 24 to ~24.5–25)",
+                "effect": "This should reduce bitterness/harshness and bring back milk-chocolate sweetness with a cleaner finish",
+                "parameter": "Grind setting",
+                "reasoning": "The baseline brew ran very long (40s) at a modest yield, so opening the grind is the smallest change to speed flow and reduce extraction intensity",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Reduce final weight to 28–30g while keeping dose ~18.0g",
+                "effect": "This will cut burnt/bitter tail flavors and increase perceived sweetness and roundness",
+                "parameter": "Final weight (yield)",
+                "reasoning": "With harsh bitterness already present, shortening the ratio trims late-extraction compounds that dominate the finish in slow shots",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 2°F (to ~198°F)",
+                "effect": "This should soften roastiness and harsh edges while preserving chocolate/vanilla notes",
+                "parameter": "Water temperature",
+                "reasoning": "The baseline brew presents burnt/harsh character, and a small temperature drop reduces extraction aggressiveness without changing dose or workflow",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to slow flow"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Grind coarser",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "6d3629e4-c2fd-4171-b65f-55aad04dbcbf",
+        "createdAt": "2026-03-08T17:02:42.191Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "24",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 42,
+        "finalWeight": 33,
+        "quality": 2,
+        "tastingNotes": "Dry, Bitter, Heavy",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with dry, bitter, heavy notes; it lacked sweetness and clarity and finished harsh. The shot ran long (42s) at a tight ratio (18.1g in, 33g out), pushing extraction toward bitterness and dryness.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by ~0.5–1.0 on the Niche Zero to target ~28–32s for 33g out",
+                "effect": "This should reduce bitterness and dryness while bringing back sweetness and a cleaner finish",
+                "parameter": "Grind / flow",
+                "reasoning": "Two recent attempts at the same grind setting produced very long shot times (40–42s) with bitter/burnt/dry notes, so increasing flow is the most direct fix",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight to 36–38g while keeping dose at 18.1g (keep time in the ~28–32s window after the grind change)",
+                "effect": "This will lighten the heavy texture and improve balance, making chocolate/vanilla notes read sweeter instead of harsh",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew was heavy and dry at 33g out, and a slightly longer ratio can round the cup once flow is corrected without relying on higher extraction intensity",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 1–2°F (to ~198–199°F) if bitterness persists after fixing flow",
+                "effect": "This should soften harsh/burnt edges and make the finish smoother without thinning the shot too much",
+                "parameter": "Water temperature",
+                "reasoning": "Both recent shots were bitter/harsh at 199.9°F, so a small temperature reduction is a controlled way to reduce roast-driven bitterness after the main flow issue is addressed",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to restricted flow (too fine/slow shot at a tight ratio)"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Grind coarser",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "010fbd26-00a8-410a-bb51-3751ded82a29",
+        "createdAt": "2026-03-09T14:24:38.510Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "25.5",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 38,
+        "finalWeight": 33.1,
+        "quality": 1,
+        "tastingNotes": "Bitter, Harsh, Drying",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew rated Bad with bitter, harsh, drying notes and a heavy finish, missing sweetness and roundness. The shot is being pushed into astringent over-extraction at a long contact time for the given yield.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by +0.7 to +1.2 on the Niche Zero (e.g., 25.5 → 26.2–26.7) to bring the shot to ~28–32s at the same dose and yield",
+                "effect": "This should reduce bitterness/astringency and bring back milk-chocolate sweetness with a smoother finish",
+                "parameter": "Grind setting",
+                "reasoning": "Across previous attempts at the same ratio and temperature, longer times tracked with bitter/drying outcomes, so reducing contact time is the most direct fix",
+                "confidence": "High"
+              },
+              {
+                "action": "Increase final weight to 36–38g while keeping dose ~18.1g (aim ~1:2.0–1:2.1) and stop the shot at first signs of blonding",
+                "effect": "This will lighten the heavy/drying finish and improve balance by shifting the cup toward sweeter, more rounded flavors",
+                "parameter": "Final weight (yield)",
+                "reasoning": "All recorded shots are clustered at a tight ~1:1.8 ratio with persistent bitterness/harshness, so a slightly longer ratio is a non-redundant lever to improve balance without raising extraction intensity",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 2°F (199.9°F → ~198°F) after adjusting grind, keeping dose and yield targets the same",
+                "effect": "This should soften harsh/burnt edges and reduce drying astringency while preserving chocolate/vanilla notes",
+                "parameter": "Water temperature",
+                "reasoning": "With repeated bitter/harsh results at 199.9°F, a small temperature drop can reduce extraction aggressiveness once flow is brought back into range",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time at a tight ratio"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Grind coarser",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "56ce9cc3-e8c7-4ffa-8403-bcc388ec6cd5",
+        "createdAt": "2026-03-10T14:28:07.031Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "26.2",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 27,
+        "finalWeight": 33.3,
+        "quality": 1,
+        "tastingNotes": "Watery, Weak, Drying, Hollow",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew rated Bad with watery, weak, drying, hollow notes and lacked sweetness, body, and finish.",
+            "suggestions": [
+              {
+                "action": "Grind finer by ~0.7–1.0 on the Niche Zero (e.g., 26.2 → 25.2–25.5) and target 33g in 32–36s",
+                "effect": "This should increase body, sweetness, and chocolate/vanilla clarity while reducing the hollow, watery finish",
+                "parameter": "Grind setting",
+                "reasoning": "Previous attempts at the same dose/yield showed that slower shots in the ~38–42s range moved away from watery/weak and toward fuller extraction, so the baseline needs a moderate tightening of flow rather than staying this fast",
+                "confidence": "High"
+              },
+              {
+                "action": "Reduce final weight to 30–31g (keep 18.1g dose) while keeping time in the 30–36s window",
+                "effect": "This will increase concentration and perceived sweetness, making the cup rounder and less thin/drying",
+                "parameter": "Final weight / ratio",
+                "reasoning": "With the baseline already reading watery at a 33g yield, a slightly shorter ratio boosts strength without pushing the harsher bitterness seen when shots ran very long",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "under-extracted due to fast flow"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Grind finer",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "b312388d-7f17-44d2-a3c1-180fbf3a10f1",
+        "createdAt": "2026-03-11T14:32:42.030Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "26.2",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 31,
+        "finalWeight": 33.1,
+        "quality": 2,
+        "tastingNotes": "Muted, Flat, Hollow",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent but tasted muted, flat, and hollow, missing sweetness, clarity, and a satisfying body. The shot is under-extracted from too little dissolved coffee at the current ratio and flow profile.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 30–31g (keep dose 18.1g) while holding time around 30–32s",
+                "effect": "This should increase sweetness, body, and chocolate/vanilla intensity while reducing the hollow, watery impression",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Previous attempts at the same yield swung between watery/weak when faster and bitter/harsh when slower, so tightening the ratio is the cleanest way to add concentration without pushing extraction harsher",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind finer by ~0.3–0.5 on the Niche Zero, then re-target 30–31g in 30–33s",
+                "effect": "This will increase extraction and texture, filling in the mid-palate and reducing flatness",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "Earlier finer settings increased time but tipped into bitter/drying at the same yield, so a smaller step paired with a slightly shorter yield raises extraction more safely",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase water temperature by 1.5–2.5°F (to ~201.5–202.5°F)",
+                "effect": "This should lift sweetness and aromatics and make the cup feel less muted without adding heaviness",
+                "parameter": "Water temperature",
+                "reasoning": "All recorded shots were held at 199.9°F, and the baseline’s muted/hollow profile benefits from a small extraction boost without repeating the large grind/time pushes that became harsh",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient extraction yield at the current ratio"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Reduce final weight",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "89ecc14a-7c3d-4adf-9018-dfdb1cb19e05",
+        "createdAt": "2026-03-12T14:08:46.821Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "26",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 32,
+        "finalWeight": 30.5,
+        "quality": 2,
+        "tastingNotes": "",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent but came across muted and not fully expressive, with sweetness and roundness not showing clearly. The shot is running relatively tight at a 1:1.7 ratio, limiting clarity and balance for this medium espresso blend.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 33–34g while keeping grind at 26 and dose at 18.1g",
+                "effect": "This should increase sweetness, open up chocolate/vanilla notes, and reduce the muted/hollow impression",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Previous attempts at similar grind and temperature tasted flat/hollow at higher yields when the shot ran faster, so holding grind steady and extending yield targets more extraction without introducing the watery weakness seen with quicker flows",
+                "confidence": "High"
+              },
+              {
+                "action": "If the longer yield tastes thin, grind finer by ~0.2–0.4 on the Niche Zero and keep the 33–34g yield target",
+                "effect": "This will increase body and intensity and reduce any watery/weak character while keeping sweetness",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "Earlier faster shots at similar yield were described as watery/weak, so a small finer move supports the higher yield by slowing flow and raising extraction concentration",
+                "confidence": "Medium"
+              },
+              {
+                "action": "If the shot is still muted after the yield change, increase water temperature by 1–2°F (to ~201–202°F)",
+                "effect": "This should lift aromatics and sweetness and make the cup feel more rounded",
+                "parameter": "Water temperature",
+                "reasoning": "Temperature has been held constant across all attempts, so a small increase is the cleanest next lever to add extraction once ratio and flow are in a better place",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient yield (too short a ratio)"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Increase yield",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "a2419a20-48c7-4bfa-9ffd-46481ab5aa0c",
+        "createdAt": "2026-03-13T14:39:55.470Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "26.1",
+        "dosage": 18.1,
+        "waterTemp": 199.9,
+        "brewTime": 38,
+        "finalWeight": 34.2,
+        "quality": 1,
+        "tastingNotes": "Unbalanced",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Bad with an unbalanced cup at 18.1g in, 34.2g out over 38s, missing sweetness and cohesion. The shot is being pushed into a harsh, drying zone by too much extraction for the yield.",
+            "suggestions": [
+              {
+                "action": "Grind coarser by ~0.4–0.6 on the Niche Zero to target ~30–32s at the same 34g yield",
+                "effect": "This should increase sweetness, reduce dryness/bitterness, and make the cup feel more balanced",
+                "parameter": "Grind / flow",
+                "reasoning": "Across previous attempts, longer shots in the ~38–42s range repeatedly tasted bitter/harsh/drying while the ~31–32s range was the most drinkable, so bringing the baseline brew’s time down addresses the same failure mode directly",
+                "confidence": "High"
+              },
+              {
+                "action": "Reduce final weight to 32.0–33.0g (keep dose 18.1g) while holding time ~30–32s",
+                "effect": "This will add body and chocolate/vanilla intensity and reduce hollow, watery impressions",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier shots at similar dose and temperature that landed closer to ~32–33g avoided the weakest/wateriest outcomes seen when yield drifted higher without improving balance",
+                "confidence": "Medium"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive contact time"
+          },
+          "concise": {
+            "goal": "Increase sweetness",
+            "action": "Grind coarser",
+            "confidence": "High"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "coffeeId": "f868bd7b-fa19-4e87-9d1d-5b3b60a64446",
+    "coffee": {
+      "name": "Peru Cajamara (Washed)",
+      "roaster": "Flat Track",
+      "region": "Peru",
+      "notes": "caramel, raw sugar, orange"
+    },
+    "brews": [
+      {
+        "id": "09ac23da-f55c-49db-84c8-907a3f28b3fb",
+        "createdAt": "2026-02-11T15:23:21.841Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "19",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 25,
+        "finalWeight": 31.7,
+        "quality": 2,
+        "tastingNotes": "Thin, Dry",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with thin, dry tasting notes, missing sweetness and body. The shot finished at a relatively tight ratio (18.2g in to 31.7g out) in 25s, pointing to insufficient dissolved solids for a round, caramel-forward cup.",
+            "suggestions": [
+              {
+                "action": "Increase final weight to 36–38g (keep dose 18.2g) while holding time ~25–30s",
+                "effect": "This should increase body and sweetness and reduce the dry finish by pulling more caramel/raw sugar character into the cup",
+                "parameter": "Final weight / ratio",
+                "reasoning": "The baseline brew presented thin and dry at a 1:1.74 ratio, so extending yield is the smallest change that directly targets more solubles without reworking the whole recipe",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Grind slightly finer by ~0.3–0.5 on the Niche Zero to keep the longer yield from running too fast",
+                "effect": "This will add viscosity and balance, helping the longer shot stay sweet instead of turning watery",
+                "parameter": "Grind setting",
+                "reasoning": "If you increase yield from the baseline brew without tightening flow, the shot can thin out further, so a small grind tweak stabilizes extraction at the new ratio",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Increase water temperature by 1–2°F (to ~201–202°F)",
+                "effect": "This should improve sweetness and roundness and soften the dry impression without pushing harshness",
+                "parameter": "Water temperature",
+                "reasoning": "With the baseline brew reading thin/dry, a small temperature bump is a controlled way to increase extraction once ratio and flow are in a better range",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "under-extracted due to insufficient yield"
+          },
+          "concise": {
+            "goal": "Increase body",
+            "action": "Increase yield",
+            "confidence": "Medium"
+          }
+        }
+      },
+      {
+        "id": "3ccb8d3e-249f-472f-b00e-e23c77407322",
+        "createdAt": "2026-02-12T14:38:19.201Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "19",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 26,
+        "finalWeight": 35.9,
+        "quality": 2,
+        "tastingNotes": "Dry, Bitter",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with a dry, bitter finish and lacked sweetness and roundness. The shot is presenting as over-extracted at the current ratio and flow profile.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 32–33g (keep 18.2g dose) while holding 25–28s",
+                "effect": "This should reduce bitterness and dryness while increasing perceived sweetness and balance",
+                "parameter": "Final weight / ratio",
+                "reasoning": "A previous attempt at the same grind and temperature with a lower yield tasted thinner and dry, while the baseline’s higher yield pushed into bitter/dry, so tightening the yield targets the over-extracted finish without changing the whole flow profile",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind slightly coarser by ~0.3–0.5 on the Niche Zero, then re-hit 32–33g in 25–28s",
+                "effect": "This will soften the harsh, drying finish and make the cup feel rounder at the same ratio",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "With the baseline already tasting bitter/dry at a longer yield, a small coarsening reduces extraction intensity while keeping the shot time in a controlled range",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Lower water temperature by 1–2°F (to ~198–199°F) after dialing yield to 32–33g",
+                "effect": "This should further reduce bitterness and bring out more caramel/raw sugar sweetness",
+                "parameter": "Water temperature",
+                "reasoning": "At ~200°F the baseline presents bitter/dry, and a small temperature drop is a minimal lever to reduce extraction harshness once ratio is corrected",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive yield"
+          },
+          "concise": {
+            "goal": "Reduce bitterness",
+            "action": "Reduce yield",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "e112dc88-13de-4cd8-952b-323c480d7a27",
+        "createdAt": "2026-02-16T15:31:10.398Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.9",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 27,
+        "finalWeight": 33,
+        "quality": null,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "ed12fef6-106c-43d3-95b1-48f850482117",
+        "createdAt": "2026-02-17T15:35:03.339Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.9",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 28,
+        "finalWeight": 31,
+        "quality": null,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "f96f25f4-921a-4297-9861-20b2c7f26086",
+        "createdAt": "2026-02-19T15:10:02.246Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.5",
+        "dosage": 18.2,
+        "waterTemp": 198.1,
+        "brewTime": 30,
+        "finalWeight": 33.1,
+        "quality": null,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "15d6d221-ff58-4346-9e76-e286e4e359d1",
+        "createdAt": "2026-02-23T15:25:57.041Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.5",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 29,
+        "finalWeight": 33.1,
+        "quality": 2,
+        "tastingNotes": "Rounded, Syrupy, Drying",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was decent with a rounded, syrupy shot but finished drying, muting sweetness and clarity. What’s missing is a cleaner, sweeter finish that better supports the caramel/raw sugar and orange notes.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 30–31g (keep 18.2g dose) while holding time ~28–30s",
+                "effect": "This should reduce dryness/bitterness and make sweetness and orange acidity pop with a cleaner finish",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Earlier attempts at similar grind and temperature showed more dryness as yield pushed higher, and the baseline already reads syrupy so tightening the ratio is the most direct way to clean up the finish",
+                "confidence": "High"
+              },
+              {
+                "action": "Grind slightly coarser by ~0.3–0.5 on the Niche Zero, then re-hit 30–31g in ~27–29s",
+                "effect": "This will soften the drying finish and improve clarity while keeping body intact",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "With the baseline already landing near 29s at a moderate ratio, a small coarsening reduces late-stage extraction that presents as drying without requiring a big recipe change",
+                "confidence": "Medium"
+              },
+              {
+                "action": "Add a 3–5s low-flow pre-infusion (or gentle line-pressure soak) before full pressure, keeping the same dose and target yield",
+                "effect": "This should make the shot more even and reduce astringent dryness while preserving syrupy texture",
+                "parameter": "Puck preparation",
+                "reasoning": "Drying astringency can come from uneven extraction even when time and ratio look reasonable, and this is a low-risk way to improve uniformity without redoing the whole recipe",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted finish due to excessive contact time at the current ratio"
+          },
+          "concise": {
+            "goal": "Reduce dryness",
+            "action": "Shorten ratio",
+            "confidence": "High"
+          }
+        }
+      },
+      {
+        "id": "f24fb7a8-0e7c-4291-8618-01d576c7e0d9",
+        "createdAt": "2026-02-24T14:21:34.437Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.8",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 27,
+        "finalWeight": 32.7,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "ad923550-6901-4b61-a04e-787216031074",
+        "createdAt": "2026-02-25T14:22:04.492Z",
+        "brewMethod": "espresso",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.8",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 25,
+        "finalWeight": 33.2,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "1690b83e-7d0f-4a5c-a674-43fe4f96e452",
+        "createdAt": "2026-02-26T14:22:37.537Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.6",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 25,
+        "finalWeight": 32.3,
+        "tastingNotes": "",
+        "suggestion": null
+      },
+      {
+        "id": "8045c525-d203-463b-b77b-fd206eb71435",
+        "createdAt": "2026-03-02T15:17:42.598Z",
+        "brewMethod": "espresso",
+        "brewerName": "La Marzocco Linea Mini",
+        "grinderName": "Niche Zero",
+        "coffeeTemperature": "frozen",
+        "grindSetting": "18.6",
+        "dosage": 18.2,
+        "waterTemp": 199.9,
+        "brewTime": 28,
+        "finalWeight": 32.8,
+        "quality": 2,
+        "tastingNotes": "Rounded, Dry, Sweet",
+        "suggestion": {
+          "full": {
+            "summary": "The baseline brew was rated Decent with a rounded, sweet cup but finished dry, muting the caramel/raw sugar balance and limiting the orange clarity.",
+            "suggestions": [
+              {
+                "action": "Reduce final weight to 30.0–31.0g while keeping 18.2g dose and aiming for ~28s",
+                "effect": "This should reduce dryness/astringency and make sweetness feel rounder while letting the orange note read cleaner",
+                "parameter": "Final weight / ratio",
+                "reasoning": "Your shots have clustered around ~32–33g and the ones you described as drying were in that same yield range, so shortening the ratio is the smallest direct lever to pull back the drying finish",
+                "confidence": "Medium"
+              },
+              {
+                "action": "If the shorter yield finishes before 26s, grind finer by ~0.3–0.5 on the Niche Zero to bring it back to ~28–30s",
+                "effect": "This will restore body and sweetness at the shorter ratio without bringing back a papery/drying finish",
+                "parameter": "Grind / flow behavior",
+                "reasoning": "When you change yield, flow rate often shifts; using a tiny Niche adjustment to keep time in the same band preserves extraction balance while you evaluate the ratio change",
+                "confidence": "Low"
+              }
+            ],
+            "primaryIssue": "over-extracted due to excessive dryness/astringency"
+          },
+          "concise": {
+            "goal": "Reduce dryness",
+            "action": "Reduce yield",
+            "confidence": "Medium"
+          }
+        }
+      }
+    ]
+  }
+]
