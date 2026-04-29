@@ -1,4 +1,4 @@
-import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2, FileText } from 'lucide-react';
+import { Calendar, Coffee, Droplet, Clock, Scale, Settings, ListOrdered, Thermometer, Gauge, Weight, User, MoreVertical, RotateCcw, Trash2, FileText, Sparkles, Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { formatTime, formatExtractionTime } from './TimeInput';
@@ -69,14 +69,16 @@ interface BrewDetailProps {
   scrollToGuidance?: boolean;
   onScrollComplete?: () => void;
   onViewGuidancePrompt?: (brew: Brew) => Promise<{ systemMessage: string; userPrompt: string }>;
+  onRegenerateGuidance?: (brew: Brew) => Promise<void>;
 }
 
-export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext, scrollToGuidance, onScrollComplete, onViewGuidancePrompt }: BrewDetailProps) {
+export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDeleteBrew, onNavigatePrev, onNavigateNext, hasPrev, hasNext, scrollToGuidance, onScrollComplete, onViewGuidancePrompt, onRegenerateGuidance }: BrewDetailProps) {
   const guidanceRef = useRef<HTMLDivElement>(null);
   const hasScrolledRef = useRef(false);
   const [showGuidancePrompt, setShowGuidancePrompt] = useState(false);
   const [guidancePromptData, setGuidancePromptData] = useState<{ systemMessage: string; userPrompt: string } | null>(null);
   const [loadingPrompt, setLoadingPrompt] = useState(false);
+  const [regeneratingGuidance, setRegeneratingGuidance] = useState(false);
 
   // Scroll to guidance section
   const scrollToGuidanceSection = (element: HTMLDivElement) => {
@@ -232,6 +234,27 @@ export function BrewDetail({ brew, users, onClose, onEdit, onDuplicateBrew, onDe
           <DropdownMenuItem onSelect={() => onDuplicateBrew(brew)} className="cursor-pointer">
             <RotateCcw className="w-4 h-4" />
             Brew From This
+          </DropdownMenuItem>
+        )}
+        {onRegenerateGuidance && (
+          <DropdownMenuItem
+            onSelect={(e) => {
+              if (regeneratingGuidance) {
+                e.preventDefault();
+                return;
+              }
+              setRegeneratingGuidance(true);
+              onRegenerateGuidance(brew).finally(() => setRegeneratingGuidance(false));
+            }}
+            disabled={regeneratingGuidance}
+            className="cursor-pointer"
+          >
+            {regeneratingGuidance ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
+            {regeneratingGuidance ? 'Regenerating…' : 'Regenerate Guidance'}
           </DropdownMenuItem>
         )}
         {onViewGuidancePrompt && (

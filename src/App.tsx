@@ -1815,6 +1815,27 @@ export default function App() {
               if (!response.ok) throw new Error(`API error: ${response.status}`);
               return await response.json();
             } : undefined}
+            onRegenerateGuidance={currentUser?.email === ADMIN_EMAIL ? async (brew) => {
+              try {
+                const authToken = await getAccessToken() || accessToken;
+                if (!authToken) throw new Error('Not authenticated');
+                const res = await fetch(`${apiUrl}/brews/${brew.id}/regenerate-suggestion`, {
+                  method: 'POST',
+                  headers: { Authorization: `Bearer ${authToken}` },
+                });
+                if (!res.ok) {
+                  const err = await res.json().catch(() => ({}));
+                  throw new Error(err.error || `API error: ${res.status}`);
+                }
+                const updated = await res.json();
+                setBrews((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+                setSelectedBrew(updated);
+                toast.success('Guidance regenerated');
+              } catch (e) {
+                console.error('Failed to regenerate guidance:', e);
+                toast.error(e instanceof Error ? e.message : 'Failed to regenerate guidance');
+              }
+            } : undefined}
             onNavigatePrev={hasPrev ? () => {
               setScrollToGuidance(false);
               setSelectedBrew(navBrews[currentIndex - 1]);

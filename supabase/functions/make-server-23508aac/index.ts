@@ -1148,12 +1148,27 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
       }
     }
     
-    // Regenerate suggestions if quality rating or notes were added/changed
+    // Regenerate suggestions if outcome (quality/notes) OR any recorded brew
+    // parameter changed. Parameter edits represent corrections to the data
+    // that fed the previous diagnosis, so the guidance should follow.
     const qualityChanged = body.quality !== undefined && body.quality !== existing.quality;
     const tastingNotesChanged = body.tastingNotes !== undefined && body.tastingNotes !== existing.tastingNotes;
     const personalNotesChanged = body.personalNotes !== undefined && body.personalNotes !== existing.personalNotes;
-    
-    if (qualityChanged || tastingNotesChanged || personalNotesChanged) {
+    const REGEN_PARAM_KEYS = [
+      'grindSetting',
+      'dosage',
+      'waterTemp',
+      'brewTime',
+      'finalWeight',
+      'coffeeTemperature',
+      'stages',
+      'brewMethod',
+    ] as const;
+    const parameterChanged = REGEN_PARAM_KEYS.some(
+      (k) => body[k] !== undefined && JSON.stringify(body[k]) !== JSON.stringify(existing[k])
+    );
+
+    if (qualityChanged || tastingNotesChanged || personalNotesChanged || parameterChanged) {
       // Check if brew has quality or notes (after update)
       if (updated.quality || updated.tastingNotes || updated.personalNotes) {
         // Check if this is the newest brew for the coffee (scoped to user/household)
@@ -1214,6 +1229,51 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
   } catch (error) {
     console.log('Error updating brew:', error);
     return c.json({ error: 'Failed to update brew' }, 500);
+  }
+});
+
+// Force-regenerate AI guidance for a single brew. Synchronous (waits for
+// OpenAI), unlike the background regeneration on PUT. Returns the updated
+// brew with the new suggestion attached.
+app.post('/make-server-23508aac/brews/:id/regenerate-suggestion', async (c) => {
+  try {
+    const accessToken = c.req.header('Authorization')?.split(' ')[1];
+    const user = await getUser(accessToken);
+    if (!user) {
+      return c.json({ error: 'Unauthorized - please sign in to regenerate guidance' }, 401);
+    }
+
+    const id = c.req.param('id');
+    const existing = await kv.get(`brew:${id}`);
+    if (!existing) {
+      return c.json({ error: 'Brew not found' }, 404);
+    }
+
+    const householdMemberIds = await getHouseholdMemberIds(user.id);
+    if (!existing.userId || !householdMemberIds.includes(existing.userId)) {
+      return c.json({ error: 'Forbidden - brew does not belong to your household' }, 403);
+    }
+
+    const brewUserId = existing.userId || user.id;
+    const suggestions = await generateBrewSuggestions(id, brewUserId);
+    if (!suggestions) {
+      return c.json({ error: 'Failed to generate suggestions' }, 500);
+    }
+
+    // Re-fetch to avoid clobbering any concurrent write
+    const fresh = await kv.get(`brew:${id}`);
+    if (!fresh) {
+      return c.json({ error: 'Brew disappeared during regeneration' }, 500);
+    }
+    const updated = {
+      ...fresh,
+      suggestion: { concise: suggestions.concise, full: suggestions.full },
+    };
+    await kv.set(`brew:${id}`, updated);
+    return c.json(updated);
+  } catch (error) {
+    console.log('Error regenerating suggestion:', error);
+    return c.json({ error: 'Failed to regenerate suggestion' }, 500);
   }
 });
 
