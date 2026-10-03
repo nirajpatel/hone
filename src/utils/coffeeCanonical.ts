@@ -62,6 +62,19 @@ export function resolveCanonicalCoffee(
   };
 }
 
+const ROASTER_SUFFIX = /(\s+(coffee|coffees|roasters|roastery|roasting|roasting co|co|company|&))+$/;
+
+/** Roaster key that ignores case, punctuation and trailing "Coffee", "Roasters", "Co." etc. */
+export function looseRoasterKey(s: string): string {
+  const base = normalizeCoffeeKey(s).replace(/[.,'’]/g, '').replace(/\s+/g, ' ');
+  return base.replace(ROASTER_SUFFIX, '').trim() || base;
+}
+
+/** Coffee name key that ignores case, punctuation and spacing (but not words). */
+export function looseNameKey(s: string): string {
+  return normalizeCoffeeKey(s).replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+}
+
 /** Stable key for grouping / cache: normalized canonical roaster and coffee name. */
 export function canonicalCoffeeKey(
   roaster: string,

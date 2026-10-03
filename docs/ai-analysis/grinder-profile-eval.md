@@ -1,0 +1,31 @@
+# Grinder profile eval
+
+Generated 2026-10-03 22:10 UTC · 10 grinders × 2 runs · `gpt-6.1-sol` · profile v2 · answer key `scripts/fixtures/grinder-profiles.json` (hand-verified against the sources listed there).
+
+- Runs fully correct: 19/20
+- Direction correct: 20/20
+- Grinders correct on every run: 9/10; same direction across runs: 10/10
+- Median latency 19s, 2.8 searches per run
+
+| Grinder | Run | Result | Prompt line |
+|---|---|---|---|
+| Niche Zero | 1 | ✓ | Niche Zero: higher numbers are coarser. Stepless dial printed 0–50, with no clicks between marks; write settings as numbers, including fractions, e.g. 15.5. |
+| Niche Zero | 2 | ✓ | Niche Zero: higher numbers are coarser. Stepless dial printed 0–50, with no clicks; fractional settings are valid, e.g. 15.5. Higher numbers mean coarser grinds. |
+| Fellow Ode Brew Grinder Gen 2 | 1 | ✓ | Fellow Ode Brew Grinder Gen 2: higher numbers are coarser. Dial numbered 1–11, with two intermediate click positions between adjacent numbers (31 settings total). Write intermediate settings as N.1 or N.2, meaning one or two clicks above N—not decimal fractions; for example, 3.2. |
+| Fellow Ode Brew Grinder Gen 2 | 2 | ✓ | Fellow Ode Brew Grinder Gen 2: higher numbers are coarser. Dial printed 1–11, with two intermediate clicks between adjacent numbers (31 positions total); 1 is finest and 11 coarsest. Write intermediate settings as.1 or.2 after the printed number, e.g. 3.2 means the second click above 3, not a decimal fraction. |
+| Kinu M47 Phoenix Manual | 1 | ✓ | Kinu M47 Phoenix Manual: higher numbers are coarser. Stepless dial numbered 0–9 with four intermediate marks between adjacent numbers (50 divisions per revolution), allowing settings between marks. Record full revolutions from burr zero, dial number, and intermediate division as R.N.D; for example, 3.2.0 means three full revolutions plus dial number 2 and zero additional divisions. |
+| Kinu M47 Phoenix Manual | 2 | ✓ | Kinu M47 Phoenix Manual: higher numbers are coarser. Stepless dial numbered 0–9, with five subdivisions per numbered interval (50 per revolution); settings count full revolutions from burr zero plus the dial number and subdivision. Write, for example, 1.4.0: one full revolution, dial 4, subdivision 0; larger values mean coarser. |
+| Baratza Encore | 1 | ✓ | Baratza Encore: higher numbers are coarser. Numbered scale with 40 discrete settings, 1 (finest) through 40 (coarsest), with one click per integer setting and no intermediate clicks; write a whole number, e.g. 15. |
+| Baratza Encore | 2 | ✓ | Baratza Encore: higher numbers are coarser. Numbered scale 1–40 with 40 discrete settings, one click per integer and no fractional settings; 1 is finest and 40 is coarsest. Write a single integer, e.g. 15. |
+| Baratza Vario+ | 1 | ✓ | Baratza Vario+: higher numbers are coarser. Stepped macro scale 1–10 plus 22 lettered micro positions A–V; A is finest, and higher numbers or later letters are coarser. Write the macro number followed by the micro letter, e.g. 2Q; twelve micro clicks equal one macro click. |
+| Baratza Vario+ | 2 | missing micro A–V; has A–W (original Vario) | Baratza Vario+: higher numbers are coarser. Stepped macro scale 1–10 and micro scale A–W, with one click per numbered or lettered position (no fractional settings); A is the finest letter, and higher numbers or later letters are coarser. Write the macro number followed by the micro letter, e.g. 2Q. |
+| Breville Barista Express | 1 | ✓ | Breville Barista Express: higher numbers are coarser. The Barista Express (BES870) built-in grinder has a numbered 1–16 external grind-size dial with discrete settings, not a stepless scale; write an integer setting, e.g. 5. Lower numbers are finer; no letters or revolution counts are needed. |
+| Breville Barista Express | 2 | ✓ | Breville Barista Express: higher numbers are coarser. The built-in grinder’s external dial has 16 stepped settings numbered 1–16, with 1 finest; write an integer setting, e.g. 5. |
+| Zerno Z1 | 1 | ✓ | Zerno Z1: higher numbers are coarser. Stepless dial graduated in microns (µm), with a 0–1400 µm adjustment range; settings between marks are valid. Write the micron value, e.g. 200 µm. |
+| Zerno Z1 | 2 | ✓ | Zerno Z1: higher numbers are coarser. Stepless dial graduated in microns (µm), with a manufacturer-stated adjustment range of 0–1400 µm; settings between marks are valid, with no clicks. Write the micron value, e.g. 200 µm. |
+| Breville Barista Touch | 1 | ✓ | Breville Barista Touch: higher numbers are coarser. The built-in grinder uses numbered grind-size settings 1–30, shown on the touchscreen, with 1 finest and 30 coarsest; write an integer setting, e.g. 14. Breville documents 30 grind levels; sources conflict about adjustment between numbered levels, so fractional targets are not established. |
+| Breville Barista Touch | 2 | ✓ | Breville Barista Touch: higher numbers are coarser. The built-in grinder uses 30 discrete, whole-number grind-size settings, shown on the touchscreen, from 1 (finest) to 30 (coarsest); each step changes the setting by 1. Write a setting as a plain number, e.g. 14, without letters or revolution counts. |
+| Turin DF64v | 1 | ✓ | Turin DF64v: higher numbers are coarser. Stepless numbered dial spanning 0–90, with continuous adjustment between marks rather than clicks; write a numeric setting, e.g. 20 or 20.5. |
+| Turin DF64v | 2 | ✓ | Turin DF64v: higher numbers are coarser. Stepless numbered dial printed 0–90, with continuous adjustment between marks; write settings as numbers, including fractions, e.g. 20.5. |
+| Lagom Mini 2 | 1 | ✓ | Lagom Mini 2: higher numbers are coarser. Stepless, unnumbered collar with 10 large dots per revolution and four small dots between each pair; fractional positions are valid. Record large-dot intervals from your grinder’s burr zero, including full revolutions when needed, e.g. 15 large dots from zero (1 revolution + 5 large-dot intervals). |
+| Lagom Mini 2 | 2 | ✓ | Lagom Mini 2: higher numbers are coarser. Stepless, unnumbered dot scale with 10 large dots per revolution; record the cumulative number of large-dot intervals from burr-lock zero, including fractions between marks. For example, +15 from zero means 1.5 revolutions from zero. |

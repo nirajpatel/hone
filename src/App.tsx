@@ -1752,61 +1752,20 @@ export default function App() {
               setDeletingBrewId(id);
             }}
             onViewGuidancePrompt={currentUser?.email === ADMIN_EMAIL ? async (brew) => {
-              const coffee = coffees.find(c => c.id === brew.coffeeId);
-              if (!coffee) throw new Error('Coffee not found');
-
-              const matchingBrews = brews
-                .filter(b => b.coffeeId === brew.coffeeId && b.brewMethod === brew.brewMethod)
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-              const top10Recent = matchingBrews.slice(0, 10);
-              const top10Ids = new Set(top10Recent.map(b => b.id));
-              const exceptionalBrew = matchingBrews.find(b => b.quality === 3);
-
-              let brewsToSend = [...top10Recent];
-              if (!top10Ids.has(brew.id)) brewsToSend.push(brew);
-              if (exceptionalBrew && !brewsToSend.find(b => b.id === exceptionalBrew.id)) brewsToSend.push(exceptionalBrew);
-              brewsToSend.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
+              const authToken = await getAccessToken() || accessToken;
+              if (!authToken) throw new Error('Not authenticated');
               const response = await fetch(
                 `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/brew-suggestions`,
                 {
                   method: 'POST',
                   headers: {
-                    'Authorization': `Bearer ${publicAnonKey}`,
+                    'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    coffee: {
-                      name: coffee.name,
-                      roaster: coffee.roaster,
-                      notes: coffee.notes,
-                      region: coffee.region,
-                      roastLevel: coffee.roastLevel,
-                    },
-                    brews: brewsToSend.map(b => ({
-                      id: b.id,
-                      grindSetting: b.grindSetting,
-                      dosage: b.dosage,
-                      waterTemp: b.waterTemp,
-                      brewTime: b.brewTime,
-                      finalWeight: b.finalWeight,
-                      quality: b.quality,
-                      tastingNotes: b.tastingNotes,
-                      brewMethod: b.brewMethod,
-                      stages: b.stages,
-                      coffeeTemperature: b.coffeeTemperature,
-                      brewerName: b.brewerName,
-                      grinderName: b.grinderName,
-                      notes: b.personalNotes,
-                      createdAt: b.createdAt,
-                      isBaseline: b.id === brew.id,
-                      isExceptional: exceptionalBrew ? b.id === exceptionalBrew.id : false,
-                    })),
+                    coffeeId: brew.coffeeId,
                     brewMethod: brew.brewMethod,
-                    targetBrewId: brew.id,
-                    brewerName: brew.brewerName,
-                    grinderName: brew.grinderName,
+                    baselineBrewId: brew.id,
                     debugPrompt: true,
                   }),
                 }
@@ -1948,6 +1907,7 @@ export default function App() {
           duplicateData={duplicateCoffeeData}
           onUpdate={handleUpdateCoffee}
           existingCoffees={coffees}
+          aliases={aliases}
         />
       )}
 

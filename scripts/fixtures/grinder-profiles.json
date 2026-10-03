@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Niche Zero",
+    "direction": ["higher-is-coarser"],
+    "facts": { "printed 0–50 scale": "0\\s*[–-]\\s*50", "stepless": "stepless|no clicks" },
+    "forbidden": { "thirds example": "⅓" },
+    "source": "nichecoffee.co.uk product page"
+  },
+  {
+    "name": "Fellow Ode Brew Grinder Gen 2",
+    "direction": ["higher-is-coarser"],
+    "facts": { "dial 1–11": "1\\s*[–-]\\s*11", "thirds between numbers": "⅓|third|31" },
+    "forbidden": {},
+    "source": "fellowproducts.com product page"
+  },
+  {
+    "name": "Kinu M47 Phoenix Manual",
+    "direction": ["higher-is-coarser"],
+    "facts": { "dial 0–9": "0\\s*[–-]\\s*9", "50 marks per revolution": "50", "revolutions counted": "revolution|turn|rotation" },
+    "forbidden": {},
+    "source": "Kinu M47 Phoenix user manual (kinugrinders.de); gear.coffee notation guide"
+  },
+  {
+    "name": "Baratza Encore",
+    "direction": ["higher-is-coarser"],
+    "facts": { "40 settings": "40" },
+    "forbidden": { "fractions allowed": "fractional settings are (fine|valid|allowed)" },
+    "source": "Baratza Encore operating manual"
+  },
+  {
+    "name": "Baratza Vario+",
+    "direction": ["higher-is-coarser"],
+    "facts": { "macro 1–10": "1\\s*[–-]\\s*10", "micro A–V": "A\\s*[–-]\\s*V", "A is finest": "A[^.;]*finest|finest[^.;]*\\bA\\b|later letters[^.;]*coarser|toward V[^.;]*coarser" },
+    "forbidden": { "A–W (original Vario)": "A\\s*[–-]\\s*W" },
+    "source": "Vario+ manual (220 settings, 12 micro clicks = 1 macro); home-barista.com: 1A is finest"
+  },
+  {
+    "name": "Breville Barista Express",
+    "direction": ["higher-is-coarser"],
+    "facts": { "dial 1–16": "1\\s*[–-]\\s*16" },
+    "forbidden": { "thirds example": "⅓" },
+    "source": "BES870 instruction manual"
+  },
+  {
+    "name": "Zerno Z1",
+    "direction": ["higher-is-coarser"],
+    "facts": { "microns": "µm|micron" },
+    "forbidden": {},
+    "source": "store.zerno.co Z1 manual"
+  },
+  {
+    "name": "Breville Barista Touch",
+    "direction": ["higher-is-coarser"],
+    "facts": { "settings 1–30": "\\b1\\b[^.;]{0,25}\\b30\\b" },
+    "forbidden": { "thirds example": "⅓" },
+    "source": "BES880 manual / breville.com setup guide"
+  },
+  {
+    "name": "Turin DF64v",
+    "direction": ["higher-is-coarser"],
+    "facts": { "dial 0–90": "0\\s*[–-]\\s*90", "stepless": "stepless|no clicks" },
+    "forbidden": {},
+    "source": "DF64V manual"
+  },
+  {
+    "name": "Lagom Mini 2",
+    "direction": ["higher-is-coarser", "unknown"],
+    "facts": { "dots, not numbers": "dot", "stepless": "stepless|no clicks" },
+    "forbidden": {},
+    "source": "option-o.com product page; coffeegeek.com first look (unnumbered dots, counted from burr zero)"
+  }
+]

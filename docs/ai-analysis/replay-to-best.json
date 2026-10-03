@@ -1,0 +1,5377 @@
+{
+  "arms": [
+    {
+      "version": "old",
+      "model": "gpt-5.4",
+      "label": "old:gpt-5.4"
+    },
+    {
+      "version": "new",
+      "model": "gpt-5.4",
+      "label": "new:gpt-5.4"
+    },
+    {
+      "version": "new",
+      "model": "gpt-6.1-sol",
+      "label": "new:gpt-6.1-sol"
+    },
+    {
+      "version": "new",
+      "model": "gpt-6-astra",
+      "label": "new:gpt-6-astra"
+    }
+  ],
+  "runs": 2,
+  "effort": "medium",
+  "results": [
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by about 1 click on the Ode Gen 2, moving from 6 to 5 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 18.1,
+            "finalWeight": 281.1,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.0072925,
+      "avgLatencyMs": 6536
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 0.5 to 1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.75,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by about 1.0 on the Niche Zero, moving from 24.75 to around 25.75 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.75,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight] Increase final weight from 32g to 36-38g while keeping dose at 18.1g (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.75,
+            "dosage": 18.1,
+            "finalWeight": 37,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "a2419a20-48c7-4bfa-9ffd-46481ab5aa0c",
+          "towardBest": "farther"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Grind setting] Grind coarser by about 1.0 on the Niche Zero, moving from 25.75 to around 26.75 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 26.75,
+            "dosage": 18.1,
+            "finalWeight": 37,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "a2419a20-48c7-4bfa-9ffd-46481ab5aa0c",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Final weight / ratio] Increase final weight to 40-42g while keeping dose at 18.1g (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 26.75,
+            "dosage": 18.1,
+            "finalWeight": 41,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.036410000000000005,
+      "avgLatencyMs": 5347
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 1 step on the Ode Gen 2, from 6 to 7 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.006136249999999999,
+      "avgLatencyMs": 5181
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 1 full step on the Ode Gen 2, from 7 to 8 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 8,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 204
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0060575,
+      "avgLatencyMs": 5005
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by about 0.3-0.5 on the Ode Gen 2, moving from 5.3 to around 4.8-5.0 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.9,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind finer by about 0.4-0.5 on the Ode Gen 2, moving from 4.9 to around 4.4-4.5 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.45,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer by about 0.4-0.5 on the Ode Gen 2, moving from 4.45 to around 4.0-4.05 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.025,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0227675,
+      "avgLatencyMs": 4900.666666666667
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 0.5 to 1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.75,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3a03ffeb-9d96-4e6e-ba9a-2b8254ac5a61",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight to 34-36g while keeping dose at 18.1g (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.75,
+            "dosage": 18.1,
+            "finalWeight": 35,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "4894019b-effc-401f-8ad5-c04c9e1b8b94",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight to 38-40g while keeping dose at 18.1g (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.75,
+            "dosage": 18.1,
+            "finalWeight": 39,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0218175,
+      "avgLatencyMs": 5235
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 1 full step on the Ode Gen 2, from 5 to 6 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.00673375,
+      "avgLatencyMs": 5155
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Final weight / ratio] Reduce total yield to 255–260g from 18.1g dose, about 1:14.1–1:14.4 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 18.1,
+            "finalWeight": 257.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.02629625,
+      "avgLatencyMs": 28875
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "cap",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by ~0.7 on the Niche Zero and keep dose 18.1–18.3g with the same 32g yield (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.7,
+            "dosage": 18.2,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1.3–1.5 on the Niche Zero and keep 18.2g in / 32g out (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 26.1,
+            "dosage": 18.2,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "56ce9cc3-e8c7-4ffa-8403-bcc388ec6cd5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer by 0.5–0.7 on the Niche Zero to about 25.4–25.6 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.5,
+            "dosage": 18.2,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "farther"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Grind setting] Grind coarser by 0.3-0.4 on the Niche Zero (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.85,
+            "dosage": 18.2,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "closer"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Puck preparation] Add 10-15 seconds of thorough WDT and keep the tamp perfectly level before repeating 18.2g → 32g at the current grind (High)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 25.85,
+            "dosage": 18.2,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "56ce9cc3-e8c7-4ffa-8403-bcc388ec6cd5",
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.14606,
+      "avgLatencyMs": 28665.4
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "cap",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 280-284g total yield (about 1:14.0-1:14.2) (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "99c4de6d-fa8e-4346-8030-423b8df0ef14",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind finer by 2 clicks to about 5.2 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[All parameters] Repeat the baseline brew exactly once at grind 5.2, 282g out, 204°F, and the same pour schedule (Medium)",
+          "kind": "hold",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Pour structure] Match the same checkpoints within ±5g and ±5 sec: 60g by 0:45, 213g by 1:30, finish 282g by 2:55 (High)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Recipe] Repeat grind 5.2, 20g to 282g, 204°F, and the same 0:45 and 1:30 pour checkpoints (High)",
+          "kind": "hold",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        },
+        {
+          "step": 7,
+          "suggestion": "[Recipe] Repeat the baseline brew unchanged and match the same pour checkpoints: 60.5g at 0:45, 213.2g at 1:30, and 282g at 2:55 (High)",
+          "kind": "hold",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        },
+        {
+          "step": 8,
+          "suggestion": "[Recipe] Repeat the baseline brew unchanged and hit 60.5g at 0:45, 213g at 1:30, and 282g by 2:55 (High)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        },
+        {
+          "step": 9,
+          "suggestion": "[Recipe] Repeat the full recipe unchanged: grind 5.2, 20g to 282g, 204°F, finish at 2:55 (High)",
+          "kind": "hold",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        },
+        {
+          "step": 10,
+          "suggestion": "[Recipe] Repeat the exact recipe and pour checkpoints once more (High)",
+          "kind": "hold",
+          "next": {
+            "grindSetting": 5.2,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 3,
+          "matchedId": "e07c59ae-e7b3-4e06-9514-50aecbd75260",
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.23941625,
+      "avgLatencyMs": 26093.666666666668
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower the water temperature to 202°F (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Coarsen from 7 to 8 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 8,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0741525,
+      "avgLatencyMs": 41514.5
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "cap",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.3 on the Ode, from 5.3 to 5.0, and keep the same pour structure (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight to 280g from 20g dose (1:14.0) (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer by 0.6 on the Ode to 4.4 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.4,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "d02fe2bd-f389-4a42-95b1-65c020aa8a4f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Grind setting] Grind coarser by 0.2–0.3 on the Ode, targeting about 4.6–4.7 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.65,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+          "towardBest": "closer"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Pour structure] Split the larger pulses into smaller 55-65g pours, aiming for about 40g at 0:30, 125g at 1:00, 190g at 1:30, 235g at 1:50, and 280g by 2:20 (Medium)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 4.65,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "d02fe2bd-f389-4a42-95b1-65c020aa8a4f",
+          "towardBest": "same"
+        },
+        {
+          "step": 7,
+          "suggestion": "[Pour structure] Consolidate to 3 pours total: bloom 40g at 0:30, pour to 160g by 0:45, then finish to 280g by 1:10 (High)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 4.65,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+          "towardBest": "same"
+        },
+        {
+          "step": 8,
+          "suggestion": "[Final weight / ratio] Increase final weight to 284g (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.65,
+            "dosage": 20,
+            "finalWeight": 284,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "d02fe2bd-f389-4a42-95b1-65c020aa8a4f",
+          "towardBest": "same"
+        },
+        {
+          "step": 9,
+          "suggestion": "[Pour structure] Consolidate the post-bloom pours into one continuous pour from 0:45 to 1:20, keep the bloom near 40g, and finish at 284g (Medium)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 4.65,
+            "dosage": 20,
+            "finalWeight": 284,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.31607124999999997,
+      "avgLatencyMs": 41273.875
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "reached",
+      "attempts": 4,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "bd33aff2-506a-4ecf-a9d4-dd299d0ae0cc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1.0 on the Niche Zero to about 22.5 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3f2d0cdc-4441-404c-a20a-d64780d0ddd4",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Water temperature] Lower temperature to 198°F (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "ffbbaa67-005c-4cd1-a122-d7af3658c8ab",
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.08227,
+      "avgLatencyMs": 26529.666666666668
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by about 0.5 on the Ode to 4.5, targeting a 3:15–3:30 drawdown (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.5,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "51942746-0801-44e7-b9a1-1ccb33492cfc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 238–241g total yield for 17g coffee (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.5,
+            "dosage": 17,
+            "finalWeight": 239.5,
+            "waterTemp": 199
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0549775,
+      "avgLatencyMs": 26566.5
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by three clicks on the Ode Gen 2, from 6 to 5, keeping dose, final weight, and pouring schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 18.1,
+            "finalWeight": 281.1,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.0107015,
+      "avgLatencyMs": 12253
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting from 24 to 24.5; keep dose at 18.1g, final weight at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 1.0, from 24.5 to 25.5, keeping the 18.1g dose, 32g yield, and 199.9°F temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 2.0, from 25.5 to 27.5, keeping the dose at 18.1g, yield at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 27.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.03130775,
+      "avgLatencyMs": 24165.333333333332
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by two clicks on the Fellow Ode Gen 2, from 6 to 6⅔, keeping dose, final weight, temperature, and pours unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6.666666666666667,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 201°F, keeping dose, final weight, grind and pours unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6.666666666666667,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 6.67 to 6, keeping the 20g dose, 301.9g water and 201°F temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Final cup weight / bypass water] Add 15g of water at 201°F to the finished baseline brew, keeping grind 6, the 20g dose, and 301.9g brewing water unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 316.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Bypass water] Add 30g of warm water directly to the finished coffee after drawdown; keep the 316.9g brewing water, grind 6, 20g dose, and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 346.9,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0603915,
+      "avgLatencyMs": 17493.6
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower water temperature by 1°F to 203°F; keep grind 7, dose 20.2g, and final weight 283.7g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 203
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by three clicks on the Ode Gen 2, from 7 to 8, keeping dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 8,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 203
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0214565,
+      "avgLatencyMs": 26993
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by 2 clicks from 5.3 on the Ode Gen 2, keeping dose, final weight, and temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 268.1g to 280g (1:14), keeping dose at 20g, grind at 5.1, and temperature at 205°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind four clicks finer from 5.1; keep the dose at 20 g, final weight at 280 g, and temperature at 205°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.7,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "d02fe2bd-f389-4a42-95b1-65c020aa8a4f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Final water weight / ratio] Increase final water weight from 280g to 320g (1:16), escalating beyond the previous 12g increase; keep dose at 20g, grind at 4.7, and temperature at 205°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.7,
+            "dosage": 20,
+            "finalWeight": 320,
+            "waterTemp": 205
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.05109925,
+      "avgLatencyMs": 13728.75
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "reached",
+      "attempts": 4,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero, from 21 to 21.5, keeping dose at 18.1g, final weight at 31.1g, and temperature at 201°F for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "bd33aff2-506a-4ecf-a9d4-dd299d0ae0cc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1.0 on the Niche Zero, from 21.5 to 22.5; keep the baseline brew’s 18.1g dose, 31.1g yield, and 201°F temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3f2d0cdc-4441-404c-a20a-d64780d0ddd4",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 198°F, keeping dose at 18.1g, yield at 31.1g, and grind at 22.5 for this comparison (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "ffbbaa67-005c-4cd1-a122-d7af3658c8ab",
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.034753,
+      "avgLatencyMs": 12390
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 5 to 4⅓, keeping dose, final weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.33,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Reduce total brew water from 256.5g to 245g for a 1:14.4 ratio, keeping dose, grind, temperature, and pour timing unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.33,
+            "dosage": 17,
+            "finalWeight": 245,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "5b15dc09-c49f-47fe-a5ae-99f2b00a07a7",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight by 11.5g to 256.5g (1:15.1), keeping the 17g dose, 4.33 grind, and 199°F temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.33,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Water temperature] Increase water temperature from 199°F to 201°F, keeping grind 4.33, dose 17g, and final weight 256.5g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.33,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Grind four clicks finer, from 4.33 to 3.00, keeping the 17 g dose, 256.5 g final weight, and 201°F temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 3,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.05886425,
+      "avgLatencyMs": 18984
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Move the Ode Gen 2 two clicks finer, from 6 to 5⅓, keeping the dose, water amount, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.333333333333333,
+            "dosage": 18.1,
+            "finalWeight": 281.1,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.04629875,
+      "avgLatencyMs": 10650
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 0.5, from 24 to 24.5; keep dose at 18.1g, yield at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting from 24.5 to 25.5 (+1.0 coarser), keeping dose at 18.1g, final weight at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 2 marks, from 25.5 to 27.5, keeping 18.1g dose, 32g yield, and 199.9°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 27.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.14217749999999998,
+      "avgLatencyMs": 9813.333333333334
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Move the Fellow Ode from 6 to 6⅔—two clicks coarser—and keep dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6.67,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Return the Ode Gen 2 from 6.67 to 6, two clicks finer, keeping dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Water temperature] Lower water temperature from 204°F to 201°F, keeping grind 6 and 20g → 301.9g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Bypass water / cup strength] Add 15g of warm water to the finished baseline brew, keeping the brewing recipe unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 316.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Bypass water] Add 30g of warm water directly to the finished baseline brew after drawdown, keeping grind 6, dose, brewing water and temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 346.9,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.26845874999999997,
+      "avgLatencyMs": 11900.2
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower water temperature by 2°F to 202°F, keeping grind 7, dose 20.2g, and final weight 283.7g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Increase the Ode Gen 2 setting from 7 to 7⅔, two clicks coarser, while keeping dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7.666666666666667,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.09789500000000001,
+      "avgLatencyMs": 10877
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 5.3 to 5.1, keeping dose, final weight, and temperature unchanged for the next brew (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 268.1g to 280g for a 1:14 ratio, keeping the 20g dose, grind 5.1, and 205°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer from 5.1 to 4.1, one full numbered interval; keep the dose at 20g, final weight at 280g and temperature at 205°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.1,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.16132375000000002,
+      "avgLatencyMs": 11923.333333333334
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "reached",
+      "attempts": 4,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 0.5, from 21 to 21.5; keep dose at 18.1g, yield at 31.1g, and temperature at 201°F for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "bd33aff2-506a-4ecf-a9d4-dd299d0ae0cc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 1.0, from 21.5 to 22.5, keeping 18.1g in, 31.1g out, and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3f2d0cdc-4441-404c-a20a-d64780d0ddd4",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Water temperature] Lower temperature by 3°F to 198°F, keeping grind 22.5, dose 18.1g and final weight 31.1g unchanged for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "ffbbaa67-005c-4cd1-a122-d7af3658c8ab",
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.16021625,
+      "avgLatencyMs": 12781.666666666666
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Move the Ode Gen 2 two clicks finer, from 5 to 4⅓, keeping the other baseline brew settings unchanged for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Reduce total brew water from 256.5g to 244g (1:14.4), keeping the 17g dose, grind 4⅓, and 199°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 244,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "5b15dc09-c49f-47fe-a5ae-99f2b00a07a7",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight by 12.5g to 256.5g (1:15.1), keeping the 17g dose, grind 4⅓, and 199°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Water temperature] Increase water temperature from 199°F to 201°F, keeping grind 4⅓, dose 17g, final weight 256.5g, and pouring unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Grind finer by four Ode clicks, from 4⅓ to 3, keeping the 17 g dose, 256.5 g water weight, and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 3,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.26539625000000006,
+      "avgLatencyMs": 11181.6
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by about 1 click on the Ode Gen 2, moving from 6 to 5 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 18.1,
+            "finalWeight": 281.1,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.0070625,
+      "avgLatencyMs": 6070
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 1.0 on the Niche Zero, moving from 24 to around 25 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight to 36-38g while keeping dose at 18.1g (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25,
+            "dosage": 18.1,
+            "finalWeight": 37,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.01308,
+      "avgLatencyMs": 4799
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 1 click on the Ode Gen 2, from 6 to 7 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0062275,
+      "avgLatencyMs": 4500
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 1 full step on the Ode, moving from 7 to 8 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 8,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 204
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.006025,
+      "avgLatencyMs": 4489
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by about 0.3-0.5 on the Ode Gen 2, moving from 5.3 to around 4.8-5.0 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.9,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind finer by about 0.4-0.5 on the Ode Gen 2, moving from 4.9 to around 4.4-4.5 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.45,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind coarser by about 0.6 to 0.8 on the Ode, moving from 4.45 to around 5.0 to 5.25 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.125,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "d75b8fdb-2005-4105-bd05-7877dad65923",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Grind setting] Grind finer by about 0.5 to 0.7 on the Ode Gen 2, moving from 5.125 to around 4.4-4.6 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.5,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "c56dc05d-0fff-4e6f-988c-a8b2bcfce28b",
+          "towardBest": "farther"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode Gen 2, moving from 4.5 to about 4.0 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.03648,
+      "avgLatencyMs": 4919.6
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "cap",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 0.5 to 1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.75,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3a03ffeb-9d96-4e6e-ba9a-2b8254ac5a61",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight to 34-36g while keeping dose at 18.1g (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.75,
+            "dosage": 18.1,
+            "finalWeight": 35,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "4894019b-effc-401f-8ad5-c04c9e1b8b94",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind coarser by 0.75 to 1.0 on the Niche Zero (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.625,
+            "dosage": 18.1,
+            "finalWeight": 35,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "f9c415c8-abe9-49b7-b618-1712b6b6fd15",
+          "towardBest": "farther"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Flow behavior / puck preparation] Improve puck prep: break up clumps thoroughly, distribute evenly, and tamp level while keeping the same grind and ratio for one shot (Medium)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 22.625,
+            "dosage": 18.1,
+            "finalWeight": 35,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "f9c415c8-abe9-49b7-b618-1712b6b6fd15",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Grind finer by about 0.8 to 1.0 on the Niche Zero (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.725,
+            "dosage": 18.1,
+            "finalWeight": 35,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "4894019b-effc-401f-8ad5-c04c9e1b8b94",
+          "towardBest": "closer"
+        },
+        {
+          "step": 7,
+          "suggestion": "[Final weight] Reduce final weight from 35g to 31-32g while keeping dose the same (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.725,
+            "dosage": 18.1,
+            "finalWeight": 31.5,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3a03ffeb-9d96-4e6e-ba9a-2b8254ac5a61",
+          "towardBest": "closer"
+        }
+      ],
+      "costUsd": 0.043995,
+      "avgLatencyMs": 5550.833333333333
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by about 1 step on the Ode Gen 2, moving from 5 to 4 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "ee70ef20-dd22-4527-97a9-74bedd69a887",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind finer by 1 click, from 4 to 3 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 3,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.013229999999999999,
+      "avgLatencyMs": 4975
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Final weight / ratio] Reduce the final weight by 20-25g to 256-261g total out (about 1:14.1-1:14.4) (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 18.1,
+            "finalWeight": 258.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.022288750000000003,
+      "avgLatencyMs": 21609
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1.0 on the Niche Zero to about 25.5 (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind coarser by 1.5 to 2.0 on the Niche Zero and target 28 to 30s (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 27.25,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0871775,
+      "avgLatencyMs": 30387.333333333332
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower water temperature to 201°F (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Stop the brew at 285–290g out, about 1:14.3–1:14.5 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 287.5,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind 2 clicks finer to about 5.3–5.5 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.4,
+            "dosage": 20,
+            "finalWeight": 287.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "closer"
+        }
+      ],
+      "costUsd": 0.1291325,
+      "avgLatencyMs": 48952.666666666664
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower brew temperature to 202°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Coarsen to 7.5 on the Ode (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7.5,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.05317375,
+      "avgLatencyMs": 28681.5
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "reached",
+      "attempts": 3,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.4 on the Ode Gen 2 to about 4.9 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.9,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight to 280–284g from 20g coffee (1:14.0–1:14.2) (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.9,
+            "dosage": 20,
+            "finalWeight": 282,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "084154de-e1d6-4774-ba80-27c4189a8480",
+          "towardBest": "closer"
+        }
+      ],
+      "costUsd": 0.05050375000000001,
+      "avgLatencyMs": 24500.5
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "reached",
+      "attempts": 4,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.7 on the Niche Zero (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.7,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3a03ffeb-9d96-4e6e-ba9a-2b8254ac5a61",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Water temperature] Lower brew temperature to 198°F (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.7,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "3a03ffeb-9d96-4e6e-ba9a-2b8254ac5a61",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind coarser by 1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.7,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "ffbbaa67-005c-4cd1-a122-d7af3658c8ab",
+          "towardBest": "closer"
+        }
+      ],
+      "costUsd": 0.09028125,
+      "avgLatencyMs": 31948.666666666668
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode, aiming for a 3:15–3:30 drawdown (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.5,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "51942746-0801-44e7-b9a1-1ccb33492cfc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 238–241g for 17g of coffee, targeting 1:14.0–1:14.2 (High)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.5,
+            "dosage": 17,
+            "finalWeight": 239.5,
+            "waterTemp": 199
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0508375,
+      "avgLatencyMs": 24816
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Move two clicks finer on the Ode Gen 2, from 6 to 5⅓, keeping the 18.1g dose, 281.1g final weight, and pouring schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.33,
+            "dosage": 18.1,
+            "finalWeight": 281.1,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.0104565,
+      "avgLatencyMs": 11292
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero, from 24 to 24.5, keeping the dose at 18.1g, yield at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 1.0 to 25.5, keeping dose at 18.1g, final weight at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 2.0, from 25.5 to 27.5, keeping dose at 18.1g, yield at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 27.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.03192275,
+      "avgLatencyMs": 11590.666666666666
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Move the Fellow Ode Gen 2 two clicks coarser, from 6 to 6⅔, keeping dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6.6666666667,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Return the Ode Gen 2 from 6⅔ to 6, two clicks finer, keeping dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight / dilution] Add 18g of hot water after drawdown to bring the finished cup to about 320g; keep the 20g dose, grind 6, 204°F brewing temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 319.9,
+            "waterTemp": 204
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 201°F, keeping grind 6, dose 20g, final weight 320g, and pouring technique unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 320,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Bypass water] Add 40g of hot water directly to the finished coffee after drawdown, keeping 20g coffee, 320g brew water, grind 6, and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 360,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.06422025,
+      "avgLatencyMs": 18960.2
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower water temperature by 1°F, from 204°F to 203°F, keeping grind, dose, yield, and pours unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 203
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by two clicks on the Ode Gen 2, from 7 to 7⅔; keep dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7.67,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 203
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.0240515,
+      "avgLatencyMs": 14196.5
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 5.3 to 5.1, keeping the other settings unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 268.1g to 280g for a 1:14 ratio, keeping the 20g dose, grind 5.1, and 205°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer by four clicks from 5.1, keeping the dose at 20g, final weight at 280g, and temperature at 205°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.7,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "d02fe2bd-f389-4a42-95b1-65c020aa8a4f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight from 280g to 304g for a 1:15.2 ratio, keeping dose at 20g, grind at 4.7, and temperature at 205°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.7,
+            "dosage": 20,
+            "finalWeight": 304,
+            "waterTemp": 205
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "084154de-e1d6-4774-ba80-27c4189a8480",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Coarsen the Ode from 4.7 to 5.0, approximately one click, keeping 20g coffee, 304g water, and 205°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 20,
+            "finalWeight": 304,
+            "waterTemp": 205
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "084154de-e1d6-4774-ba80-27c4189a8480",
+          "towardBest": "closer"
+        },
+        {
+          "step": 7,
+          "suggestion": "[Water temperature] Lower water temperature by 2°F to 203°F, keeping grind 5, dose 20g, and final weight 304g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5,
+            "dosage": 20,
+            "finalWeight": 304,
+            "waterTemp": 203
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "084154de-e1d6-4774-ba80-27c4189a8480",
+          "towardBest": "same"
+        },
+        {
+          "step": 8,
+          "suggestion": "[Grind setting] Increase the Ode setting from 5 to 5⅔, two clicks coarser; keep 20g → 304g, 203°F, and the pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.67,
+            "dosage": 20,
+            "finalWeight": 304,
+            "waterTemp": 203
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.09027699999999998,
+      "avgLatencyMs": 15158.42857142857
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "reached",
+      "attempts": 4,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero, from 21 to 21.5, keeping the 18.1g dose, 31.1g yield, and 201°F temperature unchanged for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "bd33aff2-506a-4ecf-a9d4-dd299d0ae0cc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 1.0, from 21.5 to 22.5, keeping 18.1g in, 31.1g out, and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3f2d0cdc-4441-404c-a20a-d64780d0ddd4",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Water temperature] Lower temperature from 201°F to 198°F, keeping grind at 22.5, dose at 18.1g, and yield at 31.1g for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "ffbbaa67-005c-4cd1-a122-d7af3658c8ab",
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.03555925000000001,
+      "avgLatencyMs": 13830.666666666666
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 5 to 4⅓, keeping dose, water weight, temperature and pours unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Reduce final water weight from 256.5g to 238g for a 1:14 ratio, keeping the 17g dose, 4.33 grind setting, and 199°F temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 238,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "5b15dc09-c49f-47fe-a5ae-99f2b00a07a7",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight by 18.5g to 256.5g (1:15.1), keeping the 17g dose, grind 4⅓, and 199°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Water temperature] Increase water temperature from 199°F to 201°F; keep grind 4.33, dose 17g, final weight 256.5g, and the pour schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.333333333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Lower the Ode setting from 4.33 to 3.0—four clicks finer—while keeping the 17 g dose, 256.5 g water and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 3,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.061275500000000004,
+      "avgLatencyMs": 17876
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind two clicks finer on the Ode Gen 2, from 6 to 5⅓, keeping the 18.1g dose, 281.1g water weight, and pour structure unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.3333333333,
+            "dosage": 18.1,
+            "finalWeight": 281.1,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "same"
+        }
+      ],
+      "costUsd": 0.047192500000000005,
+      "avgLatencyMs": 9454
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 2,
+      "cap": 6,
+      "outcome": "off-map",
+      "attempts": 7,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 0.5, from 24 to 24.5; keep dose at 18.1g, final weight at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 24.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "11d725b3-251b-417c-9ee0-87f527bd3ede",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1.0 on the Niche Zero, from 24.5 to 25.5; keep dose at 18.1g, yield at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 25.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "010fbd26-00a8-410a-bb51-3751ded82a29",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 2 marks, from 25.5 to 27.5; keep 18.1g dose, 32g yield, and 199.9°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 27.5,
+            "dosage": 18.1,
+            "finalWeight": 32,
+            "waterTemp": 199.9
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.14209000000000002,
+      "avgLatencyMs": 9312.666666666666
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 6,
+      "cap": 10,
+      "outcome": "off-map",
+      "attempts": 11,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Move the Fellow Ode Gen 2 two clicks coarser, from 6 to 6⅔, keeping dose, water weight, temperature, and pouring schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6.67,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 204
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+          "towardBest": "farther"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Water temperature] Lower water temperature from 204°F to 201°F, keeping grind, dose, final weight, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6.67,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "e52672e1-dfda-44a5-9de3-643ce80d329f",
+          "towardBest": "same"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 6.67 to 6; keep the baseline brew’s 20g dose, 301.9g final weight, 201°F water and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 301.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Final beverage weight / bypass dilution] Add 15g of hot water to the finished cup; keep grind 6, the 20g dose, 301.9g brewing water, and 201°F brewing temperature unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 316.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Post-brew bypass water] Add 30g of warm water directly to the finished baseline brew, keeping grind 6, dose 20g, brewing water 316.9g, and temperature 201°F unchanged (Medium)",
+          "kind": "technique",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 316.9,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "7d3a445d-60e8-4809-a7e4-0efea89bd396",
+          "towardBest": "same"
+        },
+        {
+          "step": 7,
+          "suggestion": "[Bypass water] Add 30g of hot water directly to the finished baseline brew, keeping grind 6, 20g dose, 316.9g brewing water and 201°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 6,
+            "dosage": 20,
+            "finalWeight": 346.9,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.31679375,
+      "avgLatencyMs": 11110
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Water temperature] Lower water temperature from 204°F to 202°F, keeping grind 7, dose 20.2g, and final weight 283.7g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 7,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "0ad7d9d3-874e-4177-97fb-56742ab92cff",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Coarsen the Fellow Ode Gen 2 from 7 to 8, three clicks, keeping dose, final weight, temperature, and pouring schedule unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 8,
+            "dosage": 20.2,
+            "finalWeight": 283.7,
+            "waterTemp": 202
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.09998125,
+      "avgLatencyMs": 10881
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "actualAttempts": 5,
+      "cap": 9,
+      "outcome": "off-map",
+      "attempts": 10,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind two clicks finer on the Ode Gen 2, from 5.3 to 5.1, keeping dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 268.1,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "same"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 268.1g to 280g for a 1:14 ratio at 20g dose, keeping grind 5.1 and temperature 205°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 5.1,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "213f54c7-3426-4cac-8eab-a11c679e4002",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Grind setting] Grind four clicks finer from 5.1, keeping 20g coffee, 280g water, and 205°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.1,
+            "dosage": 20,
+            "finalWeight": 280,
+            "waterTemp": 205
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.15236499999999997,
+      "avgLatencyMs": 11207
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "reached",
+      "attempts": 4,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 0.5, from 21 to 21.5, keeping dose at 18.1g, yield at 31.1g, and temperature at 201°F for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 21.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 1,
+          "matchedId": "bd33aff2-506a-4ecf-a9d4-dd299d0ae0cc",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1.0 on the Niche Zero, from 21.5 to 22.5, keeping 18.1g dose, 31.1g yield, and 201°F unchanged for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 201
+          },
+          "match": "exact",
+          "matchedQuality": 1,
+          "matchedId": "3f2d0cdc-4441-404c-a20a-d64780d0ddd4",
+          "towardBest": "closer"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Water temperature] Lower temperature by 3°F to 198°F, keeping grind 22.5, dose 18.1g, and final weight 31.1g unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 22.5,
+            "dosage": 18.1,
+            "finalWeight": 31.1,
+            "waterTemp": 198
+          },
+          "match": "exact",
+          "matchedQuality": 2,
+          "matchedId": "ffbbaa67-005c-4cd1-a122-d7af3658c8ab",
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.15456124999999998,
+      "avgLatencyMs": 11455
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "actualAttempts": 3,
+      "cap": 7,
+      "outcome": "off-map",
+      "attempts": 8,
+      "steps": [
+        {
+          "step": 2,
+          "suggestion": "[Grind setting] Grind two clicks finer on the Ode Gen 2, from 5 to 4⅓, leaving the other recipe settings unchanged for this test (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.3333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 3,
+          "suggestion": "[Final weight / ratio] Reduce final water weight from 256.5g to 244g for 17g coffee (1:14.4), keeping grind at 4.33 and temperature at 199°F (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.3333333333,
+            "dosage": 17,
+            "finalWeight": 244,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "5b15dc09-c49f-47fe-a5ae-99f2b00a07a7",
+          "towardBest": "farther"
+        },
+        {
+          "step": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight from 244g to 256.5g (1:15.1), keeping the 17g dose, grind 4⅓ and 199°F unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.3333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 199
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "closer"
+        },
+        {
+          "step": 5,
+          "suggestion": "[Water temperature] Increase water temperature by 2°F to 201°F, keeping grind 4.33, dose 17g, final weight 256.5g, and pouring technique unchanged (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 4.3333333333,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "approx",
+          "matchedQuality": 2,
+          "matchedId": "94076842-d132-4b9d-b898-46ac4b5398a5",
+          "towardBest": "same"
+        },
+        {
+          "step": 6,
+          "suggestion": "[Grind setting] Lower the Ode Gen 2 from 4⅓ to 3, four clicks finer, keeping 17g coffee, 256.5g water, 201°F, and the same pouring technique (Medium)",
+          "kind": "change",
+          "next": {
+            "grindSetting": 3,
+            "dosage": 17,
+            "finalWeight": 256.5,
+            "waterTemp": 201
+          },
+          "match": "off-map",
+          "matchedQuality": null,
+          "matchedId": null,
+          "towardBest": "farther"
+        }
+      ],
+      "costUsd": 0.26749500000000004,
+      "avgLatencyMs": 11694.2
+    }
+  ],
+  "openResults": [
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by 1 click on the Ode Gen 2, moving from 6 to 5 (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.00705125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 299.7g to 282-285g (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.006571250000000001
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 295g to 280g (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.006685
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode Gen 2, from 5.7 to about 5.2 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00810875
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by about 0.5-1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00826
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by about 1 click on the Ode Gen 2, from 6 to 7 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.006217500000000001
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind coarser by 1 full step to 7.5 on the Ode Gen 2 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00619625
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Reduce final brew weight to 270-275g instead of 283.7g (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.006840000000000001
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 282.5g to 265-270g (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.00693125
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Reduce final beverage weight to 255-260g instead of 269.7g (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0070825
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 1 full step on the Ode, moving from 7 to 8 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.006064999999999999
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by 1 full step on the Ode Gen 2, from 7 to 6 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.00665125
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 to 1.0 on the Ode, moving from 6.5 to about 7.0-7.5 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00727875
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight to 295-305g while keeping dose at 19.5g (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00687875
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by about 0.3 to 0.5 on the Ode Gen 2, moving from 5.3 to around 4.8-5.0 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0079325
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode Gen 2, moving from 5.0 to 4.5 (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.00646125
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by 0.8-1.0 on the Ode Gen 2, moving from 4.5 to about 3.5-3.7 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00695125
+        },
+        {
+          "k": 4,
+          "suggestion": "[Pour structure] Simplify to 2 main pours after bloom: keep the 45s bloom, then pour to ~180g by 1:05 and finish to 280g by 1:35 (Medium)",
+          "kind": "technique",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0084
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by about 0.5 to 1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.0081325
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight] Increase final weight to 34-36g while keeping dose and temperature the same (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.00683
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by about 1 full step on the Ode Gen 2, from 5 to 4 (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.00718125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.6 on the Ode Gen 2, moving from 4.7 to about 4.1 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.00639625
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 250-255g for 18.1g coffee, about 1:13.8-1:14.1 (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.025966250000000003
+        },
+        {
+          "k": 2,
+          "suggestion": "[Dose] Reduce dose to 18.0–18.5g and brew 280–285g at grind 6 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.04615375
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Move 1 click finer to 5 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.044591250000000006
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Grind finer by 0.6 on the Ode, from 5.7 to about 5.1 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.047763749999999994
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 0.8 on the Niche Zero (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0225675
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature to 200–201°F (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0368325
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Return to grind 6.0 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.039627499999999996
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode, from 6 to 5.5 (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.041727499999999994
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Grind finer to 5.5 on the Ode (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.055155
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight to 282–285g out (about 1:13.8–1:14.0) (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.038296250000000004
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 201°F (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.027505
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 279–282g, keeping the 19.8g dose the same (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.037651250000000004
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 to 7.0 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0358125
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Revert coarser by 0.5 to grind 6.8 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.036608749999999995
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Move 0.4 finer to 4.9 and keep the same pour structure, targeting a 2:45-2:55 drawdown (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.026525
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Increase final weight to 285–288g at the same 20.3g dose for a 1:14.0–1:14.2 ratio (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.02296125
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind coarser by 0.4-0.6 on the Ode, aiming for a 2:50-3:00 drawdown (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.02881375
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Coarsen to 4.7–4.8 on the Ode (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.05164375
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Coarsen the Niche by about 0.8-1.0 to roughly 21.8-22.0 (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.027731250000000002
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind coarser by 1.5–2.0 on the Niche Zero and keep the shot at 30.5–31g (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.03053
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Lower the Ode from 5 to about 4.3–4.5 (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.030801250000000002
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 238–241g (1:14.0–1:14.2) (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.03287125
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 6 to 5⅓, keeping dose, final weight, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.011004
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Increase the Ode Gen 2 setting from 6 to 7, three clicks coarser, keeping dose, water weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01180525
+        },
+        {
+          "k": 3,
+          "suggestion": "[Recipe repeatability] Repeat the baseline brew unchanged: grind 6, 21.5g dose, 295.4g final weight, 200°F water, and the same pour schedule (Medium)",
+          "kind": "hold",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.011303
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight from 285.1g to 300g, targeting 1:14.2; keep dose at 21.1g, grind at 5.7, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": true,
+          "costUsd": 0.012169000000000001
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser on the Niche Zero from 24 to 24.5, keeping the 18.1g dose, 32g final weight, and 199.9°F temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01068225
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by two clicks on the Ode Gen 2, from 6 to 6⅔, keeping dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01065725
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower water temperature by 2°F to 201°F, keeping grind 6.5, dose 20.1g, and final weight 301.1g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.011210250000000001
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind two clicks finer from setting 6 on the Ode Gen 2, keeping the 20.4g dose, 283.7g final weight, and 204°F temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.013288749999999998
+        },
+        {
+          "k": 4,
+          "suggestion": "[Water temperature] Lower water temperature from 204°F to 201°F, keeping grind 6, dose 20.4g and final weight 282.5g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.010988000000000001
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight by 12 g to 282 g (1:13.8), keeping the 20.4 g dose, grind 5.5, and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.011618
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 201°F, keeping grind, dose, final weight and pouring unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0112095
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 7 to 6⅓ (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.01075025
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 287.3g to 300g with the same 19.5g dose, targeting 1:15.4 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0128765
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase water from 280g to 295g, targeting 1:15.1 while keeping dose, grind, and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01163825
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by two clicks from 5.3 on the Ode Gen 2, keeping dose, final weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0119115
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Increase final weight from 275.6g to 284g, about 1:14, keeping dose at 20.3g, grind at 5.0, and temperature at 204°F (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.012271
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight by 18g to 300g (1:15), keeping the 20g dose, grind 4.5, and 204°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.012734500000000001
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight from 277.8g to 300g for a 1:15 ratio, keeping the 20g dose, grind 4.5, and 204°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01279125
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 0.5, from 21 to 21.5, keeping the dose at 18.1g, yield at 31.1g, and temperature at 201°F for this test (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.010997
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower temperature by 3°F to 198°F, keeping grind 22, dose 18.2g, and final weight 31g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.012362749999999999
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 5 to 4⅓, keeping dose, final weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.01106
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 265g to 238g for a 1:14 ratio, keeping the 17g dose, grind 4.7, and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.010967750000000002
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Move the Fellow Ode Gen 2 two clicks finer, from 6 to 5⅓, keeping dose, total water, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.04564875
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Increase the Ode Gen 2 from 6 to 6⅔, two clicks coarser, keeping dose, final weight, and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.05254875
+        },
+        {
+          "k": 3,
+          "suggestion": "[Recipe repeatability] Repeat the baseline brew unchanged once: grind 6, 21.5g coffee, 295.4g final weight, and 200°F water, using the same pouring schedule (Medium)",
+          "kind": "hold",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0506575
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase total brew water from 285.1g to 300g (1:14.2), keeping dose at 21.1g, grind at 5.7, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": true,
+          "costUsd": 0.059623749999999996
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting from 24 to 24.5; keep the dose at 18.1g, final weight at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.041965
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Move the Fellow Ode Gen 2 two clicks coarser, from 6 to 6⅔, keeping dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.04620125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 200°F, keeping grind, dose, final weight, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.048712500000000006
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 6 to 5⅓, keeping dose, final weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.0504125
+        },
+        {
+          "k": 4,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 201°F, keeping grind 6 and 20.4g → 282.5g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.052096250000000004
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight from 269.7g to 283g (1:13.9), keeping dose at 20.4g, grind at 5.5, and temperature at 203°F (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0538275
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature from 204°F to 201°F, keeping grind 7, dose 20.2g, final weight 283.7g, and pouring technique unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.045995
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks, from 7 to 6⅓ on the Ode Gen 2, keeping dose, final weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.0542925
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind coarser from 6.5 to 7.5 on the Ode Gen 2, keeping dose, final water weight, and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0582525
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final water weight / ratio] Increase total brew water from 280g to 300g (1:15.4), keeping dose at 19.5g, grind at 6.3, temperature at 202°F, and the same smooth pouring technique (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.057592500000000005
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by two clicks from 5.3 on the Ode Gen 2, keeping dose, final weight, temperature, and pouring technique unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0481775
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Increase final weight from 275.6g to 284g (about 1:14), keeping dose at 20.3g, grind at 5.0, and temperature at 204°F (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.050675000000000005
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 282g to 302g (1:15.1), keeping dose at 20g, grind at 4.5, and temperature at 204°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0559575
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / bypass dilution] Add 20g of 204°F water to the finished coffee, keeping the brewing dose, grind and pour schedule unchanged for this test (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0797575
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting from 21 to 21.5, keeping the dose at 18.1g, final weight at 31.1g, and temperature at 201°F (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.049125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower temperature by 2°F to 199°F, keeping grind 22, dose 18.2g, and final weight 31g unchanged for this diagnostic trial (Low)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.05848375
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind 2 clicks finer on the Ode Gen 2, from 5 to 4⅓, keeping dose, final weight, temperature and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.049078750000000004
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final water weight from 265g to 238g for a 1:14 ratio, keeping the 17g dose, 4.7 grind, and 199°F temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.04987875
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by about 1 click on the Ode Gen 2, moving from 6 to 5 (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0063025
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 299.7g to 282-285g (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.006551250000000001
+        },
+        {
+          "k": 3,
+          "suggestion": "[Water temperature] Hold or lower water temperature slightly to 199-200°F (High)",
+          "kind": "hold",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.00900375
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 270-275g from 285.1g (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": true,
+          "costUsd": 0.007287500000000001
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by about 1.0 on the Niche Zero, moving from 24 to around 25 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00627625
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 1 step on the Ode, from 6 to 7 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.006342499999999999
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind coarser by 1 full step to 7.5 on the Ode Gen 2 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00616625
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode Gen 2, moving from 6 to 5.5 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.00677625
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 282.5g to 265-270g (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.00682125
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Reduce final beverage weight to 255-260g instead of 269.7g (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0070525
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 1.0-1.5 steps on the Ode Gen 2, moving from 7 to about 8-8.5 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00688125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by 1 step on the Ode Gen 2, moving from 7 to 6 (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.00649125
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind coarser by 1 full step to 7.5 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00668375
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 to 0.7 on the Ode Gen 2, moving from 6.3 to around 6.8-7.0 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00752125
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by about 0.3-0.5 on the Ode Gen 2, moving from 5.3 to around 4.8-5.0 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.00694125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by about 0.6 on the Ode Gen 2, moving from 5.0 to around 4.4 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.006673750000000001
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by about 0.8 on the Ode Gen 2, moving from 4.5 to around 3.7 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0065725
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 277.8g to 255-260g (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0069725
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by about 0.5 to 1.0 on the Niche Zero (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.0072325
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind coarser by about 1.0 on the Niche Zero, moving from 22 to around 23 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.00632125
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "old:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by about 1 full step on the Ode Gen 2, from 5 to around 4 (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.0073125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.6 on the Ode Gen 2, moving from 4.7 to about 4.1 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.006476249999999999
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 255-262g from 18.1g coffee, for about 1:14.1-1:14.5 (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.027887500000000003
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Ode and target a 3:15–3:25 total brew time (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.02316
+        },
+        {
+          "k": 3,
+          "suggestion": "[Water temperature] Lower water temperature to 198°F (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.04348875
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Grind finer by 0.6 on the Ode, from 5.7 to about 5.1 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.049173749999999995
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 0.8–1.0 on the Niche Zero and keep the dose at 18.1–18.3g while targeting 32g in 26–28s (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.02444375
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature to 201°F (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.03703
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 281–286g, targeting 1:14.0–1:14.2 (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.02363875
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by 0.5 on the Ode to 5.5 and keep the rest of the recipe the same (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.03633375
+        },
+        {
+          "k": 4,
+          "suggestion": "[Recipe] Repeat the baseline brew unchanged one more time (Medium)",
+          "kind": "hold",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.032580000000000005
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight by 13–16g to 283–286g (about 1:13.9–1:14.0) (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0385825
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower brew water to 200°F–201°F (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.029413750000000002
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by 0.5-1.0 on the Ode and aim for a 2:45-2:55 drawdown (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.033100000000000004
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Move coarser by 0.5 on the Ode to 7.0 (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.03272625
+        },
+        {
+          "k": 4,
+          "suggestion": "[Grind setting] Coarsen to 6.7 on the Ode (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0397625
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by 0.4 on the Ode, from 5.3 to 4.9 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.02159375
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Increase final weight to 284–288g for 20.3g coffee for a 1:14.0–1:14.2 ratio (High)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.03003875
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Coarsen to 4.8 on the Ode and keep 20g dose, 282g yield, and 204°F the same (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.039202499999999994
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Stop the brew at 270g out, about 1:13.5 (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.036726249999999995
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Coarsen by 1.0 on the Niche Zero, keeping dose at 18.2g and targeting 26-30s (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.027995
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower brew temperature to 198°F (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.04315
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-5.4",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Lower the Ode from 5 to 4.5 (High)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.033465
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight to 238–241g for 17g coffee, keeping the same pour structure (High)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.02217
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by two Ode clicks, from 6 to 5⅓, keeping dose, final weight, and pouring schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.010817750000000001
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind coarser by two clicks on the Ode Gen 2, from 6 to 6⅔, keeping dose, final weight, temperature, and pouring sequence unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.010129
+        },
+        {
+          "k": 3,
+          "suggestion": "[Recipe repeatability] Repeat the baseline brew once unchanged: grind 6, dose 21.5g, final weight 295.4g, water 200°F, and the same pour schedule (Medium)",
+          "kind": "hold",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.01107425
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight from 285.1g to 300g for a 1:14.2 ratio, keeping the 21.1g dose, grind 5.7, and 199.9°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": true,
+          "costUsd": 0.013267749999999998
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting from 24 to 24.5; keep dose at 18.1g, final weight at 32g, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01011975
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by two clicks on the Fellow Ode Gen 2, from 6 to 6⅔, keeping dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01008975
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower water temperature by 2°F to 201°F, keeping grind 6.5, dose, and final weight unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.01106775
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by three clicks on the Ode Gen 2, from 6 to 5, keeping dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.011498749999999999
+        },
+        {
+          "k": 4,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F, from 204°F to 201°F; keep grind 6, dose 20.4g, final weight 282.5g, and the pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0117905
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight by 12.3g to 282g (1:13.8), keeping dose at 20.4g, grind at 5.5 and temperature at 203°F (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.01289425
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature by 3°F to 201°F, keeping grind 7, dose 20.2g, and final weight 283.7g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.00997325
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 7 to 6⅓, keeping dose, final weight, temperature, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.0122465
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Increase final water weight from 287.3g to 299g for a 1:15.3 ratio, keeping the 19.5g dose, grind 6.5, and 202°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.013444
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase brew water from 280g to 300g for 19.5g coffee, keeping grind 6.3 and temperature 202°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01268325
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind two clicks finer on the Ode Gen 2, from 5.3 to 5.1, keeping the other settings unchanged for the next brew (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.013064000000000001
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Increase brew water from 275.6g to 284g for a 1:14 ratio, keeping the 20.3g dose, grind 5.0, and 204°F temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.010711
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Increase final water weight from 282g to 300g (1:15), keeping the 20g dose, grind 4.5, and 204°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.01083575
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final beverage weight / bypass dilution] Add 20g of 204°F water to the finished baseline brew, increasing beverage weight from 277.8g to 297.8g without passing additional water through the grounds (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.01653125
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero, from 21 to 21.5, keeping dose at 18.1g, yield at 31.1g, and temperature at 201°F (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.01148575
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Increase the Niche Zero setting by 0.5 to 22.5, keeping 18.2g dose, 31g yield, and 201°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": true,
+          "costUsd": 0.01330025
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6.1-sol",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 5 to 4⅓, keeping dose, final weight, temperature, and pour schedule unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.01182
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce total brew water from 265g to 238g with the same 17g dose for a 1:14 ratio, keeping grind at 4.7 (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.011716500000000001
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Banko Taratu",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind two clicks finer on the Ode Gen 2, from 6 to 5⅓, keeping the 18.1g dose, 281.1g final weight, and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0470625
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Increase the Ode setting from 6 to 6⅔ (two clicks coarser), keeping dose, final weight, and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.05181625
+        },
+        {
+          "k": 3,
+          "suggestion": "[Recipe repeatability] Repeat the baseline brew once without changes: grind 6, 21.5g coffee, 295.4g final weight, and 200°F water, matching the recorded pour schedule (Medium)",
+          "kind": "hold",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.04990875
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight from 285.1g to 300g for a 1:14.2 ratio, keeping dose at 21.1g, grind at 5.7, and temperature at 199.9°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": true,
+          "costUsd": 0.059396250000000005
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Frame Coffee Roasters — 4\" x 6\" Espresso Blend",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero, from 24 to 24.5; keep 18.1g in, 32g out, and 199.9°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.04519
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Willy’s Beans — Colombia Finca La Secreta Lychee",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Increase the Ode Gen 2 setting by two clicks, from 6 to 6⅔, keeping dose, water weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0452075
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower water temperature from 203°F to 201°F, keeping grind, dose, final weight, and pours unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.05169125
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 6 to 5⅓, keeping dose, final weight, temperature and pouring pattern unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.049751250000000004
+        },
+        {
+          "k": 4,
+          "suggestion": "[Water temperature] Lower temperature by 3°F to 201°F, keeping grind 6, dose 20.4g, and final weight 282.5g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.052520000000000004
+        },
+        {
+          "k": 5,
+          "suggestion": "[Final weight / ratio] Increase final weight by 13g to 283g (1:13.9), keeping dose at 20.4g, grind at 5.5 and temperature at 203°F (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.05782375
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Greater Goods Coffee Co. — El Diviso - Java",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Water temperature] Lower water temperature from 204°F to 201°F, keeping grind 7, dose 20.2g, and final weight 283.7g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.05010125
+        },
+        {
+          "k": 2,
+          "suggestion": "[Grind setting] Grind finer by two clicks on the Ode Gen 2, from 7 to 6⅓; keep 19.8g coffee, 302.8g water, 202°F, and the same pour pattern (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.0573375
+        },
+        {
+          "k": 3,
+          "suggestion": "[Grind setting] Grind coarser from 6.5 to 7.5, keeping the 19.5g dose, 287g final weight, and 202°F temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.06100875
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final water weight from 280g to 295g for a 1:15.1 ratio, keeping 19.5g coffee, grind 6.3, and 202°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.056853749999999995
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Mazateca Mujeres",
+      "set": "tuning",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind two clicks finer from 5.3 on the Fellow Ode Gen 2, keeping dose, final weight, temperature, and pouring technique unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.0515975
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final water weight / ratio] Increase total water from 275.6g to 284g for a 1:14 ratio at 20.3g dose, keeping grind 5.0 and temperature 204°F unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "same",
+          "landsOnBest": false,
+          "costUsd": 0.04993375
+        },
+        {
+          "k": 3,
+          "suggestion": "[Final weight / ratio] Increase final weight from 282g to 300g (1:15), keeping dose at 20g, grind at 4.5, and temperature at 204°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.053275
+        },
+        {
+          "k": 4,
+          "suggestion": "[Final weight / ratio] Increase final weight from 277.8g to 300g (1:15), keeping dose at 20g, grind at 4.5, and temperature at 204°F (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.05511
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Small Planes Coffee — Arboretum",
+      "set": "tuning",
+      "method": "espresso",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind coarser by 0.5 on the Niche Zero, from 21 to 21.5; keep the dose at 18.1g, yield at 31.1g, and temperature at 201°F for this test (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.05215875
+        },
+        {
+          "k": 2,
+          "suggestion": "[Water temperature] Lower temperature from 201°F to 199°F; keep grind 22, dose 18.2g, and final weight 31g unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.04851875
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "arm": "new:gpt-6-astra",
+      "coffee": "Flat Track — Xilontla Geisha",
+      "set": "hold-out",
+      "method": "pour over",
+      "points": [
+        {
+          "k": 1,
+          "suggestion": "[Grind setting] Grind two clicks finer on the Ode Gen 2, from 5 to 4⅓, keeping dose, final weight, temperature, and pouring unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "closer",
+          "landsOnBest": false,
+          "costUsd": 0.051867500000000004
+        },
+        {
+          "k": 2,
+          "suggestion": "[Final weight / ratio] Reduce final weight from 265g to 240g with the same 17g dose (1:14.1), keeping grind and temperature unchanged (Medium)",
+          "kind": "change",
+          "towardBest": "farther",
+          "landsOnBest": false,
+          "costUsd": 0.0475275
+        }
+      ]
+    }
+  ]
+}

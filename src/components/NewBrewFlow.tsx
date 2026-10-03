@@ -1133,26 +1133,11 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       const mostRecentBrew = matchingBrews.length > 0 ? matchingBrews[0] : null;
       const isBaselineMostRecent = currentBaselineBrew && mostRecentBrew && currentBaselineBrew.id === mostRecentBrew.id;
 
-      // Check if baseline brew is exceptional (quality === 3)
-      // If so, show special message and skip LLM call
-      if (currentBaselineBrew?.quality === 3) {
-        setSuggestions("The baseline brew shows excellent balance and extraction. No adjustments are recommended — this recipe is dialed in.");
-        setLoadingSuggestions(false);
-        setThinkingText('');
-        
-        // Mark as analyzed
-        lastSuggestionCoffeeIdRef.current = coffeeId;
-        lastSuggestionBrewerIdRef.current = brewerId;
-        lastSuggestionGrinderIdRef.current = grinderId;
-        lastSuggestionBrewMethodRef.current = brewMethod;
-        lastSuggestionBrewIdRef.current = currentBrewId;
-        return;
-      }
-
-      // If baseline brew is most recent and has stored full suggestion, use it (regardless of confidence)
+      // If baseline brew is most recent and has stored full suggestion, use it (regardless of confidence).
+      // Excellent baselines go to the server, which answers "dialed in" without a model call.
       // Note: If suggestions haven't been processed yet (background job still running), 
       // suggestion?.full will be undefined and we'll fall through to make a live LLM call
-      if (isBaselineMostRecent && currentBaselineBrew.suggestion?.full) {
+      if (isBaselineMostRecent && currentBaselineBrew.quality !== 3 && currentBaselineBrew.suggestion?.full) {
         // Use stored full suggestion
         setSuggestions(currentBaselineBrew.suggestion.full);
         setLoadingSuggestions(false);
@@ -1184,88 +1169,26 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       setSuggestions(null);
 
       try {
-        // Determine if this is a first-time coffee (no previous brews)
-        const isFirstTime = matchingBrews.length === 0;
-        
-        let brewsToSend: Brew[] = [];
-        let baselineBrewId: string | null = null;
-        let exceptionalBrewId: string | null = null;
-        
-        if (!isFirstTime) {
-          // Take top 10 most recent brews
-          const top10Recent = matchingBrews.slice(0, 10);
-          const top10Ids = new Set(top10Recent.map(b => b.id));
-          
-          // Find baseline brew (the one being analyzed)
-          const baselineBrew = preFilledBrew || matchingBrews[0];
-          baselineBrewId = baselineBrew?.id || null;
-          
-          // Find most recent Exceptional brew (quality === 3)
-          const exceptionalBrew = matchingBrews.find(b => b.quality === 3);
-          exceptionalBrewId = exceptionalBrew?.id || null;
-          
-          // Start with top 10
-          brewsToSend = [...top10Recent];
-          
-          // Add baseline brew if not already in top 10
-          if (baselineBrewId && !top10Ids.has(baselineBrewId)) {
-            brewsToSend.push(baselineBrew);
-          }
-          
-          // Add exceptional brew if not already included
-          if (exceptionalBrew && !brewsToSend.find(b => b.id === exceptionalBrew.id)) {
-            brewsToSend.push(exceptionalBrew);
-          }
-          
-          // Re-sort chronologically (most recent first)
-          brewsToSend.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        }
-        
+        // The server assembles history, profile and references from these IDs.
         const brewer = brewerId ? equipment.find(e => e.id === brewerId) : undefined;
         const grinder = grinderId ? equipment.find(e => e.id === grinderId) : undefined;
-        const brewerName = brewer ? formatEquipmentName(brewer) : undefined;
-        const grinderName = grinder ? formatEquipmentName(grinder) : undefined;
         
         const response = await fetch(
           `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/brew-suggestions`,
           {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${publicAnonKey}`,
+              'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              coffee: {
-                name: selectedCoffee.name,
-                roaster: selectedCoffee.roaster,
-                notes: selectedCoffee.notes,
-                brewMethod: brewMethod,
-                region: selectedCoffee.region,
-                roastLevel: selectedCoffee.roastLevel,
-              },
-              brews: brewsToSend.map(e => ({
-                id: e.id,
-                grindSetting: e.grindSetting,
-                dosage: e.dosage,
-                waterTemp: e.waterTemp,
-                brewTime: e.brewTime,
-                finalWeight: e.finalWeight,
-                quality: e.quality,
-                tastingNotes: e.tastingNotes,
-                brewMethod: e.brewMethod,
-                stages: e.stages,
-                coffeeTemperature: e.coffeeTemperature,
-                brewerName: e.brewerName,
-                grinderName: e.grinderName,
-                notes: e.notes,
-                createdAt: e.createdAt,
-                isBaseline: e.id === baselineBrewId,
-                isExceptional: e.id === exceptionalBrewId,
-              })),
-              brewMethod: brewMethod,
-              targetBrewId: baselineBrewId,
-              brewerName,
-              grinderName,
+              coffeeId,
+              brewMethod,
+              baselineBrewId: currentBaselineBrew?.id ?? null,
+              brewerId: brewerId || undefined,
+              brewerName: brewer ? formatEquipmentName(brewer) : undefined,
+              grinderId: grinderId || undefined,
+              grinderName: grinder ? formatEquipmentName(grinder) : undefined,
             }),
             signal: abortController.signal,
           }
@@ -1274,10 +1197,9 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         if (abortController.signal.aborted) return;
 
         if (response.ok) {
-          // Handle regular JSON response
           const data = await response.json();
           if (!abortController.signal.aborted) {
-            setSuggestions(data);
+            setSuggestions(data.dialedIn ? data.message : data);
             setThinkingText(''); // Clear thinking text when done
           }
         } else {

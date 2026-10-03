@@ -1,708 +1,398 @@
 #!/usr/bin/env node
 /**
- * A/B-test the OLD vs NEW brew-suggestion prompt against gpt-5.4 over real
- * brew fixtures pulled by analyze-brew-prompts.mjs.
+ * Improvement-guidance eval: score each arm (prompt version × model) on real brew
+ * histories cut at every rated brew with at least 2 earlier brews. Picks MODEL.
  *
- * Scoring:
- *   A. Issue-fix checks (one per failure mode found in Step 3)
- *   B. Voice / conciseness regression guard
- *
- * Writes: docs/ai-analysis/prompt-eval.md
- *
- * Required env (read from .env if present):
- *   OPENAI_API_KEY
+ * Checks (pass rates; n < 3 is reported as "not measured"):
+ *   Issue fixes (from the original failure-mode analysis)
+ *     diagnosisRefreshed  primary issue isn't copied from the previous brew's guidance after params changed
+ *     breaksRepeatLoop    doesn't repeat the previous top suggestion at the same magnitude
+ *     hasMagnitude        top suggestion has a number
+ *   Voice
+ *     noHedges, imperative
+ *   Behavior (new rules)
+ *     holdOnce            single Bad cup at settings that were Decent+ before → repeat the settings
+ *     noDoubleHold        second Bad cup in a row at the same settings → don't hold again
+ *     avoidsBadCluster    never proposes settings the tried-settings list marks consistently Bad
+ *     staysInHabitBand    next dose / water temp stay inside the brewer's standard band
+ *     basisGrounded       every date cited in basis appears in the prompt (new prompt only, pre-filter)
  *
  * Usage:
- *   node scripts/test-brew-prompt.mjs                  # run all eligible fixtures
- *   node scripts/test-brew-prompt.mjs --max 8          # cap brews evaluated
- *   node scripts/test-brew-prompt.mjs --coffee <id>    # only one coffee
+ *   node scripts/test-brew-prompt.mjs --dry-run
+ *   node scripts/test-brew-prompt.mjs --arms old:gpt-5.4,new:gpt-5.4,new:gpt-5.4@7,new:gpt-6.1-sol,new:gpt-6-astra --runs 2
+ *   node scripts/test-brew-prompt.mjs --max-per-set 15
+ *
+ * Writes docs/ai-analysis/prompt-eval-models.md (+ .json), and blind-review.md when the
+ * top two new-prompt arms overlap within their run-to-run spread.
  */
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import * as P from "../supabase/functions/make-server-23508aac/brewPrompts.ts";
+import { REPO_ROOT, loadHousehold, requireEnv, ANALYZE_USER_ID } from "./lib/household.mjs";
+import { applyFirstSuggestion, argValue, fmt, generateGuidance, loadTuningCoffeeIds, mapLimit, mean, parseArms } from "./lib/guidanceArms.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, "..");
+const DRY = process.argv.includes("--dry-run");
+requireEnv("SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY", "ANALYZE_USER_ID", ...(DRY ? [] : ["OPENAI_API_KEY"]));
 
-async function loadDotenv() {
-  try {
-    const raw = await fs.readFile(path.join(REPO_ROOT, ".env"), "utf8");
-    for (const line of raw.split("\n")) {
-      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-      if (!m) continue;
-      if (process.env[m[1]] === undefined)
-        process.env[m[1]] = m[2].replace(/^['"]|['"]$/g, "");
+const ARMS = parseArms(argValue("--arms", "old:gpt-5.4,new:gpt-5.4"));
+let RUNS = parseInt(argValue("--runs", "1"), 10);
+const CONCURRENCY = parseInt(argValue("--concurrency", "8"), 10);
+const EFFORT = argValue("--effort", "medium");
+const MAX_PER_SET = parseInt(argValue("--max-per-set", "20"), 10);
+const OUT_BASE = argValue("--out", "docs/ai-analysis/prompt-eval-models");
+
+const num = (v) => {
+  const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
+  return Number.isFinite(n) ? n : NaN;
+};
+const byOldest = (a, b) => new Date(a.createdAt) - new Date(b.createdAt);
+const settingsOf = (b) => ({ grindSetting: num(b.grindSetting), dosage: num(b.dosage), finalWeight: num(b.finalWeight), waterTemp: num(b.waterTemp) });
+
+const hh = await loadHousehold(ANALYZE_USER_ID);
+const tuningIds = await loadTuningCoffeeIds();
+
+// ---------------------------------------------------------------------------
+// Cases
+// ---------------------------------------------------------------------------
+
+function grindTolFor(equipment) {
+  const grinds = hh.householdBrews
+    .filter((b) => P.onSameEquipment(b, { ...equipment, brewerId: b.brewerId, brewerName: b.brewerName }))
+    .map((b) => num(b.grindSetting))
+    .filter(Number.isFinite);
+  return grinds.length > 1 ? Math.max(0.05 * (Math.max(...grinds) - Math.min(...grinds)), 0.05) : 0.25;
+}
+
+function sameSettings(a, b, method, grindTol) {
+  const sa = settingsOf(a);
+  const sb = settingsOf(b);
+  const ratioTol = method === "espresso" ? 0.1 : 0.5;
+  return (
+    Math.abs(sa.grindSetting - sb.grindSetting) <= grindTol + 1e-9 &&
+    Math.abs(sa.dosage - sb.dosage) <= Math.max(0.02 * sb.dosage, 0.2) + 1e-9 &&
+    Math.abs(sa.finalWeight / sa.dosage - sb.finalWeight / sb.dosage) <= ratioTol + 1e-9
+  );
+}
+
+function buildCases() {
+  const seen = new Set();
+  const cases = [];
+  for (const coffee of hh.coffees) {
+    const sameIds = P.findSameCoffeeIds(coffee, hh.coffees, hh.aliases);
+    const key = [...sameIds].sort().join(",");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const beanBrews = hh.householdBrews.filter((b) => sameIds.includes(b.coffeeId)).sort(byOldest);
+    for (const method of [...new Set(beanBrews.map((b) => b.brewMethod))]) {
+      const brews = beanBrews.filter((b) => b.brewMethod === method);
+      brews.forEach((target, i) => {
+        if (i < 2 || !target.quality) return;
+        const history = brews.slice(0, i + 1);
+        const equipment = P.equipmentOf(target);
+        const grindTol = grindTolFor(equipment);
+        const onSetup = history.filter((b) => P.onSameEquipment(b, equipment));
+        const prev = history[i - 1];
+        const earlierSame = onSetup.slice(0, -1).filter((b) => b.quality && sameSettings(b, target, method, grindTol));
+        const prevSame = prev && P.onSameEquipment(prev, equipment) && sameSettings(prev, target, method, grindTol);
+
+        const ctx = P.assembleGuidanceContext({
+          coffee: hh.coffees.find((c) => c.id === target.coffeeId) ?? coffee,
+          coffees: hh.coffees,
+          householdBrews: [...hh.householdBrews.filter((b) => !sameIds.includes(b.coffeeId) && b.createdAt < target.createdAt), ...history],
+          brewMethod: method,
+          sameCoffeeIds: sameIds,
+          baselineBrewId: target.id,
+          requesterUserId: target.userId,
+        });
+        const standard = ctx.profileLines.find((l) => l.includes("Your standard")) ?? "";
+        const bands = {};
+        for (const m of standard.matchAll(/(dose|water temperature|grind) (\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)/g)) bands[m[1]] = [+m[2], +m[3]];
+
+        cases.push({
+          id: `${target.id}`,
+          label: `${coffee.roaster.trim()} — ${coffee.name}`,
+          method,
+          set: sameIds.some((id) => tuningIds.has(id)) ? "tuning" : "hold-out",
+          coffee: hh.coffees.find((c) => c.id === target.coffeeId) ?? coffee,
+          sameIds,
+          history,
+          target,
+          prev,
+          equipment,
+          grindTol,
+          bands,
+          badClusters: ctx.ledger.filter((c) => c.consistentlyBad).map((c) => c.brews[0]),
+          applies: {
+            holdOnce: target.quality === 1 && earlierSame.some((b) => b.quality >= 2) && !(prevSame && prev.quality === 1),
+            noDoubleHold: target.quality === 1 && !!prevSame && prev.quality === 1,
+            avoidsBadCluster: ctx.ledger.some((c) => c.consistentlyBad),
+            staysInHabitBand: Object.keys(bands).some((k) => k !== "grind"),
+          },
+        });
+      });
     }
-  } catch {}
-}
-await loadDotenv();
-
-const OPENAI_KEY = process.env.OPENAI_API_KEY;
-const MODEL = process.env.TEST_MODEL || "gpt-5.4";
-if (!OPENAI_KEY) {
-  console.error("Missing OPENAI_API_KEY. Add it to .env.");
-  process.exit(1);
-}
-
-const args = process.argv.slice(2);
-const maxIdx = args.indexOf("--max");
-const MAX_BREWS = maxIdx >= 0 ? parseInt(args[maxIdx + 1], 10) || Infinity : Infinity;
-const coffeeIdx = args.indexOf("--coffee");
-const ONLY_COFFEE = coffeeIdx >= 0 ? args[coffeeIdx + 1] : null;
-
-// ------------------------------------------------------------------------
-// 1. Load fixtures
-// ------------------------------------------------------------------------
-const fixturesPath = path.join(REPO_ROOT, "scripts", "fixtures", "brew-sequences.json");
-const fixtures = JSON.parse(await fs.readFile(fixturesPath, "utf8"));
-console.log(`[eval] loaded ${fixtures.length} coffee sequences`);
-
-// ------------------------------------------------------------------------
-// 2. Reproduce both prompt builders. The OLD prompt is a verbatim copy of
-//    the pre-edit prompt at supabase/functions/make-server-23508aac/index.ts
-//    (commit before this PR). The NEW prompt mirrors the current edge-function
-//    code (using buildBrewRules).
-// ------------------------------------------------------------------------
-
-function getQualityLabel(q) {
-  return !q ? "Not rated" : q === 1 ? "Bad" : q === 2 ? "Decent" : "Excellent";
-}
-function fmtDate(d) {
-  return new Date(d).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-function formatBrewMethodDetails(brew, method) {
-  if (method === "pour over" && brew.stages) {
-    return `\n- Stages: ${brew.stages
-      .map((s, i) => `Stage ${i + 1}: ${s.endTime}s / ${s.endWeight}g`)
-      .join(", ")}`;
   }
-  if (method === "immersion") {
-    return `\n- Steep Time: ${brew.brewTime}s\n- Final Weight: ${brew.finalWeight}g`;
+  return cases;
+}
+
+function pickCases(all) {
+  const out = [];
+  for (const set of ["tuning", "hold-out"]) {
+    const pool = all.filter((c) => c.set === set);
+    const special = pool.filter((c) => c.applies.holdOnce || c.applies.noDoubleHold || c.applies.avoidsBadCluster);
+    const rest = pool.filter((c) => !special.includes(c));
+    const step = rest.length / Math.max(1, MAX_PER_SET - special.length);
+    const filler = [];
+    for (let i = 0; filler.length < MAX_PER_SET - special.length && i < rest.length; i += Math.max(step, 1)) filler.push(rest[Math.floor(i)]);
+    out.push(...special, ...filler);
   }
-  return `\n- Extraction Time: ${brew.brewTime}s\n- Final Weight: ${brew.finalWeight}g`;
+  return out;
 }
 
-function buildHistoryAndCoffeeBlocks(coffee, brews, baselineId) {
-  const baseline = brews.find((b) => b.id === baselineId);
-  const exceptional = brews.find((b) => b.quality === 3);
+const allCases = buildCases();
+const cases = pickCases(allCases);
+const applyCount = (k) => cases.filter((c) => c.applies[k]).length;
+console.log(
+  `[eval] ${cases.length} cases (${cases.filter((c) => c.set === "tuning").length} tuning, ${cases.filter((c) => c.set === "hold-out").length} hold-out) of ${allCases.length} · holdOnce n=${applyCount("holdOnce")} · noDoubleHold n=${applyCount("noDoubleHold")} · avoidsBadCluster n=${applyCount("avoidsBadCluster")} · habitBand n=${applyCount("staysInHabitBand")}`,
+);
+console.log(`[eval] arms ${ARMS.map((a) => a.label).join(", ")} · runs ${RUNS} · effort ${EFFORT}\n`);
+if (DRY) process.exit(0);
 
-  const top7 = [...brews]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 7);
-  const set = new Set(top7.map((b) => b.id));
-  const list = [...top7];
-  if (!set.has(baselineId) && baseline) list.push(baseline);
-  if (exceptional && !list.find((b) => b.id === exceptional.id)) list.push(exceptional);
-  list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+// ---------------------------------------------------------------------------
+// Scoring
+// ---------------------------------------------------------------------------
 
-  const tagged = list.map((b) => ({
-    ...b,
-    isBaseline: b.id === baselineId,
-    isExceptional: exceptional && b.id === exceptional.id,
-  }));
+const HEDGES = ["likely", "suggests", "step in the right direction", "might", "could potentially", "perhaps", "may be"];
+const IMPERATIVES = new Set(
+  "grind increase decrease reduce raise lower adjust switch hold maintain skip try use move keep shorten lengthen extend stop add remove swirl pour wait preinfuse pre-infuse tamp distribute set warm cool rest change target repeat rebrew re-brew brew".split(" "),
+);
+const MONTH = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/g;
 
-  const coffeeInfo = `COFFEE:
-- Name: ${coffee.name}
-- Roaster: ${coffee.roaster}
-- Brew Method: ${baseline.brewMethod}${coffee.region ? `\n- Region: ${coffee.region}` : ""}${coffee.roastLevel ? `\n- Roast Level: ${coffee.roastLevel}` : ""}${coffee.notes ? `\n- Flavor Notes: ${coffee.notes}` : ""}`;
-
-  let hist = `BREW HISTORY (Most recent to oldest):\n`;
-  tagged.forEach((b, i) => {
-    const n = i + 1;
-    const tags =
-      b.isBaseline && b.isExceptional
-        ? " ⭐ REFERENCE BREW, 🏆 BEST RECORDED BREW"
-        : b.isBaseline
-        ? " ⭐ REFERENCE BREW"
-        : b.isExceptional
-        ? " 🏆 BEST RECORDED BREW"
-        : "";
-    hist += `\nBREW #${n} (${fmtDate(b.createdAt)})${tags}:
-- Brewer: ${b.brewerName || "Not specified"}
-- Grinder: ${b.grinderName || "Not specified"}
-- Bean Temperature: ${b.coffeeTemperature === "frozen" ? "Frozen" : "Room Temperature"}
-- Grind Setting: ${b.grindSetting}
-- Dosage: ${b.dosage}g
-- Water Temperature: ${b.waterTemp ? `${b.waterTemp}°F` : "Not recorded"}`;
-    hist += formatBrewMethodDetails(b, baseline.brewMethod);
-    hist += `\n- Quality Rating: ${getQualityLabel(b.quality)}${
-      b.tastingNotes ? `\n- Tasting Notes: ${b.tastingNotes}` : ""
-    }${
-      b.personalNotes ? `\n- Extraction Notes: ${b.personalNotes}` : ""
-    }\n`;
-  });
-
-  return { coffeeInfo, hist };
+function paramOf(label = "") {
+  const s = label.toLowerCase();
+  if (s.includes("grind")) return "grind";
+  if (s.includes("dose") || s.includes("dosage")) return "dose";
+  if (s.includes("temp")) return "temp";
+  if (/ratio|yield|final weight|output/.test(s)) return "yield";
+  return s;
 }
+const direction = (a = "") => (/(finer|decrease|reduce|lower|less|shorten|tighten)/i.test(a) ? "down" : /(coarser|increase|raise|higher|more|extend|longer)/i.test(a) ? "up" : null);
+const magnitude = (a = "") => {
+  const by = a.match(/by\s*(?:about\s+|~)?\s*(\d+(?:\.\d+)?)(?:\s*(?:[-–]|to)\s*(\d+(?:\.\d+)?))?/i);
+  if (by) return Math.max(+by[1], +(by[2] ?? 0));
+  const ft = a.match(/from\s+(\d+(?:\.\d+)?)\s*(?:to|→|->)\s*(\d+(?:\.\d+)?)/i);
+  return ft ? Math.abs(+ft[1] - +ft[2]) : 0;
+};
+const wps = (t = "") => {
+  const ss = t.split(/[.!?]+/).map((s) => s.trim()).filter(Boolean);
+  return ss.length ? ss.reduce((a, s) => a + s.split(/\s+/).length, 0) / ss.length : 0;
+};
 
-const OLD_RULES = `
-IMPORTANT CONSIDERATIONS:
-1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried and avoid suggesting the same adjustments that were already attempted.
-2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
-3. Avoid Repetition: Review the previous brews to ensure you're not suggesting something that was already tried. If a previous brew tried a parameter change and it didn't improve things, suggest a different approach.
-4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
-5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew" instead of "most recent brew" or "best brew". This brew is the starting point for improvement suggestions.
-6. Do not infer causes that are not supported by recorded data.
+async function score(c, arm, g) {
+  const top = g.full.suggestions[0];
+  const checks = {};
+  const prevTop = c.prev?.suggestion?.full?.suggestions?.[0];
+  const prevIssue = c.prev?.suggestion?.full?.primaryIssue;
+  const changed = c.prev && JSON.stringify(settingsOf(c.prev)) !== JSON.stringify(settingsOf(c.target));
+  if (prevIssue && changed) checks.diagnosisRefreshed = g.full.primaryIssue !== prevIssue;
+  if (prevTop && direction(prevTop.action) && direction(top.action)) {
+    const same = paramOf(prevTop.parameter) === paramOf(top.parameter) && direction(prevTop.action) === direction(top.action);
+    checks.breaksRepeatLoop =
+      !same ||
+      /\b(hold|repeat|re-?taste|same settings)\b/i.test(`${top.action} ${top.reasoning}`) ||
+      (magnitude(prevTop.action) > 0 && magnitude(top.action) >= 1.6 * magnitude(prevTop.action));
+  }
+  checks.hasMagnitude = /\d/.test(top.action) || /\b(hold|repeat)\b/i.test(top.action);
+  checks.noHedges = HEDGES.every((h) => !JSON.stringify(g.full).toLowerCase().includes(h));
+  checks.imperative = IMPERATIVES.has((top.action.trim().split(/\s+/)[0] || "").toLowerCase().replace(/[^a-z-]/g, ""));
 
-ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy and change magnitude (use this order unless history strongly suggests otherwise, prefer minimal changes):
-   - Grind / flow behavior
-   - Final weight / ratio
-   - Water temperature
-   - Dose
-   - If flow issues indicate puck preparation or channeling, address distribution, tamping, or pre-infusion before changing core parameters.
-   - Prefer the smallest reasonable change that could plausibly fix the issue. Avoid large jumps unless history clearly shows they are necessary.
-
-B) Require directional reasoning (no vague advice):
-   - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
-   - Each suggestion must include the expected taste/texture impact (example: "should reduce sourness and increase body").
-
-C) Confidence score:
-   - Every suggestion must include a confidence score: High / Medium / Low.
-   - Confidence should reflect how strongly the brew history supports the change (e.g., repeated evidence vs weak signal).
-   - Use "High" only when supported by at least two prior brews or a direct comparison.
-
-D) Primary failure mode:
-   - Before listing suggestions, identify exactly ONE primary failure mode for the selected brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield").
-   - All suggestions must directly address this failure mode.
-
-E) Quality over quantity:
-   - If fewer than three high-quality, non-redundant suggestions exist, provide fewer suggestions rather than forcing additional ones.
-   - It is acceptable to provide only 1-2 suggestions if those are the most impactful changes.
-   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
-
-F) Exceptional brews:
-   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning.
-   - Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
-
-G) Stability check:
-   - If a parameter appears optimal based on excellent brews, explicitly state that it should remain unchanged.`;
-
-function buildNewRules(brewMethod) {
-  const espressoFlow =
-    brewMethod === "espresso"
-      ? `\n   - Flow behavior / puck preparation (if flow issues indicate channeling, address distribution, tamping, or pre-infusion before changing core parameters)`
-      : "";
-  const immersionTime = brewMethod === "immersion" ? `\n   - Steep time` : "";
-  return `
-IMPORTANT CONSIDERATIONS:
-1. Focus on the REFERENCE BREW (marked with ⭐): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried.
-2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
-3. Anti-repeat escalation: When the same parameter+direction has been suggested in any of the three prior brews on this coffee, you MUST NOT repeat the same magnitude. Either (a) escalate the magnitude meaningfully (~2× the prior step) and explain why, (b) switch to a different parameter from the decision hierarchy, or (c) explicitly recommend holding all parameters and re-tasting to confirm the diagnosis. The minimal-change preference does not apply once a small step in this direction has already been tried without improvement.
-4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
-5. Baseline Brew Terminology: When referring to the REFERENCE BREW (marked with ⭐) in your summary or suggestions, always use the term "baseline brew". This brew is the starting point for improvement suggestions.
-6. Do not infer causes that are not supported by recorded data.
-
-ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy (use this order unless history strongly suggests otherwise; default to small steps for the first attempt at a parameter, then escalate per rule 3):
-   - Grind setting${espressoFlow}
-   - Final weight / ratio${immersionTime}
-   - Water temperature
-   - Dose
-
-B) Require directional reasoning (no vague advice):
-   - Each suggestion must specify the exact direction and a small magnitude that fits the grinder/equipment (example: "Grind finer by ~0.3–0.5 on Niche Zero").
-   - Each suggestion must include the expected taste/texture impact (example: "should reduce sourness and increase body").
-
-C) Confidence score:
-   - Every suggestion must include a confidence score: High / Medium / Low.
-   - Use "High" only when supported by at least two prior brews or a direct comparison.
-   - Downgrade confidence to Medium or Low whenever the most recent brew that followed a similar suggestion regressed in quality, or whenever the suggested direction would push past a known-good baseline value (e.g. a previous excellent brew used a coarser grind than what you're proposing).
-
-D) Primary failure mode:
-   - Identify exactly ONE primary failure mode for the baseline brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield"). All suggestions must directly address it.
-   - Re-derive this from the baseline brew's recorded outcome alone; do not carry forward the diagnosis from any prior brew. If the same diagnosis recurs across consecutive brews despite parameter changes, treat that as evidence the diagnosis itself is wrong and consider an alternative cause (e.g. dose / ratio rather than grind, or puck preparation).
-
-E) Quality over quantity:
-   - If fewer than three high-quality, non-redundant suggestions exist, provide fewer.
-   - It is acceptable to provide only 1-2 suggestions if those are the most impactful.
-   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
-
-F) Exceptional brews:
-   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning. Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
-   - If a parameter appears optimal based on excellent brews, explicitly state it should remain unchanged.`;
-}
-
-const OUTPUT_FORMAT = `
-
-TONE AND VOICE:
-Use a calm, confident, craft-focused tone.
-Sound like an experienced specialty barista giving guidance.
-
-OUTPUT FORMAT:
-You must respond with valid JSON only. No markdown, no code blocks, just raw JSON. Use this exact structure:
-
-{
-  "summary": "Brief diagnostic summary (1-2 sentences). State the outcome (quality rating and key tasting notes) and what was missing or wrong. Avoid hedging language like 'likely', 'suggests', 'step in the right direction'. Collapse cause and effect into one sentence.",
-  "primaryIssue": "The primary failure mode (e.g., 'under-extracted due to fast flow' or 'over-extracted due to excessive yield')",
-  "suggestions": [
-    {
-      "parameter": "Parameter name",
-      "action": "Action with specific magnitude (no period at end)",
-      "effect": "Expected taste/texture effect as a complete sentence starting with 'This will' or 'This should' (no period at end)",
-      "reasoning": "Concise explanation (1 sentence) of why this works based on brew history. Do NOT reference brew numbers (no period at end)",
-      "confidence": "High" | "Medium" | "Low"
+  const needsApplied = c.applies.holdOnce || c.applies.noDoubleHold || c.applies.avoidsBadCluster || c.applies.staysInHabitBand;
+  if (needsApplied) {
+    const current = settingsOf(c.target);
+    const applied = await applyFirstSuggestion({ method: c.method, grinderName: c.equipment.grinderName, settings: current, suggestion: top });
+    const next = { ...c.target, grindSetting: applied.grindSetting, dosage: applied.dosage, finalWeight: applied.finalWeight, waterTemp: applied.waterTemp };
+    // Technique advice and small temperature/yield moves are not holds.
+    const unchanged = ["grindSetting", "dosage", "finalWeight", "waterTemp"].every((k) => !(Math.abs(num(next[k]) - current[k]) > 1e-6));
+    const isHold = applied.kind === "hold" || (applied.kind === "change" && unchanged);
+    if (c.applies.holdOnce) checks.holdOnce = isHold;
+    if (c.applies.noDoubleHold) checks.noDoubleHold = !isHold;
+    if (c.applies.avoidsBadCluster) checks.avoidsBadCluster = !c.badClusters.some((b) => sameSettings(next, b, c.method, c.grindTol));
+    if (c.applies.staysInHabitBand) {
+      const inBand = (v, band) => !band || (v >= band[0] - 0.05 && v <= band[1] + 0.05);
+      checks.staysInHabitBand = inBand(applied.dosage, c.bands.dose) && inBand(applied.waterTemp, c.bands["water temperature"]);
     }
-  ]
-}
-
-REQUIREMENTS:
-- You must provide at least 1 suggestion and at most 3 suggestions
-- Each suggestion must follow the structure: Action → Expected effect → Why it matters (based on history)
-- Only include high-quality, non-redundant suggestions`;
-
-function buildPrompt(coffee, brews, baselineId, version) {
-  const baseline = brews.find((b) => b.id === baselineId);
-  const { coffeeInfo, hist } = buildHistoryAndCoffeeBlocks(coffee, brews, baselineId);
-  const rules = version === "old" ? OLD_RULES : buildNewRules(baseline.brewMethod);
-  return `You are an expert barista analyzing the brew history for a specific coffee to provide improvement suggestions.
-
-${coffeeInfo}
-
-GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced cup of coffee.
-
-${hist}${rules}${OUTPUT_FORMAT}`;
-}
-
-const SYSTEM_MSG =
-  "You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.";
-
-// ------------------------------------------------------------------------
-// 3. OpenAI call
-// ------------------------------------------------------------------------
-async function callOpenAI(prompt) {
-  const t0 = Date.now();
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${OPENAI_KEY}`,
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_MSG },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0.2,
-      max_completion_tokens: 1000,
-      response_format: { type: "json_object" },
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`OpenAI ${res.status}: ${err.slice(0, 400)}`);
   }
-  const data = await res.json();
-  const elapsed = Date.now() - t0;
+  if (g.storedBasisGrounded !== undefined) {
+    checks.basisGrounded = g.storedBasisGrounded;
+  } else if (arm.version === "new" && Array.isArray(g.raw?.basis) && g.raw.basis.some((s) => MONTH.test(s))) {
+    checks.basisGrounded = g.raw.basis.every((s) => [...s.matchAll(MONTH)].every((m) => g.prompt.user.includes(`${m[1]} ${+m[2]}`)));
+  }
+  MONTH.lastIndex = 0;
+  return { checks, summaryWps: wps(g.full.summary) };
+}
+
+// ---------------------------------------------------------------------------
+// Run
+// ---------------------------------------------------------------------------
+
+const CHECKS = ["diagnosisRefreshed", "breaksRepeatLoop", "hasMagnitude", "noHedges", "imperative", "holdOnce", "noDoubleHold", "avoidsBadCluster", "staysInHabitBand", "basisGrounded"];
+const results = [];
+const RESCORE = argValue("--rescore");
+
+if (RESCORE) {
+  // Re-score saved guidance after a scorer change, without regenerating it.
+  const saved = JSON.parse(await fs.readFile(path.resolve(REPO_ROOT, RESCORE), "utf8"));
+  ARMS.splice(0, ARMS.length, ...saved.arms);
+  RUNS = saved.runs;
+  const byId = new Map(cases.map((c) => [c.id, c]));
+  const rows = await mapLimit(saved.results, CONCURRENCY, async (r) => {
+    const c = byId.get(r.caseId);
+    if (r.error || !c) return r;
+    const arm = saved.arms.find((a) => a.label === r.arm);
+    const s = await score(c, arm, { full: r.full, storedBasisGrounded: r.checks.basisGrounded });
+    return { ...r, ...s };
+  });
+  results.push(...rows);
+}
+
+for (let run = 1; run <= (RESCORE ? 0 : RUNS); run++) {
+  for (const arm of ARMS) {
+    const t0 = Date.now();
+    const rows = await mapLimit(cases, CONCURRENCY, async (c) => {
+      try {
+        const g = await generateGuidance(arm, {
+          coffee: c.coffee,
+          coffees: hh.coffees,
+          householdBrews: [...hh.householdBrews.filter((b) => !c.sameIds.includes(b.coffeeId) && b.createdAt < c.target.createdAt), ...c.history],
+          coffeeBrews: c.history,
+          sameCoffeeIds: c.sameIds,
+          baselineId: c.target.id,
+          brewMethod: c.method,
+          requesterUserId: c.target.userId,
+          userNames: hh.userNames,
+          grinderProfiles: hh.grinderProfiles,
+          effort: EFFORT,
+          now: new Date(c.target.createdAt),
+        });
+        const s = await score(c, arm, g);
+        return { run, arm: arm.label, caseId: c.id, set: c.set, label: c.label, ...s, full: g.full, costUsd: g.costUsd, elapsedMs: g.elapsedMs };
+      } catch (e) {
+        console.error(`  ${arm.label} ${c.label} ${c.id.slice(0, 8)}: ${e.message.slice(0, 200)}`);
+        return { run, arm: arm.label, caseId: c.id, set: c.set, label: c.label, error: e.message };
+      }
+    });
+    results.push(...rows);
+    const s = summarize(rows);
+    console.log(`[run ${run}] ${arm.label.padEnd(20)} score ${fmt(s.score * 100, 1)} · errors ${s.errors} · $${fmt(s.cost, 2)} · ${fmt(s.latency / 1000, 1)}s/call · ${Math.round((Date.now() - t0) / 1000)}s`);
+  }
+}
+
+function summarize(rows) {
+  const ok = rows.filter((r) => !r.error);
+  const rates = {};
+  for (const k of CHECKS) {
+    const vals = ok.map((r) => r.checks[k]).filter((v) => v !== undefined);
+    rates[k] = { pass: vals.filter(Boolean).length, n: vals.length };
+  }
+  const measured = CHECKS.filter((k) => rates[k].n >= 3 && k !== "basisGrounded");
   return {
-    content: data.choices?.[0]?.message?.content,
-    usage: data.usage,
-    elapsedMs: elapsed,
+    rates,
+    score: mean(measured.map((k) => rates[k].pass / rates[k].n)),
+    errors: rows.length - ok.length,
+    cost: ok.reduce((a, r) => a + r.costUsd, 0),
+    latency: mean(ok.map((r) => r.elapsedMs)),
+    wps: mean(ok.map((r) => r.summaryWps)),
   };
 }
 
-// ------------------------------------------------------------------------
-// 4. Pick which brews to score per fixture: those with a real quality rating
-//    AND at least 2 prior brews (so the failure modes can manifest).
-// ------------------------------------------------------------------------
-function eligibleTargets(seq) {
-  return seq.brews
-    .map((b, i) => ({ b, i }))
-    .filter(({ b, i }) => i >= 2 && b.quality)
-    .map(({ b }) => b);
-}
+// ---------------------------------------------------------------------------
+// Report
+// ---------------------------------------------------------------------------
 
-// ------------------------------------------------------------------------
-// 5. Scorers
-// ------------------------------------------------------------------------
-function normalizeParameter(label) {
-  if (!label) return null;
-  const s = label.toLowerCase();
-  if (s.includes("grind")) return "grindSetting";
-  if (s.includes("dose") || s.includes("dosage")) return "dosage";
-  if (s.includes("water") && s.includes("temp")) return "waterTemp";
-  if (s.includes("temperature")) return "waterTemp";
-  if (s.includes("ratio") || s.includes("yield") || s.includes("final weight") || s.includes("output"))
-    return "finalWeight";
-  if (s.includes("time") || s.includes("steep") || s.includes("extraction time"))
-    return "brewTime";
-  return null;
-}
-function extractDirection(action) {
-  if (!action) return null;
-  const s = action.toLowerCase();
-  if (/(finer|smaller|decrease|reduce|lower|down|less|tight)/.test(s)) return "down";
-  if (/(coarser|larger|increase|raise|higher|up|more|loose|extend|longer)/.test(s)) return "up";
-  return null;
-}
-// Pull the maximum numeric magnitude from an action string. Handles
-// "0.3-0.5", "by ~0.5 to 1.0", "from 5.0 to 4.5" (returns the delta in that
-// case as |to - from|), bare numbers, and percentages. Returns 0 if nothing
-// useful is found.
-function maxMagnitude(action) {
-  if (!action) return 0;
-  // 1) Explicit "by X" or "by ~X" or "by X to Y" magnitude clause -- preferred.
-  const byClause = action.match(
-    /by\s*(?:about\s+|~)?\s*(\d+(?:\.\d+)?)\s*(?:[-–]|to)\s*(\d+(?:\.\d+)?)|by\s*(?:about\s+|~)?\s*(\d+(?:\.\d+)?)/i
-  );
-  if (byClause) {
-    const nums = [byClause[1], byClause[2], byClause[3]]
-      .filter(Boolean)
-      .map((n) => parseFloat(n));
-    return Math.max(...nums);
-  }
-  // 2) "from X to Y" -- compute the absolute delta (real magnitude).
-  const fromTo = action.match(
-    /from\s+(?:about\s+|~)?(\d+(?:\.\d+)?)\s*(?:to|→|->)\s*(?:about\s+|~)?(\d+(?:\.\d+)?)/i
-  );
-  if (fromTo) {
-    return Math.abs(parseFloat(fromTo[1]) - parseFloat(fromTo[2]));
-  }
-  return 0;
-}
-
-function meanWordsPerSentence(text) {
-  if (!text) return 0;
-  const sentences = text.split(/[.!?]+/).map((s) => s.trim()).filter(Boolean);
-  if (sentences.length === 0) return 0;
-  return (
-    sentences.reduce((sum, s) => sum + s.split(/\s+/).filter(Boolean).length, 0) /
-    sentences.length
-  );
-}
-
-const HEDGES = [
-  "likely",
-  "suggests",
-  "step in the right direction",
-  "might",
-  "could potentially",
-  "perhaps",
-  "may be",
-];
-
-const IMPERATIVE_VERBS = [
-  "grind",
-  "increase",
-  "decrease",
-  "reduce",
-  "raise",
-  "lower",
-  "adjust",
-  "switch",
-  "hold",
-  "maintain",
-  "skip",
-  "try",
-  "use",
-  "move",
-  "keep",
-  "shorten",
-  "lengthen",
-  "extend",
-  "stop",
-  "add",
-  "remove",
-  "swirl",
-  "pour",
-  "wait",
-  "preinfuse",
-  "pre-infuse",
-  "tamp",
-  "distribute",
-  "set",
-  "warm",
-  "cool",
-  "rest",
-  "change",
-  "target",
-];
-
-function scoreSingle({ parsed, prevSuggestion, prevPrimaryIssue, paramsChangedSincePrev }) {
-  const checks = {};
-  if (!parsed) {
-    checks.parses = false;
-    return checks;
-  }
-  checks.parses = true;
-
-  const top = parsed.suggestions?.[0];
-  const topParam = normalizeParameter(top?.parameter || top?.action);
-  const topDir = extractDirection(top?.action);
-
-  // A1. primaryIssue not stale: if the previous suggestion existed and params changed since, primaryIssue should not exactly equal previous.
-  if (prevPrimaryIssue && paramsChangedSincePrev?.length > 0) {
-    checks.A_diagnosisRefreshed = parsed.primaryIssue !== prevPrimaryIssue;
-  }
-
-  // A2. anti-repeat: if previous baseline's top suggestion targeted the same
-  // (param, dir), this baseline must either pivot (different param/dir) OR
-  // meaningfully escalate magnitude (~2x) OR explicitly recommend holding.
-  // F1 explicitly *allows* repeating direction with an escalated step, so
-  // simply checking "same direction" punishes the right behavior.
-  if (prevSuggestion) {
-    const prevParam = normalizeParameter(prevSuggestion.parameter || prevSuggestion.action);
-    const prevDir = extractDirection(prevSuggestion.action);
-    if (prevParam && prevDir && topParam && topDir) {
-      const samePair = prevParam === topParam && prevDir === topDir;
-      if (!samePair) {
-        checks.A_breaksRepeatLoop = true; // pivot
-      } else {
-        const prevMag = maxMagnitude(prevSuggestion.action || "");
-        const currMag = maxMagnitude(top.action || "");
-        const holdLanguage = /\b(hold|keep|maintain)\b.*(parameter|setting|all)|re-?taste|re-?test|same setting|do not (change|adjust)/i.test(
-          (top.action || "") + " " + (top.reasoning || "") + " " + (parsed.summary || "")
-        );
-        const escalated = prevMag > 0 && currMag >= 1.6 * prevMag;
-        const escalationLanguage = /\b(meaningfully|larger|bigger|escalate|aggressive|substantial)\b/i.test(
-          (top.action || "") + " " + (top.reasoning || "")
-        );
-        checks.A_breaksRepeatLoop = holdLanguage || escalated || escalationLanguage;
-      }
-    }
-  }
-
-  // A3. magnitude specified: top suggestion action must contain a digit
-  if (top) {
-    checks.A_hasMagnitude = /\d/.test(top.action || "");
-  }
-
-  // B. tone / conciseness checks
-  const hedgeText = JSON.stringify(parsed).toLowerCase();
-  checks.B_noHedges = HEDGES.every((h) => !hedgeText.includes(h));
-  checks.B_summaryWPS = meanWordsPerSentence(parsed.summary || "");
-  checks.B_effectWPS =
-    parsed.suggestions
-      ?.map((s) => meanWordsPerSentence(s.effect || ""))
-      .reduce((a, b) => a + b, 0) / Math.max(parsed.suggestions?.length || 1, 1);
-
-  if (top) {
-    const firstWord = (top.action || "").trim().split(/\s+/)[0]?.toLowerCase().replace(/[^a-z\-]/g, "");
-    checks.B_imperative = IMPERATIVE_VERBS.includes(firstWord);
-  }
-  return checks;
-}
-
-// ------------------------------------------------------------------------
-// 6. Run
-// ------------------------------------------------------------------------
-const reportChunks = [];
-let totalPairs = 0;
-let oldUsage = { prompt: 0, completion: 0 };
-let newUsage = { prompt: 0, completion: 0 };
-const aggregate = {
-  A_diagnosisRefreshed: { old: [0, 0], new: [0, 0] },
-  A_breaksRepeatLoop: { old: [0, 0], new: [0, 0] },
-  A_hasMagnitude: { old: [0, 0], new: [0, 0] },
-  B_noHedges: { old: [0, 0], new: [0, 0] },
-  B_imperative: { old: [0, 0], new: [0, 0] },
-};
-const wpsAccum = { old: { sum: 0, n: 0 }, new: { sum: 0, n: 0 } };
-
-const PARAM_KEYS = [
-  "grindSetting",
-  "dosage",
-  "waterTemp",
-  "brewTime",
-  "finalWeight",
-  "coffeeTemperature",
-];
-const paramDiff = (a, b) => {
-  const out = [];
-  for (const k of PARAM_KEYS) if (a?.[k] !== b?.[k]) out.push(k);
-  return out;
-};
-
-reportChunks.push(`# Brew Prompt Eval — OLD vs NEW on ${MODEL}`);
-reportChunks.push("");
-reportChunks.push(
-  `Generated ${new Date().toISOString()}. Fixtures: ${fixturesPath.replace(REPO_ROOT + "/", "")}`
-);
-reportChunks.push("");
-
-for (const seq of fixtures) {
-  if (ONLY_COFFEE && seq.coffeeId !== ONLY_COFFEE) continue;
-  const targets = eligibleTargets(seq);
-  if (targets.length === 0) continue;
-
-  reportChunks.push(`## ${seq.coffee.roaster} — ${seq.coffee.name}`);
-  reportChunks.push("");
-
-  for (const target of targets) {
-    if (totalPairs >= MAX_BREWS) break;
-    const baselineIdx = seq.brews.findIndex((b) => b.id === target.id);
-    const prev = seq.brews[baselineIdx - 1];
-    const prevSuggestion = prev?.suggestion?.full?.suggestions?.[0];
-    const prevPrimaryIssue = prev?.suggestion?.full?.primaryIssue;
-    const paramsChanged = prev ? paramDiff(prev, target) : [];
-
-    process.stdout.write(
-      `[eval] ${seq.coffee.name} brew ${baselineIdx + 1}/${seq.brews.length} (${target.id.slice(0, 8)})…`
-    );
-
-    const oldPrompt = buildPrompt(seq.coffee, seq.brews, target.id, "old");
-    const newPrompt = buildPrompt(seq.coffee, seq.brews, target.id, "new");
-
-    let oldRes, newRes;
-    try {
-      [oldRes, newRes] = await Promise.all([callOpenAI(oldPrompt), callOpenAI(newPrompt)]);
-    } catch (e) {
-      console.log(` ERR ${e.message}`);
-      continue;
-    }
-    process.stdout.write(` ok (${oldRes.elapsedMs}ms / ${newRes.elapsedMs}ms)\n`);
-    totalPairs++;
-    oldUsage.prompt += oldRes.usage?.prompt_tokens || 0;
-    oldUsage.completion += oldRes.usage?.completion_tokens || 0;
-    newUsage.prompt += newRes.usage?.prompt_tokens || 0;
-    newUsage.completion += newRes.usage?.completion_tokens || 0;
-
-    let oldParsed = null,
-      newParsed = null;
-    try {
-      oldParsed = JSON.parse(oldRes.content);
-    } catch {}
-    try {
-      newParsed = JSON.parse(newRes.content);
-    } catch {}
-
-    const oldScore = scoreSingle({
-      parsed: oldParsed,
-      prevSuggestion,
-      prevPrimaryIssue,
-      paramsChangedSincePrev: paramsChanged,
-    });
-    const newScore = scoreSingle({
-      parsed: newParsed,
-      prevSuggestion,
-      prevPrimaryIssue,
-      paramsChangedSincePrev: paramsChanged,
-    });
-
-    for (const key of Object.keys(aggregate)) {
-      if (oldScore[key] !== undefined) {
-        aggregate[key].old[1]++;
-        if (oldScore[key]) aggregate[key].old[0]++;
-      }
-      if (newScore[key] !== undefined) {
-        aggregate[key].new[1]++;
-        if (newScore[key]) aggregate[key].new[0]++;
-      }
-    }
-    if (oldScore.B_summaryWPS) {
-      wpsAccum.old.sum += oldScore.B_summaryWPS;
-      wpsAccum.old.n++;
-    }
-    if (newScore.B_summaryWPS) {
-      wpsAccum.new.sum += newScore.B_summaryWPS;
-      wpsAccum.new.n++;
-    }
-
-    reportChunks.push(
-      `### Brew ${baselineIdx + 1} (${new Date(target.createdAt).toISOString().slice(0, 10)}, quality=${getQualityLabel(target.quality)})`
-    );
-    if (prev && prevSuggestion) {
-      reportChunks.push(
-        `Prev top suggestion: \`${(prevSuggestion.action || "").slice(0, 120)}\` (${prevSuggestion.confidence}); params changed since prev: \`${paramsChanged.join(", ") || "none"}\``
-      );
-    }
-    reportChunks.push("");
-    reportChunks.push("**OLD prompt output:**");
-    reportChunks.push("```json");
-    reportChunks.push(oldRes.content || "(unparseable)");
-    reportChunks.push("```");
-    reportChunks.push("");
-    reportChunks.push("**NEW prompt output:**");
-    reportChunks.push("```json");
-    reportChunks.push(newRes.content || "(unparseable)");
-    reportChunks.push("```");
-    reportChunks.push("");
-    reportChunks.push("Score deltas:");
-    for (const k of Object.keys(aggregate)) {
-      if (oldScore[k] === undefined && newScore[k] === undefined) continue;
-      reportChunks.push(`- ${k}: old=${oldScore[k]} → new=${newScore[k]}`);
-    }
-    reportChunks.push(
-      `- summary mean wps: old=${oldScore.B_summaryWPS?.toFixed(1)} → new=${newScore.B_summaryWPS?.toFixed(1)}`
-    );
-    reportChunks.push("");
-  }
-  if (totalPairs >= MAX_BREWS) break;
-}
-
-// ------------------------------------------------------------------------
-// 7. Verdict
-// ------------------------------------------------------------------------
-function pct([n, d]) {
-  return d === 0 ? "n/a" : `${((100 * n) / d).toFixed(0)}% (${n}/${d})`;
-}
-const summaryRows = [];
-summaryRows.push(`| Check | OLD | NEW | Δ |`);
-summaryRows.push(`|---|---|---|---|`);
-for (const k of Object.keys(aggregate)) {
-  const o = aggregate[k].old;
-  const n = aggregate[k].new;
-  const delta = n[1] && o[1] ? `${(((n[0] / n[1]) - (o[0] / o[1])) * 100).toFixed(0)}pp` : "n/a";
-  summaryRows.push(`| ${k} | ${pct(o)} | ${pct(n)} | ${delta} |`);
-}
-const oldTokTotal = oldUsage.prompt + oldUsage.completion;
-const newTokTotal = newUsage.prompt + newUsage.completion;
-const tokDelta = oldTokTotal ? (((newTokTotal - oldTokTotal) / oldTokTotal) * 100).toFixed(1) : "n/a";
-
-const aggregateBlock = [
-  "## Aggregate scorecard",
-  "",
-  ...summaryRows,
-  "",
-  "Token usage:",
-  `- OLD: prompt=${oldUsage.prompt}, completion=${oldUsage.completion}, total=${oldTokTotal}`,
-  `- NEW: prompt=${newUsage.prompt}, completion=${newUsage.completion}, total=${newTokTotal}`,
-  `- delta: ${tokDelta}% total tokens (NEW vs OLD)`,
-  "",
-  "Voice/conciseness:",
-  `- mean summary words/sentence: OLD=${(wpsAccum.old.sum / Math.max(wpsAccum.old.n, 1)).toFixed(1)} → NEW=${(wpsAccum.new.sum / Math.max(wpsAccum.new.n, 1)).toFixed(1)}`,
-  "",
-];
-
-// Ship gate
-const issueFixKeys = ["A_diagnosisRefreshed", "A_breaksRepeatLoop", "A_hasMagnitude"];
-const voiceKeys = ["B_noHedges", "B_imperative"];
-const issueFixOK = issueFixKeys.every((k) => {
-  const o = aggregate[k].old, n = aggregate[k].new;
-  if (!o[1] || !n[1]) return true;
-  return n[0] / n[1] >= o[0] / o[1];
+const armStats = ARMS.map((arm) => {
+  const perRun = Array.from({ length: RUNS }, (_, i) => summarize(results.filter((r) => r.arm === arm.label && r.run === i + 1)));
+  const scores = perRun.map((s) => s.score);
+  return { arm, perRun, mean: mean(scores), spread: Math.max(...scores) - Math.min(...scores) };
 });
-const voiceOK = voiceKeys.every((k) => {
-  const o = aggregate[k].old, n = aggregate[k].new;
-  if (!o[1] || !n[1]) return true;
-  return n[0] / n[1] >= 0.95 * (o[0] / o[1]); // allow tiny stochastic noise
-});
-const verdict = issueFixOK && voiceOK ? "SHIP" : "DO NOT SHIP";
-aggregateBlock.push(`## Verdict: **${verdict}**`);
-aggregateBlock.push(
-  `- issue-fix gate: ${issueFixOK ? "pass" : "FAIL"} (NEW pass-rate must meet or beat OLD on every check)`
-);
-aggregateBlock.push(
-  `- voice/conciseness gate: ${voiceOK ? "pass" : "FAIL"} (NEW pass-rate must be \u2265 95% of OLD on hedge + imperative checks)`
-);
-aggregateBlock.push("");
+const ranked = armStats.filter((a) => a.arm.version === "new" && !a.arm.historyLimit).sort((a, b) => b.mean - a.mean);
+const [first, second] = ranked;
+const closeCall = first && second && first.mean - second.mean <= Math.max(first.spread, second.spread);
 
-const outDir = path.join(REPO_ROOT, "docs", "ai-analysis");
-await fs.mkdir(outDir, { recursive: true });
-const outPath = path.join(outDir, "prompt-eval.md");
-await fs.writeFile(
-  outPath,
-  [reportChunks[0], reportChunks[1], reportChunks[2], "", ...aggregateBlock, "---", "", ...reportChunks.slice(3)].join(
-    "\n"
-  )
+const lines = ["# Improvement guidance eval: models and prompts", ""];
+lines.push(
+  `Generated ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC · ${cases.length} cases (${cases.filter((c) => c.set === "tuning").length} tuning, ${cases.filter((c) => c.set === "hold-out").length} hold-out) · ${RUNS} run(s) · new-prompt effort \`${EFFORT}\`.`,
 );
-console.log(`\n[eval] wrote ${outPath}`);
-console.log(`[eval] verdict: ${verdict}`);
-console.log(`[eval] tokens: ${oldTokTotal} → ${newTokTotal} (${tokDelta}%)`);
+lines.push("");
+lines.push(
+  "Score is the mean pass rate over measured checks (n ≥ 3; `basisGrounded` is reported but excluded because the old prompt has no basis). The scorers are wording heuristics tuned on gpt-5.4 output, so a different model can lose points for style alone.",
+);
+lines.push("");
+lines.push("## Summary");
+lines.push("");
+lines.push("| Arm | Score (mean of runs) | Run spread | Errors | Cost per run | Avg latency | Summary words/sentence |");
+lines.push("|---|---|---|---|---|---|---|");
+for (const a of armStats) {
+  lines.push(
+    `| \`${a.arm.label}\` | ${fmt(a.mean * 100, 1)} | ${fmt(a.spread * 100, 1)} | ${a.perRun.reduce((x, s) => x + s.errors, 0)} | $${fmt(mean(a.perRun.map((s) => s.cost)), 2)} | ${fmt(mean(a.perRun.map((s) => s.latency)) / 1000, 1)}s | ${fmt(mean(a.perRun.map((s) => s.wps)), 1)} |`,
+  );
+}
+lines.push("");
+if (first) {
+  lines.push(
+    closeCall
+      ? `**Close call:** \`${first.arm.label}\` and \`${second.arm.label}\` overlap within the run spread. Decide with docs/ai-analysis/blind-review.md.`
+      : `**Best new-prompt arm:** \`${first.arm.label}\` (${fmt(first.mean * 100, 1)} vs next ${second ? fmt(second.mean * 100, 1) : "–"}).`,
+  );
+  lines.push("");
+}
+
+for (const subset of ["all", "tuning", "hold-out"]) {
+  lines.push(`## Checks: ${subset === "all" ? "all cases" : subset === "tuning" ? "tuning set" : "hold-out set"}`);
+  lines.push("");
+  lines.push(`| Check | ${ARMS.map((a) => `\`${a.label}\``).join(" | ")} |`);
+  lines.push(`|---|${ARMS.map(() => "---").join("|")}|`);
+  for (const k of CHECKS) {
+    const cells = ARMS.map((arm) =>
+      Array.from({ length: RUNS }, (_, i) => {
+        const s = summarize(results.filter((r) => r.arm === arm.label && r.run === i + 1 && (subset === "all" || r.set === subset)));
+        const { pass, n } = s.rates[k];
+        return n === 0 ? "–" : n < 3 ? `not measured (n=${n})` : `${Math.round((100 * pass) / n)}% (${pass}/${n})`;
+      }).join(" / "),
+    );
+    lines.push(`| ${k} | ${cells.join(" | ")} |`);
+  }
+  lines.push("");
+}
+lines.push('Multiple runs are separated by " / ".');
+lines.push("");
+
+await fs.mkdir(path.dirname(path.join(REPO_ROOT, OUT_BASE)), { recursive: true });
+await fs.writeFile(path.join(REPO_ROOT, `${OUT_BASE}.md`), lines.join("\n"));
+await fs.writeFile(path.join(REPO_ROOT, `${OUT_BASE}.json`), JSON.stringify({ arms: ARMS, runs: RUNS, effort: EFFORT, results }, null, 2));
+console.log(`\n[eval] wrote ${OUT_BASE}.md and .json`);
+
+if (closeCall) {
+  const picks = cases.filter((c) => results.some((r) => r.caseId === c.id && r.arm === first.arm.label && !r.error) && results.some((r) => r.caseId === c.id && r.arm === second.arm.label && !r.error));
+  const sample = picks.filter((_, i) => i % Math.max(1, Math.floor(picks.length / 8)) === 0).slice(0, 8);
+  const key = [];
+  const doc = [
+    "# Blind review: pick the better guidance",
+    "",
+    `Two models' guidance for ${sample.length} real brews, shown in random order. For each case, write A or B next to **Pick**. The answer key is in blind-review-key.json; open it only after picking.`,
+    "",
+  ];
+  sample.forEach((c, i) => {
+    const flip = Math.random() < 0.5;
+    const [a, b] = flip ? [second, first] : [first, second];
+    key.push({ case: i + 1, A: a.arm.label, B: b.arm.label });
+    const render = (arm) => {
+      const r = results.find((x) => x.caseId === c.id && x.arm === arm.arm.label && x.run === 1 && !x.error) ?? results.find((x) => x.caseId === c.id && x.arm === arm.arm.label && !x.error);
+      return [`${r.full.summary}`, "", ...r.full.suggestions.map((s, j) => `${j + 1}. **${s.parameter}** (${s.confidence}): ${s.action}. ${s.effect}. ${s.reasoning}.`), ...(r.full.basis?.length ? ["", `_Based on: ${r.full.basis.join(" · ")}_`] : [])].join("\n");
+    };
+    doc.push(`## Case ${i + 1}: ${c.label} (${c.method}), ${P.qualityLabel(c.target.quality)} brew${c.target.tastingNotes ? ` — "${c.target.tastingNotes}"` : ""}`, "");
+    doc.push("### A", "", render(a), "", "### B", "", render(b), "", "**Pick:** ", "");
+  });
+  await fs.writeFile(path.join(REPO_ROOT, "docs/ai-analysis/blind-review.md"), doc.join("\n"));
+  await fs.writeFile(path.join(REPO_ROOT, "docs/ai-analysis/blind-review-key.json"), JSON.stringify(key, null, 2));
+  console.log("[eval] close call: wrote docs/ai-analysis/blind-review.md (key in blind-review-key.json)");
+}

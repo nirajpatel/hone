@@ -20,6 +20,7 @@ import { sanitizeErrorMessage } from '../utils/errorHandling';
 import { COPY } from '../constants/copy';
 import { toTitleCase } from '../utils/tastingNotes';
 import { useWakeLock } from '../hooks/useWakeLock';
+import { CoffeeAliases, looseNameKey, looseRoasterKey, resolveCanonicalCoffee } from '../utils/coffeeCanonical';
 
 interface AddCoffeeFormProps {
   onClose: () => void;
@@ -32,7 +33,10 @@ interface AddCoffeeFormProps {
   duplicateData?: Coffee | null;
   onUpdate?: (id: string, data: Omit<Coffee, 'id' | 'createdAt'>) => void;
   existingCoffees?: Coffee[];
+  aliases?: CoffeeAliases;
 }
+
+const NO_ALIASES: CoffeeAliases = { roasterAliases: {}, coffeeNameAliases: {} };
 
 // Title case helper
 const toTitleCase = (str: string): string => {
@@ -42,7 +46,7 @@ const toTitleCase = (str: string): string => {
     .join(' ');
 };
 
-export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpdate, existingCoffees = [] }: AddCoffeeFormProps) {
+export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpdate, existingCoffees = [], aliases = NO_ALIASES }: AddCoffeeFormProps) {
   useWakeLock(true);
 
   const [roaster, setRoaster] = useState('');
@@ -533,6 +537,18 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
 
     setIsExtracting(true);
     try {
+      const knownCoffees = Array.from(
+        new Map(
+          existingCoffees
+            .filter(c => c.roaster && c.name)
+            .map(c => {
+              const r = resolveCanonicalCoffee(c.roaster, c.name, aliases);
+              return [`${r.normalizedRoaster}|${r.normalizedName}`, { roaster: r.roaster.trim(), name: r.coffeeName.trim() }] as const;
+            })
+        ).values()
+      );
+      const knownRoasters = Array.from(new Map(knownCoffees.map(c => [looseRoasterKey(c.roaster), c.roaster])).values());
+
       const response = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/extract-coffee-bag`,
         {
@@ -541,7 +557,7 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${publicAnonKey}`,
           },
-          body: JSON.stringify({ images }),
+          body: JSON.stringify({ images, knownRoasters, knownCoffees }),
         }
       );
 
@@ -552,28 +568,23 @@ export function AddCoffeeForm({ onClose, onSave, editData, duplicateData, onUpda
 
       const data = await response.json();
       
-      // Match casing with existing coffees
-      let roasterValue = data.roaster || '';
-      let nameValue = data.name || '';
-      
-      // Find matching roaster (case-insensitive) and use its casing
+      // Backstop in case the model didn't reuse an established spelling. Roasters match
+      // ignoring suffixes ("Desnudo" = "Desnudo Coffee"); names only on a full match, so
+      // "Guji" never merges into "Guji Natural".
+      let roasterValue = (data.roaster || '').trim();
+      let nameValue = (data.name || '').trim();
       if (roasterValue) {
-        const existingRoaster = existingCoffees.find(
-          c => c.roaster.toLowerCase() === roasterValue.toLowerCase()
-        );
-        if (existingRoaster) {
-          roasterValue = existingRoaster.roaster;
-        }
+        const canonical = resolveCanonicalCoffee(roasterValue, nameValue, aliases);
+        roasterValue = canonical.roaster;
+        nameValue = canonical.coffeeName;
+        const knownRoaster = knownRoasters.find(r => looseRoasterKey(r) === looseRoasterKey(roasterValue));
+        if (knownRoaster) roasterValue = knownRoaster;
       }
-      
-      // Find matching name (case-insensitive) and use its casing
       if (nameValue) {
-        const existingName = existingCoffees.find(
-          c => c.name.toLowerCase() === nameValue.toLowerCase()
+        const knownName = knownCoffees.find(
+          c => looseRoasterKey(c.roaster) === looseRoasterKey(roasterValue) && looseNameKey(c.name) === looseNameKey(nameValue)
         );
-        if (existingName) {
-          nameValue = existingName.name;
-        }
+        if (knownName) nameValue = knownName.name;
       }
       
       // Auto-fill the fields with extracted data

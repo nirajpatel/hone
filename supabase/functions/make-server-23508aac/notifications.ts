@@ -21,6 +21,14 @@ function getTastingNoteSuggestions(qualityRating: number): string[] {
   return ['Under-Extracted', 'Over-Extracted', 'Bitter', 'Sour', 'Bland', 'Balanced', 'Sweet', 'Syrupy', 'Clarity', 'Rounded'];
 }
 
+// Set by index.ts so SMS ratings and notes trigger the same guidance regeneration as web edits
+// (notifications.ts can't import index.ts without a cycle).
+let onBrewOutcomeUpdated: ((brewId: string, userId: string) => void) | null = null;
+
+export function setBrewOutcomeHandler(handler: (brewId: string, userId: string) => void): void {
+  onBrewOutcomeUpdated = handler;
+}
+
 export interface NotificationState {
   brewId: string;
   userId: string;
@@ -362,6 +370,7 @@ export async function handleNotesResponse(phoneNumber: string, notes: string): P
     }
     
     await kv.set(`brew:${brewId}`, brew);
+    onBrewOutcomeUpdated?.(brewId, brew.userId);
     
     await clearPendingNotes(phoneNumber);
 
@@ -550,6 +559,7 @@ export async function handleRatingResponse(phoneNumber: string, rating: number):
     // Update brew with rating
     brew.quality = rating;
     await kv.set(`brew:${brewId}`, brew);
+    onBrewOutcomeUpdated?.(brewId, brew.userId);
 
     // Clear active notification (but keep pending response for notes)
     await clearActiveNotification(brew.userId, brewId);

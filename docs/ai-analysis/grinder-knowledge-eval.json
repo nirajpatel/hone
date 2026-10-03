@@ -1,0 +1,2317 @@
+[
+  {
+    "name": "Niche Zero",
+    "methods": [
+      "espresso",
+      "pour over"
+    ],
+    "observed": {
+      "espresso": [
+        24,
+        20.1,
+        18.25,
+        18,
+        24,
+        24.25,
+        21.5,
+        22,
+        24.2,
+        22.5,
+        18,
+        24.5,
+        23,
+        21,
+        18.75,
+        24.25,
+        24.5,
+        18.25,
+        24.25,
+        24.2,
+        18.25,
+        24.5,
+        18.5,
+        24.5,
+        18,
+        18.9,
+        18.9,
+        18.8,
+        18,
+        19,
+        18.5,
+        24.25,
+        24,
+        24.5,
+        24.4,
+        24.4,
+        24.4,
+        19,
+        24.4,
+        26.2,
+        18.6,
+        24.25,
+        18.6,
+        25.5,
+        26,
+        19.5,
+        19.5,
+        24,
+        20,
+        19,
+        26.2,
+        24,
+        26.1,
+        19.5,
+        18.75,
+        20.5,
+        20.5,
+        19.75,
+        21,
+        22,
+        22.1,
+        23.5,
+        20,
+        22,
+        22,
+        22.25,
+        22.1,
+        22.5,
+        23.25,
+        22.75,
+        18,
+        24.4,
+        23.25,
+        20,
+        22.75,
+        23.25,
+        18.5,
+        19.5
+      ],
+      "pour over": [
+        38
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 50
+        },
+        "notation": "Single numbered 0–50 stepless dial, adjusted by rotating the hopper collar. Settings are recorded as numbers, including fractional positions such as 15.5. The collar can move beyond the marked scale; 50 is not a mechanical limit. Settings depend on calibration.",
+        "espresso": {
+          "min": 10,
+          "max": 20
+        },
+        "pourOver": {
+          "min": 30,
+          "max": 40
+        },
+        "smallestUsefulStep": 0.5,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.004438,
+      "ms": 7954
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 50
+        },
+        "notation": "Stepless numbered collar, normally recorded as a single number or decimal, such as 15 or 15.5. The printed scale runs from 0 to 50, but adjustment can extend beyond it; these are not mechanical limits. Settings depend on calibration.",
+        "espresso": {
+          "min": 10,
+          "max": 20
+        },
+        "pourOver": {
+          "min": 30,
+          "max": 40
+        },
+        "smallestUsefulStep": 0.5,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.004248,
+      "ms": 8005
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 50
+        },
+        "notation": "0–50 marked stepless dial; record the number aligned with the white indicator dot, including fractional positions between marks. Higher numbers are coarser; rotate the bean funnel clockwise for finer and anticlockwise for coarser. The marked scale is not a hard limit: extra-coarse adjustment beyond 50 is possible, but no standardized extended numeric notation is specified. Smallest useful adjustment is not established. Manufacturer’s manual and guidance: ([nzowners.org](https://nzowners.org/home/Niche_Zero_IFU.pdf))",
+        "espresso": {
+          "min": 10,
+          "max": 20
+        },
+        "pourOver": {
+          "min": 35,
+          "max": 50
+        },
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 3,
+      "cost": 0.040896,
+      "ms": 13255
+    },
+    "noise": [],
+    "vsWeb": [
+      "pour-over range"
+    ],
+    "fitA": {
+      "espresso": 0.41025641025641024,
+      "pour over": 1
+    },
+    "fitWeb": {
+      "espresso": 0.3717948717948718,
+      "pour over": 1
+    }
+  },
+  {
+    "name": "Baratza Vario+",
+    "methods": [
+      "espresso",
+      "pour over",
+      "immersion"
+    ],
+    "observed": {
+      "espresso": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "pour over": [
+        8,
+        7,
+        8,
+        7,
+        8,
+        8,
+        8,
+        8,
+        7,
+        7,
+        7
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 10
+        },
+        "notation": "Two stepped adjustment levers: macro 1–10 and micro A–W (23 lettered positions). Settings are written as number + letter, such as 2Q. Macro 1 is finest and 10 coarsest; micro A is finest and W coarsest. The numeric scale describes only the macro lever, not a complete setting. It supports both espresso and pour-over, but I do not know reliable typical ranges to provide. The smallest selectable adjustment is one micro-letter position; this has no single numeric dial-unit equivalent.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.005662,
+      "ms": 11520
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 10
+        },
+        "notation": "Two stepped sliders, not a single dial: macro 1–10 plus micro A–W, giving 230 combinations. Settings are written as a number and letter, e.g. 2Q. Macro 1 is finest and 10 coarsest; micro A is finest and W coarsest within a macro setting. The numeric scale above describes only the macro slider.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.005042,
+      "ms": 8983
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 10
+        },
+        "notation": "Standalone grinder with two stepped levers, not a rotary dial: macro 1–10 plus micro A–V, written as number+letter (e.g. 2Q). Higher numbers and later letters are coarser; move either lever up for finer, down for coarser. Scale above represents only the macro lever, not the complete setting. ([assets.breville.com](https://assets.breville.com/ZCG887/manual-varioplus-en-v1-6_082123.pdf)) Manufacturer starting points: espresso 2Q, Hario V60 6M, Chemex 9M; these are starting points, not established numeric ranges, so range fields are null. One micro click is the fine-adjustment increment; 12 micro clicks equal one macro click. With beans present, run the motor when adjusting finer. ([assets.breville.com](https://assets.breville.com/ZCG887/manual-varioplus-en-v1-6_082123.pdf))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 4,
+      "cost": 0.049934,
+      "ms": 16097
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Fellow Ode Brew Grinder Gen 2",
+    "methods": [
+      "pour over"
+    ],
+    "observed": {
+      "pour over": [
+        7,
+        6,
+        5.2,
+        6.9,
+        6.7,
+        6,
+        4.7,
+        6,
+        5.7,
+        6,
+        7.25,
+        5.7,
+        5.7,
+        5.7,
+        5.7,
+        6,
+        5.7,
+        5.7,
+        6.6,
+        5.7,
+        5,
+        5,
+        6.5,
+        6,
+        6.5,
+        5,
+        5,
+        6,
+        5.5,
+        7,
+        6,
+        5,
+        4.6,
+        7,
+        5.3,
+        5,
+        7.25,
+        4.5,
+        4.5,
+        5,
+        5.2,
+        4.7,
+        4.7,
+        6.3,
+        4.7,
+        6,
+        5.7,
+        5.7,
+        5.7,
+        5.7,
+        6.3,
+        5,
+        6.3,
+        7.6,
+        5.3,
+        5,
+        5.7,
+        6.3,
+        6.3,
+        6.3,
+        5.3,
+        5,
+        4.1,
+        5.3,
+        4.3,
+        5.3,
+        4.5,
+        4.5,
+        5,
+        4.7,
+        4.3,
+        4,
+        4.1,
+        3.67,
+        4.1,
+        4.1,
+        5.3,
+        5.3,
+        5.3,
+        5.3,
+        5.2,
+        5.5,
+        5.5,
+        5.5,
+        5.5
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone brew grinder with 31 settings: numbered positions 1–11, with two intermediate clicks between each pair of numbers. Users commonly write these as 1, 1.1, 1.2, 2, etc.; the suffix denotes intermediate clicks, not decimal fractions.",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004748,
+      "ms": 13033
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "1–11 with 31 positions: two intermediate clicks between each numbered setting. Settings can be written as 4, 4⅓, 4⅔, 5; users also write 4.1 and 4.2 for the intermediate clicks, meaning first and second clicks after 4, not decimal tenths.",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.004678,
+      "ms": 10458
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "1–11 numbered dial with two intermediate clicks between integers (31 total positions). Write settings as 5, 5 + 1/3, 5 + 2/3; shorthand 5.1 and 5.2 means one and two clicks past 5, not decimal tenths. Smallest adjustment is one click (1/3 numbered dial unit). Standalone grinder; ranges assume stock Gen 2 Brew Burrs. Manufacturer pour-over guide spans approximately 3–6. ([fellowproducts.com](https://fellowproducts.com/products/ode-brew-grinder-gen-2)) Higher numbers are coarser. ([fellowproducts.com](https://fellowproducts.com/pages/gear-guide-ode/search?utm_source=openai)) Not intended for espresso. ([help.fellowproducts.com](https://help.fellowproducts.com/hc/en-us/articles/10034632333339-Is-Ode-Gen-2-suitable-for-grinding-espresso))",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 3,
+      "cost": 0.056482,
+      "ms": 15355
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {
+      "pour over": 0.8705882352941177
+    },
+    "fitWeb": {
+      "pour over": 0.8705882352941177
+    }
+  },
+  {
+    "name": "ads asd",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        20
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": false,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "unknown",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 0,
+      "cost": 0.001428,
+      "ms": 2989
+    },
+    "b": {
+      "profile": {
+        "recognized": false,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Unknown; the text \"ads asd\" does not identify a specific grinder model.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 0,
+      "cost": 0.001578,
+      "ms": 2920
+    },
+    "web": {
+      "profile": {
+        "recognized": false,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "unknown; web searches for \"ads asd\" did not identify a coffee grinder or espresso machine, or locate a manufacturer's manual or specifications. A brand and model number or a photo of the machine and dial is needed.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 1,
+      "cost": 0.01903,
+      "ms": 6218
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Breville Smart Grinder Pro",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        3
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 60
+        },
+        "notation": "Whole-number grind-size settings 1–60 on the digital display, changed using the side dial; 1 is finest and 60 is coarsest. There is also a separate internal upper-burr adjustment, numbered 1–10, which shifts the external dial's effective range. Record that internal setting separately when comparing recipes. This profile is for the standalone Smart Grinder Pro, not a Breville machine's built-in grinder.",
+        "espresso": {
+          "min": 1,
+          "max": 30
+        },
+        "pourOver": {
+          "min": 35,
+          "max": 45
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004332,
+      "ms": 8236
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 60
+        },
+        "notation": "Single integer from 1–60 on the digital display, adjusted with the side grind-size dial. Lower numbers are finer. A separate internal upper-burr adjustment changes the calibration; it is not part of the displayed setting. This profile is for the standalone Smart Grinder Pro, not a Breville machine with a built-in grinder.",
+        "espresso": {
+          "min": 1,
+          "max": 30
+        },
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004622,
+      "ms": 8651
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 60
+        },
+        "notation": "Breville Smart Grinder Pro BCG820 standalone grinder: integer grind-size settings 1–60 shown on the LCD, with 1 finest and 60 coarsest; adjust by one numbered setting. Espresso range 1–30; manufacturer starting point 12. These are external grind-size settings, not grind-time settings or the separate adjustable upper-burr setting. Do not apply this profile to an unidentified built-in grinder. Pour-over range is unknown: the US manual specifies 31–48 for paper-filter drip coffee, not explicitly pour-over. Source: Breville BCG820 instruction manual. ([breville.com](https://www.breville.com/content/dam/breville/us/assets/miscellaneous/instruction-manual/coffee-grinders/BCG820-instruction-manual.pdf))",
+        "espresso": {
+          "min": 1,
+          "max": 30
+        },
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.03785,
+      "ms": 11336
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {
+      "espresso": 1
+    },
+    "fitWeb": {
+      "espresso": 1
+    }
+  },
+  {
+    "name": "Breville Barista Touch",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        6,
+        7,
+        8,
+        7
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 30
+        },
+        "notation": "Single-number setting on the built-in grinder's 1–30 stepped side dial; 1 is finest and 30 is coarsest. A separate internal upper-burr adjustment can shift the grind range without changing the external dial notation.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.003702,
+      "ms": 7436
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 30
+        },
+        "notation": "External grind-size dial: integer settings 1–30, with 1 finest and 30 coarsest. The built-in grinder also has a separately adjustable upper burr; changing that calibration shifts the grind produced at each external setting.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.003882,
+      "ms": 7594
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 30
+        },
+        "notation": "Breville Barista Touch BES880 built-in grinder: 30 discrete settings, recorded as whole numbers (e.g. 14 or 15). Turn the physical side dial; the selected number appears on the touchscreen. Higher numbers are coarser; 1 is finest and 30 is coarsest. These are external settings, not internal burr settings. Manufacturer specifications and manual: ([breville.com](https://www.breville.com/en-us/product/bes880?bvstate=pg%3A4%2Fct%3Ar&utm_source=openai)) No verified typical espresso or pour-over interval; null means unknown, not necessarily unsuitable.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 3,
+      "cost": 0.03804,
+      "ms": 13446
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Baratza Encore",
+    "methods": [
+      "espresso",
+      "pour over",
+      "immersion"
+    ],
+    "observed": {
+      "espresso": [
+        7,
+        8,
+        7,
+        7,
+        7,
+        7,
+        7,
+        8,
+        7,
+        7,
+        7,
+        7,
+        4,
+        8,
+        6,
+        6,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        5,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        7,
+        7,
+        6,
+        7,
+        6,
+        6,
+        6,
+        6,
+        7,
+        7,
+        7,
+        6,
+        5,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "pour over": [
+        18,
+        18,
+        20,
+        18
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 40
+        },
+        "notation": "1–40 integer settings, selected by rotating the bean hopper; one click equals one setting. This describes the original standalone Encore, not the Encore ESP. Espresso adjustment is limited; I don't know a reliable typical espresso range for this model.",
+        "espresso": null,
+        "pourOver": {
+          "min": 15,
+          "max": 25
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.00449,
+      "ms": 10825
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 40
+        },
+        "notation": "Whole-number settings 1–40, selected by rotating the bean hopper; each click is one setting. This describes the original standalone Encore, not the Encore ESP. Burr calibration can shift the useful ranges.",
+        "espresso": {
+          "min": 1,
+          "max": 10
+        },
+        "pourOver": {
+          "min": 15,
+          "max": 25
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.00348,
+      "ms": 6424
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 40
+        },
+        "notation": "Standard Baratza Encore (not Encore ESP): integer settings 1–40, one click per setting. Rotate the bean hopper to align its silver indicator with the desired number; higher numbers are coarser. The manufacturer gives starting points, not typical ranges: espresso 8, Hario V60 15, Chemex 20. Espresso and pour-over ranges are therefore left null rather than guessed. Adjust while running or completely empty of beans. Source: manufacturer’s Encore operations manual. ([assets.breville.com](https://assets.breville.com/ZCG485/manual-encore-en-v4-3-120122.pdf))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.029608,
+      "ms": 11221
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {
+      "pour over": 1
+    },
+    "fitWeb": {}
+  },
+  {
+    "name": "Breville Oracle Touch",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        11
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 45
+        },
+        "notation": "Whole-number settings 1–45 on the built-in grinder's side adjustment dial; 1 is finest and 45 is coarsest.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.00308,
+      "ms": 8302
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 45
+        },
+        "notation": "Whole-number settings 1–45, selected with the side grind-size dial and shown on the display; 1 is finest and 45 is coarsest. This describes the built-in grinder's external adjustment, not its internal burr adjustment.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.00314,
+      "ms": 5212
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 45
+        },
+        "notation": "Breville Oracle Touch BES990 built-in grinder: integer settings 1–45, e.g. '30', adjusted using the side dial. 1 is finest; 45 is coarsest. Turn clockwise for finer, counter-clockwise for coarser. The manufacturer recommends starting espresso at 30 but does not specify a typical espresso range or a pour-over range. ([breville.com](https://www.breville.com/content/dam/breville/ca/assets/miscellaneous/instruction-manual/espresso/BES990-instruction-manual.pdf))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.028722,
+      "ms": 9685
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Mazzer Philos",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Numbered rear adjustment dial; settings are recorded as dial numbers. Factory adjustment is stepped, with approximately 6 microns of burr movement per click; it can also be configured for stepless adjustment. I do not reliably know the full numbered range.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004208,
+      "ms": 8731
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 120
+        },
+        "notation": "Rear-mounted numbered dial, recorded as a single setting from 0–120. Normally stepped, with approximately 6 micrometres of burr movement per click; it can also be configured for stepless adjustment. The zero reference depends on calibration.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004438,
+      "ms": 7842
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Single numeric setting on the rear adjustment dial, e.g. 25 or 100; one notch is one dial unit and changes burr spacing by 6 microns. Stepped by default, but user-convertible to stepless; confirm the user's mode before prescribing clicks. Factory zero includes clearance between the burrs and can be recalibrated. Full numeric dial endpoints were not verified in manufacturer documentation. ([mazzer.com](https://www.mazzer.com/en/blocchi-prodotto/faq-philos/?utm_source=openai)) Manufacturer starting ranges are 10–40 for espresso and 80–120 for filter/pour-over; increasing the number makes the grind coarser. ([mazzer.com](https://www.mazzer.com/wp-content/uploads/2024/04/IPH0L001S-QQQ.pdf?x39751=&utm_source=openai))",
+        "espresso": {
+          "min": 10,
+          "max": 40
+        },
+        "pourOver": {
+          "min": 80,
+          "max": 120
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.038668,
+      "ms": 13285
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Fiorenzato AllGround",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Indexed adjustment ring with click positions and three brewing sectors: Espresso, Moka, and Filter. I do not know its numeric labeling well enough to specify a reliable numeric notation.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003284,
+      "ms": 7004
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Indexed adjustment collar divided into espresso, moka, and filter zones. I do not reliably know its printed numeric scale or standard numeric setting notation.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003274,
+      "ms": 6739
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Standalone grinder with a non-numeric adjustment ring marked Espresso, Moka and Filter, aligned against a red reference notch. Record the sector and position relative to its markings rather than inventing a numeric scale. Clockwise makes the grind coarser; anticlockwise makes it finer; the manual requires adjustment with the motor running. Espresso uses the Espresso sector; pour-over uses the Filter sector. ([fiorenzatohome.com](https://www.fiorenzatohome.com/pdf/Manuale%20Macinacaffe%20AllGround_Ed_04-2024-IT-EN-DE-ES-FR%28Testo%29.pdf)) Manufacturer specifications describe the adjustment as micrometric-continuous, but stepped versus stepless operation is not established unambiguously by the manufacturer material checked. ([ep-shopify.s3.amazonaws.com](https://ep-shopify.s3.amazonaws.com/related-documents/fiorenzato/specs/allground-grinder-specs.pdf?utm_source=openai))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 3,
+      "cost": 0.05505,
+      "ms": 14160
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "FELLOW ODE GEN 2",
+    "methods": [
+      "pour over"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "1–11 dial with 31 click positions: two intermediate clicks between adjacent whole numbers. Settings are commonly written 4, 4.1, 4.2, 5, where .1 and .2 identify intermediate clicks, not decimal distances. In linear dial units these correspond to 4, 4⅓, 4⅔, 5.",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.005996,
+      "ms": 11905
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "1–11 dial with 31 positions: two intermediate clicks between each numbered setting. Settings can be written as thirds (3, 3⅓, 3⅔, 4) or as numbered sub-steps (3, 3.1, 3.2, 4). In sub-step notation, .1 and .2 mean clicks, not decimal fractions.",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.005576,
+      "ms": 9299
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone Fellow Ode Brew Grinder Gen 2, with a numbered 1–11 dial and 31 discrete positions: two intermediate clicks between consecutive whole numbers. Record settings as whole numbers plus thirds, e.g. 5, 5 + 1/3, 5 + 2/3, 6; do not interpret click-index notation such as 5.1 as decimal 5.1. One click equals 1/3 dial unit. Manufacturer specifications confirm 31 steps, and Fellow uses '5 + 1/3' notation. ([fellowproducts.com](https://fellowproducts.com/collections/grind-brew/products/ode-brew-grinder-gen-2?variant=40978992529508&utm_source=openai)) Higher numbers are coarser. ([fellowproducts.com](https://fellowproducts.com/pages/gear-guide-ode/search?utm_source=openai)) The stock Gen 2 burr guide indicates approximately 3–6 for pour-over. ([help.fellowproducts.com](https://help.fellowproducts.com/hc/article_attachments/9962286440219)) Not intended for espresso. ([fellowproducts.com](https://fellowproducts.com/collections/grind-brew/products/ode-brew-grinder-gen-2?variant=40978992529508&utm_source=openai))",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 3,
+      "cost": 0.03518,
+      "ms": 16913
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "La Marzocco Pico",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Stepped grind-adjustment collar; I do not know its exact numeric labeling or how users record intermediate settings.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004062,
+      "ms": 9110
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "The La Marzocco Pico is a standalone espresso grinder, not a machine with a built-in grinder. I do not reliably know its dial numbering, adjustment mechanism, or setting notation.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 0,
+      "cost": 0.004852,
+      "ms": 11149
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Standalone grinder with a micro-stepped numbered collar; US manufacturer specs classify it as stepped. ([lamarzoccousa.com](https://www.lamarzoccousa.com/home-products/coffee-grinders/pico/)) Lower numbers are finer; higher numbers are coarser. ([home.lamarzoccousa.com](https://home.lamarzoccousa.com/wp-content/uploads/2024/01/Pico-Manual.pdf)) Collar numbering goes up to 27, but the ring rotates multiple times, so this is not a bounded full adjustment range. Record the collar reading along with revolution/calibration context; an unqualified number may be ambiguous. Manufacturer-recommended espresso range 7–15 applies only when the finest stop has been indexed to 26 using its calibration procedure. ([home.lamarzoccousa.com](https://home.lamarzoccousa.com/the-details-of-calibration-fine-tuning-your-pico/)) The full numeric range, pour-over range, and smallest useful adjustment in dial units are not established by these sources.",
+        "espresso": {
+          "min": 7,
+          "max": 15
+        },
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 2,
+      "cost": 0.037886,
+      "ms": 11580
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Cuisinart DBM-8P1",
+    "methods": [
+      "pour over",
+      "immersion"
+    ],
+    "observed": {
+      "immersion": [
+        10,
+        10
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Standalone Supreme Grind burr grinder with 18 selectable grind positions, adjusted by rotating the bean hopper. The selector uses fine-to-coarse markings; I do not know an official numeric numbering scheme. Record settings by marked position rather than assuming a 1–18 dial.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003462,
+      "ms": 7438
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Standalone Supreme Grind automatic burr grinder. Rotate the bean hopper to select one of 18 discrete grind positions, grouped under Fine, Medium, and Coarse labels. I do not know a manufacturer-defined numeric numbering scheme; app-assigned numbers should not be assumed to match the grinder.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003832,
+      "ms": 8172
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Standalone grinder with an 18-position rotating hopper/grind selector: Fine, Medium, and Coarse, with six positions per category. Positions are marked by dots rather than a manufacturer-defined numeric scale; do not assume 1–18 numbering or its direction. The separate 4–18 slide dial selects the number of cups, not grind size. The manual recommends Fine for espresso but does not specify a numeric espresso or pour-over range. ([cuisinart.com](https://www.cuisinart.com/supreme-grind-automatic-burr-mill/DBM-8P1.html))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 4,
+      "cost": 0.032974,
+      "ms": 12697
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Fellow Ode Gen 1",
+    "methods": [
+      "pour over"
+    ],
+    "observed": {
+      "pour over": [
+        4.2
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone grinder with a 1–11 dial and 31 click positions: three click intervals per whole number. Settings can be written as a numbered mark plus one or two clicks, or as thirds (for example, 2, 2⅓, 2⅔, 3).",
+        "espresso": null,
+        "pourOver": {
+          "min": 2,
+          "max": 5
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004644,
+      "ms": 8230
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "1–11 dial with 31 positions: two intermediate clicks between each numbered setting. Record intermediate settings as, for example, '4 + 1 click' or '4 + 2 clicks'; each click is one-third of a numbered interval.",
+        "espresso": null,
+        "pourOver": {
+          "min": 2,
+          "max": 5
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004944,
+      "ms": 9371
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone grinder; numbered dial 1–11 with 31 positions (two intermediate clicks between each whole number). Record intermediate settings as a number plus 1/3 or 2/3, e.g. 4 + 1/3; shorthand 4.1 and 4.2 means first and second clicks after 4, not decimal tenths. Higher numbers are coarser. Profile assumes original Gen 1 burrs. Manufacturer guidance: ([fellowproducts.com](https://fellowproducts.com/blogs/learn/how-to-dial-in-your-coffee-with-ode-brew-grinder))",
+        "espresso": null,
+        "pourOver": {
+          "min": 2,
+          "max": 5
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 3,
+      "cost": 0.03607,
+      "ms": 13808
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {
+      "pour over": 1
+    },
+    "fitWeb": {
+      "pour over": 1
+    }
+  },
+  {
+    "name": "Fellow Ode",
+    "methods": [
+      "espresso",
+      "immersion"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone filter-coffee grinder. Dial numbered 1–11, with two intermediate clicks between whole numbers (31 positions total). Write settings as whole numbers plus thirds, e.g. 4, 4⅓, 4⅔, 5; app notation may differ. Pour-over recommendations depend on whether this is the original Ode, Ode Gen 2, or an Ode with replacement burrs, so no single range is supplied.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.005168,
+      "ms": 10729
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone brew grinder. Dial labeled 1–11, with two intermediate positions between consecutive integers (31 settings total). Record intermediate positions as thirds, e.g. 4, 4⅓, 4⅔, 5. Original Ode and Ode Gen 2 have different burrs and grind-range recommendations; the name alone does not identify the generation.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.005248,
+      "ms": 9608
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone Fellow Ode Brew Grinder; generation and installed burrs unspecified. Dial numbered 1–11, with 31 discrete settings total: two intermediate clicks between adjacent whole numbers. Record settings as a whole number plus clicks, e.g. '5 + 1 click' or '5 + 2 clicks'; one click equals one-third of a numbered dial interval. Higher settings are coarser. Pour-over range is left null because the unspecified generation/burr set affects the appropriate starting range, not because Ode is unsuitable for pour-over. Espresso is unsupported. Manufacturer references: ([fellowproducts.com](https://fellowproducts.com/pages/gear-guide-ode/search?utm_source=openai))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.038736,
+      "ms": 13119
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Turin DF64v",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        12,
+        17
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 90
+        },
+        "notation": "0–90 stepless numbered collar; settings are recorded as numbers, with fractional positions possible between markings. The zero reference depends on calibration. This is a standalone grinder; its variable-speed control is separate from grind size. I do not know reliable model-specific espresso or pour-over intervals; null below does not mean it is unsuitable.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004512,
+      "ms": 8162
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 90
+        },
+        "notation": "0–90 stepless grind dial; settings are recorded as dial numbers, including intermediate values. The numbered scale is a reference, not discrete clicks. The burr-touch zero can differ from the printed zero. This is a standalone grinder; its separate RPM control is not the grind setting.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004172,
+      "ms": 7590
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 90
+        },
+        "notation": "0–90 stepless grind-size collar; record the number at the indicator, not clicks or the separate RPM setting. The DF64V is a standalone grinder. Manufacturer manual recommends espresso 10–30 and pour-over 40–60 as starting ranges. ([turingrinders.com](https://www.turingrinders.com/products/turin-df64v-gen-2-grinder-with-ion-generator-variable-speed-single-dose-grinder?utm_source=openai))",
+        "espresso": {
+          "min": 10,
+          "max": 30
+        },
+        "pourOver": {
+          "min": 40,
+          "max": 60
+        },
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 6,
+      "cost": 0.072104,
+      "ms": 25324
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {
+      "espresso": 1
+    }
+  },
+  {
+    "name": "Generic Hand Grinder with 40 levels",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": false,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Unknown; '40 levels' does not identify a specific grinder or establish its numbering convention.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 0,
+      "cost": 0.001596,
+      "ms": 2660
+    },
+    "b": {
+      "profile": {
+        "recognized": false,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Unknown; '40 levels' does not identify the grinder or establish its dial numbering or setting notation.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 0,
+      "cost": 0.001616,
+      "ms": 2719
+    },
+    "web": {
+      "profile": {
+        "recognized": false,
+        "adjustment": "unknown",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "unknown; no manufacturer manual or specifications could be matched to this generic name. '40 levels' alone does not establish numbered endpoints, click notation, or adjustment direction.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "low"
+      },
+      "searches": 1,
+      "cost": 0.01925,
+      "ms": 4760
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Breville Barista Express",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        7,
+        4,
+        2,
+        6,
+        6,
+        5,
+        8,
+        5,
+        5,
+        6
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 16
+        },
+        "notation": "External grind-size dial: whole-number settings 1–16, with 1 finest and 16 coarsest. Some versions also have a separate adjustable upper burr; changing that shifts the grind sizes associated with the external numbers. Espresso starting guidance is commonly setting 5, but I do not know a reliable typical espresso range. I also do not know a reliable pour-over range for this built-in grinder.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.004032,
+      "ms": 8615
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 16
+        },
+        "notation": "External dial settings are recorded as integers 1–16; 1 is finest and 16 coarsest. The usual recommended espresso starting setting is 5, not a guaranteed working range. Models with an adjustable internal upper burr also have a separate calibration setting; changing it shifts the grind sizes produced by the external dial.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004092,
+      "ms": 8793
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 16
+        },
+        "notation": "BES870 built-in grinder: external GRIND SIZE dial, integer settings 1–16 (1 finest, 16 coarsest); record settings as integers, e.g. 5. One numbered setting is one adjustment step. The separate adjustable upper burr changes calibration and should be recorded separately; do not confuse GRIND SIZE with GRIND AMOUNT. Breville recommends starting espresso at 5 but does not establish a typical espresso interval or a pour-over interval. ([breville.com](https://www.breville.com/content/dam/breville/us/en/assets/miscellaneous/instruction-manual/espresso/BES870-instruction-manual.pdf))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.02954,
+      "ms": 9540
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Turin DF64 Gen 2",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        12
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 90
+        },
+        "notation": "Stepless dial marked 0–90; settings are recorded as a single number, with fractional positions possible. The scale is a reference, not a set of clicks. Zero should be referenced to burr touch; calibration can shift the usable numbers.",
+        "espresso": {
+          "min": 5,
+          "max": 25
+        },
+        "pourOver": {
+          "min": 40,
+          "max": 60
+        },
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004966,
+      "ms": 8264
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 90
+        },
+        "notation": "0–90 stepless collar dial; settings are recorded as a single number, with fractional values possible. The adjustable indicator should be referenced to burr-touch zero. Calibration and burr choice affect usable settings.",
+        "espresso": {
+          "min": 5,
+          "max": 20
+        },
+        "pourOver": {
+          "min": 30,
+          "max": 60
+        },
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004956,
+      "ms": 9061
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 90
+        },
+        "notation": "0–90 stepless numbered collar; record the pointer reading, including fractional positions rather than clicks. Turin confirms continuous adjustment. ([turingrinders.com](https://www.turingrinders.com/products/turin-df64-gen-2-single-dose-coffee-grinder-1?utm_source=openai)) The DF Grinders chart shows higher numbers as coarser, with starting references around 5–20 for espresso and 50–70 for pour-over. ([device.report](https://device.report/m/90e05f8ef1e23a87b366423d0153e6d274298335cd805d1ad151fc5163027cde_optim.pdf?utm_source=openai)) These are starting points, not fixed limits: establish the individual grinder's zero-point offset before comparing settings. ([dfgrinders.com](https://dfgrinders.com/pages/df64-grind-size-guide)) No verified minimum useful adjustment was found.",
+        "espresso": {
+          "min": 5,
+          "max": 20
+        },
+        "pourOver": {
+          "min": 50,
+          "max": 70
+        },
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 5,
+      "cost": 0.057404,
+      "ms": 16745
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {
+      "espresso": 1
+    },
+    "fitWeb": {
+      "espresso": 1
+    }
+  },
+  {
+    "name": "Kinu M47 Phoenix Manual",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {
+      "espresso": [
+        8.2,
+        8.2,
+        8.8,
+        8.4,
+        8.2,
+        8.8,
+        8.4,
+        8.2,
+        8.4,
+        8.2,
+        8,
+        1.5,
+        1.5,
+        8.2,
+        8.2,
+        1.7,
+        1.6,
+        1.5,
+        1.7,
+        1.6,
+        1.6,
+        1.6,
+        1.5,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.7,
+        1.6,
+        1.6,
+        1.6,
+        1.7,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.6,
+        1.5,
+        1.4,
+        1.4,
+        1.4,
+        1.4,
+        1.4,
+        1.6
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Multi-turn adjustment referenced to burr zero. Settings are commonly written as turns.number.mark, e.g. 2.3.0 means 2 full turns plus dial number 3. The numbered dial runs 0–9 within each revolution, with 50 reference divisions per revolution; these are markings, not clicks. The full setting range is not simply 0–9.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.005184,
+      "ms": 9975
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Multi-turn adjustment measured from burr-touch zero. Settings are commonly written as rotations.number.tick, e.g. 2.3.4: two full turns, numbered position 3, then four additional divisions. The knob has numbers 0–9 and 50 divisions per revolution. This notation is not a decimal number; retain the components when recording settings. There is no single fixed 0–N numeric scale.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.005294,
+      "ms": 9888
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Standalone manual grinder, not a built-in grinder. Record full turns plus the dial number and subdivision; Kinu's recording sheet labels these Turns / Number / Clicks. The adjustment is stepless, with 50 marked subdivisions per revolution, not 50 mandatory steps. For an app, decimal total turns is an unambiguous alternative: one marked subdivision equals 0.02 turn. Increasing total turns opens the burr gap and makes the grind coarser. Loosen the top counter-screw before adjusting; turn the adjustment wheel clockwise for finer or counter-clockwise for coarser, then retighten the counter-screw. A full multi-turn numeric maximum is not specified in the manufacturer material reviewed. ([cdn.shopify.com](https://cdn.shopify.com/s/files/1/0908/1244/9069/files/Kinu_-_M47_Phoenix_User_Manual.pdf?v=1772011140)) Typical espresso and pour-over ranges were not established by those sources; the manual's generic 1.5-turn initial setting is not a method-specific range. ([cdn.shopify.com](https://cdn.shopify.com/s/files/1/0908/1244/9069/files/Kinu_-_M47_Phoenix_User_Manual.pdf?v=1772011140)) The current product specification advertises adjustments as fine as 5 microns, but does not establish the smallest adjustment that meaningfully changes the cup. ([kinugrinders.com](https://kinugrinders.com/products/m47-phoenix-3))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 4,
+      "cost": 0.068522,
+      "ms": 15535
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Eureka Mignon Libra",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Numbered micrometric adjustment knob, with settings between markings and across multiple revolutions. Clockwise makes the grind finer; counterclockwise makes it coarser. The markings repeat each revolution and are not a calibrated absolute grind-size scale. Record the knob position plus revolution count relative to a reference point; a number alone is ambiguous.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.003922,
+      "ms": 7531
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Numbered, stepless micrometric adjustment knob that can make multiple revolutions. Clockwise makes the grind finer; counterclockwise makes it coarser. The printed number alone is not an absolute grind setting: record the knob position together with its revolution count relative to a defined reference. I do not know the exact printed numeric range.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003822,
+      "ms": 6972
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "unknown",
+        "scale": null,
+        "notation": "Standalone Eureka Mignon Libra (standard 55 mm model), with a stepless micrometric adjustment knob. Manufacturer specifications confirm stepless adjustment. ([eureka.co.it](https://eureka.co.it/en/products/eureka%2B1920/prosumer%2Bgrinders/gbw%2Brange/117/)) The manufacturer’s manual specifies clockwise = finer and counterclockwise = coarser; use these directions for adjustments. The sources checked do not establish a full numeric scale, a standardized numeric setting notation, or whether increasing printed numbers means coarser. ([maxicoffee.com](https://www.maxicoffee.com/images/pdf/Eureka-Mignon-Libra-Manual.pdf))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 4,
+      "cost": 0.046362,
+      "ms": 15383
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Timemore 78s",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 18
+        },
+        "notation": "Timemore Sculptor 078S: 0–18 stepless dial; settings can be recorded as decimal positions between markings. The dial's zero point can be recalibrated.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003524,
+      "ms": 6343
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 18
+        },
+        "notation": "TIMEMORE Sculptor 078S: 0–18 stepless dial; settings can be recorded between numbered marks, e.g. 3.5. The zero point can be recalibrated, so identical dial numbers may not represent identical burr gaps across grinders.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.004014,
+      "ms": 6791
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 18
+        },
+        "notation": "Identified as the standalone TIMEMORE Sculptor 078S, not the stepped 078. Continuous 0–18 dial; record fractional positions as decimal numbers, not clicks. TIMEMORE confirms stepless adjustment; its manual specifies smaller numbers for finer grounds and larger numbers for coarser grounds. Espresso and pour-over ranges and a smallest useful increment were not sufficiently verified, so are left null. ([timemore.com](https://www.timemore.com/products/timemore-electric-coffee-grinder-sculptor-series))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 7,
+      "cost": 0.059874,
+      "ms": 21282
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Zerno Z1",
+    "methods": [
+      "pour over"
+    ],
+    "observed": {
+      "pour over": [
+        500,
+        625,
+        675,
+        525,
+        525
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Numbered stepless adjustment dial, referenced to a calibrated burr-zero point. I do not know the exact numeric scale or how multiple revolutions are recorded.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.0027,
+      "ms": 4953
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Numeric markings on a stepless adjustment dial. I do not know the full marked range or a reliable convention for recording settings beyond one revolution.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.00331,
+      "ms": 5772
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepless",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 1400
+        },
+        "notation": "Stepless micron (µm) dial; record settings such as 200 µm or 600 µm, referenced to the calibrated zero point. Manufacturer specifies a 0–1400 µm adjustment range. ([zerno.co](https://zerno.co/products/zerno-z1?utm_source=openai)) Typical espresso and pour-over ranges were not verified in accessible manufacturer documentation, so those fields are null; the manufacturer's FAQ gives starting settings of 200 µm for espresso and 600 µm for pour-over, not ranges. Higher settings are coarser. ([zerno.co](https://zerno.co/pages/faq?utm_source=openai)) Smallest useful adjustment is unverified.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": null,
+        "confidence": "high"
+      },
+      "searches": 4,
+      "cost": 0.042668,
+      "ms": 13242
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "1Zpresso ZP6",
+    "methods": [
+      "pour over"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "External numbered adjustment ring with 60 clicks per revolution and 10 clicks per numbered interval. Settings are commonly written as dial numbers with tenths: 4.5 means 45 clicks from calibrated zero. Zero calibration can differ between grinders; the ring can pass zero on subsequent revolutions.",
+        "espresso": null,
+        "pourOver": {
+          "min": 4,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.007096,
+      "ms": 14024
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Numbered external adjustment dial. Settings are commonly written as decimals, such as 4.5, with each click representing 0.1. Settings should be referenced to a calibrated burr-touch zero; the full usable numeric range is not known.",
+        "espresso": null,
+        "pourOver": {
+          "min": 4,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.005446,
+      "ms": 9955
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "For the ZP6 Special manual grinder: decimal dial numbers, e.g. 4.5 = number 4 plus 5 clicks from calibrated zero. External adjustment ring; 10 clicks per numbered interval, 90 clicks per revolution. Clockwise is coarser; counterclockwise is finer. Settings can exceed one revolution, so 9 is not a maximum; the manufacturer does not specify the full mechanical range. Zero is calibrated where the handle begins turning with resistance, not at forced burr lock. These specifications assume 'ZP6' means ZP6 Special; confirm the version because the original ZP6 differs. ([1zpresso.coffee](https://1zpresso.coffee/manual-k-en/?utm_source=openai))",
+        "espresso": null,
+        "pourOver": {
+          "min": 4,
+          "max": 5
+        },
+        "smallestUsefulStep": 0.1,
+        "confidence": "medium"
+      },
+      "searches": 3,
+      "cost": 0.04086,
+      "ms": 15004
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "KINGrinder P1",
+    "methods": [
+      "espresso"
+    ],
+    "observed": {},
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Internal adjustment, recorded as total clicks from the gently closed burr position (zero), including clicks across multiple revolutions. Larger click counts are coarser; this is not a fixed-range numbered dial.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003282,
+      "ms": 5766
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Internal adjustment, recorded as total clicks from the fully closed burr-zero position; 30 clicks per full rotation. Counts continue across rotations, rather than resetting each turn. I do not know a fixed maximum click count or reliable model-specific recommended brewing ranges.",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.003562,
+      "ms": 6794
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": null,
+        "notation": "Manual hand grinder with an internal adjustment dial. Record total clicks counterclockwise from fully closed zero, not just the dial marking: 30 clicks per revolution, so 45 clicks = 1 revolution + 15 clicks. Clockwise is finer; counterclockwise is coarser. The full adjustment range is not specified. Do not grind below 8 clicks. Manufacturer specifies 0.0333 mm adjustment per click. ([uploads.strikinglycdn.com](https://uploads.strikinglycdn.com/files/cc5b0283-a270-4fd6-a06a-03db19d43b1f/KINGrinder%20Lightweight%20Manual%20Hand%20Coffee%20Grinder.pdf?id=4217690&t=1734682095))",
+        "espresso": {
+          "min": 10,
+          "max": 20
+        },
+        "pourOver": {
+          "min": 45,
+          "max": 60
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 4,
+      "cost": 0.044502,
+      "ms": 13475
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {},
+    "fitWeb": {}
+  },
+  {
+    "name": "Fellow Ode 2",
+    "methods": [
+      "pour over"
+    ],
+    "observed": {
+      "pour over": [
+        6,
+        6,
+        5
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Standalone Fellow Ode Gen 2: dial numbered 1–11, with two intermediate clicks between adjacent whole numbers (31 positions total). Settings may be written as 4, 4.1, 4.2, then 5; in that notation, .1 and .2 mean the first and second intermediate clicks, not decimal tenths.",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.004752,
+      "ms": 9541
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "1–11 numbered dial with 31 positions: two intermediate clicks between consecutive integers. Users commonly write these as 1, 1.1, 1.2, 2, etc.; .1 and .2 denote intermediate clicks, not decimal tenths.",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 0,
+      "cost": 0.005012,
+      "ms": 9955
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 11
+        },
+        "notation": "Fellow Ode Brew Grinder Gen 2, a standalone grinder. Dial numbered 1–11 with 31 total positions: two intermediate clicks between adjacent integers. Settings are written 4, 4.1, 4.2, 5; .1 and .2 denote intermediate clicks, not decimal tenths. Adjust by clicks rather than decimal arithmetic. Higher numbers are coarser. Espresso is unsupported; the manufacturer's stock Gen 2 burr guide indicates pour-over settings approximately 3–6. Sources: manufacturer specifications ([fellowproducts.com](https://fellowproducts.com/collections/grind-brew/products/ode-brew-grinder-gen-2?variant=40978992529508&utm_source=openai)), adjustment direction ([fellowproducts.com](https://fellowproducts.com/pages/gear-guide-ode/search?utm_source=openai)), setting notation examples ([fellowproducts.com](https://fellowproducts.com/blogs/brew-talks/fellows-take-on-mulu-by-prodigal-brew-guide?utm_source=openai)), and grind guide ([help.fellowproducts.com](https://help.fellowproducts.com/hc/article_attachments/9962286440219)).",
+        "espresso": null,
+        "pourOver": {
+          "min": 3,
+          "max": 6
+        },
+        "smallestUsefulStep": 0.3333333333333333,
+        "confidence": "high"
+      },
+      "searches": 3,
+      "cost": 0.041566,
+      "ms": 16393
+    },
+    "noise": [],
+    "vsWeb": [],
+    "fitA": {
+      "pour over": 1
+    },
+    "fitWeb": {
+      "pour over": 1
+    }
+  },
+  {
+    "name": "Barratza Encore",
+    "methods": [
+      "pour over",
+      "espresso",
+      "immersion"
+    ],
+    "observed": {
+      "immersion": [
+        20
+      ],
+      "pour over": [
+        18
+      ]
+    },
+    "a": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 40
+        },
+        "notation": "Assuming 'Barratza Encore' means the standalone Baratza Encore, not the Encore ESP: rotate the hopper to select a numbered setting, written as an integer from 1–40. Lower numbers are finer; higher numbers are coarser. The standard Encore has no separate micro-adjustment.",
+        "espresso": null,
+        "pourOver": {
+          "min": 15,
+          "max": 20
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.00418,
+      "ms": 9889
+    },
+    "b": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 0,
+          "max": 40
+        },
+        "notation": "Assuming “Barratza Encore” means the original Baratza Encore, not the Encore ESP: rotate the bean hopper to select a numbered setting on the 0–40 scale. Settings are recorded as single integers; higher numbers are coarser.",
+        "espresso": {
+          "min": 4,
+          "max": 10
+        },
+        "pourOver": {
+          "min": 12,
+          "max": 24
+        },
+        "smallestUsefulStep": 1,
+        "confidence": "medium"
+      },
+      "searches": 0,
+      "cost": 0.00409,
+      "ms": 8666
+    },
+    "web": {
+      "profile": {
+        "recognized": true,
+        "adjustment": "stepped",
+        "higherIsCoarser": "yes",
+        "scale": {
+          "min": 1,
+          "max": 40
+        },
+        "notation": "Interpreted as Baratza Encore (original model, not Encore ESP). Settings are whole-number clicks from 1–40, written as e.g. '15'; rotate the bean hopper to align its silver indicator with the setting. Higher numbers are coarser. Adjust while running or completely empty of beans. The manufacturer's manual gives starting points, not typical ranges: espresso 8, Hario V60 15, Chemex 20; espresso and pourOver are null because verified range endpoints are not supplied. ([assets.breville.com](https://assets.breville.com/ZCG485/manual-encore-en-v4-3-120122.pdf))",
+        "espresso": null,
+        "pourOver": null,
+        "smallestUsefulStep": 1,
+        "confidence": "high"
+      },
+      "searches": 2,
+      "cost": 0.03306,
+      "ms": 11926
+    },
+    "noise": [
+      "pour-over range"
+    ],
+    "vsWeb": [],
+    "fitA": {
+      "pour over": 1
+    },
+    "fitWeb": {}
+  }
+]

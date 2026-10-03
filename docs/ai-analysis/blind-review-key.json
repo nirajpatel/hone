@@ -1,0 +1,42 @@
+[
+  {
+    "case": 1,
+    "A": "new:gpt-6.1-sol",
+    "B": "new:gpt-6-astra"
+  },
+  {
+    "case": 2,
+    "A": "new:gpt-6-astra",
+    "B": "new:gpt-6.1-sol"
+  },
+  {
+    "case": 3,
+    "A": "new:gpt-6.1-sol",
+    "B": "new:gpt-6-astra"
+  },
+  {
+    "case": 4,
+    "A": "new:gpt-6.1-sol",
+    "B": "new:gpt-6-astra"
+  },
+  {
+    "case": 5,
+    "A": "new:gpt-6.1-sol",
+    "B": "new:gpt-6-astra"
+  },
+  {
+    "case": 6,
+    "A": "new:gpt-6.1-sol",
+    "B": "new:gpt-6-astra"
+  },
+  {
+    "case": 7,
+    "A": "new:gpt-6-astra",
+    "B": "new:gpt-6.1-sol"
+  },
+  {
+    "case": 8,
+    "A": "new:gpt-6.1-sol",
+    "B": "new:gpt-6-astra"
+  }
+]
