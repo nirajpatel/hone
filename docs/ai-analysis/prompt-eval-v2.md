@@ -90,6 +90,29 @@ gpt-5.4 and Sol were re-run together (gpt-5.4 scored 23/29 on names that run); t
 
 Same answers on region (both got the decaf blend wrong in the same way); Sol is about 3s slower per lookup, so lookups stay on gpt-5.4.
 
+## 6. Hold or move (`scripts/test-hold-or-move.mjs`)
+
+After deploy, 14 of 21 regenerated suggestions said to hold or repeat. Some were wrong: eight Decent cups in a row at grind 20 after an Excellent one at 19.5, and still "repeat 20". The cause was three scattered rules (the anti-repeat rule's "hold and re-taste" option and its hold-once exception, "mixed outcomes → repeat the settings", and the exceptional-brew rule). They are now one rule 3, "Hold or move":
+
+- hold only on an Excellent cup, or once after a single Bad cup at settings that were Decent before (unless it names a new defect);
+- otherwise move toward the best-rated earlier brew, starting with the parameter that differs most;
+- an unrated cup is never answered with "rate it"; it counts below any Decent cup and gets the move the rated history points to.
+
+The eval replays all 166 household brews with later brews hidden (Sol, `medium`) and applies the first suggestion:
+
+| | Before | After (2 runs) |
+|---|---|---|
+| Holds | 76/166 | 20–21/166 |
+| Held although an earlier, better-rated brew used different settings | 34/57 | 1/57 |
+| Moved toward that better brew / away | 26% / 9% | 75–77% / 12% |
+| Excellent cups held | 17/18 | 17–18/18 |
+| Unrated cups answered only with "rate / re-taste" | 16/27 | 0/27 |
+| Rated cups toward the next better brew found later: closer / farther | 25% / 37% | 27–31% / 48–50% |
+| Grind/temperature/ratio moves that contradict the tasting notes, unexplained | 1 | 3–4 |
+
+- More moves means more moves away from the later best brew. Reading those cases, most are standard fixes (bitter → coarser, watery → finer, burnt → cooler water); the later best often came from an unrelated recipe change (e.g. Ethiopia Wuri's Excellent cup changed dose, ratio and grind at once). The closed-loop replay (section 2) is unchanged: 1/7 reached on both runs, open loop 23–27% closer.
+- Improvement eval (section 1) on the new rules: 96.0 vs 97.3. The hold-once scorer now also passes a return to the earlier Decent cup's exact settings, which is what the new prompt does in 4 of 6 cases (e.g. Frame back to 30.5g after a Bad 34.2g shot).
+
 ## Caveats
 
 - The scorers are wording heuristics tuned on gpt-5.4 output, and several checks have n of 6–16.
@@ -102,6 +125,7 @@ Same answers on region (both got the decaf blend wrong in the same way); Sol is 
 node scripts/test-brew-prompt.mjs --arms old:gpt-5.4,new:gpt-6.1-sol,new:gpt-6-astra --runs 2
 node scripts/test-brew-prompt.mjs --rescore docs/ai-analysis/prompt-eval-models.json   # after changing a scorer
 node scripts/test-replay-to-best.mjs --arms old:gpt-5.4,new:gpt-6.1-sol --runs 2
+node scripts/test-hold-or-move.mjs --label after
 node scripts/test-first-brew.mjs --arms old:gpt-5.4,new:gpt-6.1-sol
 node scripts/test-bag-extraction.mjs --models gpt-5.4,gpt-6.1-sol
 ```

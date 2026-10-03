@@ -11,7 +11,7 @@
  *   Voice
  *     noHedges, imperative
  *   Behavior (new rules)
- *     holdOnce            single Bad cup at settings that were Decent+ before → repeat the settings
+ *     holdOnce            single Bad cup at settings that were Decent+ before → repeat them or return to the Decent+ brew's exact settings
  *     noDoubleHold        second Bad cup in a row at the same settings → don't hold again
  *     avoidsBadCluster    never proposes settings the tried-settings list marks consistently Bad
  *     staysInHabitBand    next dose / water temp stay inside the brewer's standard band
@@ -122,6 +122,7 @@ function buildCases() {
           grindTol,
           bands,
           badClusters: ctx.ledger.filter((c) => c.consistentlyBad).map((c) => c.brews[0]),
+          goodSame: earlierSame.filter((b) => b.quality >= 2),
           applies: {
             holdOnce: target.quality === 1 && earlierSame.some((b) => b.quality >= 2) && !(prevSame && prev.quality === 1),
             noDoubleHold: target.quality === 1 && !!prevSame && prev.quality === 1,
@@ -214,7 +215,8 @@ async function score(c, arm, g) {
     // Technique advice and small temperature/yield moves are not holds.
     const unchanged = ["grindSetting", "dosage", "finalWeight", "waterTemp"].every((k) => !(Math.abs(num(next[k]) - current[k]) > 1e-6));
     const isHold = applied.kind === "hold" || (applied.kind === "change" && unchanged);
-    if (c.applies.holdOnce) checks.holdOnce = isHold;
+    const returnsToGood = c.goodSame.some((b) => sameSettings(next, b, c.method, c.grindTol) && Math.abs(num(next.waterTemp) - num(b.waterTemp)) <= 1);
+    if (c.applies.holdOnce) checks.holdOnce = isHold || returnsToGood;
     if (c.applies.noDoubleHold) checks.noDoubleHold = !isHold;
     if (c.applies.avoidsBadCluster) checks.avoidsBadCluster = !c.badClusters.some((b) => sameSettings(next, b, c.method, c.grindTol));
     if (c.applies.staysInHabitBand) {

@@ -658,18 +658,21 @@ export function buildBrewRules(brewMethod: string): string {
 IMPORTANT CONSIDERATIONS:
 1. Focus on the BASELINE BREW (marked ⭐ BASELINE): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried.
 2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions. When a GRINDER line is given, follow its direction and setting format, but write grind settings exactly the way the brew history writes them (same notation and letter case).
-3. Anti-repeat escalation: When the same parameter+direction has been suggested in any of the three prior brews on this coffee, you MUST NOT repeat the same magnitude. Either (a) escalate the magnitude meaningfully (~2× the prior step) and explain why, (b) switch to a different parameter from the decision hierarchy, or (c) explicitly recommend holding all parameters and re-tasting to confirm the diagnosis. The minimal-change preference does not apply once a small step in this direction has already been tried without improvement.
-   - Hold once: if the baseline is a single bad cup at settings that produced Decent or better before, recommend repeating those settings (Medium or Low confidence) unless the tasting notes name a new defect. If the previous cup at these settings was also bad, move on with (a) or (b). Never hold twice in a row.
+3. Hold or move (decide this first; the goal is Excellent, so Decent is not a reason to hold):
+   - Hold (repeat the baseline settings) only when the baseline is Excellent, or when it is a single Bad cup at settings that were Decent or better before (similar grind, dose, ratio and time) and its notes name no new defect; then use Medium or Low confidence and don't do it twice in a row. Never hold just to re-taste or collect a rating.
+   - Move toward better brews: if an earlier brew of this coffee was rated higher than the baseline, the first suggestion moves toward that brew's settings, starting with the parameter that differs most. Reverting to a proven setting is not repetition. Say which parameters stay unchanged because the best brews share them.
+   - Unrated baseline: the cup is gone, so never ask to re-taste or rate it, and don't guess how it tasted. Count every Decent or better brew as rated higher (the most recent one when tied): hold only if the best rated brews used these settings; otherwise move toward the best as above. If the baseline already matches it, or nothing is rated Decent, keep fixing the last recorded defect. You may add one alternative for a different outcome (e.g. "if it turned bitter instead, go back to 5.2").
+   - Mixed outcomes at the same settings mean execution or bean variance: name a recipe cause only when it is the single recorded difference, and don't treat the mix as a reason to hold when a better-rated brew used different settings. Never propose settings listed as consistently Bad.
+   - No repeated small steps: if the same parameter and direction was suggested in any of the three prior brews without improvement, escalate (~2× the prior step) and say why, or switch to another parameter from the decision hierarchy.
 4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
 5. Baseline Brew Terminology: When referring to the baseline brew in your summary or suggestions, always use the term "baseline brew". This brew is the starting point for improvement suggestions.
 6. Do not infer causes that are not supported by recorded data.
 7. Evidence order when sources disagree: the baseline brew, then this coffee's tried settings and history, then the brewer's preferences. Lines marked "low sample" are hints, not targets.
-8. Tried settings: mixed outcomes at the same settings mean execution or bean variance, so repeat the settings rather than move the recipe; name a cause only when it is the single recorded difference. Never propose settings listed as consistently Bad.
-9. Bean age: days off roast is a freshness signal only for room-temperature beans. For frozen beans, do not attribute taste to age.
-10. Keep any parameter listed as the brewer's standard inside its band unless history shows the band causes the problem.
+8. Bean age: days off roast is a freshness signal only for room-temperature beans. For frozen beans, do not attribute taste to age.
+9. Keep any parameter listed as the brewer's standard inside its band unless history shows the band causes the problem.
 
 ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy (use this order unless history strongly suggests otherwise; default to small steps for the first attempt at a parameter, then escalate per rule 3):
+A) Decision hierarchy (use this order unless rule 3 or the history points elsewhere; default to small steps for the first attempt at a parameter, then escalate per rule 3):
    - Grind setting${espressoFlow}
    - Final weight / ratio${immersionTime}
    - Water temperature
@@ -686,17 +689,12 @@ C) Confidence score:
 
 D) Primary failure mode:
    - Identify exactly ONE primary failure mode for the baseline brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield"). All suggestions must directly address it.
-   - Re-derive this from the baseline brew's recorded outcome alone; do not carry forward the diagnosis from any prior brew. If the same diagnosis recurs across consecutive brews despite parameter changes, treat that as evidence the diagnosis itself is wrong and consider an alternative cause (e.g. dose / ratio rather than grind, or puck preparation).
+   - Re-derive this from the baseline brew's recorded outcome alone (for an unrated baseline, from the brews rule 3 points to); do not carry forward the diagnosis from any prior brew. If the same diagnosis recurs across consecutive brews despite parameter changes, treat that as evidence the diagnosis itself is wrong and consider an alternative cause (e.g. dose / ratio rather than grind, or puck preparation).
 
 E) Quality over quantity:
    - If fewer than three high-quality, non-redundant suggestions exist, provide fewer.
    - It is acceptable to provide only 1-2 suggestions if those are the most impactful.
-   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
-
-F) Exceptional brews:
-   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning. Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
-   - If a parameter appears optimal based on excellent brews, explicitly state it should remain unchanged.`;
+   - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.`;
 }
 
 const TONE = `TONE AND VOICE:

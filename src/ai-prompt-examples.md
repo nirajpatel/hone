@@ -22,7 +22,7 @@ Real prompts generated from household data by the shared builder in `supabase/fu
 - **Brew history:** the 15 most recent brews of this bean and method (every bag), plus the baseline and best brew if older. One line per brew: date, setup, days off roast, frozen or room temp, settings, rating, notes, and the guidance shown before that brew.
 - **Tried settings:** groups of near-identical settings on this setup with their outcomes and what differed. Grind tolerance is 5% of the grinder's observed range.
 - **Brewer preferences:** last 20 rated brews on the same brewer and grinder, across all coffees. Covers habit bands, typical Decent-or-better ranges for the roast bucket (n ≥ 5, otherwise labeled low sample), and recurring complaints.
-- **Rules:** hold once, never hold twice, evidence order, frozen-bean age rule, standard bands, and the brewer's own tasting words.
+- **Rules:** hold or move (hold only on an Excellent cup or a one-off Bad cup at proven settings; otherwise move toward the best-rated brew; unrated cups are judged from the rated ones and never answered with "rate it"), evidence order, frozen-bean age rule, standard bands, and the brewer's own tasting words.
 
 **First brew (no brews of this bean yet):** up to 3 reference beans (same grinder, roast within one level, origin, recency) with their best brews, plus the brewer preferences. Without references it falls back to typical ranges.
 
@@ -48,6 +48,8 @@ COFFEE:
 - Region: Colombia, Ethiopia
 - Roast Level: Medium-Light
 - Flavor Notes: Milk Chocolate, Toasted Nuts, Ripe Fruit
+
+GRINDER: Niche Zero: higher numbers are coarser. Stepless dial printed 0–50, with no clicks between marks; write the dial number, allowing fractional settings, e.g. 15.5. Higher numbers mean coarser grinds, and adjustment can extend beyond the printed 50 mark.
 
 GOAL: Help achieve an excellent rating (3/3 stars) with a well-rounded, balanced cup of coffee.
 
@@ -79,19 +81,22 @@ BREWER PREFERENCES (Niraj Patel, espresso on La Marzocco Linea Mini + Niche Zero
 
 IMPORTANT CONSIDERATIONS:
 1. Focus on the BASELINE BREW (marked ⭐ BASELINE): Your suggestions should specifically address how to improve THIS brew. Use the brew history to understand what has been tried.
-2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions.
-3. Anti-repeat escalation: When the same parameter+direction has been suggested in any of the three prior brews on this coffee, you MUST NOT repeat the same magnitude. Either (a) escalate the magnitude meaningfully (~2× the prior step) and explain why, (b) switch to a different parameter from the decision hierarchy, or (c) explicitly recommend holding all parameters and re-tasting to confirm the diagnosis. The minimal-change preference does not apply once a small step in this direction has already been tried without improvement.
-   - Hold once: if the baseline is a single bad cup at settings that produced Decent or better before, recommend repeating those settings (Medium or Low confidence) unless the tasting notes name a new defect. If the previous cup at these settings was also bad, move on with (a) or (b). Never hold twice in a row.
+2. Equipment: Consider grinder scale direction (some use lower numbers for finer, others higher), sensitivity (stepless grinders like Niche Zero are highly sensitive ~0.5 adjustments, stepped grinders need 2-3 step adjustments), and brewer characteristics when making suggestions. When a GRINDER line is given, follow its direction and setting format, but write grind settings exactly the way the brew history writes them (same notation and letter case).
+3. Hold or move (decide this first; the goal is Excellent, so Decent is not a reason to hold):
+   - Hold (repeat the baseline settings) only when the baseline is Excellent, or when it is a single Bad cup at settings that were Decent or better before (similar grind, dose, ratio and time) and its notes name no new defect; then use Medium or Low confidence and don't do it twice in a row. Never hold just to re-taste or collect a rating.
+   - Move toward better brews: if an earlier brew of this coffee was rated higher than the baseline, the first suggestion moves toward that brew's settings, starting with the parameter that differs most. Reverting to a proven setting is not repetition. Say which parameters stay unchanged because the best brews share them.
+   - Unrated baseline: the cup is gone, so never ask to re-taste or rate it, and don't guess how it tasted. Count every Decent or better brew as rated higher (the most recent one when tied): hold only if the best rated brews used these settings; otherwise move toward the best as above. If the baseline already matches it, or nothing is rated Decent, keep fixing the last recorded defect. You may add one alternative for a different outcome (e.g. "if it turned bitter instead, go back to 5.2").
+   - Mixed outcomes at the same settings mean execution or bean variance: name a recipe cause only when it is the single recorded difference, and don't treat the mix as a reason to hold when a better-rated brew used different settings. Never propose settings listed as consistently Bad.
+   - No repeated small steps: if the same parameter and direction was suggested in any of the three prior brews without improvement, escalate (~2× the prior step) and say why, or switch to another parameter from the decision hierarchy.
 4. NO BREW IDs: Do not reference brew numbers (like "Brew #1" or "#3") in your response. When referring to previous brews, use descriptive terms like "previous attempts", "an earlier excellent brew", etc. The user does not have access to brew numbers.
 5. Baseline Brew Terminology: When referring to the baseline brew in your summary or suggestions, always use the term "baseline brew". This brew is the starting point for improvement suggestions.
 6. Do not infer causes that are not supported by recorded data.
 7. Evidence order when sources disagree: the baseline brew, then this coffee's tried settings and history, then the brewer's preferences. Lines marked "low sample" are hints, not targets.
-8. Tried settings: mixed outcomes at the same settings mean execution or bean variance, so repeat the settings rather than move the recipe; name a cause only when it is the single recorded difference. Never propose settings listed as consistently Bad.
-9. Bean age: days off roast is a freshness signal only for room-temperature beans. For frozen beans, do not attribute taste to age.
-10. Keep any parameter listed as the brewer's standard inside its band unless history shows the band causes the problem.
+8. Bean age: days off roast is a freshness signal only for room-temperature beans. For frozen beans, do not attribute taste to age.
+9. Keep any parameter listed as the brewer's standard inside its band unless history shows the band causes the problem.
 
 ADDITIONAL RULES TO FOLLOW:
-A) Decision hierarchy (use this order unless history strongly suggests otherwise; default to small steps for the first attempt at a parameter, then escalate per rule 3):
+A) Decision hierarchy (use this order unless rule 3 or the history points elsewhere; default to small steps for the first attempt at a parameter, then escalate per rule 3):
    - Grind setting
    - Flow behavior / puck preparation (if flow issues indicate channeling, address distribution, tamping, or pre-infusion before changing core parameters)
    - Final weight / ratio
@@ -109,17 +114,12 @@ C) Confidence score:
 
 D) Primary failure mode:
    - Identify exactly ONE primary failure mode for the baseline brew (e.g., "under-extracted due to fast flow" or "over-extracted due to excessive yield"). All suggestions must directly address it.
-   - Re-derive this from the baseline brew's recorded outcome alone; do not carry forward the diagnosis from any prior brew. If the same diagnosis recurs across consecutive brews despite parameter changes, treat that as evidence the diagnosis itself is wrong and consider an alternative cause (e.g. dose / ratio rather than grind, or puck preparation).
+   - Re-derive this from the baseline brew's recorded outcome alone (for an unrated baseline, from the brews rule 3 points to); do not carry forward the diagnosis from any prior brew. If the same diagnosis recurs across consecutive brews despite parameter changes, treat that as evidence the diagnosis itself is wrong and consider an alternative cause (e.g. dose / ratio rather than grind, or puck preparation).
 
 E) Quality over quantity:
    - If fewer than three high-quality, non-redundant suggestions exist, provide fewer.
    - It is acceptable to provide only 1-2 suggestions if those are the most impactful.
    - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
-
-F) Exceptional brews:
-   - If the history contains an exceptional brew, it is acceptable to recommend reverting one or more parameters back toward that setup, with reasoning. Reverting to a previously successful setting is not considered repetition.
-   - When referring to it, use descriptive language like "an earlier exceptional brew" without mentioning brew numbers.
-   - If a parameter appears optimal based on excellent brews, explicitly state it should remain unchanged.
 
 TONE AND VOICE:
 Use a calm, confident, craft-focused tone.
@@ -130,25 +130,25 @@ Sound like an experienced specialty barista giving guidance.
 ```json
 {
   "concise": {
-    "goal": "Confirm balance",
-    "action": "Hold and retaste",
+    "goal": "Increase sweetness",
+    "action": "Grind finer",
     "confidence": "Medium"
   },
   "full": {
-    "summary": "The baseline brew is unrated and has no tasting notes, so no flavor defect or quality improvement has been established. Its shorter shot time alone does not establish better sweetness or balance.",
-    "primaryIssue": "Unconfirmed extraction balance: the baseline brew lacks a recorded tasting outcome",
+    "summary": "The baseline brew is unrated. The closest rated brew was Decent: round, but lacking the sweetness needed for a balanced, excellent cup.",
+    "primaryIssue": "Insufficient sweetness in the closest rated short-ratio brew",
     "suggestions": [
       {
-        "parameter": "Recipe confirmation",
-        "action": "Repeat grind 23.25, dose 18.2g, yield 30.8g, and temperature 199.9°F; record a rating and assess sweetness, roundness, and body",
-        "effect": "This will establish whether the baseline brew retains the previous cup’s roundness while resolving its lack of sweetness",
-        "reasoning": "The latest coarser adjustment shortened the shot but has no recorded taste result, so confirm its effect before changing another parameter",
+        "parameter": "Grind setting",
+        "action": "Set grind to 22.75, 0.5 finer than the baseline brew, keeping dose at 18.2g, final weight at 30.8g and temperature at 199.9°F",
+        "effect": "This should increase sweetness while preserving the round texture of the closest Decent brew",
+        "reasoning": "The most recent Decent brew used this finer setting with the same short ratio and temperature, while longer-yield attempts retained watery notes",
         "confidence": "Medium"
       }
     ],
     "basis": [
-      "May 1, 2026: baseline brew unrated after coarser adjustment",
-      "Apr 30, 2026: Decent, Round, Lacks Sweetness at nearly identical yield"
+      "Apr 30, 2026: grind 22.75, 30.7g yield—Decent, Round, Lacks Sweetness",
+      "Apr 29, 2026: grind 22.75, 33.2g yield—Bad, Watery start"
     ]
   }
 }
