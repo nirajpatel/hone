@@ -10,6 +10,13 @@ import { BrewsEmptyState } from './BrewsEmptyState';
 import { line, area, curveMonotoneX } from 'd3-shape';
 import { COPY } from '../constants/copy';
 
+function shortGuidance(concise?: { goal: string; action: string }): string {
+  if (!concise) return '';
+  const action = concise.action.charAt(0).toUpperCase() + concise.action.slice(1);
+  const goal = concise.goal.charAt(0).toLowerCase() + concise.goal.slice(1);
+  return `${action} to ${goal}`;
+}
+
 interface BrewsTimelineViewProps {
   brews: Brew[];
   coffees: Coffee[];
@@ -385,77 +392,7 @@ export function BrewsTimelineView({
                           className="text-sm text-gray-500 text-left cursor-pointer"
                           style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
                         >
-                          {(() => {
-                            if (!firstSuggestion) return '';
-                            
-                            // Extract action: remove magnitude/details, keep core action (2-4 words)
-                            let action = firstSuggestion.action;
-                            action = action.replace(/\s+by\s+.*$/i, '');
-                            action = action.replace(/\s+to\s+\d+.*$/i, '');
-                            action = action.replace(/\s+~?[\d.–-]+.*$/i, '');
-                            action = action.replace(/\s+on\s+.*$/i, '');
-                            action = action.trim();
-                            const actionWords = action.split(/\s+/);
-                            if (actionWords.length > 4) {
-                              action = actionWords.slice(0, 4).join(' ');
-                            }
-                            
-                            // Extract goal from effect: look for key phrases (2-3 words)
-                            let goal = '';
-                            const effect = firstSuggestion.effect || '';
-                            
-                            // Common goal patterns - prioritize negative outcomes to fix
-                            const goalPatterns = [
-                              /(?:reduce|decrease|fix|eliminate|minimize)\s+(?:sourness|bitterness|astringency|channeling|under[- ]extraction|over[- ]extraction|acidity|harshness)/i,
-                              /(?:increase|improve|enhance|boost)\s+(?:strength|body|extraction|balance|clarity|sweetness|viscosity)/i,
-                              /(?:fix|resolve|address|prevent)\s+(?:channeling|uneven\s+extraction|flow\s+issues)/i,
-                            ];
-                            
-                            for (const pattern of goalPatterns) {
-                              const match = effect.match(pattern);
-                              if (match) {
-                                const matchedText = match[0];
-                                const words = matchedText.split(/\s+/);
-                                goal = words.slice(0, Math.min(3, words.length)).join(' ');
-                                goal = goal.charAt(0).toUpperCase() + goal.slice(1);
-                                break;
-                              }
-                            }
-                            
-                            // Fallback: extract from effect text more generically
-                            if (!goal) {
-                              if (effect.match(/reduce.*sour/i)) {
-                                goal = 'Reduce sourness';
-                              } else if (effect.match(/increase.*strength/i)) {
-                                goal = 'Increase strength';
-                              } else if (effect.match(/increase.*body/i)) {
-                                goal = 'Increase body';
-                              } else if (effect.match(/reduce.*bitter/i)) {
-                                goal = 'Reduce bitterness';
-                              } else if (effect.match(/improve.*extraction/i)) {
-                                goal = 'Improve extraction';
-                              } else {
-                                // Final fallback based on parameter and action direction
-                                const parameter = (firstSuggestion.parameter || '').toLowerCase();
-                                const actionLower = action.toLowerCase();
-                                
-                                if (parameter.includes('grind')) {
-                                  goal = actionLower.includes('finer') ? 'Increase extraction' : 'Reduce bitterness';
-                                } else if (parameter.includes('temperature')) {
-                                  goal = actionLower.includes('increase') ? 'Increase extraction' : 'Reduce bitterness';
-                                } else if (parameter.includes('weight') || parameter.includes('ratio')) {
-                                  goal = actionLower.includes('increase') ? 'Increase strength' : 'Reduce bitterness';
-                                } else {
-                                  goal = 'Improve balance';
-                                }
-                              }
-                            }
-                            
-                            // Capitalize first letter of action, lowercase first letter of goal
-                            const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
-                            const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
-                            return `${capitalizedAction} to ${lowercasedGoal}`;
-                          })()}
+                          {shortGuidance(newestBrew?.suggestion?.concise)}
                         </button>
                       )}
                     </p>
@@ -472,77 +409,7 @@ export function BrewsTimelineView({
                           className="text-sm text-gray-500 text-left cursor-pointer"
                           style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
                         >
-                          {(() => {
-                            if (!firstSuggestion) return '';
-                            
-                            // Extract action: remove magnitude/details, keep core action (2-4 words)
-                            let action = firstSuggestion.action;
-                            action = action.replace(/\s+by\s+.*$/i, '');
-                            action = action.replace(/\s+to\s+\d+.*$/i, '');
-                            action = action.replace(/\s+~?[\d.–-]+.*$/i, '');
-                            action = action.replace(/\s+on\s+.*$/i, '');
-                            action = action.trim();
-                            const actionWords = action.split(/\s+/);
-                            if (actionWords.length > 4) {
-                              action = actionWords.slice(0, 4).join(' ');
-                            }
-                            
-                            // Extract goal from effect: look for key phrases (2-3 words)
-                            let goal = '';
-                            const effect = firstSuggestion.effect || '';
-                            
-                            // Common goal patterns - prioritize negative outcomes to fix
-                            const goalPatterns = [
-                              /(?:reduce|decrease|fix|eliminate|minimize)\s+(?:sourness|bitterness|astringency|channeling|under[- ]extraction|over[- ]extraction|acidity|harshness)/i,
-                              /(?:increase|improve|enhance|boost)\s+(?:strength|body|extraction|balance|clarity|sweetness|viscosity)/i,
-                              /(?:fix|resolve|address|prevent)\s+(?:channeling|uneven\s+extraction|flow\s+issues)/i,
-                            ];
-                            
-                            for (const pattern of goalPatterns) {
-                              const match = effect.match(pattern);
-                              if (match) {
-                                const matchedText = match[0];
-                                const words = matchedText.split(/\s+/);
-                                goal = words.slice(0, Math.min(3, words.length)).join(' ');
-                                goal = goal.charAt(0).toUpperCase() + goal.slice(1);
-                                break;
-                              }
-                            }
-                            
-                            // Fallback: extract from effect text more generically
-                            if (!goal) {
-                              if (effect.match(/reduce.*sour/i)) {
-                                goal = 'Reduce sourness';
-                              } else if (effect.match(/increase.*strength/i)) {
-                                goal = 'Increase strength';
-                              } else if (effect.match(/increase.*body/i)) {
-                                goal = 'Increase body';
-                              } else if (effect.match(/reduce.*bitter/i)) {
-                                goal = 'Reduce bitterness';
-                              } else if (effect.match(/improve.*extraction/i)) {
-                                goal = 'Improve extraction';
-                              } else {
-                                // Final fallback based on parameter and action direction
-                                const parameter = (firstSuggestion.parameter || '').toLowerCase();
-                                const actionLower = action.toLowerCase();
-                                
-                                if (parameter.includes('grind')) {
-                                  goal = actionLower.includes('finer') ? 'Increase extraction' : 'Reduce bitterness';
-                                } else if (parameter.includes('temperature')) {
-                                  goal = actionLower.includes('increase') ? 'Increase extraction' : 'Reduce bitterness';
-                                } else if (parameter.includes('weight') || parameter.includes('ratio')) {
-                                  goal = actionLower.includes('increase') ? 'Increase strength' : 'Reduce bitterness';
-                                } else {
-                                  goal = 'Improve balance';
-                                }
-                              }
-                            }
-                            
-                            // Capitalize first letter of action, lowercase first letter of goal
-                            const capitalizedAction = action.charAt(0).toUpperCase() + action.slice(1);
-                            const lowercasedGoal = goal.charAt(0).toLowerCase() + goal.slice(1);
-                            return `${capitalizedAction} to ${lowercasedGoal}`;
-                          })()}
+                          {shortGuidance(newestBrew?.suggestion?.concise)}
                         </button>
                       )}
                     </p>
