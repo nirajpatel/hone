@@ -113,6 +113,37 @@ The eval replays all 166 household brews with later brews hidden (Sol, `medium`)
 - More moves means more moves away from the later best brew. Reading those cases, most are standard fixes (bitter → coarser, watery → finer, burnt → cooler water); the later best often came from an unrelated recipe change (e.g. Ethiopia Wuri's Excellent cup changed dose, ratio and grind at once). The closed-loop replay (section 2) is unchanged: 1/7 reached on both runs, open loop 23–27% closer.
 - Improvement eval (section 1) on the new rules: 96.0 vs 97.3. The hold-once scorer now also passes a return to the earlier Decent cup's exact settings, which is what the new prompt does in 4 of 6 cases (e.g. Frame back to 30.5g after a Bad 34.2g shot).
 
+## 7. First-brew grinder history and plain wording
+
+A first brew of a Medium-Dark blend on the Niche Zero came back at grind 25.5 on all 3 runs, and every explanation named another coffee ("coarser than Santo Blend's 24.4"). Your range on that grinder is 18–26, and recent coffees sat around 18–23. Three causes:
+
+- Each reference showed one brew, that coffee's highest rated. For Santo Blend that was a bitter 44s shot at 24.4.
+- Unrated coffees never appeared, and coffees more than one roast level away were filtered out, so the newest brews on the grinder were invisible.
+- The guideline said to name the reference in each explanation.
+
+Changes:
+
+- **One grinder section** replaces the similar-bean references: the last 6 coffees brewed on this grinder with this method, newest first, rated or not. Each line has roast, origin, bag notes, the middle grind setting and time of its Decent-or-better brews (all brews if none), the brew count, and the last date. No coffee names. Grind numbers only come from this grinder. A first try with "last 5 shots plus 3 similar beans" anchored on whichever coffee was brewed last (Peru: five shots of one Medium-Dark coffee at 24.4, copied as 24.5 against a best of 19), so the shot list was dropped.
+- **Brewer preferences match the brewer only**, not brewer plus grinder: dose, ratio, time, temperature and complaints don't depend on the grinder, so a new grinder keeps them. First brews on pour over also get the pours of the latest Decent-or-better brew.
+- **Guidelines are principles:** read the grind from the pattern across the grinder's coffees (closest roast, time against target, recent first), take the rest from the preferences, and explain values without pointing to one past coffee. The "Based on" line summarizes the brews as a group.
+- **Writing style** (both prompts) replaces "calm, craft-focused barista tone": plain everyday words, short sentences, no jargon beyond the brewer's own words, no filler, no dashes. Schema descriptions lost their sample phrases.
+
+Results (Sol, `low`, 2 runs each):
+
+| | Before | After |
+|---|---|---|
+| Medium-Dark blend on the Niche (3 runs) | 25.5 | 21 |
+| First-brew eval: median grind error (tolerances) | 4.9 / 5.1 | 5.1 / 5.1 |
+| First-brew eval: median ratio error | 0.76 | 0.27 |
+| First brews that name another coffee | 11/15 | 0/15 |
+| Em dashes in first-brew output (15 coffees) | 20–21 | 0 |
+| Improvement eval score (section 1) | 96.0 | 95.4 |
+| Hold-or-move replay: holds / bad holds / toward earlier better brew | 21 / 1 / 43–44 of 57 | 21 / 1 / 44 of 57 |
+
+- Grind accuracy is unchanged overall: Peru (24.5 → 22, best 19) and Frame (18.6 → 22.5, best 24) improved, a few pour overs moved a click either way. The Ode Gen 2 has only three clicks per number, so one click is several tolerances there.
+- Ratio improved because ratio now comes only from the brewer's typical Decent-or-better range instead of one reference brew.
+- Improvement decisions didn't move; the 0.6-point score change is one case each on two wording checks.
+
 ## Caveats
 
 - The scorers are wording heuristics tuned on gpt-5.4 output, and several checks have n of 6–16.
@@ -126,6 +157,6 @@ node scripts/test-brew-prompt.mjs --arms old:gpt-5.4,new:gpt-6.1-sol,new:gpt-6-a
 node scripts/test-brew-prompt.mjs --rescore docs/ai-analysis/prompt-eval-models.json   # after changing a scorer
 node scripts/test-replay-to-best.mjs --arms old:gpt-5.4,new:gpt-6.1-sol --runs 2
 node scripts/test-hold-or-move.mjs --label after
-node scripts/test-first-brew.mjs --arms old:gpt-5.4,new:gpt-6.1-sol
+node scripts/test-first-brew.mjs --arms old:gpt-5.4,new:gpt-6.1-sol   # --out tmp/x.md to keep the saved report
 node scripts/test-bag-extraction.mjs --models gpt-5.4,gpt-6.1-sol
 ```

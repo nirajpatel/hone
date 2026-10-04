@@ -65,7 +65,6 @@ export async function generateGuidance(arm, input) {
       userNames: input.userNames,
       grinderProfiles: input.grinderProfiles,
       historyLimit,
-      now: input.now,
     });
     prompt = P.buildImprovementPrompt(ctx);
     body = P.buildChatBody(
@@ -156,6 +155,31 @@ export async function mapLimit(items, limit, fn) {
     }),
   );
   return out;
+}
+
+const GENERIC_WORDS = new Set(["coffee", "coffees", "roasters", "roastery", "roasting", "co", "company", "espresso", "blend", "decaf", "light", "medium", "dark", "the", "bright", "sweet", "classic", "house"]);
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Other coffees' names and roasters that appear in `text`. Skips words that also describe the
+ * target (its name, roaster, region, notes) and generic coffee words, so only real leaks count.
+ */
+export function otherCoffeeMentions(text, coffees, target, sameIds) {
+  const own = `${target.name} ${target.roaster} ${target.region ?? ""} ${target.notes ?? ""}`.toLowerCase();
+  const distinctive = (s) => {
+    const words = String(s ?? "").replace(/["'”“]/g, " ").split(/\s+/).filter((w) => w && !GENERIC_WORDS.has(w.toLowerCase()) && !/^[\d.x]+$/i.test(w));
+    const phrase = words.join(" ").trim();
+    return phrase.length > 3 && !own.includes(phrase.toLowerCase()) ? phrase : null;
+  };
+  const terms = new Set();
+  for (const c of coffees) {
+    if (sameIds.includes(c.id)) continue;
+    const name = distinctive(c.name);
+    if (name) terms.add(name);
+    const roaster = distinctive(c.roaster);
+    if (roaster && roaster.toLowerCase() !== target.roaster?.trim().toLowerCase()) terms.add(roaster);
+  }
+  return [...terms].filter((t) => new RegExp(`\\b${escapeRe(t)}\\b`, "i").test(text));
 }
 
 export function argValue(name, fallback = null) {

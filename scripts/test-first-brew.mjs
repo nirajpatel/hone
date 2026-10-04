@@ -5,7 +5,7 @@
  * and measure how far they land from the coffee's actual best brew.
  *
  *   old:<model>  bag details only ("assume typical ranges for that grinder")
- *   new:<model>  similar-bean references + brewer profile
+ *   new:<model>  coffees recently brewed on the grinder + brewer profile
  *
  * Distances: grind in grinder tolerances (5% of the grinder's range), ratio, brew time,
  * water temperature. "Closer" compares the sum of normalized distances per coffee.
@@ -13,14 +13,16 @@
  * Usage:
  *   node scripts/test-first-brew.mjs --dry-run
  *   node scripts/test-first-brew.mjs --arms old:gpt-5.4,new:gpt-5.4,new:gpt-6.1-sol --runs 2
+ *   node scripts/test-first-brew.mjs --arms new:gpt-6.1-sol --out tmp/first-brew-before.md
  *
- * Writes docs/ai-analysis/first-brew-eval.md.
+ * Also counts other coffees named in the reader-facing text (introduction, recommendations,
+ * explanations, note) and em dashes. Writes docs/ai-analysis/first-brew-eval.md unless --out is given.
  */
 import fs from "node:fs/promises";
 import path from "node:path";
 import * as P from "../supabase/functions/make-server-23508aac/brewPrompts.ts";
 import { REPO_ROOT, callChat, costUsd, loadHousehold, requireEnv, ANALYZE_USER_ID } from "./lib/household.mjs";
-import { argValue, fmt, loadTuningCoffeeIds, mapLimit, mean, median, parseArms } from "./lib/guidanceArms.mjs";
+import { argValue, fmt, loadTuningCoffeeIds, mapLimit, mean, median, otherCoffeeMentions, parseArms } from "./lib/guidanceArms.mjs";
 import { buildLegacyChatBody, buildLegacyFirstBrewPrompt } from "./lib/legacyPrompt.mjs";
 
 const DRY = process.argv.includes("--dry-run");
@@ -30,6 +32,7 @@ const ARMS = parseArms(argValue("--arms", "old:gpt-5.4,new:gpt-5.4"));
 const RUNS = parseInt(argValue("--runs", "1"), 10);
 const CONCURRENCY = parseInt(argValue("--concurrency", "6"), 10);
 const EFFORT = argValue("--effort", "low");
+const OUT = argValue("--out", "docs/ai-analysis/first-brew-eval.md");
 
 const num = (v) => {
   const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
@@ -83,7 +86,7 @@ console.log(`[first-brew] ${cases.length} coffees · arms ${ARMS.map((a) => a.la
 if (DRY) {
   for (const c of cases) {
     const ctx = P.assembleGuidanceContext({ coffee: c.coffee, coffees: hh.coffees, householdBrews: c.priorBrews, brewMethod: c.method, sameCoffeeIds: c.sameIds, requesterUserId: c.best.userId, equipment: c.equipment });
-    console.log(`${c.set.padEnd(8)} ${c.label} [${c.method}] best ${P.qualityLabel(c.best.quality)} · references ${ctx.references.length} · prior brews ${c.priorBrews.length}`);
+    console.log(`${c.set.padEnd(8)} ${c.label} [${c.method}] best ${P.qualityLabel(c.best.quality)} · grinder coffees ${ctx.grinderHistory.length} · prior brews ${c.priorBrews.length}`);
   }
   process.exit(0);
 }
@@ -137,7 +140,6 @@ async function suggest(arm, c) {
       equipment: c.equipment,
       userNames: hh.userNames,
       grinderProfiles: hh.grinderProfiles,
-      now: new Date(c.best.createdAt),
     });
     prompt = P.buildFirstBrewPrompt(ctx);
     body = P.buildChatBody(
@@ -152,7 +154,15 @@ async function suggest(arm, c) {
   }
   const res = await callChat(body);
   const parsed = JSON.parse(res.content);
-  return { params: parseParams(parsed.parameters ?? [], c.method), costUsd: costUsd(arm.model, res.usage), elapsedMs: res.elapsedMs };
+  const params = parsed.parameters ?? [];
+  const reader = [parsed.introduction, ...params.flatMap((p) => [p.recommendation, p.explanation]), parsed.note].filter(Boolean).join(" ");
+  return {
+    params: parseParams(params, c.method),
+    leaks: otherCoffeeMentions(reader, hh.coffees, c.coffee, c.sameIds),
+    emDashes: (`${reader} ${(parsed.basis ?? []).join(" ")}`.match(/—/g) ?? []).length,
+    costUsd: costUsd(arm.model, res.usage),
+    elapsedMs: res.elapsedMs,
+  };
 }
 
 function distances(c, p) {
@@ -179,7 +189,7 @@ for (let run = 1; run <= RUNS; run++) {
       try {
         const s = await suggest(arm, c);
         const d = distances(c, s.params);
-        return { run, arm: arm.label, coffee: c.label, method: c.method, set: c.set, params: s.params, d, composite: composite(c, d), costUsd: s.costUsd, elapsedMs: s.elapsedMs };
+        return { run, arm: arm.label, coffee: c.label, method: c.method, set: c.set, params: s.params, leaks: s.leaks, emDashes: s.emDashes, d, composite: composite(c, d), costUsd: s.costUsd, elapsedMs: s.elapsedMs };
       } catch (e) {
         console.error(`  ${arm.label} ${c.label}: ${e.message.slice(0, 200)}`);
         return { run, arm: arm.label, coffee: c.label, method: c.method, set: c.set, error: e.message };
@@ -198,8 +208,8 @@ lines.push(
 lines.push("");
 lines.push("Median absolute distance from each coffee's best brew. Grind is in grinder tolerances (5% of that grinder's range across your brews). Lower is better.");
 lines.push("");
-lines.push("| Arm | Run | Grind (tol) | Ratio | Time (s) | Temp (°F) | Composite | Closer than old | Errors |");
-lines.push("|---|---|---|---|---|---|---|---|---|");
+lines.push("| Arm | Run | Grind (tol) | Ratio | Time (s) | Temp (°F) | Composite | Closer than old | Names other coffees | Em dashes | Errors |");
+lines.push("|---|---|---|---|---|---|---|---|---|---|---|");
 const oldLabel = ARMS.find((a) => a.version === "old")?.label;
 for (let run = 1; run <= RUNS; run++) {
   for (const arm of ARMS) {
@@ -213,7 +223,7 @@ for (let run = 1; run <= RUNS; run++) {
       closer = `${pairs.filter(([r, o]) => r.composite < o.composite).length}/${pairs.length}`;
     }
     lines.push(
-      `| \`${arm.label}\` | ${run} | ${med("grind")} | ${med("ratio")} | ${med("time")} | ${med("temp")} | ${fmt(median(ok.map((r) => r.composite).filter(Number.isFinite)), 1)} | ${closer} | ${results.filter((r) => r.run === run && r.arm === arm.label && r.error).length} |`,
+      `| \`${arm.label}\` | ${run} | ${med("grind")} | ${med("ratio")} | ${med("time")} | ${med("temp")} | ${fmt(median(ok.map((r) => r.composite).filter(Number.isFinite)), 1)} | ${closer} | ${ok.filter((r) => r.leaks.length).length}/${ok.length} | ${ok.reduce((n, r) => n + r.emDashes, 0)} | ${results.filter((r) => r.run === run && r.arm === arm.label && r.error).length} |`,
     );
   }
 }
@@ -233,5 +243,6 @@ for (const c of cases) {
 }
 lines.push("");
 
-await fs.writeFile(path.join(REPO_ROOT, "docs/ai-analysis/first-brew-eval.md"), lines.join("\n"));
-console.log("\n[first-brew] wrote docs/ai-analysis/first-brew-eval.md");
+await fs.writeFile(path.join(REPO_ROOT, OUT), lines.join("\n"));
+await fs.writeFile(path.join(REPO_ROOT, OUT.replace(/\.md$/, ".json")), JSON.stringify(results, null, 2));
+console.log(`\n[first-brew] wrote ${OUT}`);

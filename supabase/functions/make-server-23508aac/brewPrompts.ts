@@ -99,7 +99,7 @@ export interface CoffeeAliases {
 export const HISTORY_LIMIT = 15;
 const PROFILE_WINDOW = 20;
 const MIN_ROAST_BUCKET_N = 5;
-const REFERENCE_LIMIT = 3;
+const GRINDER_HISTORY_LIMIT = 6;
 const ROAST_LEVELS = ['Light', 'Medium-Light', 'Medium', 'Medium-Dark', 'Dark'];
 
 const norm = (s: unknown): string => String(s ?? '').trim().toLowerCase();
@@ -173,10 +173,6 @@ export function roastBucket(level: string | undefined): 'lighter' | 'medium' | '
   return i <= 1 ? 'lighter' : i === 2 ? 'medium' : 'darker';
 }
 
-function originCountry(region: string | undefined): string {
-  return norm((region ?? '').split(/[(,]/)[0]);
-}
-
 function quantile(sorted: number[], q: number): number {
   if (sorted.length === 0) return NaN;
   const pos = (sorted.length - 1) * q;
@@ -209,12 +205,12 @@ export function equipmentOf(brew: Brew): Equipment {
   };
 }
 
+const onSameGrinder = (brew: Brew, eq: Equipment): boolean => sameUnit(brew.grinderId, brew.grinderName, eq.grinderId, eq.grinderName);
+const onSameBrewer = (brew: Brew, eq: Equipment): boolean => sameUnit(brew.brewerId, brew.brewerName, eq.brewerId, eq.brewerName);
+
 /** Same brewer and grinder; brews missing both ID and name never match. */
 export function onSameEquipment(brew: Brew, eq: Equipment): boolean {
-  return (
-    sameUnit(brew.grinderId, brew.grinderName, eq.grinderId, eq.grinderName) &&
-    sameUnit(brew.brewerId, brew.brewerName, eq.brewerId, eq.brewerName)
-  );
+  return onSameGrinder(brew, eq) && onSameBrewer(brew, eq);
 }
 
 function setupLabel(eq: Equipment): string {
@@ -306,10 +302,13 @@ export function buildBrewerProfile(args: {
   roastLevel?: string;
   coffeesById: Map<string, Coffee>;
   brewerLabel?: string;
+  /** First brew only: improvement history already shows each brew's pours. */
+  includePours?: boolean;
 }): string[] {
   const { method, equipment, coffeesById } = args;
+  // Brewer only: nothing here depends on the grinder, so a new grinder keeps the brewer's habits.
   const rated = args.householdBrews
-    .filter((b) => b.userId === args.brewerUserId && b.brewMethod === method && b.quality && onSameEquipment(b, equipment))
+    .filter((b) => b.userId === args.brewerUserId && b.brewMethod === method && b.quality && onSameBrewer(b, equipment))
     .sort(byNewest);
   const window = rated.slice(0, PROFILE_WINDOW);
   if (window.length < 3) return [];
@@ -334,14 +333,14 @@ export function buildBrewerProfile(args: {
   const bucket = roastBucket(args.roastLevel);
   const inBucket = bucket ? rated.filter((b) => roastBucket(coffeesById.get(b.coffeeId)?.roastLevel) === bucket).slice(0, PROFILE_WINDOW) : [];
   let pool = window;
-  let label = 'all roasts on this setup';
+  let label = 'all roasts on this brewer';
   let lowSample = true;
   if (bucket && inBucket.length >= MIN_ROAST_BUCKET_N) {
     pool = inBucket;
-    label = `${bucket} roasts on this setup`;
+    label = `${bucket} roasts on this brewer`;
     lowSample = false;
   } else if (!bucket) {
-    label = 'all roasts on this setup (this coffee has no roast level)';
+    label = 'all roasts on this brewer (this coffee has no roast level)';
   }
   const good = pool.filter((b) => (b.quality ?? 0) >= 2);
   if (good.length >= 3) {
@@ -368,6 +367,14 @@ export function buildBrewerProfile(args: {
   }
   const top = [...complaints].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, 4);
   if (top.length) lines.push(`Recurring complaints on Bad brews: ${top.map(([n, c]) => `"${n}" ×${c}`).join(', ')}.`);
+
+  if (args.includePours && method === 'pour over') {
+    const poured = rated.find((b) => (b.quality ?? 0) >= 2 && Array.isArray(b.stages) && b.stages.length);
+    if (poured) {
+      const pours = poured.stages!.map((s) => `${formatTime(s.endTime, method)}→${s.endWeight}g`).join(', ');
+      lines.push(`Pours in the latest Decent-or-better brew (${formatBrewDate(poured)}, ${round(num(poured.dosage))}g → ${round(num(poured.finalWeight))}g): ${pours}.`);
+    }
+  }
 
   return lines;
 }
@@ -463,66 +470,66 @@ export function buildSettingsLedger(args: {
 }
 
 // ---------------------------------------------------------------------------
-// Similar beans (first brew)
+// Grinder history (first brew)
 // ---------------------------------------------------------------------------
 
-export interface ReferenceBean {
-  coffee: Coffee;
-  bestBrew: Brew;
-  sameGrinder: boolean;
-  line: string;
+/**
+ * The middle setting actually used (never an average: stepped dials like 5.1/5.2 have no 5.15).
+ * Settings with letters or several parts can't be ordered, so those use the most used one (newest on ties).
+ */
+function typicalGrind(brews: Brew[]): string {
+  if (brews.every((b) => /^\s*\d+(\.\d+)?\s*$/.test(String(b.grindSetting)))) {
+    const sorted = [...brews].sort((a, b) => grindNum(a) - grindNum(b));
+    return String(sorted[Math.floor((sorted.length - 1) / 2)].grindSetting).trim();
+  }
+  const counts = new Map<string, number>();
+  for (const b of [...brews].sort(byNewest)) {
+    const g = String(b.grindSetting ?? '').trim();
+    if (g) counts.set(g, (counts.get(g) ?? 0) + 1);
+  }
+  let best = 'n/a';
+  let bestN = 0;
+  for (const [g, n] of counts) if (n > bestN) { best = g; bestN = n; }
+  return best;
 }
 
-export function selectReferenceBeans(args: {
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+/**
+ * One line per coffee recently brewed on this grinder with this method, newest first, rated or
+ * not: its roast, typical setting and time (from its Decent-or-better brews when it has any), and
+ * when it was last brewed. Coffee names are left out so they don't end up in the guidance.
+ */
+export function buildGrinderHistory(args: {
   householdBrews: Brew[];
   coffeesById: Map<string, Coffee>;
-  target: Coffee;
   excludeCoffeeIds: string[];
   method: string;
   equipment: Equipment;
-  brewerUserId?: string;
-  now?: Date;
-}): ReferenceBean[] {
-  const { coffeesById, target, method, equipment } = args;
+}): string[] {
+  const { method, equipment, coffeesById } = args;
   const exclude = new Set(args.excludeCoffeeIds);
-  const now = args.now ?? new Date();
-  const targetRoast = roastIndex(target.roastLevel);
-  const targetCountry = originCountry(target.region);
-
   const byCoffee = new Map<string, Brew[]>();
-  for (const b of args.householdBrews) {
-    if (b.brewMethod !== method || !b.quality || exclude.has(b.coffeeId)) continue;
+  for (const b of [...args.householdBrews].sort(byNewest)) {
+    if (b.brewMethod !== method || exclude.has(b.coffeeId) || !coffeesById.has(b.coffeeId) || !onSameGrinder(b, equipment)) continue;
     if (!byCoffee.has(b.coffeeId)) byCoffee.set(b.coffeeId, []);
     byCoffee.get(b.coffeeId)!.push(b);
   }
-
-  const scored: Array<{ score: number; ref: ReferenceBean }> = [];
-  for (const [coffeeId, brews] of byCoffee) {
-    const coffee = coffeesById.get(coffeeId);
-    if (!coffee) continue;
-    const roast = roastIndex(coffee.roastLevel);
-    if (targetRoast >= 0 && roast >= 0 && Math.abs(targetRoast - roast) > 1) continue;
-    const onGrinder = brews.filter((b) => sameUnit(b.grinderId, b.grinderName, equipment.grinderId, equipment.grinderName));
-    const pool = onGrinder.length ? onGrinder : brews;
-    const best = [...pool].sort((a, b) => (b.quality ?? 0) - (a.quality ?? 0) || byNewest(a, b))[0];
-    let score = 0;
-    if (onGrinder.length) score += 4;
-    score += targetRoast < 0 || roast < 0 ? 0.5 : targetRoast === roast ? 3 : 2;
-    if (targetCountry && targetCountry === originCountry(coffee.region)) score += 1.5;
-    if (args.brewerUserId && best.userId === args.brewerUserId) score += 1;
-    if (best.quality === 3) score += 1;
-    const ageDays = (now.getTime() - new Date(best.createdAt).getTime()) / 86_400_000;
-    score += 1 - Math.min(Math.max(ageDays, 0), 365) / 365;
-
-    const age = daysOffRoast(coffee, best);
-    const desc = [coffee.roastLevel, coffee.region].filter(Boolean).join(', ') || 'roast and origin unknown';
-    const bean = [qualityLabel(best.quality), age !== null ? `${age}d off roast` : null, isFrozen(best) ? 'frozen' : 'room temp']
-      .filter(Boolean)
-      .join(', ');
-    const line = `- ${coffee.name} by ${coffee.roaster} (${desc}${coffee.notes ? `; bag notes: ${coffee.notes}` : ''}). Best brew ${formatBrewDate(best)} on ${setupLabel(equipmentOf(best))} (${bean}): ${formatParams(best, method)}${best.tastingNotes ? ` | notes: ${best.tastingNotes}` : ''}`;
-    scored.push({ score, ref: { coffee, bestBrew: best, sameGrinder: onGrinder.length > 0, line } });
-  }
-  return scored.sort((a, b) => b.score - a.score).slice(0, REFERENCE_LIMIT).map((s) => s.ref);
+  return [...byCoffee].slice(0, GRINDER_HISTORY_LIMIT).map(([coffeeId, brews]) => {
+    const coffee = coffeesById.get(coffeeId)!;
+    const good = brews.filter((b) => (b.quality ?? 0) >= 2);
+    const pool = good.length ? good : brews;
+    const times = pool.map((b) => num(b.brewTime)).filter(Number.isFinite).sort((a, b) => a - b);
+    const typical = [`grind ${typicalGrind(pool)}`, ...(times.length ? [formatTime(quantile(times, 0.5), method)] : [])].join(', ');
+    let from = plural(good.length, 'Decent-or-better brew');
+    if (!good.length) {
+      const bad = brews.filter((b) => b.quality === 1).length;
+      const unrated = brews.length - bad;
+      from = [bad ? plural(bad, 'Bad brew') : '', unrated ? `${plural(unrated, 'brew')} not rated` : ''].filter(Boolean).join(' and ');
+    }
+    const desc = [coffee.roastLevel ? `${coffee.roastLevel} roast` : 'roast unknown', coffee.region].filter(Boolean).join(', ');
+    return `- ${desc}${coffee.notes ? ` (bag notes: ${coffee.notes})` : ''}: typically ${typical}, from ${from}; last brewed ${formatBrewDate(brews[0])}.`;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -536,14 +543,13 @@ export interface GuidanceInput {
   brewMethod: string;
   sameCoffeeIds: string[];
   baselineBrewId?: string | null;
-  /** Who will brew next; used for first-brew references and profile when there is no baseline. */
+  /** Who will brew next; used for the brewer profile when there is no baseline. */
   requesterUserId: string;
   /** Equipment selected for the next brew (first brew only; improvement uses the baseline's). */
   equipment?: Equipment;
   userNames?: Record<string, string>;
   grinderProfiles?: StoredGrinderProfile[];
   historyLimit?: number;
-  now?: Date;
 }
 
 export interface GuidanceContext {
@@ -557,7 +563,7 @@ export interface GuidanceContext {
   ledger: LedgerCluster[];
   profileLines: string[];
   profileLabel: string;
-  references: ReferenceBean[];
+  grinderHistory: string[];
   grinderLine: string | null;
 }
 
@@ -582,24 +588,22 @@ export function assembleGuidanceContext(input: GuidanceInput): GuidanceContext {
     equipment,
     roastLevel: coffee.roastLevel,
     coffeesById,
+    includePours: mode === 'first',
   });
-  const profileLabel = `${brewerLabel ? `${brewerLabel}, ` : ''}${brewMethod} on ${setupLabel(equipment)}, last ${PROFILE_WINDOW} rated brews across all coffees`;
+  const profileLabel = `${brewerLabel ? `${brewerLabel}, ` : ''}${brewMethod} on ${equipment.brewerName ?? 'this brewer'}, last ${PROFILE_WINDOW} rated brews across all coffees and grinders`;
   const grinderKey = equipment.grinderName ? grinderProfileKey(equipment.grinderName) : null;
   const storedGrinder = grinderKey ? input.grinderProfiles?.find((p) => grinderProfileKey(p.name) === grinderKey) : undefined;
   const grinderLine = equipment.grinderName ? formatGrinderLine(equipment.grinderName, storedGrinder) : null;
 
   if (mode === 'first') {
-    const references = selectReferenceBeans({
+    const grinderHistory = buildGrinderHistory({
       householdBrews: input.householdBrews,
       coffeesById,
-      target: coffee,
       excludeCoffeeIds: input.sameCoffeeIds,
       method: brewMethod,
       equipment,
-      brewerUserId,
-      now: input.now,
     });
-    return { mode, coffee, brewMethod, baseline: null, equipment, historyRows: [], historyBrews: [], ledger: [], profileLines, profileLabel, references, grinderLine };
+    return { mode, coffee, brewMethod, baseline: null, equipment, historyRows: [], historyBrews: [], ledger: [], profileLines, profileLabel, grinderHistory, grinderLine };
   }
 
   const limit = input.historyLimit ?? HISTORY_LIMIT;
@@ -641,7 +645,7 @@ export function assembleGuidanceContext(input: GuidanceInput): GuidanceContext {
     doseBand: doseBandMatch ? +doseBandMatch[2] - +doseBandMatch[1] : undefined,
   });
 
-  return { mode, coffee, brewMethod, baseline, equipment, historyRows, historyBrews: picked, ledger, profileLines, profileLabel, references: [], grinderLine };
+  return { mode, coffee, brewMethod, baseline, equipment, historyRows, historyBrews: picked, ledger, profileLines, profileLabel, grinderHistory: [], grinderLine };
 }
 
 // ---------------------------------------------------------------------------
@@ -697,9 +701,12 @@ E) Quality over quantity:
    - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.`;
 }
 
-const TONE = `TONE AND VOICE:
-Use a calm, confident, craft-focused tone.
-Sound like an experienced specialty barista giving guidance.`;
+const TONE = `WRITING STYLE:
+- Write for a home brewer: plain, everyday words and short sentences.
+- Avoid jargon. Use the words the brewer already uses in their notes and recipe.
+- Sound like a person talking, not a report. Skip filler and stock phrases.
+- Use commas and periods, not dashes.
+- Every sentence should say what to do or why.`;
 
 function coffeeBlock(ctx: GuidanceContext): string {
   const c = ctx.coffee;
@@ -710,7 +717,7 @@ function coffeeBlock(ctx: GuidanceContext): string {
 }
 
 export const IMPROVEMENT_SYSTEM = 'You are an expert barista helping improve coffee brews. Analyze the full brew history to understand what has been tried and provide specific, actionable suggestions. Be concise and direct.';
-export const FIRST_BREW_SYSTEM = 'You are an expert barista helping set up initial brew parameters for a new coffee. Provide specific, actionable starting parameters grounded in this brewer\'s own results on similar beans.';
+export const FIRST_BREW_SYSTEM = 'You are an expert barista helping set up initial brew parameters for a new coffee. Provide specific, actionable starting parameters grounded in this brewer\'s own past brews on this equipment.';
 
 export function buildImprovementPrompt(ctx: GuidanceContext): { system: string; user: string } {
   const sections = [
@@ -742,15 +749,16 @@ export function buildFirstBrewPrompt(ctx: GuidanceContext): { system: string; us
     'You are helping a barista brew a coffee for the first time. Suggest starting parameters with a high probability of a well-balanced brew (≈3/3 stars) on the first attempt, with room for easy adjustment.',
     `${coffeeBlock(ctx)}${eq.brewerName ? `\n- Brewing Equipment: ${eq.brewerName}` : ''}${eq.grinderName ? `\n- Grinder: ${ctx.grinderLine ?? eq.grinderName}` : ''}`,
   ];
-  if (ctx.references.length) {
-    sections.push(`REFERENCE BEANS (this household's best brews of similar coffees, closest first):\n${ctx.references.map((r) => r.line).join('\n')}`);
+  if (ctx.grinderHistory.length) {
+    sections.push(`COFFEES RECENTLY BREWED ON THIS GRINDER (${ctx.brewMethod}, newest first):\n${ctx.grinderHistory.join('\n')}`);
   }
   if (ctx.profileLines.length) {
     sections.push(`BREWER PREFERENCES (${ctx.profileLabel}):\n${ctx.profileLines.map((l) => `- ${l}`).join('\n')}`);
   }
-  const anchor = ctx.references.length
-    ? `- Anchor grind, ratio, time and temperature to the closest reference on the same grinder, adjust for roast and age differences, and name the reference in the explanation.
-- Grind numbers only transfer between brews on the same grinder.`
+  const grind = ctx.grinderHistory.length
+    ? `- Set the grind from the pattern across this grinder's coffees, not from any single one: different coffees land at different settings. Weigh coffees closest in roast to this one, correct for whether their brews ran slower or faster than the time you're targeting, and favor recent coffees, since they show where the dial sits now.
+- Take dose, ratio, time, temperature and any pour pattern from the brewer's preferences when given.
+- Past brews of other coffees are evidence, not the story. Explain each value in terms of this coffee and the brewer's brews as a whole, without pointing to one particular past coffee.`
     : `- When grinders use numeric dials, assume typical real-world ranges for that grinder and method, then pick the best starting point.
 - Assume grinder is calibrated to factory default unless stated otherwise.`;
   sections.push(`GUIDELINES:
@@ -758,7 +766,7 @@ export function buildFirstBrewPrompt(ctx: GuidanceContext): { system: string; us
 - Commit to one primary recommended value per parameter.
 - Use narrow ranges only when unavoidable (e.g., brew time).
 - Prefer forgiving starting points that avoid stalled flow, over-extraction, or under-extraction.
-${anchor}
+${grind}
 - Keep any parameter listed as the brewer's standard inside its band. Lines marked "low sample" are hints, not targets.
 - Days off roast is a freshness signal only for room-temperature beans; frozen beans don't age meaningfully.
 - Provide exactly these parameters, in this order: ${firstBrewParameterNames(ctx.brewMethod).join(', ')}.`);
@@ -776,6 +784,12 @@ const BASIS = {
   type: 'array',
   items: { type: 'string' },
   description: '1-2 short phrases naming the evidence behind the first suggestion, citing dates exactly as written in the prompt (e.g. "tried 18.2g / 1:1.8 on Apr 16: Decent twice", "3 similar lighter-roast beans on the V60"). Empty array if nothing specific.',
+};
+
+const FIRST_BREW_BASIS = {
+  type: 'array',
+  items: { type: 'string' },
+  description: "One short, plain phrase saying which of the brewer's past brews the recipe draws on, as a group rather than by coffee. Name the source, not the reasoning. Empty array if there were none.",
 };
 
 export const IMPROVEMENT_SCHEMA = {
@@ -829,7 +843,7 @@ export function buildFirstBrewSchema(brewMethod: string) {
     properties: {
       introduction: {
         type: 'string',
-        description: '1-2 sentences acknowledging this is the first time brewing this coffee and what makes it distinctive (origin, roast level, or flavor profile).',
+        description: '1-2 short sentences on what makes this coffee distinctive and what this starting recipe aims for.',
       },
       parameters: {
         type: 'array',
@@ -840,13 +854,13 @@ export function buildFirstBrewSchema(brewMethod: string) {
           required: ['name', 'recommendation', 'explanation'],
           properties: {
             name: { type: 'string', enum: firstBrewParameterNames(brewMethod) },
-            recommendation: { type: 'string', description: "One specific value, e.g. 'Start at 6.5 on the Fellow Ode Gen 2', '20g', '200°F', '300g output (1:15 ratio)'." },
-            explanation: { type: 'string', description: 'One sentence on why this value suits this coffee and equipment, naming the reference bean when one was used.' },
+            recommendation: { type: 'string', description: 'One specific value with its unit. Write grind the way this grinder\'s settings are written, and give final weight in grams with the ratio.' },
+            explanation: { type: 'string', description: 'One short sentence on why this value suits this coffee.' },
           },
         },
       },
       note: { type: 'string', description: 'One sentence on how to adjust from here (grind first, then ratio or time, based on taste and flow).' },
-      basis: BASIS,
+      basis: FIRST_BREW_BASIS,
     },
   };
 }

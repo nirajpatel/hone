@@ -21,10 +21,15 @@ Real prompts generated from household data by the shared builder in `supabase/fu
 **Improvement (the coffee has brews):**
 - **Brew history:** the 15 most recent brews of this bean and method (every bag), plus the baseline and best brew if older. One line per brew: date, setup, days off roast, frozen or room temp, settings, rating, notes, and the guidance shown before that brew.
 - **Tried settings:** groups of near-identical settings on this setup with their outcomes and what differed. Grind tolerance is 5% of the grinder's observed range.
-- **Brewer preferences:** last 20 rated brews on the same brewer and grinder, across all coffees. Covers habit bands, typical Decent-or-better ranges for the roast bucket (n ≥ 5, otherwise labeled low sample), and recurring complaints.
+- **Brewer preferences:** last 20 rated brews on the same brewer (any grinder, since nothing here is a grind number), across all coffees. Covers habit bands, typical Decent-or-better ranges for the roast bucket (n ≥ 5, otherwise labeled low sample), and recurring complaints.
 - **Rules:** hold or move (hold only on an Excellent cup or a one-off Bad cup at proven settings; otherwise move toward the best-rated brew; unrated cups are judged from the rated ones and never answered with "rate it"), evidence order, frozen-bean age rule, standard bands, and the brewer's own tasting words.
 
-**First brew (no brews of this bean yet):** up to 3 reference beans (same grinder, roast within one level, origin, recency) with their best brews, plus the brewer preferences. Without references it falls back to typical ranges.
+**First brew (no brews of this bean yet):**
+- **Coffees recently brewed on this grinder:** the last 6 coffees on this grinder and method, newest first, rated or not. One line each: roast, origin, bag notes, the middle grind setting and time of its Decent-or-better brews (or of all its brews if none), how many brews that covers, and when it was last brewed. Coffee names are left out so the guidance talks about this coffee, not others.
+- **Brewer preferences:** as above, plus the pours of the latest Decent-or-better pour over.
+- **Guidelines:** set the grind from the pattern across those coffees (closest roast, time against target, recent ones first), take dose, ratio, time, temperature and pours from the preferences, and explain values without pointing to one past coffee. With no brews on the grinder it falls back to typical ranges.
+
+**Writing style (both prompts):** plain, everyday words and short sentences, no jargon beyond the brewer's own words, no filler, no dashes.
 
 **Basis:** both outputs include 1-2 `basis` strings shown under the guidance. Any basis citing a date that isn't in the prompt is dropped before saving.
 
@@ -74,9 +79,9 @@ TRIED SETTINGS (this coffee on this setup, near-identical settings grouped):
 - grind 22-22.25, 18.2g, 1:1.81-1.84, room temp → Apr 15: Decent; Apr 16: Decent; Apr 18: Bad; Apr 19: Bad (mixed). Differed: time 24s–38s, water 201–203°F.
 - grind 22.5-22.75, 18.2g, 1:1.80-1.82, frozen → Apr 20: Decent; Apr 29: Bad (mixed). Differed: water 199.9–203°F.
 
-BREWER PREFERENCES (Niraj Patel, espresso on La Marzocco Linea Mini + Niche Zero, last 20 rated brews across all coffees):
+BREWER PREFERENCES (Niraj Patel, espresso on La Marzocco Linea Mini, last 20 rated brews across all coffees and grinders):
 - Your standard (tight band in every recent brew): dose 18.1-18.3g (mode 18.2g). Keep these inside the band.
-- Typical Decent-or-better brews, lighter roasts on this setup (n=13 of 20 rated): ratio 1:1.69–1:1.70 (median 1:1.69), time 24s–30s (median 27s), temp 198°F–201°F (median 198°F).
+- Typical Decent-or-better brews, lighter roasts on this brewer (n=13 of 20 rated): ratio 1:1.69–1:1.70 (median 1:1.69), time 24s–30s (median 27s), temp 198°F–201°F (median 198°F).
 - Recurring complaints on Bad brews: "bitter" ×2.
 
 IMPORTANT CONSIDERATIONS:
@@ -121,9 +126,12 @@ E) Quality over quantity:
    - It is acceptable to provide only 1-2 suggestions if those are the most impactful.
    - Do not suggest adjusting parameters that are already optimal or not contributing to the issue.
 
-TONE AND VOICE:
-Use a calm, confident, craft-focused tone.
-Sound like an experienced specialty barista giving guidance.
+WRITING STYLE:
+- Write for a home brewer: plain, everyday words and short sentences.
+- Avoid jargon. Use the words the brewer already uses in their notes and recipe.
+- Sound like a person talking, not a report. Skip filler and stock phrases.
+- Use commas and periods, not dashes.
+- Every sentence should say what to do or why.
 ```
 
 ### Response (saved as `suggestion`)
@@ -135,20 +143,20 @@ Sound like an experienced specialty barista giving guidance.
     "confidence": "Medium"
   },
   "full": {
-    "summary": "The baseline brew is unrated. The closest rated brew was Decent: round, but lacking the sweetness needed for a balanced, excellent cup.",
-    "primaryIssue": "Insufficient sweetness in the closest rated short-ratio brew",
+    "summary": "The baseline brew is unrated. The closest rated brew was Decent, with a round cup but not enough sweetness.",
+    "primaryIssue": "Lack of sweetness in the closest rated recipe",
     "suggestions": [
       {
         "parameter": "Grind setting",
-        "action": "Set grind to 22.75, 0.5 finer than the baseline brew, keeping dose at 18.2g, final weight at 30.8g and temperature at 199.9°F",
-        "effect": "This should increase sweetness while preserving the round texture of the closest Decent brew",
-        "reasoning": "The most recent Decent brew used this finer setting with the same short ratio and temperature, while longer-yield attempts retained watery notes",
+        "action": "Grind finer from 23.25 to 22.75, keeping the dose at 18.2g, final weight at 30.8g, and temperature at 199.9°F",
+        "effect": "This should increase sweetness while keeping the cup round",
+        "reasoning": "The most recent Decent brew used this finer setting with the same short ratio and temperature, while the longer-yield attempt at this setting tasted watery",
         "confidence": "Medium"
       }
     ],
     "basis": [
-      "Apr 30, 2026: grind 22.75, 30.7g yield—Decent, Round, Lacks Sweetness",
-      "Apr 29, 2026: grind 22.75, 33.2g yield—Bad, Watery start"
+      "Apr 30, 2026: 22.75, 18.2g → 30.7g, Decent, round but lacking sweetness",
+      "Apr 29, 2026: 22.75, 18.2g → 33.2g, Bad, watery start"
     ]
   }
 }
@@ -158,11 +166,11 @@ Sound like an experienced specialty barista giving guidance.
 
 ## Example 2: La Cabra Alto Naranjal (pour over, first brew)
 
-Generated as of the day before this coffee's first brew, so only earlier coffees can be references.
+Generated as of the day before this coffee's first brew, so only earlier brews appear.
 
 ### System message
 ```
-You are an expert barista helping set up initial brew parameters for a new coffee. Provide specific, actionable starting parameters grounded in this brewer's own results on similar beans.
+You are an expert barista helping set up initial brew parameters for a new coffee. Provide specific, actionable starting parameters grounded in this brewer's own past brews on this equipment.
 ```
 
 ### User prompt
@@ -177,74 +185,81 @@ COFFEE:
 - Roast Level: Light
 - Flavor Notes: Bright Citrus, Red Berries, Deep Dried Fruit
 - Brewing Equipment: Hario V60
-- Grinder: Fellow Ode Brew Grinder Gen 2
+- Grinder: Fellow Ode Brew Grinder Gen 2: higher numbers are coarser. Dial printed 1–11, with two intermediate tick marks between integers (three click increments per integer; 31 settings total). Write intermediate settings as .1 or .2 click labels, not decimal fractions: for example, 5.1 is the first click above 5, followed by 5.2 and then 6.
 
-REFERENCE BEANS (this household's best brews of similar coffees, closest first):
-- El Diviso - Java by Greater Goods Coffee Co.  (Light, Colombia; bag notes: Dried Dates, Mint Chocolate Chip, Cardamom Caraway). Best brew May 3, 2026 on Hario V60 + Fellow Ode Brew Grinder Gen 2 (Excellent, 67d off roast, frozen): grind 6.3 | 19.5g → 281.9g (1:14.5) | 2:45 | 202°F | pours 0:45→60.2g, 1:30→221g, 2:45→281.9g | notes: Balanced, Layered, Nutty
-- Las Flores - Java by Stereoscope (Light, Colombia; bag notes: Pink Pomelo, Lychee, Sparkling, Star Fruit). Best brew Aug 6, 2026 on Hario V60 + Fellow Ode Brew Grinder Gen 2 (Decent, 16d off roast, room temp): grind 5.2 | 20g → 321.4g (1:16.1) | 3:05 | 202°F | pours 0:45→50.6g, 1:15→150.6g, 1:45→240.1g, 3:05→321.4g | notes: Thin, One-Note, Lacks Sweetness
-- Colombia Finca La Secreta Lychee by Willy’s Beans (Medium-Light, Colombia, Antioquia; bag notes: lychee, tropical fruit). Best brew Mar 20, 2026 on Hario V60 + Fellow Ode Brew Grinder Gen 2 (Excellent, 26d off roast, frozen): grind 5.0 | 20.4g → 286g (1:14.0) | 2:45 | 203°F | pours 0:45→60.9g, 1:15→219.2g, 2:45→286g | notes: Rounded, Clean Finish
+COFFEES RECENTLY BREWED ON THIS GRINDER (pour over, newest first):
+- Light roast, Colombia (bag notes: Pink Pomelo, Lychee, Sparkling, Star Fruit): typically grind 5.2, 3:01, from 4 Decent-or-better brews; last brewed Aug 13, 2026.
+- Medium-Light roast, Risaralda, Colombia (bag notes: Watermelon Candy, Rose, Kiwi): typically grind 5.3, 2:57, from 5 Decent-or-better brews; last brewed Jul 24, 2026.
+- Light roast, Mexico (bag notes: Watermelon, Honey, Soft Floral): typically grind 4.1, 2:55, from 7 Decent-or-better brews; last brewed Jul 7, 2026.
+- Medium-Light roast, Colombia (bag notes: Pomegranate, Black Tea, Honey): typically grind 4.5, 3:18, from 4 Bad brews; last brewed Jun 5, 2026.
+- Light roast, Sierra Mazateca, Oaxaca, Mexico (bag notes: Rosewater, Berry Jam, Marzipan): typically grind 5.0, 3:30, from 9 Decent-or-better brews; last brewed May 12, 2026.
+- Light roast, Colombia (bag notes: Dried Dates, Mint Chocolate Chip, Cardamom Caraway): typically grind 6.3, 2:35, from 3 Decent-or-better brews; last brewed May 3, 2026.
 
-BREWER PREFERENCES (Tasha Patel, pour over on Hario V60 + Fellow Ode Brew Grinder Gen 2, last 20 rated brews across all coffees):
+BREWER PREFERENCES (Tasha Patel, pour over on Hario V60, last 20 rated brews across all coffees and grinders):
 - Your standard (tight band in every recent brew): water temperature 199-202°F (mode 199°F). Keep these inside the band.
-- Typical Decent-or-better brews, lighter roasts on this setup (n=16 of 20 rated): ratio 1:15.7–1:16.1 (median 1:16.0), time 2:55–2:59 (median 2:56), temp 199°F–201.3°F (median 201°F).
+- Typical Decent-or-better brews, lighter roasts on this brewer (n=16 of 20 rated): ratio 1:15.7–1:16.1 (median 1:16.0), time 2:55–2:59 (median 2:56), temp 199°F–201.3°F (median 201°F).
 - Recurring complaints on Bad brews: "unbalanced" ×2, "hollow" ×2, "bitter" ×2.
+- Pours in the latest Decent-or-better brew (Aug 6, 2026, 20g → 321.4g): 0:45→50.6g, 1:15→150.6g, 1:45→240.1g, 3:05→321.4g.
 
 GUIDELINES:
 - Adapt recommendations to the brew method (espresso, pour-over, immersion, etc.).
 - Commit to one primary recommended value per parameter.
 - Use narrow ranges only when unavoidable (e.g., brew time).
 - Prefer forgiving starting points that avoid stalled flow, over-extraction, or under-extraction.
-- Anchor grind, ratio, time and temperature to the closest reference on the same grinder, adjust for roast and age differences, and name the reference in the explanation.
-- Grind numbers only transfer between brews on the same grinder.
+- Set the grind from the pattern across this grinder's coffees, not from any single one: different coffees land at different settings. Weigh coffees closest in roast to this one, correct for whether their brews ran slower or faster than the time you're targeting, and favor recent coffees, since they show where the dial sits now.
+- Take dose, ratio, time, temperature and any pour pattern from the brewer's preferences when given.
+- Past brews of other coffees are evidence, not the story. Explain each value in terms of this coffee and the brewer's brews as a whole, without pointing to one particular past coffee.
 - Keep any parameter listed as the brewer's standard inside its band. Lines marked "low sample" are hints, not targets.
 - Days off roast is a freshness signal only for room-temperature beans; frozen beans don't age meaningfully.
 - Provide exactly these parameters, in this order: Grind Setting, Dosage, Water Temperature, Brew Time, Final Weight/Ratio, Pour Structure.
 
-TONE AND VOICE:
-Use a calm, confident, craft-focused tone.
-Sound like an experienced specialty barista giving guidance.
+WRITING STYLE:
+- Write for a home brewer: plain, everyday words and short sentences.
+- Avoid jargon. Use the words the brewer already uses in their notes and recipe.
+- Sound like a person talking, not a report. Skip filler and stock phrases.
+- Use commas and periods, not dashes.
+- Every sentence should say what to do or why.
 ```
 
 ### Response
 ```json
 {
-  "introduction": "For your first brew of Alto Naranjal, aim to bring its bright citrus and red berries into balance with the deeper dried-fruit sweetness. Start from your excellent Colombian El Diviso brew, with a slightly longer ratio guided by your recent V60 results.",
+  "introduction": "Alto Naranjal pairs bright citrus and red berries with deeper dried-fruit sweetness. Start with your usual light-roast recipe to keep that brightness sweet rather than sharp.",
   "parameters": [
     {
       "name": "Grind Setting",
-      "recommendation": "Start at 6.3 on the Fellow Ode Brew Grinder Gen 2",
-      "explanation": "El Diviso’s excellent light-roast Colombian brew used 6.3 on this same grinder, making it a forgiving starting point without assuming an unknown freshness difference."
+      "recommendation": "5.2",
+      "explanation": "Your recent light-roast brews point to this as a forgiving starting grind for clear fruit and steady flow."
     },
     {
       "name": "Dosage",
-      "recommendation": "20g",
-      "explanation": "This stays close to El Diviso’s successful 19.5g dose while providing a familiar bed depth for your V60."
+      "recommendation": "20 g",
+      "explanation": "Your familiar dose keeps the V60 setup consistent while you learn this coffee."
     },
     {
       "name": "Water Temperature",
       "recommendation": "201°F",
-      "explanation": "One degree below El Diviso’s 202°F, this matches your recent lighter-roast median and stays within your standard temperature band."
+      "explanation": "This matches your successful light-roast brews and should bring out sweetness alongside the citrus."
     },
     {
       "name": "Brew Time",
-      "recommendation": "2:56 total, including bloom",
-      "explanation": "This modest extension from El Diviso’s 2:45 accommodates the additional water and matches your recent successful lighter-roast median."
+      "recommendation": "2:56",
+      "explanation": "Your usual successful finish time is a useful target for balancing bright fruit with dried-fruit depth."
     },
     {
       "name": "Final Weight/Ratio",
-      "recommendation": "314g total brew water (1:15.7 coffee-to-water ratio)",
-      "explanation": "This lengthens El Diviso’s concentrated 1:14.5 recipe toward your usual successful range while staying below Las Flores’s 1:16.1 brew, which tasted thin and lacked sweetness."
+      "recommendation": "320 g water, 1:16",
+      "explanation": "Your usual ratio gives the fruit room to show without making the cup hollow."
     },
     {
       "name": "Pour Structure",
-      "recommendation": "Bloom with 60g until 0:45; pour to 220g by 1:20, then to 314g by 1:55; let drain until approximately 2:56",
-      "explanation": "This adapts El Diviso’s successful three-stage structure to the larger water dose, using gentle pours and minimal agitation to preserve clear fruit flavors and steady flow."
+      "recommendation": "4 pours, cumulative totals: 50 g bloom until 0:45, 150 g by 1:15, 240 g by 1:45, 320 g by 2:05.",
+      "explanation": "This follows your successful staged-pour pattern, with the final pour early enough to allow drainage toward 2:56."
     }
   ],
-  "note": "Adjust grind first—slightly finer for sour or hollow flavors with fast flow, slightly coarser for bitterness or slow flow—then adjust ratio for strength, treating brew time as a diagnostic rather than a target to force.",
+  "note": "Adjust grind first, one click finer if sour and fast or coarser if bitter and slow, then adjust ratio or pour timing only if the cup still needs balancing.",
   "basis": [
-    "El Diviso: Excellent on May 3, 2026 with the same V60 and Ode Gen 2, grind 6.3, 1:14.5, 2:45, 202°F",
-    "16 recent Decent-or-better lighter-roast brews: median 1:16.0, 2:56, 201°F"
+    "Your recent Ode Gen 2 pour-over brews and rated Hario V60 light-roast recipes."
   ]
 }
 ```
