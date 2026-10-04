@@ -18,7 +18,6 @@ export interface AISuggestionsData {
     reasoning: string;
     confidence: 'High' | 'Medium' | 'Low';
   }>;
-  basis?: string[];
 }
 
 // Type for first-time coffee suggestions
@@ -30,17 +29,6 @@ export interface FirstTimeSuggestionsData {
     explanation: string;
   }>;
   note: string;
-  basis?: string[];
-}
-
-// What the guidance drew on, e.g. "tried 18.2g / 1:1.8 on Apr 16: Decent twice"
-function BasisLine({ basis }: { basis?: string[] }) {
-  if (!basis || basis.length === 0) return null;
-  return (
-    <p className="text-xs text-gray-500 pt-1">
-      Based on: {basis.join(' · ')}
-    </p>
-  );
 }
 
 // Component to format and display AI suggestions with better readability
@@ -91,8 +79,6 @@ export function FormattedAISuggestions({ suggestions }: { suggestions: string | 
             ))}
           </div>
         )}
-
-        <BasisLine basis={data.basis} />
       </div>
     );
   }
@@ -207,8 +193,6 @@ export function FormattedAISuggestions({ suggestions }: { suggestions: string | 
           ))}
         </div>
       )}
-
-      <BasisLine basis={data.basis} />
     </div>
   );
 }

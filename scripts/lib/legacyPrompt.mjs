@@ -167,7 +167,7 @@ const CONFIDENCE_ORDER = { High: 0, Medium: 1, Low: 2 };
 export function normalizeLegacy(parsed) {
   if (!parsed?.summary || !parsed?.primaryIssue || !Array.isArray(parsed.suggestions) || parsed.suggestions.length === 0) return null;
   const suggestions = [...parsed.suggestions].sort((a, b) => (CONFIDENCE_ORDER[a.confidence] ?? 9) - (CONFIDENCE_ORDER[b.confidence] ?? 9));
-  return { summary: parsed.summary, primaryIssue: parsed.primaryIssue, suggestions, basis: [] };
+  return { summary: parsed.summary, primaryIssue: parsed.primaryIssue, suggestions };
 }
 
 /** Pre-overhaul first-brew prompt: bag details only, "assume typical ranges" for the grinder. */

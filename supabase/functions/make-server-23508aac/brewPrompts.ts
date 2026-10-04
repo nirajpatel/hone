@@ -780,22 +780,10 @@ ${grind}
 
 const CONFIDENCE = { type: 'string', enum: ['High', 'Medium', 'Low'] };
 
-const BASIS = {
-  type: 'array',
-  items: { type: 'string' },
-  description: '1-2 short phrases naming the evidence behind the first suggestion, citing dates exactly as written in the prompt (e.g. "tried 18.2g / 1:1.8 on Apr 16: Decent twice", "3 similar lighter-roast beans on the V60"). Empty array if nothing specific.',
-};
-
-const FIRST_BREW_BASIS = {
-  type: 'array',
-  items: { type: 'string' },
-  description: "One short, plain phrase saying which of the brewer's past brews the recipe draws on, as a group rather than by coffee. Name the source, not the reasoning. Empty array if there were none.",
-};
-
 export const IMPROVEMENT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['summary', 'primaryIssue', 'concise', 'suggestions', 'basis'],
+  required: ['summary', 'primaryIssue', 'concise', 'suggestions'],
   properties: {
     summary: {
       type: 'string',
@@ -831,7 +819,6 @@ export const IMPROVEMENT_SCHEMA = {
         },
       },
     },
-    basis: BASIS,
   },
 };
 
@@ -839,7 +826,7 @@ export function buildFirstBrewSchema(brewMethod: string) {
   return {
     type: 'object',
     additionalProperties: false,
-    required: ['introduction', 'parameters', 'note', 'basis'],
+    required: ['introduction', 'parameters', 'note'],
     properties: {
       introduction: {
         type: 'string',
@@ -860,7 +847,6 @@ export function buildFirstBrewSchema(brewMethod: string) {
         },
       },
       note: { type: 'string', description: 'One sentence on how to adjust from here (grind first, then ratio or time, based on taste and flow).' },
-      basis: FIRST_BREW_BASIS,
     },
   };
 }
@@ -871,27 +857,11 @@ export function buildFirstBrewSchema(brewMethod: string) {
 
 export interface ImprovementResult {
   concise: { goal: string; action: string; confidence: 'High' | 'Medium' | 'Low' };
-  full: { summary: string; primaryIssue: string; suggestions: any[]; basis: string[] };
-}
-
-const MONTH_PATTERN = /\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s+(\d{1,2})\b/g;
-
-/** Drop basis strings that cite a date absent from the prompt. */
-export function filterBasis(basis: unknown, promptText: string): string[] {
-  if (!Array.isArray(basis)) return [];
-  return basis
-    .filter((s): s is string => typeof s === 'string' && s.trim().length > 0)
-    .filter((s) => {
-      for (const m of s.matchAll(MONTH_PATTERN)) {
-        if (!promptText.includes(`${m[1].slice(0, 3)} ${+m[2]}`)) return false;
-      }
-      return true;
-    })
-    .slice(0, 2);
+  full: { summary: string; primaryIssue: string; suggestions: any[] };
 }
 
 /** Validate and normalize improvement output. Keeps the model's suggestion order. */
-export function normalizeImprovement(parsed: any, promptText: string): ImprovementResult | null {
+export function normalizeImprovement(parsed: any): ImprovementResult | null {
   if (!parsed?.summary || !parsed?.primaryIssue || !Array.isArray(parsed.suggestions) || parsed.suggestions.length === 0) {
     return null;
   }
@@ -906,14 +876,13 @@ export function normalizeImprovement(parsed: any, promptText: string): Improveme
       summary: parsed.summary,
       primaryIssue: parsed.primaryIssue,
       suggestions,
-      basis: filterBasis(parsed.basis, promptText),
     },
   };
 }
 
-export function normalizeFirstBrew(parsed: any, promptText: string): any | null {
+export function normalizeFirstBrew(parsed: any): any | null {
   if (!parsed?.introduction || !Array.isArray(parsed.parameters) || parsed.parameters.length === 0) return null;
-  return { ...parsed, basis: filterBasis(parsed.basis, promptText) };
+  return parsed;
 }
 
 // ---------------------------------------------------------------------------

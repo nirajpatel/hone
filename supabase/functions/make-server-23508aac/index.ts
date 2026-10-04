@@ -2338,7 +2338,7 @@ async function generateBrewSuggestions(brewId: string, userId: string, mode: Gui
   if (!ctx || ctx.mode !== 'improve') return null;
   const prompt = prompts.buildImprovementPrompt(ctx);
   const parsed = await callGuidanceModel(prompt, { name: 'brew_guidance', schema: prompts.IMPROVEMENT_SCHEMA }, mode);
-  const result = prompts.normalizeImprovement(parsed, prompt.user);
+  const result = prompts.normalizeImprovement(parsed);
   if (!result) throw new Error(`Invalid guidance output for brew ${brewId}`);
   return { result, inputsKey };
 }
@@ -2431,8 +2431,8 @@ async function handleGuidanceRequest(c: any, body: any) {
       : { name: 'first_brew', schema: prompts.buildFirstBrewSchema(brewMethod) };
     const parsed = await callGuidanceModel(prompt, schema, 'onDemand');
     const result = improve
-      ? prompts.normalizeImprovement(parsed, prompt.user)?.full
-      : prompts.normalizeFirstBrew(parsed, prompt.user);
+      ? prompts.normalizeImprovement(parsed)?.full
+      : prompts.normalizeFirstBrew(parsed);
     if (!result) {
       return c.json({ error: 'Invalid response from AI' }, 500);
     }

@@ -159,7 +159,7 @@ async function suggest(arm, c) {
   return {
     params: parseParams(params, c.method),
     leaks: otherCoffeeMentions(reader, hh.coffees, c.coffee, c.sameIds),
-    emDashes: (`${reader} ${(parsed.basis ?? []).join(" ")}`.match(/—/g) ?? []).length,
+    emDashes: (reader.match(/—/g) ?? []).length,
     costUsd: costUsd(arm.model, res.usage),
     elapsedMs: res.elapsedMs,
   };

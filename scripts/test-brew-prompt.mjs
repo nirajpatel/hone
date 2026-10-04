@@ -15,7 +15,6 @@
  *     noDoubleHold        second Bad cup in a row at the same settings → don't hold again
  *     avoidsBadCluster    never proposes settings the tried-settings list marks consistently Bad
  *     staysInHabitBand    next dose / water temp stay inside the brewer's standard band
- *     basisGrounded       every date cited in basis appears in the prompt (new prompt only, pre-filter)
  *
  * Usage:
  *   node scripts/test-brew-prompt.mjs --dry-run
@@ -167,8 +166,6 @@ const HEDGES = ["likely", "suggests", "step in the right direction", "might", "c
 const IMPERATIVES = new Set(
   "grind increase decrease reduce raise lower adjust switch hold maintain skip try use move keep shorten lengthen extend stop add remove swirl pour wait preinfuse pre-infuse tamp distribute set warm cool rest change target repeat rebrew re-brew brew".split(" "),
 );
-const MONTH = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/g;
-
 function paramOf(label = "") {
   const s = label.toLowerCase();
   if (s.includes("grind")) return "grind";
@@ -224,12 +221,6 @@ async function score(c, arm, g) {
       checks.staysInHabitBand = inBand(applied.dosage, c.bands.dose) && inBand(applied.waterTemp, c.bands["water temperature"]);
     }
   }
-  if (g.storedBasisGrounded !== undefined) {
-    checks.basisGrounded = g.storedBasisGrounded;
-  } else if (arm.version === "new" && Array.isArray(g.raw?.basis) && g.raw.basis.some((s) => MONTH.test(s))) {
-    checks.basisGrounded = g.raw.basis.every((s) => [...s.matchAll(MONTH)].every((m) => g.prompt.user.includes(`${m[1]} ${+m[2]}`)));
-  }
-  MONTH.lastIndex = 0;
   return { checks, summaryWps: wps(g.full.summary) };
 }
 
@@ -237,7 +228,7 @@ async function score(c, arm, g) {
 // Run
 // ---------------------------------------------------------------------------
 
-const CHECKS = ["diagnosisRefreshed", "breaksRepeatLoop", "hasMagnitude", "noHedges", "imperative", "holdOnce", "noDoubleHold", "avoidsBadCluster", "staysInHabitBand", "basisGrounded"];
+const CHECKS = ["diagnosisRefreshed", "breaksRepeatLoop", "hasMagnitude", "noHedges", "imperative", "holdOnce", "noDoubleHold", "avoidsBadCluster", "staysInHabitBand"];
 const results = [];
 const RESCORE = argValue("--rescore");
 
@@ -251,7 +242,7 @@ if (RESCORE) {
     const c = byId.get(r.caseId);
     if (r.error || !c) return r;
     const arm = saved.arms.find((a) => a.label === r.arm);
-    const s = await score(c, arm, { full: r.full, storedBasisGrounded: r.checks.basisGrounded });
+    const s = await score(c, arm, { full: r.full });
     return { ...r, ...s };
   });
   results.push(...rows);
@@ -296,7 +287,7 @@ function summarize(rows) {
     const vals = ok.map((r) => r.checks[k]).filter((v) => v !== undefined);
     rates[k] = { pass: vals.filter(Boolean).length, n: vals.length };
   }
-  const measured = CHECKS.filter((k) => rates[k].n >= 3 && k !== "basisGrounded");
+  const measured = CHECKS.filter((k) => rates[k].n >= 3);
   return {
     rates,
     score: mean(measured.map((k) => rates[k].pass / rates[k].n)),
@@ -326,7 +317,7 @@ lines.push(
 );
 lines.push("");
 lines.push(
-  "Score is the mean pass rate over measured checks (n ≥ 3; `basisGrounded` is reported but excluded because the old prompt has no basis). The scorers are wording heuristics tuned on gpt-5.4 output, so a different model can lose points for style alone.",
+  "Score is the mean pass rate over measured checks (n ≥ 3). The scorers are wording heuristics tuned on gpt-5.4 output, so a different model can lose points for style alone.",
 );
 lines.push("");
 lines.push("## Summary");
@@ -389,7 +380,7 @@ if (closeCall) {
     key.push({ case: i + 1, A: a.arm.label, B: b.arm.label });
     const render = (arm) => {
       const r = results.find((x) => x.caseId === c.id && x.arm === arm.arm.label && x.run === 1 && !x.error) ?? results.find((x) => x.caseId === c.id && x.arm === arm.arm.label && !x.error);
-      return [`${r.full.summary}`, "", ...r.full.suggestions.map((s, j) => `${j + 1}. **${s.parameter}** (${s.confidence}): ${s.action}. ${s.effect}. ${s.reasoning}.`), ...(r.full.basis?.length ? ["", `_Based on: ${r.full.basis.join(" · ")}_`] : [])].join("\n");
+      return [`${r.full.summary}`, "", ...r.full.suggestions.map((s, j) => `${j + 1}. **${s.parameter}** (${s.confidence}): ${s.action}. ${s.effect}. ${s.reasoning}.`)].join("\n");
     };
     doc.push(`## Case ${i + 1}: ${c.label} (${c.method}), ${P.qualityLabel(c.target.quality)} brew${c.target.tastingNotes ? ` — "${c.target.tastingNotes}"` : ""}`, "");
     doc.push("### A", "", render(a), "", "### B", "", render(b), "", "**Pick:** ", "");

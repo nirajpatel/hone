@@ -31,8 +31,6 @@ Real prompts generated from household data by the shared builder in `supabase/fu
 
 **Writing style (both prompts):** plain, everyday words and short sentences, no jargon beyond the brewer's own words, no filler, no dashes.
 
-**Basis:** both outputs include 1-2 `basis` strings shown under the guidance. Any basis citing a date that isn't in the prompt is dropped before saving.
-
 ---
 
 ## Example 1: Small Planes Arboretum (espresso, improvement)
@@ -143,20 +141,16 @@ WRITING STYLE:
     "confidence": "Medium"
   },
   "full": {
-    "summary": "The baseline brew is unrated. The closest rated brew was Decent, with a round cup but not enough sweetness.",
-    "primaryIssue": "Lack of sweetness in the closest rated recipe",
+    "summary": "The baseline brew is unrated. The most recent Decent cup was round but lacked sweetness, so return to its finer grind while keeping the shorter yield.",
+    "primaryIssue": "Lack of sweetness, the last recorded defect",
     "suggestions": [
       {
         "parameter": "Grind setting",
-        "action": "Grind finer from 23.25 to 22.75, keeping the dose at 18.2g, final weight at 30.8g, and temperature at 199.9°F",
-        "effect": "This should increase sweetness while keeping the cup round",
-        "reasoning": "The most recent Decent brew used this finer setting with the same short ratio and temperature, while the longer-yield attempt at this setting tasted watery",
+        "action": "Grind finer by 0.5 to 22.75, keeping the dose at 18.2g, final weight at 30.8g, and temperature at 199.9°F",
+        "effect": "This should preserve the round texture and give sweetness more room to develop",
+        "reasoning": "The most recent Decent cup used this finer setting with the same dose, temperature, and short yield, while finer grinding at a longer yield still produced a watery start",
         "confidence": "Medium"
       }
-    ],
-    "basis": [
-      "Apr 30, 2026: 22.75, 18.2g → 30.7g, Decent, round but lacking sweetness",
-      "Apr 29, 2026: 22.75, 18.2g → 33.2g, Bad, watery start"
     ]
   }
 }
@@ -224,42 +218,39 @@ WRITING STYLE:
 ### Response
 ```json
 {
-  "introduction": "Alto Naranjal pairs bright citrus and red berries with deeper dried-fruit sweetness. Start with your usual light-roast recipe to keep that brightness sweet rather than sharp.",
+  "introduction": "Alto Naranjal pairs bright citrus and red berries with deeper dried-fruit sweetness. Start with your usual 1:16 recipe to keep that brightness balanced and the cup full.",
   "parameters": [
     {
       "name": "Grind Setting",
-      "recommendation": "5.2",
-      "explanation": "Your recent light-roast brews point to this as a forgiving starting grind for clear fruit and steady flow."
+      "recommendation": "5.2, the second click above 5",
+      "explanation": "Your recent lighter-roast brews, allowing for their different flow times, support this as a forgiving starting point for sweetness without slow flow."
     },
     {
       "name": "Dosage",
       "recommendation": "20 g",
-      "explanation": "Your familiar dose keeps the V60 setup consistent while you learn this coffee."
+      "explanation": "This matches your recent successful V60 dose and keeps the pour pattern familiar."
     },
     {
       "name": "Water Temperature",
       "recommendation": "201°F",
-      "explanation": "This matches your successful light-roast brews and should bring out sweetness alongside the citrus."
+      "explanation": "This matches your typical successful lighter-roast temperature and helps bring out sweetness alongside the citrus."
     },
     {
       "name": "Brew Time",
-      "recommendation": "2:56",
-      "explanation": "Your usual successful finish time is a useful target for balancing bright fruit with dried-fruit depth."
+      "recommendation": "2:56 total",
+      "explanation": "This matches your usual successful lighter-roast finish and gives a useful flow check for this coffee."
     },
     {
       "name": "Final Weight/Ratio",
-      "recommendation": "320 g water, 1:16",
-      "explanation": "Your usual ratio gives the fruit room to show without making the cup hollow."
+      "recommendation": "320 g total water, 1:16",
+      "explanation": "Your usual successful ratio gives the fruit room to shine without making the cup hollow."
     },
     {
       "name": "Pour Structure",
-      "recommendation": "4 pours, cumulative totals: 50 g bloom until 0:45, 150 g by 1:15, 240 g by 1:45, 320 g by 2:05.",
-      "explanation": "This follows your successful staged-pour pattern, with the final pour early enough to allow drainage toward 2:56."
+      "recommendation": "Pour to 50 g at 0:00, bloom until 0:45, then pour to 150 g by 1:15, 240 g by 1:45, and 320 g by 2:10.",
+      "explanation": "These rounded amounts follow your successful four-stage pattern, with time left for the water to drain."
     }
   ],
-  "note": "Adjust grind first, one click finer if sour and fast or coarser if bitter and slow, then adjust ratio or pour timing only if the cup still needs balancing.",
-  "basis": [
-    "Your recent Ode Gen 2 pour-over brews and rated Hario V60 light-roast recipes."
-  ]
+  "note": "Adjust grind first, one click finer if sour or hollow with fast flow, or one click coarser if bitter with slow flow, then adjust ratio or pour timing only if balance still needs work."
 }
 ```

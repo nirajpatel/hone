@@ -125,7 +125,8 @@ Changes:
 
 - **One grinder section** replaces the similar-bean references: the last 6 coffees brewed on this grinder with this method, newest first, rated or not. Each line has roast, origin, bag notes, the middle grind setting and time of its Decent-or-better brews (all brews if none), the brew count, and the last date. No coffee names. Grind numbers only come from this grinder. A first try with "last 5 shots plus 3 similar beans" anchored on whichever coffee was brewed last (Peru: five shots of one Medium-Dark coffee at 24.4, copied as 24.5 against a best of 19), so the shot list was dropped.
 - **Brewer preferences match the brewer only**, not brewer plus grinder: dose, ratio, time, temperature and complaints don't depend on the grinder, so a new grinder keeps them. First brews on pour over also get the pours of the latest Decent-or-better brew.
-- **Guidelines are principles:** read the grind from the pattern across the grinder's coffees (closest roast, time against target, recent first), take the rest from the preferences, and explain values without pointing to one past coffee. The "Based on" line summarizes the brews as a group.
+- **Guidelines are principles:** read the grind from the pattern across the grinder's coffees (closest roast, time against target, recent first), take the rest from the preferences, and explain values without pointing to one past coffee.
+- **No "Based on" line** in either output: without coffee names it said the same thing every time, and the explanations already say what the advice draws on.
 - **Writing style** (both prompts) replaces "calm, craft-focused barista tone": plain everyday words, short sentences, no jargon beyond the brewer's own words, no filler, no dashes. Schema descriptions lost their sample phrases.
 
 Results (Sol, `low`, 2 runs each):

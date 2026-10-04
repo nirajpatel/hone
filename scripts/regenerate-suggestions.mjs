@@ -82,7 +82,7 @@ for (const newest of targets) {
         schema: P.IMPROVEMENT_SCHEMA,
       }),
     );
-    const result = P.normalizeImprovement(JSON.parse(res.content || "null"), prompt.user);
+    const result = P.normalizeImprovement(JSON.parse(res.content || "null"));
     if (!result) throw new Error(`invalid output (finish_reason=${res.finishReason})`);
     const fresh = await getKey(`brew:${newest.id}`);
     if (!fresh) throw new Error("brew disappeared during regenerate");

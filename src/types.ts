@@ -92,7 +92,6 @@ export interface Brew {
         reasoning: string;
         confidence: 'High' | 'Medium' | 'Low';
       }>;
-      basis?: string[]; // What the guidance drew on; absent on older suggestions
     };
   };
 }

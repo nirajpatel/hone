@@ -79,7 +79,7 @@ export async function generateGuidance(arm, input) {
   }
   const res = await withRetry(() => callChat(body));
   const parsed = JSON.parse(res.content ?? "null");
-  const full = arm.version === "old" ? normalizeLegacy(parsed) : P.normalizeImprovement(parsed, prompt.user)?.full;
+  const full = arm.version === "old" ? normalizeLegacy(parsed) : P.normalizeImprovement(parsed)?.full;
   if (!full) throw new Error(`Invalid guidance from ${arm.label}`);
   return { full, raw: parsed, concise: parsed?.concise, prompt, usage: res.usage, costUsd: costUsd(arm.model, res.usage), elapsedMs: res.elapsedMs };
 }
