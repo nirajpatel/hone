@@ -1037,7 +1037,34 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
       return c.json({ error: 'Forbidden - brew does not belong to your household' }, 403);
     }
 
+    // Regenerate suggestions if outcome (quality/notes) OR any recorded brew
+    // parameter changed. Parameter edits represent corrections to the data
+    // that fed the previous diagnosis, so the guidance should follow.
+    const qualityChanged = body.quality !== undefined && body.quality !== existing.quality;
+    const tastingNotesChanged = body.tastingNotes !== undefined && body.tastingNotes !== existing.tastingNotes;
+    const personalNotesChanged = body.personalNotes !== undefined && body.personalNotes !== existing.personalNotes;
+    const REGEN_PARAM_KEYS = [
+      'grindSetting',
+      'dosage',
+      'waterTemp',
+      'brewTime',
+      'finalWeight',
+      'coffeeTemperature',
+      'stages',
+      'brewMethod',
+    ] as const;
+    const parameterChanged = REGEN_PARAM_KEYS.some(
+      (k) => body[k] !== undefined && JSON.stringify(body[k]) !== JSON.stringify(existing[k])
+    );
+    const inputsChanged = qualityChanged || tastingNotesChanged || personalNotesChanged || parameterChanged;
+
     const updated = { ...existing, ...body };
+    // The newest brew's guidance is what the next brew uses. Drop it until the
+    // regeneration lands so clients fetch fresh guidance instead of the stale copy.
+    if (inputsChanged && updated.suggestion && updated.coffeeId &&
+        await isNewestBrewForCoffee(id, updated.coffeeId, existing.userId || user.id)) {
+      delete updated.suggestion;
+    }
     await kv.set(`brew:${id}`, updated);
     
     // If rating was added via web UI, clean up notification state
@@ -1062,27 +1089,7 @@ app.put('/make-server-23508aac/brews/:id', async (c) => {
       }
     }
     
-    // Regenerate suggestions if outcome (quality/notes) OR any recorded brew
-    // parameter changed. Parameter edits represent corrections to the data
-    // that fed the previous diagnosis, so the guidance should follow.
-    const qualityChanged = body.quality !== undefined && body.quality !== existing.quality;
-    const tastingNotesChanged = body.tastingNotes !== undefined && body.tastingNotes !== existing.tastingNotes;
-    const personalNotesChanged = body.personalNotes !== undefined && body.personalNotes !== existing.personalNotes;
-    const REGEN_PARAM_KEYS = [
-      'grindSetting',
-      'dosage',
-      'waterTemp',
-      'brewTime',
-      'finalWeight',
-      'coffeeTemperature',
-      'stages',
-      'brewMethod',
-    ] as const;
-    const parameterChanged = REGEN_PARAM_KEYS.some(
-      (k) => body[k] !== undefined && JSON.stringify(body[k]) !== JSON.stringify(existing[k])
-    );
-
-    if (qualityChanged || tastingNotesChanged || personalNotesChanged || parameterChanged) {
+    if (inputsChanged) {
       // Clears the suggestion if quality and notes were removed; otherwise regenerates when newest.
       scheduleRegeneration(id, existing.userId || user.id);
     }
