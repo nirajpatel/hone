@@ -106,6 +106,7 @@
     --container-4xl: 56rem;
     --container-6xl: 72rem;
     --container-7xl: 80rem;
+    --text-xxs: .625rem;
     --text-xs: .75rem;
     --text-xs--line-height: calc(1.25 / .875);
     --text-sm: .875rem;

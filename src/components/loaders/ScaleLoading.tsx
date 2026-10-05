@@ -69,7 +69,7 @@ export function ScaleLoading() {
           {value}
           <small style={{ fontSize: 'var(--text-xs)', color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
         </span>
-        <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', color: t ? INK : MUTED }}>TARE</span>
+        <span style={{ fontSize: 'var(--text-xxs)', fontWeight: 500, letterSpacing: '0.08em', color: t ? INK : MUTED }}>TARE</span>
       </div>
       <div
         role="progressbar"
