@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment, CoffeeTemperature, BrewStage } from './types';
 import { BrewDetail } from './components/BrewDetail';
 import { CoffeeDetail } from './components/CoffeeDetail';
@@ -16,6 +16,10 @@ import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { Profile } from './components/Profile';
 import { EquipmentDialog } from './components/EquipmentDialog';
 import { EspressoLoading } from './components/EspressoLoading';
+import { getLoaderVariant, isScaleVariant } from './components/loaders/AppLoader';
+import { LoadingScreen } from './components/loaders/LoadingScreen';
+import { AppNavBrand } from './components/AppNavBrand';
+import { LoaderPreview } from './components/loaders/LoaderPreview';
 import { Terms } from './components/Terms';
 import { Privacy } from './components/Privacy';
 import { A2POptInProof } from './components/A2POptInProof';
@@ -50,7 +54,6 @@ import {
   SheetTrigger,
 } from './components/ui/sheet';
 import coffeeBeansImage from './assets/coffee-beans.webp';
-import honeLogo from './assets/hone-logo.svg';
 import { capitalizeBrewMethod, getRatingDisplay } from './utils/formatters';
 import { getAllBrewMethodConfigs } from './utils/brewMethods';
 import { Coffee as CoffeeIcon, Plus, LogOut, Link2, ImageIcon } from 'lucide-react';
@@ -67,6 +70,10 @@ import { SimpleTooltip } from './components/ui/simple-tooltip';
 import { supabase } from './utils/supabase/client';
 import { sanitizeErrorMessage } from './utils/errorHandling';
 import { fetchWithRetry } from './utils/fetchWithRetry';
+import { completeLoadProgress, finishLoadStep, startLoadStep, trackLoadStep } from './utils/loadProgress';
+
+// Lets the scale loader land on 100.0 before the app replaces it.
+const SCALE_REVEAL_HOLD_MS = 400;
 
 export default function App() {
   const [brews, setBrews] = useState<Brew[]>([]);
@@ -77,6 +84,8 @@ export default function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const [loaderVariant] = useState(getLoaderVariant);
+  const [revealHold, setRevealHold] = useState(false);
   const [selectedBrew, setSelectedBrew] = useState<Brew | null>(null);
   const [scrollToGuidance, setScrollToGuidance] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
@@ -124,6 +133,21 @@ export default function App() {
     }
     return session?.access_token || null;
   };
+
+  // Layout effect so the hold starts before the browser paints the app for a frame.
+  const wasLoadingRef = useRef(loading);
+  useLayoutEffect(() => {
+    const finishedLoading = wasLoadingRef.current && !loading;
+    wasLoadingRef.current = loading;
+    if (!finishedLoading || !isScaleVariant(loaderVariant) || !currentUser) return;
+    completeLoadProgress();
+    setRevealHold(true);
+    const timer = setTimeout(() => setRevealHold(false), SCALE_REVEAL_HOLD_MS);
+    return () => {
+      clearTimeout(timer);
+      setRevealHold(false);
+    };
+  }, [loading]);
 
   // Stable refs so the onAuthStateChange listener always calls the latest functions
   const checkAuthRef = useRef<() => Promise<void>>(null!);
@@ -407,6 +431,7 @@ export default function App() {
   }, []);
 
   const checkAuth = async () => {
+    startLoadStep('session');
     try {
       // Skip error handling if we're on /login route (let SignInPage handle it)
       const isLoginRoute = window.location.pathname === '/login';
@@ -463,6 +488,7 @@ export default function App() {
           
           // Verify session was created
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          finishLoadStep('session');
           
           if (session?.access_token) {
             // Session established - set auth state first
@@ -518,6 +544,7 @@ export default function App() {
       
       // Check for session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      finishLoadStep('session');
       
       if (session?.access_token) {
         setAccessToken(session.access_token);
@@ -545,13 +572,13 @@ export default function App() {
 
   const createOrGetUser = async (token: string) => {
     try {
-      const res = await fetch(`${apiUrl}/users`, {
+      const res = await trackLoadStep('account', fetch(`${apiUrl}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      }));
 
       if (res.ok) {
         const userData = await res.json();
@@ -592,10 +619,10 @@ export default function App() {
     try {
       const headers = { Authorization: `Bearer ${authToken}` };
       const [brewsRes, coffeesRes, usersRes, equipmentRes] = await Promise.all([
-        fetchWithRetry(`${apiUrl}/brews`, { headers }),
-        fetchWithRetry(`${apiUrl}/coffees`, { headers }),
-        fetchWithRetry(`${apiUrl}/users`, { headers }),
-        fetchWithRetry(`${apiUrl}/equipment`, { headers }),
+        trackLoadStep('brews', fetchWithRetry(`${apiUrl}/brews`, { headers })),
+        trackLoadStep('coffees', fetchWithRetry(`${apiUrl}/coffees`, { headers })),
+        trackLoadStep('users', fetchWithRetry(`${apiUrl}/users`, { headers })),
+        trackLoadStep('equipment', fetchWithRetry(`${apiUrl}/equipment`, { headers })),
       ]);
 
       const anyUnauthorized = [brewsRes, coffeesRes, usersRes, equipmentRes].some(r => r.status === 401 || r.status === 403);
@@ -1287,12 +1314,14 @@ export default function App() {
     return <LandingPage onLoginSuccess={() => checkAuth()} />;
   }
 
+  if (currentRoute === '/loader-preview') {
+    return <LoaderPreview initialVariant={loaderVariant} />;
+  }
+
   // Show loading for /auth/confirm route (magic link verification)
   if (currentRoute === '/auth/confirm') {
     return (
-      <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-        <EspressoLoading />
-      </div>
+      <LoadingScreen variant={loaderVariant} />
     );
   }
 
@@ -1300,9 +1329,7 @@ export default function App() {
     // If user is already logged in, show loading briefly while redirect happens
     if (currentUser) {
       return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
+        <LoadingScreen variant={loaderVariant} />
       );
     }
     
@@ -1317,9 +1344,7 @@ export default function App() {
     if (hasOAuthCallback) {
       // OAuth callback detected - show loading while processing
       return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
+        <LoadingScreen variant={loaderVariant} />
       );
     }
     
@@ -1343,20 +1368,16 @@ export default function App() {
   // 1. User is logged in and loading their data, OR
   // 2. We're loading and there's a potential session (might be logged in, checking auth)
   // Don't show loading if no potential session (definitely logged out)
-  if (loading) {
+  if (loading || revealHold) {
     if (currentUser) {
       // User is logged in, loading their data - show loading
       return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
+        <LoadingScreen variant={loaderVariant} />
       );
     } else if (hasPotentialSession && !authChecked) {
       // Potential session exists, still checking auth - show loading to prevent flash
       return (
-        <div className="bg-gray-50 flex items-center justify-center" style={{ height: '100dvh' }}>
-          <EspressoLoading />
-        </div>
+        <LoadingScreen variant={loaderVariant} />
       );
     }
     // No potential session - user is definitely logged out, don't show loading
@@ -1450,10 +1471,7 @@ export default function App() {
       <nav className="bg-white border-b border-gray-200">
         <div className="px-3 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <img src={honeLogo} alt="" className="app-nav-logo" style={{ height: '22px', width: 'auto', display: 'block' }} />
-              <span className="hidden md:inline text-gray-900" style={{ fontWeight: 'var(--font-weight-bold)', fontSize: '18px', lineHeight: 1, color: '#111827' }}>Hone</span>
-            </div>
+            <AppNavBrand />
             <div className="flex items-center gap-4">
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center gap-2">
