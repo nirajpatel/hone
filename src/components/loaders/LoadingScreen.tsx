@@ -3,6 +3,7 @@ import { AppLoader, LoaderVariant } from './AppLoader';
 
 // Matches the dashboard nav's row height (set by its h-9 buttons) so the bar doesn't shift when the app appears.
 const NAV_ROW_HEIGHT = 36;
+const NAV_HEIGHT = NAV_ROW_HEIGHT + 2 * 16 + 1; // row + py-4 + bottom border
 
 export function LoadingScreen({ variant }: { variant: LoaderVariant }) {
   const white = variant === 'scale-white';
@@ -27,7 +28,8 @@ export function LoadingScreen({ variant }: { variant: LoaderVariant }) {
           </div>
         </div>
       </nav>
-      <div className="flex-1 flex items-center justify-center">
+      {/* Bottom padding mirrors the nav so the loader sits at the center of the screen, not of the space below the nav. */}
+      <div className="flex-1 flex items-center justify-center" style={{ paddingBottom: NAV_HEIGHT }}>
         <AppLoader variant={variant} />
       </div>
     </div>

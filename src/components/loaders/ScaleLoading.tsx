@@ -56,7 +56,7 @@ export function ScaleLoading() {
         }
       }}
       style={{
-        width: 190,
+        width: 170,
         color: INK,
         cursor: 'pointer',
         userSelect: 'none',
@@ -65,9 +65,9 @@ export function ScaleLoading() {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: 34, lineHeight: 1, fontWeight: 500, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 30, lineHeight: 1, fontWeight: 500, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
           {value}
-          <small style={{ fontSize: 14, color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
+          <small style={{ fontSize: 13, color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
         </span>
         <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', color: t ? INK : MUTED }}>TARE</span>
       </div>
