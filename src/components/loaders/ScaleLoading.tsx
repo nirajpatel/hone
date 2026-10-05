@@ -67,7 +67,7 @@ export function ScaleLoading() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <span style={{ fontSize: 30, lineHeight: 1, fontWeight: 500, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
           {value}
-          <small style={{ fontSize: 13, color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
+          <small style={{ fontSize: 'var(--text-xs)', color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
         </span>
         <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', color: t ? INK : MUTED }}>TARE</span>
       </div>
