@@ -6,6 +6,16 @@ const MUTED = 'var(--color-gray-500)';
 const TRACK = 'var(--color-gray-200)';
 const TARE_BLANK_MS = 250;
 
+// Hover is limited to real pointers so iOS doesn't leave the label dark after a tap.
+const STYLES = `
+.hone-scale-tare { color: ${MUTED}; transition: color 150ms; }
+.hone-scale:active .hone-scale-tare,
+.hone-scale:focus-visible .hone-scale-tare { color: var(--color-gray-900); }
+@media (hover: hover) {
+  .hone-scale:hover .hone-scale-tare { color: var(--color-gray-900); }
+}
+`;
+
 function tare() {
   loadDisplay.tare = { at: performance.now(), base: loadDisplay.shown, net: 0 };
 }
@@ -45,6 +55,7 @@ export function ScaleLoading() {
 
   return (
     <div
+      className="hone-scale"
       role="button"
       tabIndex={0}
       aria-label="Loading. Tap to tare the scale."
@@ -64,12 +75,13 @@ export function ScaleLoading() {
         outline: 'none',
       }}
     >
+      <style>{STYLES}</style>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <span style={{ fontSize: 30, lineHeight: 1, fontWeight: 500, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
           {value}
           <small style={{ fontSize: 'var(--text-xs)', color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
         </span>
-        <span className="font-medium uppercase tracking-wide" style={{ fontSize: 'var(--text-xxs)', color: t ? INK : MUTED }}>Tare</span>
+        <span className="hone-scale-tare font-medium uppercase tracking-wide" style={{ fontSize: 'var(--text-xxs)' }}>Tare</span>
       </div>
       <div
         role="progressbar"
