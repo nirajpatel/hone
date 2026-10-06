@@ -65,7 +65,7 @@ export function ScaleLoading() {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <span style={{ fontSize: 30, lineHeight: 1, fontWeight: 600, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 30, lineHeight: 1, fontWeight: 500, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
           {value}
           <small style={{ fontSize: 'var(--text-xs)', color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
         </span>
