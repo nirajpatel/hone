@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { getLoadProgress, loadDisplay } from '../../utils/loadProgress';
 
 const INK = '#030213';
-const MUTED = '#717182';
-const TRACK = 'rgba(3, 2, 19, 0.12)';
+const MUTED = 'var(--color-gray-500)';
+const TRACK = 'var(--color-gray-200)';
 const TARE_BLANK_MS = 250;
 
 function tare() {
@@ -69,7 +69,7 @@ export function ScaleLoading() {
           {value}
           <small style={{ fontSize: 'var(--text-xs)', color: MUTED, marginLeft: 4, letterSpacing: 0 }}>g</small>
         </span>
-        <span style={{ fontSize: 'var(--text-xxs)', fontWeight: 500, letterSpacing: '0.08em', color: t ? INK : MUTED }}>TARE</span>
+        <span className="font-medium uppercase tracking-wide" style={{ fontSize: 'var(--text-xxs)', color: t ? INK : MUTED }}>Tare</span>
       </div>
       <div
         role="progressbar"
