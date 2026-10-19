@@ -464,9 +464,10 @@ const MAX_STAGGERED_CARDS = 5;
 const entranceDelayFor = (index: number) => Math.min(index, MAX_STAGGERED_CARDS) * CARD_STAGGER_MS;
 
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-// The phone graph is about a third as wide, so a shorter draw keeps the line's pace closer to desktop.
-const DESKTOP_DRAW_MS = 1000;
-const MOBILE_DRAW_MS = 850;
+// Longer lines take a little longer at a faster pace: about 850ms across a phone and 1000ms across a desktop.
+const drawDurationFor = (distance: number) => 800 + distance * 0.15;
+// The longest dot, date or + transition under .tl-entering in index.css.
+const REVEAL_TRANSITION_MS = 550;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 interface TimelineRowProps {
@@ -894,7 +895,7 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
     }
   };
 
-  // Drives the entrance frame by frame: the line draws left to right, dots and dates appear as it passes them,
+  // Drives the entrance frame by frame: the line draws left to right, dots, dates and the + button appear as it passes them,
   // and the fill fades in once the line is halfway across. Dots, dates and the + button carry data-tl-* hooks whose
   // hidden starting styles live in index.css under .tl-entering; setting data-in reveals them.
   useEffect(() => {
@@ -910,11 +911,11 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
     const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
     const gap = isMobile ? mobileGap : desktopGap;
     const contentPadding = 8;
-    const revealStart = Math.max(0, scroller.scrollLeft - contentPadding);
-    const revealEnd = scroller.scrollLeft - contentPadding + scroller.clientWidth;
-
     const svgs = Array.from(row.querySelectorAll<SVGSVGElement>('[data-tl-svg]'))
       .filter(svg => getComputedStyle(svg).display !== 'none');
+    const graphWidth = svgs[0]?.width.baseVal.value ?? Infinity;
+    const revealStart = Math.max(0, scroller.scrollLeft - contentPadding);
+    const revealEnd = Math.min(scroller.scrollLeft - contentPadding + scroller.clientWidth, graphWidth);
     const inGraph = <T extends Element>(selector: string) => svgs.flatMap(svg => Array.from(svg.querySelectorAll<T>(selector)));
     const lineClips = inGraph<SVGRectElement>('[data-tl-line-clip]');
     const areas = inGraph<SVGPathElement>('[data-tl-area]');
@@ -922,9 +923,16 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
     const labels = Array.from(row.querySelectorAll<HTMLElement>('[data-tl-label]'));
     const addButton = row.querySelector<HTMLElement>('[data-tl-add]');
     const nodeXs = brews.map((_, index) => index * (containerWidth + gap) + containerWidth / 2);
-    const reveal = (el: Element | null | undefined) => el?.setAttribute('data-in', '');
+    const addX = brews.length * (containerWidth + gap) + containerWidth / 2;
+    // The entrance outlasts the reveals' CSS transitions: removing .tl-entering mid-transition can snap them to full.
+    let revealsSettleAt = 0;
+    const reveal = (el: Element | null | undefined, t: number) => {
+      if (!el || el.hasAttribute('data-in')) return;
+      el.setAttribute('data-in', '');
+      revealsSettleAt = t + REVEAL_TRANSITION_MS;
+    };
 
-    const draw = isMobile ? MOBILE_DRAW_MS : DESKTOP_DRAW_MS;
+    const draw = drawDurationFor(revealEnd - revealStart);
     // When the line is halfway across; inverts easeOutCubic, so keep the two in step.
     const fillStart = draw * (1 - Math.cbrt(1 - 0.5));
     const fillFade = 600;
@@ -938,13 +946,13 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
         lineClips.forEach(rect => rect.setAttribute('width', String(lineX)));
         nodeXs.forEach((x, index) => {
           if (x > lineX + 2) return;
-          reveal(dots[index]);
-          reveal(labels[index]);
+          reveal(dots[index], t);
+          reveal(labels[index], t);
         });
-        if (t > draw * 0.8) reveal(addButton);
+        if (addX <= lineX + 2 || t >= draw) reveal(addButton, t);
         const fill = String(easeOutCubic(clamp01((t - fillStart) / fillFade)));
         areas.forEach(p => { p.style.fillOpacity = fill; });
-        if (t >= Math.max(draw, fillStart + fillFade)) {
+        if (t >= Math.max(draw, fillStart + fillFade, revealsSettleAt)) {
           setAnimationPhase('done');
           return;
         }
