@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from './ui/select';
 import jsQR from 'jsqr@1.4.0';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { projectId } from '../utils/supabase/info';
 import { Badge } from './ui/badge';
 import { TimeInput, formatTime } from './TimeInput';
 import { toast } from 'sonner@2.0.3';
@@ -145,6 +145,9 @@ interface NewBrewFlowProps {
   hidden?: boolean;
 }
 
+// Set once the server refuses La Marzocco access, so later New Brew forms skip the attempt.
+let laMarzoccoDeniedThisSession = false;
+
 export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, onClose, onSave, duplicateData, editingBrew, onUpdate, equipmentChangeCounter, prefilledCoffeeId, prefilledBrewMethod, onMarkCoffeeFinished, onAddAnotherBag, hidden }: NewBrewFlowProps) {
   useWakeLock(true);
 
@@ -262,6 +265,14 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
   const brewingStateTimestampRef = useRef<number | null>(null);
   const stalenessCheckIntervalRef = useRef<number | null>(null);
   const previousBrewingStateRef = useRef<string | null>(null);
+  const [laMarzoccoDenied, setLaMarzoccoDenied] = useState(laMarzoccoDeniedThisSession);
+  // Polling and streaming callbacks outlive renders, so they read the latest token after a refresh.
+  const accessTokenRef = useRef(accessToken);
+  accessTokenRef.current = accessToken;
+  const denyLaMarzocco = () => {
+    laMarzoccoDeniedThisSession = true;
+    setLaMarzoccoDenied(true);
+  };
   
   const selectedCoffee = coffees.find(c => c.id === coffeeId);
 
@@ -304,13 +315,8 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
       selectedBrewer.company?.toLowerCase() === 'la marzocco' && 
       selectedBrewer.model?.toLowerCase() === 'linea mini';
     
-    if (!isLaMarzoccoLineaMini) return false;
-    
-    const allowedUserId = import.meta.env.VITE_LAMARZOCCO_ALLOWED_USER_ID;
-    const allowedHouseholdId = import.meta.env.VITE_LAMARZOCCO_ALLOWED_HOUSEHOLD_ID;
-    if (!allowedUserId && !allowedHouseholdId) return false;
-    
-    return currentUser.id === allowedUserId || currentUser.householdId === allowedHouseholdId;
+    // The server decides which accounts may read the machine; until it refuses, try to connect.
+    return isLaMarzoccoLineaMini && !laMarzoccoDenied;
   };
 
   const getCoffeesForDropdown = () => {
@@ -363,10 +369,17 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/lamarzocco/status`,
         {
           headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
+            'Authorization': `Bearer ${accessTokenRef.current}`,
           },
         }
       );
+
+      if (response.status === 403) {
+        denyLaMarzocco();
+        setMachineStatus(null);
+        setMachineError(null);
+        return null;
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -418,7 +431,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
                 `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/lamarzocco/status`,
                 {
                   headers: {
-                    'Authorization': `Bearer ${publicAnonKey}`,
+                    'Authorization': `Bearer ${accessTokenRef.current}`,
                   },
                 }
               );
@@ -454,10 +467,17 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
           `https://${projectId}.supabase.co/functions/v1/make-server-23508aac/lamarzocco/stream`,
           {
             headers: {
-              'Authorization': `Bearer ${publicAnonKey}`,
+              'Authorization': `Bearer ${accessTokenRef.current}`,
             },
           }
         );
+
+        if (response.status === 403) {
+          denyLaMarzocco();
+          stopStreaming();
+          setMachineStatus(null);
+          return;
+        }
 
         if (!response.ok) {
           throw new Error(`Stream connection failed: ${response.status}`);
@@ -746,7 +766,7 @@ export function NewBrewFlow({ coffees, users, currentUser, brews, accessToken, o
         pollIntervalRef.current = null;
       }
     };
-  }, [isEspresso, isEditMode, brewerId, equipment]);
+  }, [isEspresso, isEditMode, brewerId, equipment, laMarzoccoDenied]);
 
   // Scroll to extraction time field when brewing popover closes
   useEffect(() => {

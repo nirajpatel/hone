@@ -2701,10 +2701,45 @@ REQUIREMENTS:
   }
 }
 
-// La Marzocco endpoints
+// La Marzocco endpoints. Only the machine owner's account or household may read it (function secrets).
+const LAMARZOCCO_ALLOWED_USER_ID = Deno.env.get('LAMARZOCCO_ALLOWED_USER_ID');
+const LAMARZOCCO_ALLOWED_HOUSEHOLD_ID = Deno.env.get('LAMARZOCCO_ALLOWED_HOUSEHOLD_ID');
+// The form polls status every second while the machine is in standby, so each session's answer is reused briefly.
+const LAMARZOCCO_ACCESS_TTL_MS = 60_000;
+const laMarzoccoAccess = new Map<string, { allowed: boolean; expires: number }>();
+
+// null when the session can't be verified (missing, expired, or a transient auth error), as opposed to a refusal.
+const canUseLaMarzocco = async (accessToken: string | undefined): Promise<boolean | null> => {
+  if (!accessToken) return null;
+  const now = Date.now();
+  const cached = laMarzoccoAccess.get(accessToken);
+  if (cached && cached.expires > now) return cached.allowed;
+
+  const user = await getUser(accessToken);
+  if (!user) return null;
+  const account = await kv.get(`user:${user.id}`);
+  const allowed =
+    (!!LAMARZOCCO_ALLOWED_USER_ID && user.id === LAMARZOCCO_ALLOWED_USER_ID) ||
+    (!!LAMARZOCCO_ALLOWED_HOUSEHOLD_ID && account?.householdId === LAMARZOCCO_ALLOWED_HOUSEHOLD_ID);
+
+  for (const [token, entry] of laMarzoccoAccess) {
+    if (entry.expires <= now) laMarzoccoAccess.delete(token);
+  }
+  laMarzoccoAccess.set(accessToken, { allowed, expires: now + LAMARZOCCO_ACCESS_TTL_MS });
+  return allowed;
+};
+
+const laMarzoccoAccessError = async (c: any) => {
+  const allowed = await canUseLaMarzocco(c.req.header('Authorization')?.split(' ')[1]);
+  if (allowed === null) return c.json({ error: 'Unauthorized' }, 401);
+  if (!allowed) return c.json({ error: 'La Marzocco is not available for this account' }, 403);
+  return null;
+};
 
 // Get machine status
 app.get('/make-server-23508aac/lamarzocco/status', async (c) => {
+  const accessError = await laMarzoccoAccessError(c);
+  if (accessError) return accessError;
   try {
     const status = await lamarzocco.getMachineStatus();
     return c.json(status);
@@ -2718,6 +2753,8 @@ app.get('/make-server-23508aac/lamarzocco/status', async (c) => {
 
 // Stream machine status updates via Server-Sent Events (SSE)
 app.get('/make-server-23508aac/lamarzocco/stream', async (c) => {
+  const accessError = await laMarzoccoAccessError(c);
+  if (accessError) return accessError;
   try {
     let streamClosed = false;
     let generator: AsyncGenerator | null = null;

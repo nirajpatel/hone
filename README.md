@@ -112,6 +112,8 @@ In your Supabase Dashboard under Settings > Edge Functions > Secrets, add:
 | `LAMARZOCCO_INSTALLATION_KEY` | No | La Marzocco API integration |
 | `LAMARZOCCO_USERNAME` | No | La Marzocco account |
 | `LAMARZOCCO_PASSWORD` | No | La Marzocco account |
+| `LAMARZOCCO_ALLOWED_USER_ID` | No | Account allowed to read the machine; leave both allow-list secrets unset to keep it off for everyone |
+| `LAMARZOCCO_ALLOWED_HOUSEHOLD_ID` | No | Household allowed to read the machine |
 
 ### 5. Start development server
 
@@ -149,12 +151,6 @@ In Vercel under Project Settings > Environment Variables, add:
 ```
 VITE_SUPABASE_PROJECT_ID=your-project-ref
 VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-Optionally, for La Marzocco feature gating:
-```
-VITE_LAMARZOCCO_ALLOWED_USER_ID=<uuid>
-VITE_LAMARZOCCO_ALLOWED_HOUSEHOLD_ID=<uuid>
 ```
 
 ### 4. Configure Supabase auth redirect
