@@ -105,6 +105,18 @@ const generateInviteCode = (): string => {
   return code;
 };
 
+// Prefix scan filtered in the query on a field of the stored value, so only matching rows leave the database.
+const getByPrefixWhereIn = async (prefix: string, field: string, values: string[]): Promise<any[]> => {
+  if (values.length === 0) return [];
+  const { data, error } = await supabase
+    .from('kv_store_23508aac')
+    .select('value')
+    .like('key', `${prefix}%`)
+    .in(`value->>${field}`, values);
+  if (error) throw new Error(error.message);
+  return data?.map((d) => d.value) ?? [];
+};
+
 // Helper to get user's household members (including self)
 const getHouseholdMemberIds = async (userId: string): Promise<string[]> => {
   const user = await kv.get(`user:${userId}`);
@@ -113,8 +125,7 @@ const getHouseholdMemberIds = async (userId: string): Promise<string[]> => {
   }
   
   // Get all users in the same household
-  const allUsers = await kv.getByPrefix('user:');
-  const householdMembers = allUsers.filter(u => u.householdId === user.householdId);
+  const householdMembers = await getByPrefixWhereIn('user:', 'householdId', [user.householdId]);
   return householdMembers.map(u => u.id);
 };
 
@@ -251,12 +262,8 @@ app.get('/make-server-23508aac/users', async (c) => {
       return c.json({ error: 'Unauthorized' }, 401);
     }
     
-    // Get household member IDs
     const householdMemberIds = await getHouseholdMemberIds(user.id);
-    
-    // Get all users and filter to only household members
-    const allUsers = await kv.getByPrefix('user:');
-    const householdUsers = allUsers.filter(u => householdMemberIds.includes(u.id));
+    const householdUsers = await kv.mget(householdMemberIds.map((id) => `user:${id}`));
     
     return c.json(householdUsers);
   } catch (error) {
@@ -520,14 +527,7 @@ app.get('/make-server-23508aac/coffees', async (c) => {
     const householdMemberIds = await getHouseholdMemberIds(user.id);
     console.log('Household member IDs:', householdMemberIds);
     
-    console.log('Fetching coffees from KV store');
-    const allCoffees = await kv.getByPrefix('coffee:');
-    console.log('Total coffees found:', allCoffees.length);
-    
-    // Filter to coffees created by user or household members
-    const visibleCoffees = allCoffees.filter(coffee => 
-      coffee.createdByUserId && householdMemberIds.includes(coffee.createdByUserId)
-    );
+    const visibleCoffees = await getByPrefixWhereIn('coffee:', 'createdByUserId', householdMemberIds);
     
     console.log('Visible coffees for user:', visibleCoffees.length);
     return c.json(visibleCoffees);
@@ -927,12 +927,8 @@ app.get('/make-server-23508aac/brews', async (c) => {
     }
 
     const householdMemberIds = await getHouseholdMemberIds(user.id);
-    const allBrews = await kv.getByPrefix('brew:');
-    
-    // Filter to brews where userId (barista) is user or household member
-    const visibleBrews = allBrews.filter(brew => 
-      brew.userId && householdMemberIds.includes(brew.userId)
-    );
+    // Brews where the barista (userId) is the user or a household member
+    const visibleBrews = await getByPrefixWhereIn('brew:', 'userId', householdMemberIds);
     
     return c.json(visibleBrews);
   } catch (error) {
