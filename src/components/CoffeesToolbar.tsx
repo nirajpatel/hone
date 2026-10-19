@@ -1,6 +1,6 @@
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Plus, LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { Plus, LayoutGrid, Table as TableIcon, Loader2 } from 'lucide-react';
 import { DelayedHelpTooltip } from './ui/delayed-help-tooltip';
 import { COPY } from '../constants/copy';
 
@@ -10,6 +10,8 @@ interface CoffeesToolbarProps {
   onViewChange: (view: 'shelf' | 'table') => void;
   onGroupByChange: (groupBy: 'month' | 'coffee') => void;
   onNewCoffee: () => void;
+  /** Add Bag was tapped while data loads; shows a spinner until the form opens */
+  newCoffeePending?: boolean;
 }
 
 export function CoffeesToolbar({
@@ -18,6 +20,7 @@ export function CoffeesToolbar({
   onViewChange,
   onGroupByChange,
   onNewCoffee,
+  newCoffeePending = false,
 }: CoffeesToolbarProps) {
   return (
     <div className="flex items-center justify-between mb-4">
@@ -95,8 +98,8 @@ export function CoffeesToolbar({
 
       <h2 className="mobile-section-header">Coffee Collection</h2>
 
-      <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button">
-        <Plus className="w-4 h-4" />
+      <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button" aria-busy={newCoffeePending || undefined}>
+        {newCoffeePending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
         {COPY.addBag}
       </Button>
     </div>

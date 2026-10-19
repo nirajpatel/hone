@@ -1,6 +1,6 @@
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Plus, Activity, Table as TableIcon } from 'lucide-react';
+import { Plus, Activity, Table as TableIcon, Loader2 } from 'lucide-react';
 import { BrewMethod, Equipment, Coffee } from '../types';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { SimpleTooltip } from './ui/simple-tooltip';
@@ -18,6 +18,17 @@ interface BrewsToolbarProps {
   coffees: Coffee[];
   /** When true, hide view selector and filter/groupBy dropdowns (e.g. during empty state) */
   isEmpty?: boolean;
+  /** Data is still loading: New Brew stays enabled and a tap is held until the data arrives */
+  loading?: boolean;
+  /** New Brew was tapped while loading; shows a spinner until the form opens */
+  newBrewPending?: boolean;
+}
+
+/** At least one coffee, one active brewer, and one active grinder */
+export function canCreateBrew(equipment: Equipment[], coffees: Coffee[]) {
+  return equipment.some(e => e.type === 'brewer' && e.active)
+    && equipment.some(e => e.type === 'grinder' && e.active)
+    && coffees.length > 0;
 }
 
 export function BrewsToolbar({
@@ -31,18 +42,19 @@ export function BrewsToolbar({
   equipment,
   coffees,
   isEmpty = false,
+  loading = false,
+  newBrewPending = false,
 }: BrewsToolbarProps) {
   const brewMethodConfigs = getAllBrewMethodConfigs();
 
-  // Check if there's at least one coffee, one brewer, and one grinder
   const hasBrewers = equipment.some(e => e.type === 'brewer' && e.active);
   const hasGrinders = equipment.some(e => e.type === 'grinder' && e.active);
   const hasCoffees = coffees.length > 0;
-  const canCreateBrew = hasBrewers && hasGrinders && hasCoffees;
+  const canCreate = loading || canCreateBrew(equipment, coffees);
 
   // Generate tooltip text
   const getTooltipText = () => {
-    if (canCreateBrew) return undefined;
+    if (canCreate) return undefined;
     
     const missing = [];
     if (!hasCoffees) missing.push('at least one coffee');
@@ -56,9 +68,10 @@ export function BrewsToolbar({
     <Button 
       onClick={onNewBrew} 
       className="cursor-pointer mobile-add-button"
-      disabled={!canCreateBrew}
+      disabled={!canCreate}
+      aria-busy={newBrewPending || undefined}
     >
-      <Plus className="w-4 h-4" />
+      {newBrewPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
       New Brew
     </Button>
   );
@@ -159,7 +172,7 @@ export function BrewsToolbar({
         Brew History
       </h2>
       
-      {!canCreateBrew ? (
+      {!canCreate ? (
         <SimpleTooltip content={getTooltipText()!}>
           {button}
         </SimpleTooltip>

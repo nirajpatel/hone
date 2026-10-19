@@ -13,6 +13,8 @@ import { CoffeesShelvesView, setRepImageCacheEntry } from './components/CoffeesS
 import { generateDefaultBagImage, hasRepresentativeImage, saveRepresentativeImage } from './utils/generateBagImage';
 import { CoffeesTableView } from './components/CoffeesTableView';
 import { CoffeesToolbar } from './components/CoffeesToolbar';
+import { BrewsToolbar, canCreateBrew } from './components/BrewsToolbar';
+import { AvatarSkeleton, BeanShelvesSkeleton, BrewCardsSkeleton } from './components/loaders/DashboardSkeleton';
 import { Profile } from './components/Profile';
 import { EquipmentDialog } from './components/EquipmentDialog';
 import { EspressoLoading } from './components/EspressoLoading';
@@ -119,6 +121,20 @@ export default function App() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [aliases, setAliases] = useState<{ roasterAliases: Record<string, string>; coffeeNameAliases: Record<string, string> }>({ roasterAliases: {}, coffeeNameAliases: {} });
   const [isFeedbackHovered, setIsFeedbackHovered] = useState(false);
+  // New Brew or Add Bag tapped while the dashboard's data is loading; the form opens once it arrives.
+  const [pendingOpen, setPendingOpen] = useState<'newBrew' | 'addCoffee' | null>(null);
+
+  useEffect(() => {
+    if (loading || !pendingOpen) return;
+    if (currentUser) {
+      if (pendingOpen === 'addCoffee') setShowAddCoffee(true);
+      else if (canCreateBrew(equipment, coffees)) setShowNewBrew(true);
+    }
+    setPendingOpen(null);
+  }, [loading, pendingOpen, currentUser, equipment, coffees]);
+
+  const openNewBrew = () => (loading ? setPendingOpen('newBrew') : setShowNewBrew(true));
+  const openAddCoffee = () => (loading ? setPendingOpen('addCoffee') : setShowAddCoffee(true));
 
   const apiUrl = `https://${projectId}.supabase.co/functions/v1/make-server-23508aac`;
 
@@ -558,6 +574,8 @@ export default function App() {
   };
 
   const createOrGetUser = async (token: string): Promise<boolean> => {
+    // Covers sign-ins after the first load too, so the dashboard shows skeletons rather than empty states.
+    setLoading(true);
     // The data endpoints don't depend on the account upsert, so both run at once.
     const data = fetchData(token);
     try {
@@ -1373,26 +1391,15 @@ export default function App() {
   const hasPotentialSession = typeof window !== 'undefined' && 
     localStorage.getItem('hone-auth') !== null;
 
-  // Show loading spinner if:
-  // 1. User is logged in and loading their data, OR
-  // 2. We're loading and there's a potential session (might be logged in, checking auth)
-  // Don't show loading if no potential session (definitely logged out)
-  if (loading) {
-    if (currentUser) {
-      // User is logged in, loading their data - show loading
-      return (
-        <LoadingScreen variant={loaderVariant} />
-      );
-    } else if (hasPotentialSession && !authChecked) {
-      // Potential session exists, still checking auth - show loading to prevent flash
-      return (
-        <LoadingScreen variant={loaderVariant} />
-      );
-    }
-    // No potential session - user is definitely logged out, don't show loading
+  // While signed in (or a stored session is being checked) and data is loading, the dashboard renders with
+  // working controls and skeletons in place of brews and beans. Other pages wait on the loading screen.
+  // With no stored session the user is definitely logged out, so nothing waits.
+  const dashboardLoading = loading && (!!currentUser || (hasPotentialSession && !authChecked));
+  if (dashboardLoading && (currentRoute === '/feed' || currentRoute === '/profile')) {
+    return <LoadingScreen variant={loaderVariant} />;
   }
 
-  if (!currentUser) {
+  if (!currentUser && !dashboardLoading) {
     // Show LandingPage - no loading spinner for logged-out users
     return <LandingPage onLoginSuccess={() => checkAuth()} />;
   }
@@ -1568,6 +1575,8 @@ export default function App() {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                ) : loading ? (
+                  <AvatarSkeleton />
                 ) : (
                   <span className="text-sm text-gray-500">Not signed in</span>
                 )}
@@ -1614,7 +1623,24 @@ export default function App() {
       {/* Main Content — grows with content so footer stays at bottom of page when content overflows */}
       <div className="px-3 py-4 md:px-6 md:py-6 flex flex-col flex-1 mobile-page-content" style={{ flex: '1 1 auto' }}>
         {activeView === 'brews' ? (
-          brewsView === 'table' ? (
+          loading ? (
+            <>
+              <BrewsToolbar
+                view={brewsView}
+                filterMethod={filterMethod}
+                groupBy={brewsView === 'table' ? groupBy : undefined}
+                onViewChange={setBrewsView}
+                onFilterMethodChange={setFilterMethod}
+                onGroupByChange={setGroupBy}
+                onNewBrew={openNewBrew}
+                equipment={equipment}
+                coffees={coffees}
+                loading
+                newBrewPending={pendingOpen === 'newBrew'}
+              />
+              <BrewCardsSkeleton />
+            </>
+          ) : brewsView === 'table' ? (
             <BrewsTableView
               brews={brews}
               coffees={coffees}
@@ -1677,16 +1703,19 @@ export default function App() {
           )
         ) : (
           <>
-            {coffees.length > 0 && (
+            {(loading || coffees.length > 0) && (
               <CoffeesToolbar
                 view={coffeesView}
                 groupBy={groupBy}
                 onViewChange={setCoffeesView}
                 onGroupByChange={setGroupBy}
-                onNewCoffee={() => setShowAddCoffee(true)}
+                onNewCoffee={openAddCoffee}
+                newCoffeePending={pendingOpen === 'addCoffee'}
               />
             )}
-            {coffeesView === 'table' ? (
+            {loading ? (
+              <BeanShelvesSkeleton />
+            ) : coffeesView === 'table' ? (
               <CoffeesTableView
                 coffees={coffees}
                 brews={brews}
