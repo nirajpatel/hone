@@ -466,7 +466,7 @@ const entranceDelayFor = (index: number) => Math.min(index, MAX_STAGGERED_CARDS)
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 // The phone graph is about a third as wide, so a shorter draw keeps the line's pace closer to desktop.
 const DESKTOP_DRAW_MS = 1000;
-const MOBILE_DRAW_MS = 700;
+const MOBILE_DRAW_MS = 850;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 interface TimelineRowProps {
@@ -895,7 +895,7 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
   };
 
   // Drives the entrance frame by frame: the line draws left to right, dots and dates appear as it passes them,
-  // and the fill fades in from halfway through the draw. Dots, dates and the + button carry data-tl-* hooks whose
+  // and the fill fades in once the line is halfway across. Dots, dates and the + button carry data-tl-* hooks whose
   // hidden starting styles live in index.css under .tl-entering; setting data-in reveals them.
   useEffect(() => {
     if (animationPhase !== 'animating') return;
@@ -925,7 +925,8 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
     const reveal = (el: Element | null | undefined) => el?.setAttribute('data-in', '');
 
     const draw = isMobile ? MOBILE_DRAW_MS : DESKTOP_DRAW_MS;
-    const fillStart = draw * 0.5;
+    // When the line is halfway across; inverts easeOutCubic, so keep the two in step.
+    const fillStart = draw * (1 - Math.cbrt(1 - 0.5));
     const fillFade = 600;
     const start = performance.now() + entranceDelayFor(entranceIndex);
     let frameId = 0;
@@ -943,7 +944,7 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
         if (t > draw * 0.8) reveal(addButton);
         const fill = String(easeOutCubic(clamp01((t - fillStart) / fillFade)));
         areas.forEach(p => { p.style.fillOpacity = fill; });
-        if (t >= fillStart + fillFade) {
+        if (t >= Math.max(draw, fillStart + fillFade)) {
           setAnimationPhase('done');
           return;
         }
