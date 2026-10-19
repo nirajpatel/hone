@@ -13,14 +13,14 @@ const STYLES = `
 .hone-skel-line { display: flex; align-items: center; }
 .hone-skel-cards { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
 .hone-skel-card { padding: 16px; }
-.hone-skel-chart { position: relative; height: 134px; overflow: hidden; }
+.hone-skel-chart { position: relative; height: 136px; overflow: hidden; }
 .hone-skel-block { position: absolute; left: 0; right: 0; top: 0; height: 90px; border-radius: 8px; background: linear-gradient(var(--color-gray-100), transparent); }
-.hone-skel-dates { position: absolute; left: 0; right: 0; top: 102px; height: 32px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); grid-auto-rows: 32px; column-gap: 8px; }
+.hone-skel-dates { position: absolute; left: 0; right: 0; top: 102px; height: 34px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); grid-auto-rows: 34px; column-gap: 8px; }
 .hone-skel-date { display: flex; flex-direction: column; align-items: center; }
 @media (min-width: 768px) {
   .hone-skel-cards { gap: 10px; padding-top: 0; }
   .hone-skel-card { padding: 20px; }
-  .hone-skel-chart { height: 164px; }
+  .hone-skel-chart { height: 166px; }
   .hone-skel-block { height: 120px; }
   .hone-skel-dates { top: 132px; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); column-gap: 32px; }
 }
@@ -57,8 +57,8 @@ function SkeletonChart() {
       <div className="hone-skel-dates">
         {Array.from({ length: COLUMN_COUNT }, (_, i) => (
           <div key={i} className="hone-skel-date">
-            <div className="hone-skel-line" style={{ height: 16 }}><Bar width={36} height={9} /></div>
-            <div className="hone-skel-line" style={{ height: 16 }}><Bar width={44} height={9} /></div>
+            <div className="hone-skel-line" style={{ height: 17 }}><Bar width={36} height={9} /></div>
+            <div className="hone-skel-line" style={{ height: 17 }}><Bar width={44} height={9} /></div>
           </div>
         ))}
       </div>
@@ -70,7 +70,7 @@ function SkeletonCard() {
   return (
     <div className="bg-white rounded-lg border border-gray-200 mobile-timeline-card hone-skel-card">
       <div className="mb-3">
-        <TextLine height={16} width={72} barHeight={9} />
+        <TextLine height={17} width={72} barHeight={9} />
         <TextLine height={24} width={150} barHeight={13} />
         <TextLine height={20} width={190} barHeight={10} className="md:hidden" />
         <TextLine height={20} width={290} barHeight={10} className="hidden md:block" />

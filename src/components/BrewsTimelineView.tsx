@@ -371,49 +371,54 @@ export function BrewsTimelineView({
                       </>
                     )}
                   </p>
+                  {/* The third line is reserved even when empty so every card matches DashboardSkeleton's height */}
                   {/* Desktop: Show trend and guidance on third line */}
-                  {(hasSuggestion || isExceptional) && (
-                    <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 hidden md:flex">
-                      {displayTrendInfo && (
-                        <>
-                          <span className="flex items-center gap-1">
-                            {displayTrendInfo.icon}
-                            <span>{displayTrendInfo.trend.charAt(0).toUpperCase() + displayTrendInfo.trend.slice(1)}</span>
-                          </span>
-                          <span>•</span>
-                        </>
-                      )}
-                      {isExceptional ? (
-                        'No adjustment needed'
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => onSelectBrew(newestBrew, true)}
-                          className="text-sm text-gray-500 text-left cursor-pointer"
-                          style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
-                        >
-                          {shortGuidance(newestBrew?.suggestion?.concise)}
-                        </button>
-                      )}
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 hidden md:flex" style={{ minHeight: 20 }}>
+                    {(hasSuggestion || isExceptional) && (
+                      <>
+                        {displayTrendInfo && (
+                          <>
+                            <span className="flex items-center gap-1">
+                              {displayTrendInfo.icon}
+                              <span>{displayTrendInfo.trend.charAt(0).toUpperCase() + displayTrendInfo.trend.slice(1)}</span>
+                            </span>
+                            <span>•</span>
+                          </>
+                        )}
+                        {isExceptional ? (
+                          'No adjustment needed'
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onSelectBrew(newestBrew, true)}
+                            className="text-sm text-gray-500 text-left cursor-pointer"
+                            style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
+                          >
+                            {shortGuidance(newestBrew?.suggestion?.concise)}
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </p>
                   {/* Mobile: Show guidance on third line */}
-                  {(hasSuggestion || isExceptional) && (
-                    <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden">
-                      {isExceptional ? (
-                        'No adjustment needed'
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => onSelectBrew(newestBrew, true)}
-                          className="text-sm text-gray-500 text-left cursor-pointer"
-                          style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
-                        >
-                          {shortGuidance(newestBrew?.suggestion?.concise)}
-                        </button>
-                      )}
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={{ minHeight: 20 }}>
+                    {(hasSuggestion || isExceptional) && (
+                      <>
+                        {isExceptional ? (
+                          'No adjustment needed'
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onSelectBrew(newestBrew, true)}
+                            className="text-sm text-gray-500 text-left cursor-pointer"
+                            style={{ textDecoration: 'underline', textDecorationStyle: 'dotted', textDecorationColor: 'rgba(107,114,128,0.4)', textUnderlineOffset: '3px' }}
+                          >
+                            {shortGuidance(newestBrew?.suggestion?.concise)}
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </p>
                 </div>
 
                 {/* Timeline */}
