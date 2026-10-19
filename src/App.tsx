@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Brew, Coffee, User, BrewMethod, Equipment, CoffeeTemperature, BrewStage } from './types';
 import { BrewDetail } from './components/BrewDetail';
 import { CoffeeDetail } from './components/CoffeeDetail';
@@ -16,7 +16,7 @@ import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { Profile } from './components/Profile';
 import { EquipmentDialog } from './components/EquipmentDialog';
 import { EspressoLoading } from './components/EspressoLoading';
-import { getLoaderVariant, isScaleVariant } from './components/loaders/AppLoader';
+import { getLoaderVariant } from './components/loaders/AppLoader';
 import { LoadingScreen } from './components/loaders/LoadingScreen';
 import { AppNavBrand } from './components/AppNavBrand';
 import { LoaderPreview } from './components/loaders/LoaderPreview';
@@ -70,10 +70,9 @@ import { SimpleTooltip } from './components/ui/simple-tooltip';
 import { supabase } from './utils/supabase/client';
 import { sanitizeErrorMessage } from './utils/errorHandling';
 import { fetchWithRetry } from './utils/fetchWithRetry';
-import { completeLoadProgress, finishLoadStep, startLoadStep, trackLoadStep } from './utils/loadProgress';
+import { finishLoadStep, startLoadStep, trackLoadStep } from './utils/loadProgress';
 
-// Lets the scale loader land on 100.0 before the app replaces it.
-const SCALE_REVEAL_HOLD_MS = 400;
+type AccountSession = { access_token: string; user: { id: string } };
 
 export default function App() {
   const [brews, setBrews] = useState<Brew[]>([]);
@@ -85,7 +84,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   const [loaderVariant] = useState(getLoaderVariant);
-  const [revealHold, setRevealHold] = useState(false);
   const [selectedBrew, setSelectedBrew] = useState<Brew | null>(null);
   const [scrollToGuidance, setScrollToGuidance] = useState(false);
   const [selectedCoffee, setSelectedCoffee] = useState<Coffee | null>(null);
@@ -134,24 +132,12 @@ export default function App() {
     return session?.access_token || null;
   };
 
-  // Layout effect so the hold starts before the browser paints the app for a frame.
-  const wasLoadingRef = useRef(loading);
-  useLayoutEffect(() => {
-    const finishedLoading = wasLoadingRef.current && !loading;
-    wasLoadingRef.current = loading;
-    if (!finishedLoading || !isScaleVariant(loaderVariant) || !currentUser) return;
-    completeLoadProgress();
-    setRevealHold(true);
-    const timer = setTimeout(() => setRevealHold(false), SCALE_REVEAL_HOLD_MS);
-    return () => {
-      clearTimeout(timer);
-      setRevealHold(false);
-    };
-  }, [loading]);
-
   // Stable refs so the onAuthStateChange listener always calls the latest functions
   const checkAuthRef = useRef<() => Promise<void>>(null!);
-  const createOrGetUserRef = useRef<(token: string) => Promise<void>>(null!);
+  const loadAccountRef = useRef<(session: AccountSession) => Promise<boolean>>(null!);
+  // On a reload Supabase reports the same session several times (SIGNED_IN, INITIAL_SESSION, and
+  // checkAuth's getSession), so each user's account and data load runs once and is shared.
+  const accountLoadRef = useRef<{ userId: string; promise: Promise<boolean> } | null>(null);
 
   // Refresh data when app resumes from iOS home screen frozen state.
   // Use getSession() only — do NOT call refreshSession() here. Forcing refresh on tab focus
@@ -407,19 +393,20 @@ export default function App() {
       
       if (event === 'INITIAL_SESSION' && session?.access_token) {
         setAccessToken(session.access_token);
-        await createOrGetUserRef.current(session.access_token);
+        await loadAccountRef.current(session);
         setLoading(false);
         setAuthChecked(true);
       } else if (event === 'TOKEN_REFRESHED' && session?.access_token) {
         setAccessToken(session.access_token);
       } else if (event === 'SIGNED_IN' && session?.access_token) {
         setAccessToken(session.access_token);
-        await createOrGetUserRef.current(session.access_token);
+        await loadAccountRef.current(session);
         if (window.location.pathname === '/login') {
           window.history.pushState({}, '', '/');
           setCurrentRoute('/');
         }
       } else if (event === 'SIGNED_OUT') {
+        accountLoadRef.current = null;
         setCurrentUser(null);
         setAccessToken(null);
         setLoading(false);
@@ -493,7 +480,7 @@ export default function App() {
           if (session?.access_token) {
             // Session established - set auth state first
             setAccessToken(session.access_token);
-            await createOrGetUser(session.access_token);
+            await loadAccount(session);
             
             // Extract target path from redirect_to, default to root
             let targetPath = '/';
@@ -548,7 +535,7 @@ export default function App() {
       
       if (session?.access_token) {
         setAccessToken(session.access_token);
-        await createOrGetUser(session.access_token);
+        await loadAccount(session);
         // Redirect from /login to root after successful sign-in
         if (window.location.pathname === '/login') {
           window.history.pushState({}, '', '/');
@@ -570,7 +557,9 @@ export default function App() {
     }
   };
 
-  const createOrGetUser = async (token: string) => {
+  const createOrGetUser = async (token: string): Promise<boolean> => {
+    // The data endpoints don't depend on the account upsert, so both run at once.
+    const data = fetchData(token);
     try {
       const res = await trackLoadStep('account', fetch(`${apiUrl}/users`, {
         method: 'POST',
@@ -583,9 +572,15 @@ export default function App() {
       if (res.ok) {
         const userData = await res.json();
         setCurrentUser(userData);
-        await fetchData(token);
+        await data;
+        return true;
       } else {
         const errorData = await res.json().catch(() => ({}));
+        await data;
+        setBrews([]);
+        setCoffees([]);
+        setUsers([]);
+        setEquipment([]);
 
         if (res.status === 403) {
           await supabase.auth.signOut();
@@ -602,12 +597,26 @@ export default function App() {
       console.error('Error creating/getting user:', error);
       toast.error('Failed to connect. Please check your internet and try again.');
     } finally {
+      await data;
       setLoading(false);
     }
+    return false;
+  };
+
+  const loadAccount = (session: AccountSession): Promise<boolean> => {
+    const current = accountLoadRef.current;
+    if (current?.userId === session.user.id) return current.promise;
+    const promise = createOrGetUser(session.access_token);
+    accountLoadRef.current = { userId: session.user.id, promise };
+    // A failed load is retried by the next auth event instead of being reused.
+    promise.then((ok) => {
+      if (!ok && accountLoadRef.current?.promise === promise) accountLoadRef.current = null;
+    });
+    return promise;
   };
 
   checkAuthRef.current = checkAuth;
-  createOrGetUserRef.current = createOrGetUser;
+  loadAccountRef.current = loadAccount;
 
   const fetchData = async (token?: string) => {
     const authToken = token || await getAccessToken() || accessToken;
@@ -1368,7 +1377,7 @@ export default function App() {
   // 1. User is logged in and loading their data, OR
   // 2. We're loading and there's a potential session (might be logged in, checking auth)
   // Don't show loading if no potential session (definitely logged out)
-  if (loading || revealHold) {
+  if (loading) {
     if (currentUser) {
       // User is logged in, loading their data - show loading
       return (
