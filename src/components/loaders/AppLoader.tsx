@@ -2,15 +2,15 @@ import { EspressoLoading } from '../EspressoLoading';
 import { MarkTraceLoading } from './MarkTraceLoading';
 import { ScaleLoading } from './ScaleLoading';
 
-export type LoaderVariant = 'scale' | 'scale-white' | 'trace' | 'espresso';
+export type LoaderVariant = 'skeleton' | 'scale' | 'scale-white' | 'trace' | 'espresso';
 
-const VARIANTS: LoaderVariant[] = ['scale', 'scale-white', 'trace', 'espresso'];
+const VARIANTS: LoaderVariant[] = ['skeleton', 'scale', 'scale-white', 'trace', 'espresso'];
 const STORAGE_KEY = 'hone-loader';
-const DEFAULT_VARIANT: LoaderVariant = 'scale';
+const DEFAULT_VARIANT: LoaderVariant = 'skeleton';
 
 export const isScaleVariant = (variant: LoaderVariant) => variant === 'scale' || variant === 'scale-white';
 
-/** `?loader=scale|scale-white|trace|espresso` picks a loader and remembers it on this device. */
+/** `?loader=skeleton|scale|scale-white|trace|espresso` picks a loader and remembers it on this device. */
 export function getLoaderVariant(): LoaderVariant {
   try {
     const fromUrl = new URLSearchParams(window.location.search).get('loader') as LoaderVariant | null;

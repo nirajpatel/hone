@@ -6,6 +6,7 @@ import { LOAD_STEP_DEFAULTS, LoadStep, resetLoadProgress, simulatedLoadStep } fr
 const { start: startLoadStep, finish: finishLoadStep } = simulatedLoadStep;
 
 const OPTIONS: { id: LoaderVariant; label: string }[] = [
+  { id: 'skeleton', label: 'Skeleton' },
   { id: 'scale', label: 'Scale' },
   { id: 'scale-white', label: 'Scale, white' },
   { id: 'trace', label: 'Mark trace' },
