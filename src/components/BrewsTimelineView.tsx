@@ -464,7 +464,9 @@ const MAX_STAGGERED_CARDS = 5;
 const entranceDelayFor = (index: number) => Math.min(index, MAX_STAGGERED_CARDS) * CARD_STAGGER_MS;
 
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+// The phone graph is about a third as wide, so a shorter draw keeps the line's pace closer to desktop.
+const DESKTOP_DRAW_MS = 1000;
+const MOBILE_DRAW_MS = 700;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 interface TimelineRowProps {
@@ -922,7 +924,7 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
     const nodeXs = brews.map((_, index) => index * (containerWidth + gap) + containerWidth / 2);
     const reveal = (el: Element | null | undefined) => el?.setAttribute('data-in', '');
 
-    const draw = 1000;
+    const draw = isMobile ? MOBILE_DRAW_MS : DESKTOP_DRAW_MS;
     const fillStart = draw * 0.5;
     const fillFade = 600;
     const start = performance.now() + entranceDelayFor(entranceIndex);
@@ -931,7 +933,7 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
     const frame = (now: number) => {
       const t = now - start;
       if (t >= 0) {
-        const lineX = revealStart + (revealEnd - revealStart) * easeInOutCubic(clamp01(t / draw));
+        const lineX = revealStart + (revealEnd - revealStart) * easeOutCubic(clamp01(t / draw));
         lineClips.forEach(rect => rect.setAttribute('width', String(lineX)));
         nodeXs.forEach((x, index) => {
           if (x > lineX + 2) return;
