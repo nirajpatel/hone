@@ -1,3 +1,4 @@
+import { useLayoutEffect, useState, type CSSProperties } from 'react';
 import { AppNavBrand } from '../AppNavBrand';
 import { BrewsToolbar } from '../BrewsToolbar';
 import { Button } from '../ui/button';
@@ -28,8 +29,21 @@ const STYLES = `
   .hone-skel-bag { width: 26em; display: flex; gap: 0.75em; padding: 0.75em; }
   .hone-skel-bag-image { width: 155px; flex: none; }
 }
-@media (prefers-reduced-motion: reduce) { .hone-skel-bar, .hone-skel-chart { animation: none; } }
+@keyframes hone-skel-ghost-out { from { opacity: 1; } to { opacity: 0; } }
+.hone-skel-ghost { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; animation: hone-skel-ghost-out 700ms ease-out both; }
+.hone-skel-ghost .hone-skel-bar, .hone-skel-ghost .hone-skel-chart { animation-delay: var(--hone-skel-phase, 0ms); }
+.hone-skel-ghost .hone-skel-dates { animation: hone-skel-ghost-out 300ms ease-out both; animation-delay: inherit; }
+@media (prefers-reduced-motion: reduce) { .hone-skel-bar, .hone-skel-chart, .hone-skel-ghost { animation: none; } }
 `;
+
+const PULSE_MS = 1600;
+let brewSkeletonShownAt = 0;
+let brewSkeletonRemovedAt = -Infinity;
+
+/** True while real brew cards are mounting in place of BrewCardsSkeleton (as opposed to appearing later on). */
+export function isReplacingBrewSkeleton() {
+  return performance.now() - brewSkeletonRemovedAt < 250;
+}
 
 const CARD_COUNT = 4;
 // More date columns than the widest card holds; the extras wrap to a hidden second row.
@@ -82,8 +96,30 @@ function SkeletonCard() {
   );
 }
 
+/**
+ * A brew card skeleton's chart, left behind over the real timeline and faded out as it draws. Its pulse continues
+ * in step with the skeleton it replaces so the handoff has no jump.
+ */
+export function SkeletonChartGhost({ delayMs }: { delayMs: number }) {
+  const [pulsePhase] = useState(() => (performance.now() - brewSkeletonShownAt) % PULSE_MS);
+  return (
+    <div
+      className="hone-skel-ghost"
+      style={{ animationDelay: `${delayMs}ms`, '--hone-skel-phase': `${-pulsePhase}ms` } as CSSProperties}
+      aria-hidden="true"
+    >
+      <style>{STYLES}</style>
+      <SkeletonChart />
+    </div>
+  );
+}
+
 /** Stand-in brew cards for the timeline while brews load. */
 export function BrewCardsSkeleton() {
+  useLayoutEffect(() => {
+    brewSkeletonShownAt = performance.now();
+    return () => { brewSkeletonRemovedAt = performance.now(); };
+  }, []);
   return (
     <div className="hone-skel-cards" aria-busy="true" aria-label="Loading your brews">
       <style>{STYLES}</style>

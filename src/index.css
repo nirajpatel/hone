@@ -3643,6 +3643,54 @@ html {
   pointer-events: none;
 }
 
+/* Content replacing a loading skeleton fades up once. */
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+
+.reveal-in {
+  animation: reveal-in 450ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+/* Brew card entrance. Timings are driven by TimelineRow; these are the starting states. */
+.mobile-timeline-card:has(> .tl-entering) > .tl-card-header {
+  animation: reveal-in 450ms cubic-bezier(.22, 1, .36, 1) both;
+  animation-delay: var(--tl-delay, 0ms);
+}
+
+.tl-entering [data-tl-dot] {
+  opacity: 0;
+  transform: scale(.4);
+  transition: opacity 380ms ease-out, transform 520ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.tl-entering [data-tl-label] > * {
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity 450ms ease-out, transform 550ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.tl-entering [data-tl-add] {
+  opacity: 0;
+  transition: opacity 450ms ease-out;
+}
+
+.tl-entering [data-tl-dot][data-in],
+.tl-entering [data-tl-label][data-in] > *,
+.tl-entering [data-tl-add][data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+.tl-entering [data-tl-area] {
+  fill-opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-in { animation: none; }
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -7,6 +7,7 @@ import { getRatingEmoji, capitalizeBrewMethod } from '../utils/formatters';
 import { getAllBrewMethodConfigs } from '../utils/brewMethods';
 import { BrewsToolbar } from './BrewsToolbar';
 import { BrewsEmptyState } from './BrewsEmptyState';
+import { isReplacingBrewSkeleton, SkeletonChartGhost } from './loaders/DashboardSkeleton';
 import { line, area, curveMonotoneX } from 'd3-shape';
 import { COPY } from '../constants/copy';
 
@@ -320,7 +321,7 @@ export function BrewsTimelineView({
         )
       ) : (
         <div className={isMobileWidth ? 'space-y-2 pt-2.5' : ''} style={!isMobileWidth ? { display: 'flex', flexDirection: 'column', gap: '10px' } : undefined}>
-          {sortedGroups.map(([key, group]) => {
+          {sortedGroups.map(([key, group], groupIndex) => {
             // Sort brews by date ascending for timeline (oldest to newest left to right)
             const sortedExtractions = [...group.brews].sort((a, b) => 
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -345,9 +346,13 @@ export function BrewsTimelineView({
               : trendInfo;
 
             return (
-              <div key={key} className={`bg-white rounded-lg border border-gray-200 ${isMobileWidth ? 'p-4' : 'p-5'} mobile-timeline-card`}>
-                {/* Header with Coffee and Method */}
-                <div className="mb-3">
+              <div
+                key={key}
+                className={`bg-white rounded-lg border border-gray-200 ${isMobileWidth ? 'p-4' : 'p-5'} mobile-timeline-card`}
+                style={{ '--tl-delay': `${entranceDelayFor(groupIndex)}ms` } as React.CSSProperties}
+              >
+                {/* Header with Coffee and Method; fades in alongside its timeline's entrance (index.css) */}
+                <div className="mb-3 tl-card-header">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
                   <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.coffeeName}</h3>
                   <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
@@ -423,6 +428,7 @@ export function BrewsTimelineView({
 
                 {/* Timeline */}
                 <TimelineRow
+                  entranceIndex={groupIndex}
                   brews={sortedExtractions}
                   onSelectBrew={onSelectBrew}
                   formatNodeDateTime={formatNodeDateTime}
@@ -446,7 +452,23 @@ let timelineIdCounter = 0;
 // Survives tab switches (component remounts) but clears on page reload (module re-init).
 const animatedTimelineKeys = new Set<string>();
 
+// Desktop hover spotlight: opacity of points (and their line, fill and dates) 1, 2 and 3+ steps from the hovered one.
+const HOVER_STEP_1 = 0.8;
+const HOVER_STEP_2 = 0.6;
+const HOVER_REST = 0.4;
+const hoverOpacityFor = (stepsAway: number) =>
+  stepsAway === 0 ? 1 : stepsAway === 1 ? HOVER_STEP_1 : stepsAway === 2 ? HOVER_STEP_2 : HOVER_REST;
+
+const CARD_STAGGER_MS = 80;
+const MAX_STAGGERED_CARDS = 5;
+const entranceDelayFor = (index: number) => Math.min(index, MAX_STAGGERED_CARDS) * CARD_STAGGER_MS;
+
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
 interface TimelineRowProps {
+  entranceIndex?: number;
   brews: Brew[];
   onSelectBrew: (brew: Brew, scrollToGuidance?: boolean) => void;
   formatNodeDateTime: (dateString: string, nextDateString?: string | null) => { date: string; time: string };
@@ -455,7 +477,7 @@ interface TimelineRowProps {
   onAddExtraction?: (coffeeId: string, brewMethod: BrewMethod) => void;
 }
 
-function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMethod, onAddExtraction }: TimelineRowProps) {
+function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMethod, onAddExtraction }: TimelineRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const graphContainerRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -465,24 +487,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
   const [hoveredNodeIndex, setHoveredNodeIndex] = useState<number | null>(null);
   const [mouseX, setMouseX] = useState<number | null>(null);
 
-  // Animation refs and state for entrance microinteraction
+  // Entrance: 'pending' until the first layout decides whether this timeline is on screen
   const timelineKey = brews.length > 0 ? `${brews[0].coffeeId}-${brews[0].brewMethod}` : '';
   const alreadyAnimated = !!timelineKey && animatedTimelineKeys.has(timelineKey);
   const [animationPhase, setAnimationPhase] = useState<'pending' | 'animating' | 'done'>(alreadyAnimated ? 'done' : 'pending');
-  const hasAnimated = useRef(alreadyAnimated);
+  const [replacingSkeleton, setReplacingSkeleton] = useState(false);
   const rowRef = useRef<HTMLDivElement>(null);
-  const revealRectMobileRef = useRef<SVGRectElement>(null);
-  const revealRectDesktopRef = useRef<SVGRectElement>(null);
-  const staticRectMobileRef = useRef<SVGRectElement>(null);
-  const staticRectDesktopRef = useRef<SVGRectElement>(null);
-  const mobileAreaPathRef = useRef<SVGPathElement>(null);
-  const desktopAreaBasePathRef = useRef<SVGPathElement>(null);
-  const dotButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const labelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const addButtonWrapRef = useRef<HTMLDivElement>(null);
-  const animScrollRef = useRef({ scrollLeft: 0, clientWidth: 0 });
-  const rafIdRef = useRef<number>(0);
-  const doneTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Generate unique IDs for this timeline's SVG elements using incrementor
   const uniqueId = useRef(`timeline-${timelineIdCounter++}`).current;
@@ -500,8 +510,9 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     setShowRightFade(scrollLeft + clientWidth < scrollWidth - 1); // -1 for rounding
   };
 
-  // Scroll to show more of the graph on mount - on mobile show partial scroll, on desktop scroll all the way
-  useEffect(() => {
+  // Scroll to show more of the graph on mount - on mobile show partial scroll, on desktop scroll all the way.
+  // Runs before paint so the entrance never shows the graph jumping to its scrolled position.
+  useLayoutEffect(() => {
     if (scrollRef.current) {
       const isMobile = window.innerWidth < 768;
       const { scrollWidth, clientWidth } = scrollRef.current;
@@ -555,130 +566,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     }
   }, [brews.length]);
 
-  // IntersectionObserver for entrance animation — only animate timelines that are in viewport on load; others show by default
-  useEffect(() => {
-    const row = rowRef.current;
-    if (!row) return;
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          if (timelineKey) animatedTimelineKeys.add(timelineKey);
-
-          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            setAnimationPhase('done');
-            return;
-          }
-
-          if (scrollRef.current) {
-            animScrollRef.current = {
-              scrollLeft: scrollRef.current.scrollLeft,
-              clientWidth: scrollRef.current.clientWidth,
-            };
-          }
-
-          setAnimationPhase('animating');
-        } else if (!entry.isIntersecting && !hasAnimated.current) {
-          // Row is outside viewport — show in final state, never animate when scrolled into view
-          hasAnimated.current = true;
-          if (timelineKey) animatedTimelineKeys.add(timelineKey);
-          setAnimationPhase('done');
-        }
-      });
-    }, { threshold: 0.2 });
-
-    observer.observe(row);
-    return () => observer.disconnect();
-  }, []);
-
-  // Run reveal animation when phase changes to 'animating'
-  useEffect(() => {
-    if (animationPhase !== 'animating') return;
-
-    const { scrollLeft, clientWidth } = animScrollRef.current;
-    const padding = 8;
-    const visibleLeft = Math.max(0, scrollLeft - padding);
-    const isMobile = window.innerWidth < 768;
-    const cw = isMobile ? mobileContainerWidth : desktopContainerWidth;
-    const g = isMobile ? mobileGap : desktopGap;
-    const brewCount = brews.length;
-    const startTime = performance.now();
-    const duration = 500;
-
-    [staticRectMobileRef, staticRectDesktopRef].forEach(ref => {
-      ref.current?.setAttribute('width', String(visibleLeft));
-    });
-
-    [revealRectMobileRef, revealRectDesktopRef].forEach(ref => {
-      if (ref.current) {
-        ref.current.setAttribute('x', String(visibleLeft));
-        ref.current.setAttribute('width', '0');
-      }
-    });
-
-    const easeInOutQuad = (t: number) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      const rawProgress = Math.min(elapsed / duration, 1);
-      const progress = easeInOutQuad(rawProgress);
-      const revealWidth = clientWidth * progress;
-
-      [revealRectMobileRef, revealRectDesktopRef].forEach(ref => {
-        ref.current?.setAttribute('width', String(revealWidth));
-      });
-
-      // Area fades in during the last 30% of the line trace
-      const areaOpacity = progress < 0.7 ? 0 : Math.min(1, (progress - 0.7) / 0.3);
-      mobileAreaPathRef.current?.setAttribute('opacity', String(areaOpacity));
-      desktopAreaBasePathRef.current?.setAttribute('opacity', String(areaOpacity));
-
-      for (let i = 0; i < brewCount; i++) {
-        const dotX = i * (cw + g) + cw / 2;
-        const normalizedPos = clientWidth > 0 ? (dotX - visibleLeft) / clientWidth : 0;
-
-        if (normalizedPos <= progress || normalizedPos < 0) {
-          const dotEl = dotButtonRefs.current[i];
-          if (dotEl && dotEl.style.opacity !== '1') {
-            dotEl.style.opacity = '1';
-            dotEl.style.transform = 'scale(1)';
-          }
-          const labelEl = labelRefs.current[i];
-          if (labelEl && labelEl.style.opacity !== '1') {
-            labelEl.style.opacity = '1';
-          }
-        }
-      }
-
-      const addBtnX = brewCount * (cw + g) + cw / 2;
-      const addBtnNorm = clientWidth > 0 ? (addBtnX - visibleLeft) / clientWidth : 0;
-      if ((addBtnNorm <= progress || addBtnNorm < 0) && addButtonWrapRef.current) {
-        addButtonWrapRef.current.style.opacity = '1';
-      }
-
-      if (rawProgress < 1) {
-        rafIdRef.current = requestAnimationFrame(animate);
-      } else {
-        // Set clip rects to full so transition to 'done' doesn't change clip shape (avoids shift)
-        staticRectMobileRef.current?.setAttribute('width', '0');
-        revealRectMobileRef.current?.setAttribute('x', '0');
-        revealRectMobileRef.current?.setAttribute('width', String(mobileSvgWidth));
-        staticRectDesktopRef.current?.setAttribute('width', '0');
-        revealRectDesktopRef.current?.setAttribute('x', '0');
-        revealRectDesktopRef.current?.setAttribute('width', String(desktopSvgWidth));
-        requestAnimationFrame(() => setAnimationPhase('done'));
-      }
-    };
-
-    rafIdRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
-      if (doneTimeoutRef.current) clearTimeout(doneTimeoutRef.current);
-    };
+  // Decided before the first paint: a timeline on screen starts its entrance right away instead of flashing empty,
+  // and one below the fold shows in its final state rather than animating when scrolled into view.
+  useLayoutEffect(() => {
+    if (animationPhase !== 'pending') return;
+    if (timelineKey) animatedTimelineKeys.add(timelineKey);
+    const rect = rowRef.current?.getBoundingClientRect();
+    const onScreen = !!rect && rect.top < window.innerHeight && rect.bottom > 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setAnimationPhase(onScreen && !reduceMotion ? 'animating' : 'done');
+    setReplacingSkeleton(isReplacingBrewSkeleton());
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animationPhase]);
+  }, []);
 
   // Get dot color based on rating
   const getDotColor = (quality: number | null) => {
@@ -829,6 +728,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     const secondRightX = hoveredIndex < brews.length - 2
       ? (hoveredIndex + 2) * (containerWidth + gap) + containerWidth / 2
       : nextNodeX + nodeSpacing;
+    const thirdLeftX = secondLeftX - nodeSpacing;
+    const thirdRightX = secondRightX + nodeSpacing;
     
     return {
       hoveredX,
@@ -838,6 +739,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
       // 80% opacity zone: segments to left of left segment and right of right segment
       secondLeftX,
       secondRightX,
+      thirdLeftX,
+      thirdRightX,
       // Fade boundaries
       leftFadeStart: Math.max(0, prevNodeX),
       leftFadeEnd: hoveredX - fadeDistance,
@@ -989,6 +892,74 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     }
   };
 
+  // Drives the entrance frame by frame: the line draws left to right, dots and dates appear as it passes them,
+  // and the fill fades in from halfway through the draw. Dots, dates and the + button carry data-tl-* hooks whose
+  // hidden starting styles live in index.css under .tl-entering; setting data-in reveals them.
+  useEffect(() => {
+    if (animationPhase !== 'animating') return;
+    const row = rowRef.current;
+    const scroller = scrollRef.current;
+    if (!row || !scroller) {
+      setAnimationPhase('done');
+      return;
+    }
+
+    const isMobile = window.innerWidth < 768;
+    const containerWidth = isMobile ? mobileContainerWidth : desktopContainerWidth;
+    const gap = isMobile ? mobileGap : desktopGap;
+    const contentPadding = 8;
+    const revealStart = Math.max(0, scroller.scrollLeft - contentPadding);
+    const revealEnd = scroller.scrollLeft - contentPadding + scroller.clientWidth;
+
+    const svgs = Array.from(row.querySelectorAll<SVGSVGElement>('[data-tl-svg]'))
+      .filter(svg => getComputedStyle(svg).display !== 'none');
+    const inGraph = <T extends Element>(selector: string) => svgs.flatMap(svg => Array.from(svg.querySelectorAll<T>(selector)));
+    const lineClips = inGraph<SVGRectElement>('[data-tl-line-clip]');
+    const areas = inGraph<SVGPathElement>('[data-tl-area]');
+    const dots = Array.from(row.querySelectorAll<HTMLElement>('[data-tl-dot]'));
+    const labels = Array.from(row.querySelectorAll<HTMLElement>('[data-tl-label]'));
+    const addButton = row.querySelector<HTMLElement>('[data-tl-add]');
+    const nodeXs = brews.map((_, index) => index * (containerWidth + gap) + containerWidth / 2);
+    const reveal = (el: Element | null | undefined) => el?.setAttribute('data-in', '');
+
+    const draw = 1000;
+    const fillStart = draw * 0.5;
+    const fillFade = 600;
+    const start = performance.now() + entranceDelayFor(entranceIndex);
+    let frameId = 0;
+
+    const frame = (now: number) => {
+      const t = now - start;
+      if (t >= 0) {
+        const lineX = revealStart + (revealEnd - revealStart) * easeInOutCubic(clamp01(t / draw));
+        lineClips.forEach(rect => rect.setAttribute('width', String(lineX)));
+        nodeXs.forEach((x, index) => {
+          if (x > lineX + 2) return;
+          reveal(dots[index]);
+          reveal(labels[index]);
+        });
+        if (t > draw * 0.8) reveal(addButton);
+        const fill = String(easeOutCubic(clamp01((t - fillStart) / fillFade)));
+        areas.forEach(p => { p.style.fillOpacity = fill; });
+        if (t >= fillStart + fillFade) {
+          setAnimationPhase('done');
+          return;
+        }
+      }
+      frameId = requestAnimationFrame(frame);
+    };
+
+    frameId = requestAnimationFrame(frame);
+    // Inline values are cleared only once .tl-entering is gone; clearing them first lets its hidden starting styles flash for a frame.
+    return () => {
+      cancelAnimationFrame(frameId);
+      areas.forEach(p => { p.style.fillOpacity = ''; });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animationPhase]);
+
+  const entering = animationPhase !== 'done';
+
   // Calculate SVG dimensions
   const mobileSvgWidth = hasButton 
     ? brews.length * (mobileContainerWidth + mobileGap) + mobileContainerWidth
@@ -997,19 +968,10 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
     ? brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth
     : brews.length * (desktopContainerWidth + desktopGap) + desktopContainerWidth;
 
-  // When phase is 'done', set clip rects to full so clip never changes shape (avoids post-animation shift)
-  useLayoutEffect(() => {
-    if (animationPhase !== 'done') return;
-    staticRectMobileRef.current?.setAttribute('width', '0');
-    revealRectMobileRef.current?.setAttribute('x', '0');
-    revealRectMobileRef.current?.setAttribute('width', String(mobileSvgWidth));
-    staticRectDesktopRef.current?.setAttribute('width', '0');
-    revealRectDesktopRef.current?.setAttribute('x', '0');
-    revealRectDesktopRef.current?.setAttribute('width', String(desktopSvgWidth));
-  }, [animationPhase, mobileSvgWidth, desktopSvgWidth]);
-
   return (
-    <div ref={rowRef}>
+    <div ref={rowRef} className={`relative${entering ? ' tl-entering' : ''}`}>
+      {/* The skeleton's chart, dissolving as the real graph draws over it */}
+      {animationPhase === 'animating' && replacingSkeleton && <SkeletonChartGhost delayMs={entranceDelayFor(entranceIndex)} />}
       {/* Timeline Container with fade overlay */}
       <div className="relative">
         {/* Left fade gradient - shows when scrolled right (content hidden on left) */}
@@ -1063,12 +1025,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
               )}
               {/* SVG Graph - Mobile */}
               <svg 
+                data-tl-svg
                 className="absolute top-0 left-0 md:hidden pointer-events-none"
                 width={mobileSvgWidth}
                 height={mobileSvgHeight}
                 style={{ zIndex: 0 }}
               >
                 <defs>
+                  {entering && (
+                    <clipPath id={`${uniqueId}-mobileLineClip`}>
+                      <rect data-tl-line-clip x="0" y="-4" width="0" height={mobileSvgHeight + 8} />
+                    </clipPath>
+                  )}
                   <linearGradient id={`${uniqueId}-mobileGradient`} x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stopColor="#d1d5db" stopOpacity="0.45" />
                     <stop offset="100%" stopColor="#d1d5db" stopOpacity="0" />
@@ -1078,43 +1046,46 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <stop offset={`${(mobileMaskCutoff.cutoffStart / mobileSvgWidth) * 100}%`} stopColor="white" stopOpacity="1" />
                     <stop offset={`${(mobileMaskCutoff.cutoffEnd / mobileSvgWidth) * 100}%`} stopColor="white" stopOpacity="0" />
                   </linearGradient>
-                  <mask id={`${uniqueId}-mobileMask`}>
+                  <mask id={`${uniqueId}-mobileMask`} maskUnits="userSpaceOnUse" x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight}>
                     <rect x="0" y="0" width={mobileSvgWidth} height={mobileSvgHeight} fill={`url(#${uniqueId}-mobileFadeMask)`} />
                   </mask>
-                  <clipPath id={`${uniqueId}-mobileRevealClip`}>
-                    <rect ref={staticRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
-                    <rect ref={revealRectMobileRef} x="0" y="0" width="0" height={mobileSvgHeight} />
-                  </clipPath>
                 </defs>
                 {/* bag-change dividers hidden for now */}
                 {/* Mobile: Base graph always at 100% opacity (no hover effects) */}
                 <path
-                  ref={mobileAreaPathRef}
+                  data-tl-area
                   d={mobileFillPath}
                   fill={`url(#${uniqueId}-mobileGradient)`}
                   mask={`url(#${uniqueId}-mobileMask)`}
-                  opacity={animationPhase === 'done' ? "1" : "0"}
+                  opacity="1"
                 />
                 <path
+                  data-tl-line
+                  clipPath={entering ? `url(#${uniqueId}-mobileLineClip)` : undefined}
                   d={mobileGraphPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  clipPath={`url(#${uniqueId}-mobileRevealClip)`}
                   opacity="1"
                 />
               </svg>
 
               {/* SVG Graph - Desktop */}
               <svg 
+                data-tl-svg
                 className="absolute top-0 left-0 hidden md:block pointer-events-none"
                 width={desktopSvgWidth}
                 height={desktopSvgHeight}
                 style={{ zIndex: 0 }}
               >
                 <defs>
+                  {entering && (
+                    <clipPath id={`${uniqueId}-desktopLineClip`}>
+                      <rect data-tl-line-clip x="0" y="-4" width="0" height={desktopSvgHeight + 8} />
+                    </clipPath>
+                  )}
                   <linearGradient id={`${uniqueId}-desktopGradient`} x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stopColor="#d1d5db" stopOpacity="0.5" />
                     <stop offset="100%" stopColor="#d1d5db" stopOpacity="0" />
@@ -1124,16 +1095,13 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     <stop offset={`${(desktopMaskCutoff.cutoffStart / desktopSvgWidth) * 100}%`} stopColor="white" stopOpacity="1" />
                     <stop offset={`${(desktopMaskCutoff.cutoffEnd / desktopSvgWidth) * 100}%`} stopColor="white" stopOpacity="0" />
                   </linearGradient>
-                  <mask id={`${uniqueId}-desktopMask`}>
+                  <mask id={`${uniqueId}-desktopMask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                     <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFadeMask)`} />
                   </mask>
-                  <clipPath id={`${uniqueId}-desktopRevealClip`}>
-                    <rect ref={staticRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
-                    <rect ref={revealRectDesktopRef} x="0" y="0" width="0" height={desktopSvgHeight} />
-                  </clipPath>
                   {/* Gradient mask for highlight effect - peaks at hovered node, fades to 0 at edges */}
+                  {/* Masks use the chart's coordinates: sized to the line's own box, a flat line's zero height would hide it */}
                   {desktopGradientStops && (() => {
-                    const { hoveredX, leftFadeStart, leftFadeEnd, rightFadeStart, rightFadeEnd, immediateLeftX, immediateRightX, secondLeftX, secondRightX } = desktopGradientStops;
+                    const { hoveredX, leftFadeStart, leftFadeEnd, rightFadeStart, rightFadeEnd, immediateLeftX, immediateRightX, secondLeftX, secondRightX, thirdLeftX, thirdRightX } = desktopGradientStops;
                     const leftFadeStartPercent = (leftFadeStart / desktopSvgWidth) * 100;
                     const leftFadeEndPercent = (leftFadeEnd / desktopSvgWidth) * 100;
                     const hoveredPercent = (hoveredX / desktopSvgWidth) * 100;
@@ -1143,6 +1111,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                     const immediateRightPercent = Math.min((immediateRightX / desktopSvgWidth) * 100, 100);
                     const secondLeftPercent = Math.max(0, (secondLeftX / desktopSvgWidth) * 100);
                     const secondRightPercent = Math.min((secondRightX / desktopSvgWidth) * 100, 100);
+                    const thirdLeftPercent = Math.max(0, (thirdLeftX / desktopSvgWidth) * 100);
+                    const thirdRightPercent = Math.min((thirdRightX / desktopSvgWidth) * 100, 100);
                     const fadeCutoffPercent = (desktopMaskCutoff.cutoffStart / desktopSvgWidth) * 100;
                     
                     return (
@@ -1160,14 +1130,14 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           {/* Hidden before immediate segments */}
                           <stop offset={`${Math.max(0, immediateLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="0" />
                           {/* Linear transition from 80% (at node 1 step away) to 100% (at hovered node) */}
-                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
                           <stop offset={`${hoveredPercent}%`} stopColor="white" stopOpacity="1" />
                           {/* Linear transition from 100% (at hovered node) to 80% (at node 1 step away) */}
-                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
                           <stop offset={`${Math.min(100, immediateRightPercent + 0.001)}%`} stopColor="white" stopOpacity="0" />
                           <stop offset="100%" stopColor="white" stopOpacity="0" />
                         </linearGradient>
-                        <mask id={`${uniqueId}-desktopLine100Mask`}>
+                        <mask id={`${uniqueId}-desktopLine100Mask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine100Gradient)`} />
                         </mask>
                         {/* 80% opacity mask: segments connecting nodes 1 step away to nodes 2 steps away - linear transition 80% to 60% */}
@@ -1182,18 +1152,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           {/* Hidden before second segments */}
                           <stop offset={`${Math.max(0, secondLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="0" />
                           {/* Linear transition from 60% (at node 2 steps away) to 80% (at node 1 step away) */}
-                          <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="0.6" />
-                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_2} />
+                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
                           {/* Hidden in immediate segments (100% zone) */}
                           <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0" />
                           <stop offset={`${immediateRightPercent - 0.001}%`} stopColor="white" stopOpacity="0" />
                           {/* Linear transition from 80% (at node 1 step away) to 60% (at node 2 steps away) */}
-                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0.8" />
-                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="0.6" />
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
+                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_2} />
                           <stop offset={`${Math.min(100, secondRightPercent + 0.001)}%`} stopColor="white" stopOpacity="0" />
                           <stop offset="100%" stopColor="white" stopOpacity="0" />
                         </linearGradient>
-                        <mask id={`${uniqueId}-desktopLine80Mask`}>
+                        <mask id={`${uniqueId}-desktopLine80Mask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine80Gradient)`} />
                         </mask>
                         {/* 60% opacity mask: everywhere else (shows at 60% visibility) */}
@@ -1204,26 +1174,28 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           x2="100%" 
                           y2="0%"
                         >
-                          <stop offset="0%" stopColor="white" stopOpacity="0.6" />
-                          {/* Show 60% layer everywhere - ends exactly at center of nodes 2 steps away */}
-                          <stop offset={`${secondLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0.6" />
+                          <stop offset="0%" stopColor="white" stopOpacity={HOVER_REST} />
+                          {/* Rest opacity beyond 3 steps, ramping to the 2-step opacity at the nodes 2 steps away */}
+                          <stop offset={`${thirdLeftPercent}%`} stopColor="white" stopOpacity={HOVER_REST} />
+                          <stop offset={`${secondLeftPercent - 0.001}%`} stopColor="white" stopOpacity={HOVER_STEP_2} />
                           {/* Hide in 80% and 100% zones - starts exactly at center of nodes 2 steps away */}
                           <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="0" />
                           <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0" />
                           <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0" />
                           {/* Show 60% layer again - starts exactly at center of nodes 2 steps away */}
                           <stop offset={`${secondRightPercent - 0.001}%`} stopColor="white" stopOpacity="0" />
-                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="0.6" />
-                          <stop offset="100%" stopColor="white" stopOpacity="0.6" />
+                          <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_2} />
+                          <stop offset={`${thirdRightPercent}%`} stopColor="white" stopOpacity={HOVER_REST} />
+                          <stop offset="100%" stopColor="white" stopOpacity={HOVER_REST} />
                         </linearGradient>
-                        <mask id={`${uniqueId}-desktopLine60Mask`}>
+                        <mask id={`${uniqueId}-desktopLine60Mask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine60Gradient)`} />
                         </mask>
                         {/* Legacy masks for backward compatibility - will be removed */}
-                        <mask id={`${uniqueId}-desktopHighlightMask`}>
+                        <mask id={`${uniqueId}-desktopHighlightMask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine100Gradient)`} />
                         </mask>
-                        <mask id={`${uniqueId}-desktopDimmingMask`}>
+                        <mask id={`${uniqueId}-desktopDimmingMask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopLine60Gradient)`} />
                         </mask>
                         {/* Fill opacity gradient: overlay shows in 100% and 80% zones, hidden in 60% zones (where base layer shows) */}
@@ -1239,12 +1211,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           <stop offset={`${Math.max(0, secondLeftPercent - 0.001)}%`} stopColor="white" stopOpacity="0" />
                           {/* Linear transition from 0% (at node 2 steps away) to 80% (at node 1 step away) */}
                           <stop offset={`${secondLeftPercent}%`} stopColor="white" stopOpacity="0" />
-                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${immediateLeftPercent - 0.001}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
                           {/* Linear transition from 80% (at node 1 step away) to 100% (at hovered node) */}
-                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${immediateLeftPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
                           <stop offset={`${hoveredPercent}%`} stopColor="white" stopOpacity="1" />
                           {/* Linear transition from 100% (at hovered node) to 80% (at node 1 step away) */}
-                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity="0.8" />
+                          <stop offset={`${immediateRightPercent}%`} stopColor="white" stopOpacity={HOVER_STEP_1} />
                           {/* Linear transition from 80% (at node 1 step away) to 0% (at node 2 steps away) */}
                           <stop offset={`${secondRightPercent}%`} stopColor="white" stopOpacity="0" />
                           <stop offset={`${Math.min(100, secondRightPercent + 0.001)}%`} stopColor="white" stopOpacity="0" />
@@ -1253,7 +1225,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           <stop offset={`${fadeCutoffPercent}%`} stopColor="white" stopOpacity="0" />
                           <stop offset="100%" stopColor="white" stopOpacity="0" />
                         </linearGradient>
-                        <mask id={`${uniqueId}-desktopFillOpacityMask`}>
+                        <mask id={`${uniqueId}-desktopFillOpacityMask`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFillOpacityGradient)`} />
                         </mask>
                         {/* Base fill mask: completely hide base layer in highlighted areas (100% and 80% zones), show it elsewhere */}
@@ -1280,7 +1252,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           <stop offset={`${fadeCutoffPercent}%`} stopColor="white" stopOpacity="1" />
                           <stop offset="100%" stopColor="white" stopOpacity="0" />
                         </linearGradient>
-                        <mask id={`${uniqueId}-desktopFillBaseMaskElement`}>
+                        <mask id={`${uniqueId}-desktopFillBaseMaskElement`} maskUnits="userSpaceOnUse" x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight}>
                           <rect x="0" y="0" width={desktopSvgWidth} height={desktopSvgHeight} fill={`url(#${uniqueId}-desktopFillBaseMask)`} />
                         </mask>
                       </>
@@ -1291,11 +1263,11 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 {/* Base fill - always rendered, opacity controlled for smooth transitions */}
                 {/* Smooth transition when entering hover, no transition when leaving to prevent darker appearance */}
                 <path
-                  ref={desktopAreaBasePathRef}
+                  data-tl-area
                   d={desktopFillPath}
                   fill={`url(#${uniqueId}-desktopGradient)`}
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopFillBaseMaskElement)` : `url(#${uniqueId}-desktopMask)`}
-                  opacity={animationPhase === 'done' ? (desktopGradientStops ? "0.6" : "1") : "0"}
+                  opacity={desktopGradientStops ? HOVER_REST : 1}
                   style={desktopGradientStops ? { 
                     transition: 'opacity 0.2s ease-out',
                   } : {
@@ -1305,6 +1277,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 {/* Fill overlay with gradient opacity - 100% for immediate segments, 80% for second segments, 60% for rest */}
                 {/* Appears instantly when entering, disappears instantly when leaving to prevent darker appearance */}
                 <path
+                  data-tl-area
                   d={desktopFillPath}
                   fill={`url(#${uniqueId}-desktopGradient)`}
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopFillOpacityMask)` : `url(#${uniqueId}-desktopMask)`}
@@ -1318,6 +1291,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                 {/* Base line - always rendered, opacity controlled for instant transitions */}
                 {/* Line at 60% opacity - mask controls visibility to 60% */}
                 <path
+                  data-tl-line
+                  clipPath={entering ? `url(#${uniqueId}-desktopLineClip)` : undefined}
                   d={desktopGraphPath}
                   fill="none"
                   stroke="#d1d5db"
@@ -1325,11 +1300,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine60Mask)` : undefined}
-                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Line at 80% opacity - mask controls visibility to 80% */}
                 <path
+                  data-tl-line
+                  clipPath={entering ? `url(#${uniqueId}-desktopLineClip)` : undefined}
                   d={desktopGraphPath}
                   fill="none"
                   stroke="#d1d5db"
@@ -1337,11 +1313,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine80Mask)` : undefined}
-                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Line at 100% opacity - mask controls visibility to 100% */}
                 <path
+                  data-tl-line
+                  clipPath={entering ? `url(#${uniqueId}-desktopLineClip)` : undefined}
                   d={desktopGraphPath}
                   fill="none"
                   stroke="#d1d5db"
@@ -1349,18 +1326,18 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   mask={desktopGradientStops ? `url(#${uniqueId}-desktopLine100Mask)` : undefined}
-                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "1" : "0"}
                 />
                 {/* Base line at full opacity when not hovering */}
                 <path
+                  data-tl-line
+                  clipPath={entering ? `url(#${uniqueId}-desktopLineClip)` : undefined}
                   d={desktopGraphPath}
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  clipPath={`url(#${uniqueId}-desktopRevealClip)`}
                   opacity={desktopGradientStops ? "0" : "1"}
                 />
               </svg>
@@ -1387,19 +1364,10 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   const isUnrated = !brew.quality;
                   const isNewest = index === brews.length - 1;
 
-                  const isHovered = hoveredNodeIndex === index;
-                  
                   // Calculate opacity: desktop only - hovered node = 1.0, adjacent nodes = 0.8, others = 0.6
-                  let nodeOpacity = 1;
-                  if (!isMobile && hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length) {
-                    if (isHovered) {
-                      nodeOpacity = 1.0; // Hovered node at full opacity
-                    } else if (Math.abs(index - hoveredNodeIndex) === 1) {
-                      nodeOpacity = 0.8; // Adjacent nodes at 80%
-                    } else {
-                      nodeOpacity = 0.6; // Everything else at 60%
-                    }
-                  }
+                  const nodeOpacity = !isMobile && hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length
+                    ? hoverOpacityFor(Math.abs(index - hoveredNodeIndex))
+                    : 1;
 
                   return (
                       <div 
@@ -1410,7 +1378,7 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                       >
                         {/* Node Circle - centered on the curve */}
                         <button
-                          ref={(el) => { dotButtonRefs.current[index] = el; }}
+                          data-tl-dot
                           onClick={() => onSelectBrew(brew)}
                           className={`w-2.5 h-2.5 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
                             isUnrated 
@@ -1419,9 +1387,6 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                           }`}
                           style={{ 
                             marginTop: `${yPos - 5}px`,
-                            opacity: animationPhase === 'done' ? 1 : 0,
-                            transform: animationPhase === 'done' ? undefined : 'scale(0)',
-                            transition: animationPhase !== 'done' ? 'opacity 250ms ease-out, transform 250ms ease-out' : undefined,
                             backgroundColor: isUnrated ? 'transparent' : undefined,
                             ...(brew.quality === 2 ? {
                               backgroundColor: 'oklch(0.76 0.18 88.84)',
@@ -1444,12 +1409,8 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
                   
                   return (
                     <div 
-                      ref={addButtonWrapRef}
+                      data-tl-add
                       className="flex flex-col items-center min-w-[60px] md:min-w-[80px]"
-                      style={{
-                        opacity: animationPhase === 'done' ? 1 : 0,
-                        transition: animationPhase !== 'done' ? 'opacity 250ms ease-out' : undefined,
-                      }}
                     >
                       {/* Vertically centered button - responsive for mobile height */}
                       <button
@@ -1478,20 +1439,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
             <div className="flex items-start gap-2 md:gap-8 relative mt-3"> {/* Match node spacing gap-2 */}
               {brews.map((brew, index) => {
                 const { date, time } = formatNodeDateTime(brew.createdAt, index < brews.length - 1 ? brews[index + 1].createdAt : null);
-                const isHovered = hoveredNodeIndex === index;
                 
                 // Calculate opacity: desktop only - hovered node = 1.0, adjacent nodes = 0.8, others = 0.6
-                let labelOpacity = 1;
                 const isMobileView = typeof window !== 'undefined' && window.innerWidth < 768;
-                if (!isMobileView && hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length) {
-                  if (isHovered) {
-                    labelOpacity = 1.0; // Hovered node at full opacity
-                  } else if (Math.abs(index - hoveredNodeIndex) === 1) {
-                    labelOpacity = 0.8; // Adjacent nodes at 80%
-                  } else {
-                    labelOpacity = 0.6; // Everything else at 60%
-                  }
-                }
+                const labelOpacity = !isMobileView && hoveredNodeIndex !== null && hoveredNodeIndex !== brews.length
+                  ? hoverOpacityFor(Math.abs(index - hoveredNodeIndex))
+                  : 1;
 
                 const firstSuggestion = brew.suggestion?.full?.suggestions?.[0];
                 const hasSuggestion = firstSuggestion && 
@@ -1499,12 +1452,12 @@ function TimelineRow({ brews, onSelectBrew, formatNodeDateTime, coffeeId, brewMe
 
                 return (
                   <div 
-                    ref={(el) => { labelRefs.current[index] = el; }}
                     key={brew.id} 
+                    data-tl-label
                     className="flex flex-col items-center text-center min-w-[60px] md:min-w-[80px]"
                     style={{
-                      opacity: animationPhase === 'done' ? labelOpacity : 0,
-                      transition: animationPhase !== 'done' ? 'opacity 250ms ease-out' : 'opacity 0.2s',
+                      opacity: labelOpacity,
+                      transition: 'opacity 0.2s',
                     }}
                   >
                     <div 

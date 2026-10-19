@@ -15,6 +15,7 @@ import { CoffeesTableView } from './components/CoffeesTableView';
 import { CoffeesToolbar } from './components/CoffeesToolbar';
 import { BrewsToolbar, canCreateBrew } from './components/BrewsToolbar';
 import { AvatarSkeleton, BeanShelvesSkeleton, BrewCardsSkeleton } from './components/loaders/DashboardSkeleton';
+import { useRevealAfterPlaceholder } from './hooks/useRevealAfterPlaceholder';
 import { Profile } from './components/Profile';
 import { EquipmentDialog } from './components/EquipmentDialog';
 import { EspressoLoading } from './components/EspressoLoading';
@@ -132,6 +133,9 @@ export default function App() {
     }
     setPendingOpen(null);
   }, [loading, pendingOpen, currentUser, equipment, coffees]);
+
+  const revealAvatar = useRevealAfterPlaceholder(!currentUser && loading);
+  const revealBeans = useRevealAfterPlaceholder(loading);
 
   const openNewBrew = () => (loading ? setPendingOpen('newBrew') : setShowNewBrew(true));
   const openAddCoffee = () => (loading ? setPendingOpen('addCoffee') : setShowAddCoffee(true));
@@ -1535,7 +1539,7 @@ export default function App() {
                 {currentUser ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full">
+                      <button className={`focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full${revealAvatar ? ' reveal-in' : ''}`}>
                         <Avatar className="h-8 w-8 cursor-pointer hover:opacity-80 transition-opacity">
                           <AvatarImage src={currentUser.avatarUrl || ''} />
                           <AvatarFallback>
@@ -1713,33 +1717,35 @@ export default function App() {
                 newCoffeePending={pendingOpen === 'addCoffee'}
               />
             )}
-            {loading ? (
-              <BeanShelvesSkeleton />
-            ) : coffeesView === 'table' ? (
-              <CoffeesTableView
-                coffees={coffees}
-                brews={brews}
-                groupBy={groupBy}
-                onNewCoffee={() => setShowAddCoffee(true)}
-                onSelectCoffee={setSelectedCoffee}
-                onEditCoffee={handleEditCoffee}
-                onDuplicateCoffee={handleDuplicateCoffee}
-                onDeleteCoffee={(id) => setDeletingCoffeeId(id)}
-                onPrintQR={setQrCodeCoffee}
-              />
-            ) : (
-              <CoffeesShelvesView
-                coffees={coffees}
-                brews={brews}
-                groupBy={groupBy}
-                aliases={aliases}
-                onNewCoffee={() => setShowAddCoffee(true)}
-                onSelectCoffee={(coffee, siblings) => {
-                  setSelectedCoffee(coffee);
-                  setSelectedCoffeeSiblings(siblings ?? null);
-                }}
-              />
-            )}
+            <div className={`flex flex-col flex-1${revealBeans ? ' reveal-in' : ''}`}>
+              {loading ? (
+                <BeanShelvesSkeleton />
+              ) : coffeesView === 'table' ? (
+                <CoffeesTableView
+                  coffees={coffees}
+                  brews={brews}
+                  groupBy={groupBy}
+                  onNewCoffee={() => setShowAddCoffee(true)}
+                  onSelectCoffee={setSelectedCoffee}
+                  onEditCoffee={handleEditCoffee}
+                  onDuplicateCoffee={handleDuplicateCoffee}
+                  onDeleteCoffee={(id) => setDeletingCoffeeId(id)}
+                  onPrintQR={setQrCodeCoffee}
+                />
+              ) : (
+                <CoffeesShelvesView
+                  coffees={coffees}
+                  brews={brews}
+                  groupBy={groupBy}
+                  aliases={aliases}
+                  onNewCoffee={() => setShowAddCoffee(true)}
+                  onSelectCoffee={(coffee, siblings) => {
+                    setSelectedCoffee(coffee);
+                    setSelectedCoffeeSiblings(siblings ?? null);
+                  }}
+                />
+              )}
+            </div>
           </>
         )}
       </div>
