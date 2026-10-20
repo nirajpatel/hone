@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import coffeeBeansImage from '../../assets/coffee-beans.webp';
 
 // Placeholders for the dashboard's data while it loads. The real nav and toolbars render around them.
-// Brew card spacing and chart height follow BrewsTimelineView so the real cards land in the same place.
+// Brew card spacing, chart height and date columns follow BrewsTimelineView so the real cards land in the same place.
 const STYLES = `
 @keyframes hone-skel-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 .hone-skel-bar, .hone-skel-chart { animation: hone-skel-pulse 1.6s ease-in-out infinite; }
@@ -15,7 +15,7 @@ const STYLES = `
 .hone-skel-card { padding: 16px; }
 .hone-skel-chart { position: relative; height: 136px; overflow: hidden; }
 .hone-skel-block { position: absolute; left: 0; right: 0; top: 0; height: 90px; border-radius: 8px; background: linear-gradient(var(--color-gray-100), transparent); }
-.hone-skel-dates { position: absolute; left: 0; right: 0; top: 102px; height: 34px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); grid-auto-rows: 34px; column-gap: 8px; }
+.hone-skel-dates { position: absolute; left: 0; right: 0; top: 102px; height: 34px; padding: 0 8px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, 60px); grid-auto-rows: 34px; column-gap: 8px; }
 .hone-skel-date { display: flex; flex-direction: column; align-items: center; }
 .hone-skel-shelf { display: flex; gap: 16px; overflow: hidden; margin-top: 8px; }
 .hone-skel-bag { flex: none; width: 14em; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 1em; }
@@ -25,7 +25,7 @@ const STYLES = `
   .hone-skel-card { padding: 20px; }
   .hone-skel-chart { height: 166px; }
   .hone-skel-block { height: 120px; }
-  .hone-skel-dates { top: 132px; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); column-gap: 32px; }
+  .hone-skel-dates { top: 132px; grid-template-columns: repeat(auto-fill, 80px); column-gap: 32px; }
   .hone-skel-bag { width: 26em; display: flex; gap: 0.75em; padding: 0.75em; }
   .hone-skel-bag-image { width: 155px; flex: none; }
 }
