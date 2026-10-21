@@ -46,7 +46,7 @@ export function isReplacingBrewSkeleton() {
 }
 
 const CARD_COUNT = 4;
-// A line of the cards' 12px text, which renders 120/7px tall; rounding it leaves the skeleton short by a fraction per line.
+// A line of the date labels' 12px text, which renders 120/7px tall; rounding it leaves the skeleton short by a fraction per line.
 const SMALL_LINE = 120 / 7;
 // More date columns than the widest card holds; the extras wrap to a hidden second row.
 const COLUMN_COUNT = 24;
@@ -86,11 +86,11 @@ function SkeletonCard() {
   return (
     <div className="bg-white rounded-lg border border-gray-200 mobile-timeline-card hone-skel-card">
       <div className="mb-3">
-        <TextLine height={SMALL_LINE} width={72} barHeight={9} />
-        <TextLine height={24} width={150} barHeight={13} />
-        <TextLine height={20} width={190} barHeight={10} className="md:hidden" style={{ paddingTop: 2 }} />
+        <TextLine height={16} width={72} barHeight={9} />
+        <TextLine height={22} width={150} barHeight={13} />
+        <TextLine height={20} width={190} barHeight={10} className="md:hidden" />
         <TextLine height={20} width={290} barHeight={10} className="hidden md:block" />
-        <TextLine height={20} width={170} barHeight={10} className="md:hidden" style={{ paddingTop: 2 }} />
+        <TextLine height={20} width={170} barHeight={10} className="md:hidden" />
         <TextLine height={20} width={250} barHeight={10} className="hidden md:block" style={{ paddingTop: 4 }} />
       </div>
       <SkeletonChart />

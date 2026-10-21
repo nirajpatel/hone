@@ -286,6 +286,7 @@ export function BrewsTimelineView({
             // Override trend for exceptional brews
             const displayTrend: Trend = isExceptional ? 'dialed in' : trendInfo;
             const showTrend = hasSuggestion || isExceptional;
+            const cornerBadge = showTrend && isMobileWidth;
 
             return (
               <div
@@ -294,23 +295,21 @@ export function BrewsTimelineView({
                 style={{ '--tl-delay': `${entranceDelayFor(groupIndex)}ms` } as React.CSSProperties}
               >
                 {/* Header with Coffee and Method; fades in alongside its timeline's entrance (index.css) */}
-                <div className="mb-3 tl-card-header">
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
-                  <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.coffeeName}</h3>
-                  {/* On phones the badge shares this line, so it gets room to clear the name above and guidance below */}
-                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1" style={{ marginTop: isMobileWidth && showTrend ? 2 : 0 }}>
+                <div className="mb-3 tl-card-header relative">
+                  {/* On phones the badge sits in the corner, centered on the roaster line, so it never changes the text spacing */}
+                  {cornerBadge && (
+                    <span className="absolute right-0 flex" style={{ top: -2 }}>
+                      <TrendBadge trend={displayTrend} />
+                    </span>
+                  )}
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0" style={{ lineHeight: '16px', paddingRight: cornerBadge ? 110 : undefined }}>{group.roaster}</p>
+                  <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)', lineHeight: '22px' }}>{group.coffeeName}</h3>
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
                     <span>{capitalizeBrewMethod(group.method)}</span>
                     <span>•</span>
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     <span className="hidden md:inline">•</span>
                     <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
-                    {/* Mobile: Show trend on second line */}
-                    {showTrend && (
-                      <>
-                        <span className="md:hidden">•</span>
-                        <TrendBadge trend={displayTrend} className="md:hidden ml-0.5" />
-                      </>
-                    )}
                   </p>
                   {/* The third line is reserved even when empty so every card matches DashboardSkeleton's height */}
                   {/* Desktop: Show trend and guidance on third line */}
@@ -335,7 +334,7 @@ export function BrewsTimelineView({
                     )}
                   </p>
                   {/* Mobile: Show guidance on third line */}
-                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={showTrend ? { minHeight: 20, marginTop: 2 } : { minHeight: 24 }}>
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={{ minHeight: 20 }}>
                     {showTrend && (
                       <>
                         {isExceptional ? (
