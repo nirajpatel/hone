@@ -3839,6 +3839,11 @@ html {
     margin-bottom: 0 !important;
   }
 
+  /* Page toolbars sit a little further from the content than its cards sit from each other. */
+  .flex.items-center.justify-between.mb-4:has(> .page-section-header) {
+    margin-bottom: 6px !important;
+  }
+
   /* 1. Add / New button */
   .flex.items-center.justify-between.mb-4:not(.equipment-section-header) .mobile-add-button {
     order: 1;
@@ -3847,12 +3852,12 @@ html {
   }
 
   /* 2. Page header — side margins expand to full width; no vertical margins/padding creating gaps */
-  .flex.items-center.justify-between.mb-4 .mobile-section-header {
+  .flex.items-center.justify-between.mb-4 .page-section-header {
     color: #111827;
     background-color: #f9fafb;
     border-radius: 0.5rem;
     order: 2;
-    margin: 1em -0.75rem 0;
+    margin: 1.25em -0.75rem 0;
     padding: 0 0.75rem;
     font-size: 1rem;
     font-weight: 600;
@@ -4145,7 +4150,29 @@ html {
     margin-bottom: 0 !important;
   }
 
-  .mobile-section-header {
+  /* Page title and the add button share the top row; the view toggle and filters sit below. */
+  .flex.items-center.justify-between.mb-4:has(> .page-section-header) {
+    flex-wrap: wrap !important;
+    row-gap: .5rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .flex.items-center.justify-between.mb-4 .page-section-header {
+    order: 0;
+    flex: 1;
+    margin: 0;
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.75rem;
+  }
+
+  .flex.items-center.justify-between.mb-4:has(> .page-section-header) .desktop-filters {
+    order: 2 !important;
+    flex-basis: 100%;
+  }
+
+  .flex.items-center.justify-between.mb-4 .desktop-filters:empty {
     display: none !important;
   }
 

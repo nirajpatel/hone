@@ -11,19 +11,19 @@ const STYLES = `
 .hone-skel-bar, .hone-skel-chart { animation: hone-skel-pulse 1.6s ease-in-out infinite; }
 .hone-skel-bar { background: var(--color-gray-200); border-radius: 4px; max-width: 100%; }
 .hone-skel-line { display: flex; align-items: center; }
-.hone-skel-cards { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
+.hone-skel-cards { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; }
 .hone-skel-card { padding: 16px; }
-.hone-skel-chart { position: relative; height: 136px; overflow: hidden; }
+.hone-skel-chart { position: relative; height: calc(102px + 240px / 7); overflow: hidden; }
 .hone-skel-block { position: absolute; left: 0; right: 0; top: 0; height: 90px; border-radius: 8px; background: linear-gradient(var(--color-gray-100), transparent); }
-.hone-skel-dates { position: absolute; left: 0; right: 0; top: 102px; height: 34px; padding: 0 8px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, 60px); grid-auto-rows: 34px; column-gap: 8px; }
+.hone-skel-dates { position: absolute; left: 0; right: 0; top: 102px; height: calc(240px / 7); padding: 0 8px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fill, 60px); grid-auto-rows: calc(240px / 7); column-gap: 8px; }
 .hone-skel-date { display: flex; flex-direction: column; align-items: center; }
 .hone-skel-shelf { display: flex; gap: 16px; overflow: hidden; margin-top: 8px; }
 .hone-skel-bag { flex: none; width: 14em; background: #fff; border: 1px solid var(--color-gray-200); border-radius: 8px; padding: 1em; }
 .hone-skel-bag-image { height: 12.5em; border-radius: 4px; }
 @media (min-width: 768px) {
-  .hone-skel-cards { gap: 10px; padding-top: 0; }
+  .hone-skel-cards { gap: 16px; padding-top: 0; }
   .hone-skel-card { padding: 20px; }
-  .hone-skel-chart { height: 166px; }
+  .hone-skel-chart { height: calc(132px + 240px / 7); }
   .hone-skel-block { height: 120px; }
   .hone-skel-dates { top: 132px; grid-template-columns: repeat(auto-fill, 80px); column-gap: 32px; }
   .hone-skel-bag { width: 26em; display: flex; gap: 0.75em; padding: 0.75em; }
@@ -46,6 +46,8 @@ export function isReplacingBrewSkeleton() {
 }
 
 const CARD_COUNT = 4;
+// A line of the cards' 12px text, which renders 120/7px tall; rounding it leaves the skeleton short by a fraction per line.
+const SMALL_LINE = 120 / 7;
 // More date columns than the widest card holds; the extras wrap to a hidden second row.
 const COLUMN_COUNT = 24;
 const noop = () => {};
@@ -54,9 +56,9 @@ function Bar({ width, height }: { width: number; height: number }) {
   return <div className="hone-skel-bar" style={{ width, height }} />;
 }
 
-function TextLine({ height, width, barHeight, className }: { height: number; width: number; barHeight: number; className?: string }) {
+function TextLine({ height, width, barHeight, className, style }: { height: number; width: number; barHeight: number; className?: string; style?: CSSProperties }) {
   return (
-    <div className={className}>
+    <div className={className} style={style}>
       <div className="hone-skel-line" style={{ height }}>
         <Bar width={width} height={barHeight} />
       </div>
@@ -71,8 +73,8 @@ function SkeletonChart() {
       <div className="hone-skel-dates">
         {Array.from({ length: COLUMN_COUNT }, (_, i) => (
           <div key={i} className="hone-skel-date">
-            <div className="hone-skel-line" style={{ height: 17 }}><Bar width={36} height={9} /></div>
-            <div className="hone-skel-line" style={{ height: 17 }}><Bar width={44} height={9} /></div>
+            <div className="hone-skel-line" style={{ height: SMALL_LINE }}><Bar width={36} height={9} /></div>
+            <div className="hone-skel-line" style={{ height: SMALL_LINE }}><Bar width={44} height={9} /></div>
           </div>
         ))}
       </div>
@@ -84,12 +86,12 @@ function SkeletonCard() {
   return (
     <div className="bg-white rounded-lg border border-gray-200 mobile-timeline-card hone-skel-card">
       <div className="mb-3">
-        <TextLine height={17} width={72} barHeight={9} />
+        <TextLine height={SMALL_LINE} width={72} barHeight={9} />
         <TextLine height={24} width={150} barHeight={13} />
-        <TextLine height={20} width={190} barHeight={10} className="md:hidden" />
+        <TextLine height={20} width={190} barHeight={10} className="md:hidden" style={{ paddingTop: 2 }} />
         <TextLine height={20} width={290} barHeight={10} className="hidden md:block" />
-        <TextLine height={20} width={170} barHeight={10} className="md:hidden" />
-        <TextLine height={20} width={250} barHeight={10} className="hidden md:block" />
+        <TextLine height={20} width={170} barHeight={10} className="md:hidden" style={{ paddingTop: 2 }} />
+        <TextLine height={20} width={250} barHeight={10} className="hidden md:block" style={{ paddingTop: 4 }} />
       </div>
       <SkeletonChart />
     </div>

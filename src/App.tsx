@@ -121,7 +121,6 @@ export default function App() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [aliases, setAliases] = useState<{ roasterAliases: Record<string, string>; coffeeNameAliases: Record<string, string> }>({ roasterAliases: {}, coffeeNameAliases: {} });
-  const [isFeedbackHovered, setIsFeedbackHovered] = useState(false);
   // New Brew or Add Bag tapped while the dashboard's data is loading; the form opens once it arrives.
   const [pendingOpen, setPendingOpen] = useState<'newBrew' | 'addCoffee' | null>(null);
 
@@ -2128,58 +2127,12 @@ export default function App() {
         )
       )}
 
-      {/* Floating Feedback Button - Only show when logged in */}
       {currentUser && (
-        <>
-          <button
-            type="button"
-            onClick={() => setShowFeedback(true)}
-            onMouseEnter={() => setIsFeedbackHovered(true)}
-            onMouseLeave={() => setIsFeedbackHovered(false)}
-            style={{
-              position: 'fixed',
-              bottom: '24px',
-              right: '24px',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              gap: isFeedbackHovered ? '10px' : '0',
-              backgroundColor: isFeedbackHovered ? '#1f2937' : '#111827',
-              color: '#ffffff',
-              paddingTop: '8px',
-              paddingBottom: '8px',
-              paddingLeft: '12px',
-              paddingRight: '12px',
-              borderRadius: '8px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '15px',
-              fontWeight: 500,
-              transition: 'background-color 0.2s, gap 0.2s',
-            }}
-            aria-label="Send feedback"
-          >
-            <MessageSquare className="w-5 h-5" style={{ flexShrink: 0 }} />
-            <span 
-              style={{
-                opacity: isFeedbackHovered ? 1 : 0,
-                maxWidth: isFeedbackHovered ? '200px' : '0',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                transition: 'opacity 0.2s, max-width 0.2s',
-                fontSize: '14px',
-              }}
-            >
-              Feedback
-            </span>
-          </button>
-          <FeedbackDialog
-            open={showFeedback}
-            onOpenChange={setShowFeedback}
-            userEmail={currentUser.email}
-          />
-        </>
+        <FeedbackDialog
+          open={showFeedback}
+          onOpenChange={setShowFeedback}
+          userEmail={currentUser.email}
+        />
       )}
       
       {/* Footer */}

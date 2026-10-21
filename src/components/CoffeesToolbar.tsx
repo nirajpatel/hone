@@ -76,27 +76,16 @@ export function CoffeesToolbar({
             {/* Group By */}
             <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
               <SelectTrigger className="w-[180px] cursor-default text-sm">
-                <span>
-                  {groupBy === 'month' && (
-                    <>
-                      <span className="hidden md:inline">By Roast Month</span>
-                      <span className="md:hidden">By Date</span>
-                    </>
-                  )}
-                  {groupBy === 'coffee' && 'By Roaster'}
-                </span>
+                <span>{groupBy === 'month' ? 'By Roast Month' : 'By Roaster'}</span>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="month">
-                  <span className="hidden md:inline">By Roast Month</span>
-                  <span className="md:hidden">By Date</span>
-                </SelectItem>
+                <SelectItem value="month">By Roast Month</SelectItem>
                 <SelectItem value="coffee">By Roaster</SelectItem>
               </SelectContent>
             </Select>
       </div>
 
-      <h2 className="mobile-section-header">Coffee Collection</h2>
+      <h2 className="page-section-header">Coffee Collection</h2>
 
       <Button onClick={onNewCoffee} className="cursor-pointer mobile-add-button" aria-busy={newCoffeePending || undefined}>
         {newCoffeePending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}

@@ -181,70 +181,32 @@ export function BrewsTimelineView({
   };
 
   // Calculate trend from rated brews
-  const calculateTrend = (brews: Brew[]) => {
+  const calculateTrend = (brews: Brew[]): Trend => {
     // Filter to only rated brews
     const ratedBrews = brews.filter(b => b.quality);
     const count = ratedBrews.length;
     
     // If less than 2 rated brews: show "No trend"
-    if (count < 2) {
-      return { 
-        trend: 'no trend', 
-        icon: <Minus className="w-3.5 h-3.5" />
-      };
-    }
+    if (count < 2) return 'no trend';
     
     // Check if last 2 are both Bad (quality === 1)
-    if (count >= 2) {
-      const last2 = ratedBrews.slice(-2);
-      if (last2[0].quality === 1 && last2[1].quality === 1) {
-        return { 
-          trend: 'needs work', 
-          icon: <TrendingDown className="w-3.5 h-3.5" />
-        };
-      }
-    }
+    const last2 = ratedBrews.slice(-2);
+    if (last2[0].quality === 1 && last2[1].quality === 1) return 'needs work';
     
     // If 4 or more rated brews: use split-halves average
     if (count >= 4) {
-      const last4 = ratedBrews.slice(-4);
-      const ratings = last4.map(b => b.quality!);
+      const ratings = ratedBrews.slice(-4).map(b => b.quality!);
       
       // Split into halves: first 2 (earlier) and last 2 (recent)
-      const earlier = ratings.slice(0, 2);
-      const recent = ratings.slice(2, 4);
-      
-      // Calculate averages
-      const avgEarlier = (earlier[0] + earlier[1]) / 2;
-      const avgRecent = (recent[0] + recent[1]) / 2;
-      
-      // Determine trend
+      const avgEarlier = (ratings[0] + ratings[1]) / 2;
+      const avgRecent = (ratings[2] + ratings[3]) / 2;
       const diff = avgRecent - avgEarlier;
       
       // If both averages round down to 1 (bad), always show "needs work"
-      if (Math.floor(avgEarlier) === 1 && Math.floor(avgRecent) === 1) {
-        return { 
-          trend: 'needs work', 
-          icon: <TrendingDown className="w-3.5 h-3.5" />
-        };
-      }
-      
-      if (diff >= 0.5) {
-        return { 
-          trend: 'improving', 
-          icon: <TrendingUp className="w-3.5 h-3.5" />
-        };
-      } else if (diff <= -0.5) {
-        return { 
-          trend: 'needs work', 
-          icon: <TrendingDown className="w-3.5 h-3.5" />
-        };
-      } else {
-        return { 
-          trend: 'stable', 
-          icon: <Minus className="w-3.5 h-3.5" />
-        };
-      }
+      if (Math.floor(avgEarlier) === 1 && Math.floor(avgRecent) === 1) return 'needs work';
+      if (diff >= 0.5) return 'improving';
+      if (diff <= -0.5) return 'needs work';
+      return 'stable';
     }
     
     // Else (2 or 3 rated brews): compare first vs last
@@ -253,29 +215,10 @@ export function BrewsTimelineView({
     const diff = lastQuality - firstQuality;
     
     // If both qualities are 1 (bad), always show "needs work"
-    if (firstQuality === 1 && lastQuality === 1) {
-      return { 
-        trend: 'needs work', 
-        icon: <TrendingDown className="w-3.5 h-3.5" />
-      };
-    }
-    
-    if (diff >= 0.5) {
-      return { 
-        trend: 'improving', 
-        icon: <TrendingUp className="w-3.5 h-3.5" />
-      };
-    } else if (diff <= -0.5) {
-      return { 
-        trend: 'needs work', 
-        icon: <TrendingDown className="w-3.5 h-3.5" />
-      };
-    } else {
-      return { 
-        trend: 'stable', 
-        icon: <Minus className="w-3.5 h-3.5" />
-      };
-    }
+    if (firstQuality === 1 && lastQuality === 1) return 'needs work';
+    if (diff >= 0.5) return 'improving';
+    if (diff <= -0.5) return 'needs work';
+    return 'stable';
   };
 
   return (
@@ -320,7 +263,7 @@ export function BrewsTimelineView({
           </div>
         )
       ) : (
-        <div className={isMobileWidth ? 'space-y-2 pt-2.5' : ''} style={!isMobileWidth ? { display: 'flex', flexDirection: 'column', gap: '10px' } : undefined}>
+        <div className={isMobileWidth ? 'pt-2.5' : ''} style={{ display: 'flex', flexDirection: 'column', gap: isMobileWidth ? '12px' : '16px' }}>
           {sortedGroups.map(([key, group], groupIndex) => {
             // Sort brews by date ascending for timeline (oldest to newest left to right)
             const sortedExtractions = [...group.brews].sort((a, b) => 
@@ -341,9 +284,8 @@ export function BrewsTimelineView({
               (firstSuggestion.confidence === 'Medium' || firstSuggestion.confidence === 'High');
             
             // Override trend for exceptional brews
-            const displayTrendInfo = isExceptional 
-              ? { trend: 'Dialed In', icon: <Sparkles className="w-3.5 h-3.5" /> }
-              : trendInfo;
+            const displayTrend: Trend = isExceptional ? 'dialed in' : trendInfo;
+            const showTrend = hasSuggestion || isExceptional;
 
             return (
               <div
@@ -355,41 +297,28 @@ export function BrewsTimelineView({
                 <div className="mb-3 tl-card-header">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0">{group.roaster}</p>
                   <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)' }}>{group.coffeeName}</h3>
-                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
+                  {/* On phones the badge shares this line, so it gets room to clear the name above and guidance below */}
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1" style={{ marginTop: isMobileWidth && showTrend ? 2 : 0 }}>
                     <span>{capitalizeBrewMethod(group.method)}</span>
                     <span>•</span>
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     <span className="hidden md:inline">•</span>
                     <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
                     {/* Mobile: Show trend on second line */}
-                    {(hasSuggestion || isExceptional) && (
+                    {showTrend && (
                       <>
                         <span className="md:hidden">•</span>
-                        <span className="md:hidden flex items-center gap-1">
-                          {displayTrendInfo && (
-                            <>
-                              {displayTrendInfo.icon}
-                              <span>{displayTrendInfo.trend.charAt(0).toUpperCase() + displayTrendInfo.trend.slice(1)}</span>
-                            </>
-                          )}
-                        </span>
+                        <TrendBadge trend={displayTrend} className="md:hidden ml-0.5" />
                       </>
                     )}
                   </p>
                   {/* The third line is reserved even when empty so every card matches DashboardSkeleton's height */}
                   {/* Desktop: Show trend and guidance on third line */}
-                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 hidden md:flex" style={{ minHeight: 20 }}>
-                    {(hasSuggestion || isExceptional) && (
+                  <p className="text-sm text-gray-500 mt-0 flex items-center hidden md:flex" style={{ minHeight: 20, marginTop: 4, gap: 6 }}>
+                    {showTrend && (
                       <>
-                        {displayTrendInfo && (
-                          <>
-                            <span className="flex items-center gap-1">
-                              {displayTrendInfo.icon}
-                              <span>{displayTrendInfo.trend.charAt(0).toUpperCase() + displayTrendInfo.trend.slice(1)}</span>
-                            </span>
-                            <span>•</span>
-                          </>
-                        )}
+                        <TrendBadge trend={displayTrend} />
+                        <span>•</span>
                         {isExceptional ? (
                           'No adjustment needed'
                         ) : (
@@ -406,8 +335,8 @@ export function BrewsTimelineView({
                     )}
                   </p>
                   {/* Mobile: Show guidance on third line */}
-                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={{ minHeight: 20 }}>
-                    {(hasSuggestion || isExceptional) && (
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={showTrend ? { minHeight: 20, marginTop: 2 } : { minHeight: 24 }}>
+                    {showTrend && (
                       <>
                         {isExceptional ? (
                           'No adjustment needed'
@@ -442,6 +371,30 @@ export function BrewsTimelineView({
         </div>
       )}
     </>
+  );
+}
+
+type Trend = 'no trend' | 'needs work' | 'improving' | 'stable' | 'dialed in';
+
+// Tints follow the timeline's quality dots: green for good, amber for decent, gray when there's no direction.
+const TREND_BADGES: Record<Trend, { label: string; Icon: typeof Minus; color: string; background: string }> = {
+  'dialed in': { label: 'Dialed in', Icon: Sparkles, color: 'oklch(45% 0.14 149)', background: 'oklch(96% 0.035 149)' },
+  improving: { label: 'Improving', Icon: TrendingUp, color: 'oklch(45% 0.14 149)', background: 'oklch(96% 0.035 149)' },
+  'needs work': { label: 'Needs work', Icon: TrendingDown, color: 'oklch(50% 0.12 70)', background: 'oklch(96% 0.05 88)' },
+  stable: { label: 'Stable', Icon: Minus, color: '#4b5563', background: '#f3f4f6' },
+  'no trend': { label: 'No trend', Icon: Minus, color: '#4b5563', background: '#f3f4f6' },
+};
+
+function TrendBadge({ trend, className = '' }: { trend: Trend; className?: string }) {
+  const { label, Icon, color, background } = TREND_BADGES[trend];
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full text-xs whitespace-nowrap flex-none ${className}`}
+      style={{ color, background, height: 20, padding: '0 8px', fontWeight: 'var(--font-weight-medium)' }}
+    >
+      <Icon className="w-3 h-3" />
+      {label}
+    </span>
   );
 }
 
@@ -1393,12 +1346,12 @@ function TimelineRow({ entranceIndex = 0, brews, onSelectBrew, formatNodeDateTim
                           onClick={() => onSelectBrew(brew)}
                           className={`w-2.5 h-2.5 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 relative z-10 border-2 ${
                             isUnrated 
-                              ? 'border-dashed bg-transparent border-gray-400' 
+                              ? 'bg-white border-gray-400' 
                               : `${dotColor} ${dotBorderColor} ${isNewest && animationPhase === 'done' ? 'animate-radiate' : ''}`
                           }`}
                           style={{ 
                             marginTop: `${yPos - 5}px`,
-                            backgroundColor: isUnrated ? 'transparent' : undefined,
+                            backgroundColor: isUnrated ? '#fff' : undefined,
                             ...(brew.quality === 2 ? {
                               backgroundColor: 'oklch(0.76 0.18 88.84)',
                               borderColor: 'oklch(0.76 0.18 88.84)'

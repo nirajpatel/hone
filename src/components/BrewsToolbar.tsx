@@ -144,21 +144,10 @@ export function BrewsToolbar({
             {groupBy && onGroupByChange && (
               <Select value={groupBy} onValueChange={(v) => onGroupByChange(v as 'month' | 'coffee')}>
                 <SelectTrigger className="w-[180px] cursor-default text-sm">
-                  <span>
-                    {groupBy === 'month' && (
-                      <>
-                        <span className="hidden md:inline">By Month</span>
-                        <span className="md:hidden">By Date</span>
-                      </>
-                    )}
-                    {groupBy === 'coffee' && 'By Coffee'}
-                  </span>
+                  <span>{groupBy === 'month' ? 'By Date' : 'By Coffee'}</span>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="month">
-                    <span className="hidden md:inline">By Month</span>
-                    <span className="md:hidden">By Date</span>
-                  </SelectItem>
+                  <SelectItem value="month">By Date</SelectItem>
                   <SelectItem value="coffee">By Coffee</SelectItem>
                 </SelectContent>
               </Select>
@@ -167,8 +156,7 @@ export function BrewsToolbar({
         )}
       </div>
       
-      {/* Mobile Header */}
-      <h2 className="mobile-section-header">
+      <h2 className="page-section-header">
         Brew History
       </h2>
       
