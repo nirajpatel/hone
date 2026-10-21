@@ -286,8 +286,6 @@ export function BrewsTimelineView({
             // Override trend for exceptional brews
             const displayTrend: Trend = isExceptional ? 'dialed in' : trendInfo;
             const showTrend = hasSuggestion || isExceptional;
-            const cornerBadge = showTrend && isMobileWidth;
-
             return (
               <div
                 key={key}
@@ -295,14 +293,8 @@ export function BrewsTimelineView({
                 style={{ '--tl-delay': `${entranceDelayFor(groupIndex)}ms` } as React.CSSProperties}
               >
                 {/* Header with Coffee and Method; fades in alongside its timeline's entrance (index.css) */}
-                <div className="mb-3 tl-card-header relative">
-                  {/* On phones the badge sits in the corner, centered on the roaster line, so it never changes the text spacing */}
-                  {cornerBadge && (
-                    <span className="absolute right-0 flex" style={{ top: -2 }}>
-                      <TrendBadge trend={displayTrend} />
-                    </span>
-                  )}
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0" style={{ lineHeight: '16px', paddingRight: cornerBadge ? 110 : undefined }}>{group.roaster}</p>
+                <div className="mb-3 tl-card-header">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate mb-0" style={{ lineHeight: '16px' }}>{group.roaster}</p>
                   <h3 className="text-gray-900 mb-0" style={{ fontWeight: 'var(--font-weight-medium)', lineHeight: '22px' }}>{group.coffeeName}</h3>
                   <p className="text-sm text-gray-500 mt-0 flex items-center gap-1">
                     <span>{capitalizeBrewMethod(group.method)}</span>
@@ -310,6 +302,13 @@ export function BrewsTimelineView({
                     <span>{sortedExtractions.length} {sortedExtractions.length === 1 ? 'brew' : 'brews'}</span>
                     <span className="hidden md:inline">•</span>
                     <span className="hidden md:inline">Last brewed {formatLastBrewedDate(group.lastExtractionDate)}</span>
+                    {/* Mobile: Show trend on second line; a shorter pill keeps clear of the lines above and below */}
+                    {showTrend && (
+                      <>
+                        <span className="md:hidden">•</span>
+                        <TrendBadge trend={displayTrend} className="md:hidden ml-0.5" height={18} />
+                      </>
+                    )}
                   </p>
                   {/* The third line is reserved even when empty so every card matches DashboardSkeleton's height */}
                   {/* Desktop: Show trend and guidance on third line */}
@@ -334,7 +333,7 @@ export function BrewsTimelineView({
                     )}
                   </p>
                   {/* Mobile: Show guidance on third line */}
-                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={{ minHeight: 20 }}>
+                  <p className="text-sm text-gray-500 mt-0 flex items-center gap-1 md:hidden" style={{ minHeight: 20, marginTop: 1 }}>
                     {showTrend && (
                       <>
                         {isExceptional ? (
@@ -384,12 +383,12 @@ const TREND_BADGES: Record<Trend, { label: string; Icon: typeof Minus; color: st
   'no trend': { label: 'No trend', Icon: Minus, color: '#4b5563', background: '#f3f4f6' },
 };
 
-function TrendBadge({ trend, className = '' }: { trend: Trend; className?: string }) {
+function TrendBadge({ trend, className = '', height = 20 }: { trend: Trend; className?: string; height?: number }) {
   const { label, Icon, color, background } = TREND_BADGES[trend];
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full text-xs whitespace-nowrap flex-none ${className}`}
-      style={{ color, background, height: 20, padding: '0 8px', fontWeight: 'var(--font-weight-medium)' }}
+      style={{ color, background, height, padding: '0 8px', fontWeight: 'var(--font-weight-medium)' }}
     >
       <Icon className="w-3 h-3" />
       {label}

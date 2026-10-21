@@ -90,7 +90,7 @@ function SkeletonCard() {
         <TextLine height={22} width={150} barHeight={13} />
         <TextLine height={20} width={190} barHeight={10} className="md:hidden" />
         <TextLine height={20} width={290} barHeight={10} className="hidden md:block" />
-        <TextLine height={20} width={170} barHeight={10} className="md:hidden" />
+        <TextLine height={20} width={170} barHeight={10} className="md:hidden" style={{ paddingTop: 1 }} />
         <TextLine height={20} width={250} barHeight={10} className="hidden md:block" style={{ paddingTop: 4 }} />
       </div>
       <SkeletonChart />
